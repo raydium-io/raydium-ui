@@ -1,5 +1,11 @@
 <template>
-  <Header class="header">1 </Header>
+  <Header class="header fs-container">
+    <img class="logo" src="@/assets/icons/logo-text.svg" />
+
+    <Nav />
+
+    <Wallet />
+  </Header>
 </template>
 
 <script lang="ts">
@@ -19,5 +25,9 @@ export default Vue.extend({
 <style lang="less" scoped>
 .header {
   border-bottom: 2px solid #1c274f;
+
+  .logo {
+    height: 35px;
+  }
 }
 </style>

@@ -1,4 +1,7 @@
+import lessToJson from 'less-to-json'
 import path from 'path'
+
+const lessVariables = lessToJson('src/styles/variables.less')
 
 export default {
   srcDir: './src/',
@@ -27,7 +30,16 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: [
+    {
+      src: '@/styles/antd.less',
+      lang: 'less',
+    },
+    {
+      src: '@/styles/global.less',
+      lang: 'less',
+    },
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
@@ -61,12 +73,7 @@ export default {
     loaders: {
       less: {
         javascriptEnabled: true,
-        modifyVars: {
-          // https://github.com/ant-design/ant-design/blob/master/components/style/themes/default.less
-          // 'primary-color': '#666ee8',
-          'layout-header-background': '#131A35',
-          'layout-body-background': '#131A35',
-        },
+        modifyVars: lessVariables,
       },
     },
 
