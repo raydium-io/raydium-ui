@@ -42,7 +42,7 @@ export default {
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['@/plugins/notify.ts'],
 
   router: {
     // 在每页渲染前运行 middleware/route.js 中间件的逻辑

@@ -24,6 +24,8 @@
   "dependencies": {
     "@nuxt/typescript-runtime": "^2.0.1",
     "@nuxtjs/axios": "^5.12.5",
+    "@project-serum/sol-wallet-adapter": "^0.1.5",
+    "@solana/web3.js": "^0.92.2",
     "ant-design-vue": "^1.7.2",
     "core-js": "^3.8.3",
     "nuxt": "^2.14.12",

@@ -1,16 +1,18 @@
 export const state = () => ({
   connected: false,
-  wallet: null,
+  address: '',
 })
 
 export const mutations = {
-  connect(state: any, wallet: any) {
+  connected(state: any, address: any) {
     state.connected = true
-    state.wallet = wallet
+
+    state.address = address
   },
 
-  disconnect(state: any) {
+  disconnected(state: any) {
     state.connected = false
-    state.wallet = null
+
+    state.address = ''
   },
 }

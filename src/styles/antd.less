@@ -1,8 +1,30 @@
 @import './variables.less';
 
+.ant-notification-notice {
+  background: @modal-header-bg !important;
+
+  .ant-notification-notice-message {
+    color: @text-color;
+  }
+
+  .ant-notification-notice-description {
+    color: rgba(241, 241, 242, 0.75);
+  }
+
+  .ant-notification-notice-close {
+    color: @text-color;
+  }
+}
+
 button.ant-btn-background-ghost {
-  border-color: @primary-color !important;
+  border-color: #5ac4be !important;
   background: rgba(90, 196, 190, 0.1) !important;
+
+  &:active,
+  &:focus,
+  &:hover {
+    color: #5ac4be !important;
+  }
 }
 
 .ant-card.ant-card-bordered {
