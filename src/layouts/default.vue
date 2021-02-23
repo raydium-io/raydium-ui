@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <Header />
+    <Head />
 
     <Content>
       <Nuxt />
@@ -10,15 +10,23 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Component from 'vue-class-component'
 
 import { Layout } from 'ant-design-vue'
 
 const { Content } = Layout
 
-export default Vue.extend({
+@Component({
   components: {
     Layout,
     Content,
   },
 })
+export default class DefaultLayout extends Vue {}
 </script>
+
+<style lang="less">
+.ant-layout-content {
+  min-height: calc(100vh - 64px);
+}
+</style>

@@ -1,1 +1,1 @@
-export {} from '@ant-design/icons'
+export { CloseOutline } from '@ant-design/icons'

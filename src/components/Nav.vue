@@ -1,37 +1,60 @@
 <template>
-  <Menu mode="horizontal">
-    <MenuItem key="trading">
-      <a :href="url.trading" target="_blank" rel="noopener noreferrer">
-        Trading
+  <Menu v-model="currentRoute" mode="horizontal" @click="changeRoute">
+    <MenuItem v-for="(extra, name) in navs" :key="name">
+      <a
+        v-if="extra"
+        :href="url[name]"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {{ name }}
       </a>
+      <span v-else> {{ name }} </span>
     </MenuItem>
-    <MenuItem key="swap">Swap</MenuItem>
-    <MenuItem key="liquidity">Liquidity</MenuItem>
-    <MenuItem key="staking">Staking</MenuItem>
-    <MenuItem key="farms">Farms</MenuItem>
   </Menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import Component from 'vue-class-component'
+
 import { mapState } from 'vuex'
 
 import { Menu } from 'ant-design-vue'
 
 const MenuItem = Menu.Item
 
-export default Vue.extend({
+@Component({
   components: {
     Menu,
     MenuItem,
   },
 
-  data() {
-    return {}
+  computed: {
+    ...mapState(['url']),
+    currentRoute: {
+      get() {
+        return [this.$store.state.route.name]
+      },
+      set() {},
+    },
   },
-
-  computed: mapState(['url']),
 })
+export default class Index extends Vue {
+  navs: any = {
+    trading: true,
+    swap: false,
+    liquidity: false,
+    staking: false,
+    farms: false,
+  }
+
+  changeRoute({ key }: { key: string }): void {
+    if (!this.navs[key]) {
+      this.$router.push(`/${key}`)
+    }
+  }
+}
 </script>
 
 <style lang="less">

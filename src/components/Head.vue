@@ -10,16 +10,18 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Component from 'vue-class-component'
 
 import { Layout } from 'ant-design-vue'
 
 const { Header } = Layout
 
-export default Vue.extend({
+@Component({
   components: {
     Header,
   },
 })
+export default class Head extends Vue {}
 </script>
 
 <style lang="less" scoped>
