@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt-ts",
-    "build": "nuxt-ts build",
-    "start": "nuxt-ts start",
-    "generate": "nuxt-ts generate",
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{vue,css}\" --ignore-path .gitignore",
     "lint": "yarn lint:js && yarn lint:style",
@@ -22,16 +22,16 @@
     }
   },
   "dependencies": {
-    "@nuxt/typescript-runtime": "^2.0.1",
     "@nuxtjs/axios": "^5.12.5",
     "@project-serum/sol-wallet-adapter": "^0.1.5",
     "@solana/web3.js": "^0.92.2",
-    "ant-design-vue": "^1.7.2",
+    "ant-design-vue": "^1.7.3",
     "core-js": "^3.8.3",
-    "nuxt": "^2.14.12",
+    "nuxt": "^2.15.2",
     "vue-class-component": "^7.2.6"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.13.4",
     "@nuxt/types": "^2.14.12",
     "@nuxt/typescript-build": "^2.0.4",
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
@@ -39,7 +39,6 @@
     "@nuxtjs/stylelint-module": "^4.0.0",
     "@vue/test-utils": "^1.1.2",
     "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "babel-plugin-import": "^1.13.3",
     "eslint": "^7.18.0",
