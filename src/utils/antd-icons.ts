@@ -14,4 +14,6 @@ export {
   // sort
   ArrowUpOutline,
   ArrowDownOutline,
+  // swap
+  SwapOutline,
 } from '@ant-design/icons'

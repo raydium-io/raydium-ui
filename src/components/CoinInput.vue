@@ -2,10 +2,11 @@
   <div class="coin-select">
     <div class="label fs-container">
       <span>{{ label }}</span>
-      <span v-if="showBalance"> Balance: 0.01 </span>
+      <span v-if="balance"> Balance: {{ balance }} </span>
     </div>
     <div class="fs-container">
       <input
+        v-model="amount"
         inputmode="decimal"
         autocomplete="off"
         autocorrect="off"
@@ -16,10 +17,11 @@
         maxlength="79"
         spellcheck="false"
       />
-      <button class="fc-container" @click="openCoinSelect">
-        <span>
-          {{ coinName }}
-        </span>
+      <button class="fc-container" @click="onSelect">
+        <div v-if="coinName">
+          <span>{{ coinName }}</span>
+        </div>
+        <span v-else>Select a token</span>
         <Icon type="caret-down" />
       </button>
     </div>
@@ -29,8 +31,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-
 import { Button, Icon } from 'ant-design-vue'
+
+import { inputRegex, escapeRegExp } from '@/utils/regex'
 
 const CoinInputProps = Vue.extend({
   props: {
@@ -40,15 +43,11 @@ const CoinInputProps = Vue.extend({
     },
     coinName: {
       type: String,
-      default: 'RAY',
+      default: '',
     },
-    showBalance: {
-      type: Boolean,
-      default: false,
-    },
-    openCoinSelect: {
-      type: Function,
-      required: true,
+    balance: {
+      type: String,
+      default: '',
     },
   },
 })
@@ -58,14 +57,30 @@ const CoinInputProps = Vue.extend({
     Button,
     Icon,
   },
+
+  watch: {
+    amount(newAmount: string, oldAmount: string) {
+      if (inputRegex.test(escapeRegExp(newAmount))) {
+        this.$emit('onInput', newAmount)
+      } else {
+        ;(this as any).amount = oldAmount
+      }
+    },
+  },
 })
-export default class CoinInput extends CoinInputProps {}
+export default class CoinInput extends CoinInputProps {
+  amount = ''
+
+  onSelect() {
+    this.$emit('onSelect')
+  }
+}
 </script>
 
 <style lang="less" scoped>
 .coin-select {
   padding: 12px 16px;
-  background: rgb(0, 8, 41);
+  background: #000829;
   border-radius: 4px;
 
   .label {

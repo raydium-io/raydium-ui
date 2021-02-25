@@ -39,18 +39,14 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-
 import { mapState } from 'vuex'
-
 import { Button, Modal, Icon } from 'ant-design-vue'
-
 import {
   Connection,
   // types
   AccountInfo,
   Context,
 } from '@solana/web3.js'
-
 // @ts-ignore
 import SolanaWallet from '@project-serum/sol-wallet-adapter'
 
