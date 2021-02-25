@@ -20,9 +20,10 @@
     <div class="card">
       <div class="card-body">
         <CoinInput
+          v-model="fromCoinAmount"
           label="From"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
-          @onInput="onFromCoinInput"
+          @onInput="(amount) => (fromCoinAmount = amount)"
           @onSelect="openFromCoinSelect"
         />
 
@@ -33,9 +34,11 @@
         </div>
 
         <CoinInput
+          v-model="toCoinAmount"
           label="To (Estimate)"
           :coin-name="toCoin ? toCoin.symbol : ''"
-          @onInput="onToCoinInput"
+          :show-max="false"
+          @onInput="(amount) => (toCoinAmount = amount)"
           @onSelect="openToCoinSelect"
         />
       </div>
@@ -53,16 +56,35 @@ import {
   getTokenByMintAddress,
   TokenInfo,
 } from '@/utils/tokens'
+import { inputRegex, escapeRegExp } from '@/utils/regex'
 
 @Component({
   components: {
     Icon,
     Tooltip,
   },
+
+  watch: {
+    fromCoinAmount(newAmount: string, oldAmount: string) {
+      this.$nextTick(() => {
+        if (!inputRegex.test(escapeRegExp(newAmount))) {
+          ;(this as any).fromCoinAmount = oldAmount
+        }
+      })
+    },
+
+    toCoinAmount(newAmount: string, oldAmount: string) {
+      this.$nextTick(() => {
+        if (!inputRegex.test(escapeRegExp(newAmount))) {
+          ;(this as any).toCoinAmount = oldAmount
+        }
+      })
+    },
+  },
 })
 export default class Swap extends Vue {
   coinSelectShow = false
-  // 正在选择哪个的币种
+  // 正在弹框选择哪个的币种
   selectFromCoin = true
 
   fromCoin: TokenInfo | null = getTokenBySymbol('RAY')
@@ -91,6 +113,7 @@ export default class Swap extends Vue {
       // 如果选的币种被另一个选了 把另一个重置
       if (this.toCoin?.mintAddress === mintAddress) {
         this.toCoin = null
+        this.changeCoinAmountPosition()
       }
     } else {
       this.toCoin = getTokenByMintAddress(mintAddress)
@@ -98,6 +121,7 @@ export default class Swap extends Vue {
       // 如果选的币种被另一个选了 把另一个重置
       if (this.fromCoin?.mintAddress === mintAddress) {
         this.fromCoin = null
+        this.changeCoinAmountPosition()
       }
     }
 
@@ -107,22 +131,20 @@ export default class Swap extends Vue {
   changeCoinPosition() {
     const tempFromCoin = this.fromCoin
     const tempToCoin = this.toCoin
-    const tempFromCoinAmount = this.fromCoinAmount
-    const tempToCoinAmount = this.toCoinAmount
 
     this.fromCoin = tempToCoin
     this.toCoin = tempFromCoin
+
+    this.changeCoinAmountPosition()
+  }
+
+  // 切换币种金额位置
+  changeCoinAmountPosition() {
+    const tempFromCoinAmount = this.fromCoinAmount
+    const tempToCoinAmount = this.toCoinAmount
+
     this.fromCoinAmount = tempToCoinAmount
     this.toCoinAmount = tempFromCoinAmount
-  }
-
-  onFromCoinInput(amount: string) {
-    console.log(amount)
-    this.fromCoinAmount = amount
-  }
-
-  onToCoinInput(amount: string) {
-    this.toCoinAmount = amount
   }
 }
 </script>

@@ -4,9 +4,9 @@
       <span>{{ label }}</span>
       <span v-if="balance"> Balance: {{ balance }} </span>
     </div>
-    <div class="fs-container">
+    <div class="coin-input fs-container">
       <input
-        v-model="amount"
+        :value="value"
         inputmode="decimal"
         autocomplete="off"
         autocorrect="off"
@@ -16,9 +16,14 @@
         minlength="1"
         maxlength="79"
         spellcheck="false"
+        @input="$emit('onInput', $event.target.value)"
       />
-      <button class="fc-container" @click="$emit('onSelect')">
-        <div v-if="coinName">
+      <button v-if="showMax && balance && value < balance" class="max-button">
+        MAX
+      </button>
+      <button class="select-button fc-container" @click="$emit('onSelect')">
+        <div v-if="coinName" class="fc-container">
+          <img :src="importIcon(`/coins/${coinName.toLowerCase()}.png`)" />
           <span>{{ coinName }}</span>
         </div>
         <span v-else>Select a token</span>
@@ -33,9 +38,14 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Button, Icon } from 'ant-design-vue'
 
-import { inputRegex, escapeRegExp } from '@/utils/regex'
+import importIcon from '@/utils/import-icon'
 
 const CoinInputProps = Vue.extend({
+  model: {
+    prop: 'value',
+    event: 'onInput',
+  },
+
   props: {
     label: {
       type: String,
@@ -45,10 +55,22 @@ const CoinInputProps = Vue.extend({
       type: String,
       default: '',
     },
+    value: {
+      type: String,
+      default: '',
+    },
     balance: {
       type: String,
       default: '',
     },
+    showMax: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  methods: {
+    importIcon,
   },
 })
 
@@ -57,78 +79,89 @@ const CoinInputProps = Vue.extend({
     Button,
     Icon,
   },
-
-  watch: {
-    amount(newAmount: string, oldAmount: string) {
-      if (inputRegex.test(escapeRegExp(newAmount))) {
-        this.$emit('onInput', newAmount)
-      } else {
-        ;(this as any).amount = oldAmount
-      }
-    },
-  },
 })
-export default class CoinInput extends CoinInputProps {
-  amount = ''
-}
+export default class CoinInput extends CoinInputProps {}
 </script>
 
 <style lang="less" scoped>
+@import '../styles/variables';
+
 .coin-select {
-  padding: 12px 16px;
   background: #000829;
   border-radius: 4px;
 
   .label {
-    margin-bottom: 8px;
+    padding: 0.75rem 1rem 0;
     font-size: 12px;
     line-height: 14px;
     color: rgb(133, 133, 141);
-
-    .can-max {
-      border-bottom: 1px dashed rgb(133, 133, 141);
-      cursor: pointer;
-
-      &:hover {
-        color: #fff;
-        border-bottom: 1px dashed #fff;
-      }
-    }
   }
 
   input {
+    width: 0;
     padding: 0;
     border: none;
     background-color: transparent;
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
+    flex: 1 1 auto;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &:focus {
+    &:active,
+    &:focus,
+    &:hover {
       outline: 0;
     }
   }
 
-  button {
-    padding: 0;
-    border: none;
-    background-color: transparent;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 22px;
-    cursor: pointer;
+  .coin-input {
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
 
-    &:focus {
-      outline: 0;
+    button {
+      border: none;
+      background-color: transparent;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 22px;
+      border-radius: 4px;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:active,
+      &:focus,
+      &:hover {
+        outline: 0;
+      }
+
+      &:hover {
+        background-color: @modal-header-bg;
+      }
     }
 
-    .anticon {
-      margin-left: 4px;
-      font-size: 8px;
+    .max-button {
+      height: 32px;
+      padding: 0 16px;
+      color: #5ac4be;
+    }
+
+    .select-button {
+      padding: 0.5rem;
+      line-height: 24px;
+
+      .anticon {
+        margin-left: 4px;
+        font-size: 8px;
+      }
+
+      img {
+        margin-right: 5px;
+        height: 24px;
+        width: 24px;
+      }
     }
   }
 }
