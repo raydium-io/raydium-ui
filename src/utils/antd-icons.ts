@@ -6,4 +6,9 @@ export {
   CloseCircleOutline,
   // wallet
   WalletOutline,
+  // info&setting
+  InfoCircleOutline,
+  SettingOutline,
+  // down
+  CaretDownOutline,
 } from '@ant-design/icons'

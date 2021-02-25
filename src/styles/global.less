@@ -1,6 +1,5 @@
 .container {
   margin: 0 auto;
-  max-width: 1240px !important;
   padding: 24px;
 }
 
@@ -14,4 +13,56 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.page-head {
+  margin-top: 20px;
+  margin-bottom: 40px;
+
+  .title {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .buttons {
+    .anticon {
+      cursor: pointer;
+    }
+
+    .anticon:not(:first-child) {
+      margin-left: 10px;
+    }
+  }
+}
+
+.card {
+  padding: 1px;
+  background: linear-gradient(
+    245.22deg,
+    #c200fb 7.97%,
+    #3772ff 49.17%,
+    #3773fe 49.17%,
+    #5ac4be 92.1%
+  );
+  border-radius: 4px;
+
+  .card-body {
+    padding: 32px 24px;
+    background-color: #131a35;
+    opacity: 0.9;
+    border-radius: 4px;
+  }
+  // position: relative;
+  // padding: 32px 24px;
+
+  // border: 1px solid;
+  // border-image: linear-gradient(
+  //     245.22deg,
+  //     #c200fb 7.97%,
+  //     #3772ff 49.17%,
+  //     #5ac4be 92.1%
+  //   )
+  //   1;
+  // clip-path: inset(0px round 1px);
 }

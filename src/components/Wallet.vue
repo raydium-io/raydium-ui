@@ -23,7 +23,8 @@
           ghost
           @click="connect(name)"
         >
-          {{ name }}
+          <span>{{ name }}</span>
+          <img :src="`/_nuxt/src/assets/wallets/${name.toLowerCase()}.png`" />
         </Button>
       </div>
       <div v-else class="wallet-info">
@@ -99,18 +100,24 @@ export default class Wallet extends Vue {
         break
       }
       case 'MathWallet': {
-        wallet = new SolanaWallet((window as any).solana)
+        wallet = new SolanaWallet(
+          (window as any).solana,
+          (this as any).wallet.endpoint
+        )
         break
       }
       default: {
-        wallet = new SolanaWallet((this.wallets as any)[walletName])
+        wallet = new SolanaWallet(
+          (this.wallets as any)[walletName],
+          (this as any).wallet.endpoint
+        )
         break
       }
     }
 
     wallet.on('connect', () => {
       this.closeModal().then(() => {
-        ;(window as any).rayWallet = wallet
+        Vue.prototype.$wallet = wallet
 
         self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
         ;(self as any).$notify.success({
@@ -121,7 +128,7 @@ export default class Wallet extends Vue {
     })
 
     wallet.on('disconnect', () => {
-      ;(window as any).rayWallet = null
+      Vue.prototype.$wallet = null
 
       this.$store.commit('wallet/disconnected')
       ;(self as any).$notify.warning({
@@ -140,7 +147,7 @@ export default class Wallet extends Vue {
   }
 
   disconnect() {
-    ;(window as any).rayWallet.disconnect()
+    Vue.prototype.$wallet.disconnect()
   }
 }
 </script>
@@ -158,8 +165,17 @@ export default class Wallet extends Vue {
 
 .select-wallet {
   button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
     width: 100%;
     height: 48px;
+    text-align: left;
+
+    img {
+      height: 32px;
+    }
   }
 
   button:not(:first-child) {
