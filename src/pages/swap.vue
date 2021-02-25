@@ -12,9 +12,10 @@
         <Icon type="setting" />
       </div>
     </div>
+    <CoinSelect :show="coinSelectShow" :close="closeCoinSelect"></CoinSelect>
     <div class="card">
       <div class="card-body">
-        <CoinInput label="From"></CoinInput>
+        <CoinInput label="From" :open-coin-select="openCoinSelect"></CoinInput>
       </div>
     </div>
   </div>
@@ -32,7 +33,17 @@ import { Icon, Tooltip } from 'ant-design-vue'
     Tooltip,
   },
 })
-export default class Swap extends Vue {}
+export default class Swap extends Vue {
+  coinSelectShow = false
+
+  openCoinSelect() {
+    this.coinSelectShow = true
+  }
+
+  closeCoinSelect() {
+    this.coinSelectShow = false
+  }
+}
 </script>
 
 <style lang="less">

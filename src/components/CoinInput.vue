@@ -16,7 +16,7 @@
         maxlength="79"
         spellcheck="false"
       />
-      <button class="fc-container">
+      <button class="fc-container" @click="openCoinSelect">
         <span>
           {{ coinName }}
         </span>
@@ -36,18 +36,19 @@ const CoinInputProps = Vue.extend({
   props: {
     label: {
       type: String,
-      // required: true,
       default: 'From',
     },
     coinName: {
       type: String,
-      // required: true,
       default: 'RAY',
     },
     showBalance: {
       type: Boolean,
-      // required: true,
       default: false,
+    },
+    openCoinSelect: {
+      type: Function,
+      required: true,
     },
   },
 })

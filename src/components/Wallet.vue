@@ -12,7 +12,7 @@
 
     <Modal
       :title="!wallet.connected ? 'Connect to a wallet' : 'Your wallet'"
-      :visible="showModal"
+      :visible="modalShow"
       :footer="null"
       @cancel="closeModal"
     >
@@ -24,7 +24,7 @@
           @click="connect(name)"
         >
           <span>{{ name }}</span>
-          <img :src="`/_nuxt/src/assets/wallets/${name.toLowerCase()}.png`" />
+          <img :src="importIcon(`/wallets/${name.toLowerCase()}.png`)" />
         </Button>
       </div>
       <div v-else class="wallet-info">
@@ -44,10 +44,18 @@ import { mapState } from 'vuex'
 
 import { Button, Modal, Icon } from 'ant-design-vue'
 
+import {
+  Connection,
+  // types
+  AccountInfo,
+  Context,
+} from '@solana/web3.js'
+
 // @ts-ignore
 import SolanaWallet from '@project-serum/sol-wallet-adapter'
 
 import SolongWallet from '@/utils/solong-wallet'
+import importIcon from '@/utils/import-icon'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -62,8 +70,15 @@ Vue.use(Modal)
   computed: {
     ...mapState(['wallet']),
   },
+
+  methods: {
+    importIcon,
+  },
 })
 export default class Wallet extends Vue {
+  $wallet: SolanaWallet | SolongWallet | null = null
+  $conn: Connection | null = null
+
   wallets = {
     Solong: '',
     // TrustWallet: '',
@@ -75,15 +90,18 @@ export default class Wallet extends Vue {
     // Coin98: '',
   }
 
-  showModal = false
+  // wallet websocket listeners
+  accountChangeListenerId: number | undefined | null = null
+
+  modalShow = false
 
   openModal() {
-    this.showModal = true
+    this.modalShow = true
   }
 
   closeModal() {
     return new Promise((resolve) => {
-      this.showModal = false
+      this.modalShow = false
       setTimeout(() => {
         resolve(true)
       }, 500)
@@ -92,7 +110,7 @@ export default class Wallet extends Vue {
 
   connect(walletName: string) {
     const self = this
-    let wallet: any
+    let wallet: SolanaWallet | SolongWallet | null = null
 
     switch (walletName) {
       case 'Solong': {
@@ -117,7 +135,12 @@ export default class Wallet extends Vue {
 
     wallet.on('connect', () => {
       this.closeModal().then(() => {
+        const connection = new Connection((this as any).wallet.endpoint)
+
         Vue.prototype.$wallet = wallet
+        Vue.prototype.$conn = connection
+
+        this.subWebsocket()
 
         self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
         ;(self as any).$notify.success({
@@ -129,6 +152,9 @@ export default class Wallet extends Vue {
 
     wallet.on('disconnect', () => {
       Vue.prototype.$wallet = null
+      Vue.prototype.$conn = null
+
+      this.unsubWebsocket()
 
       this.$store.commit('wallet/disconnected')
       ;(self as any).$notify.warning({
@@ -148,6 +174,30 @@ export default class Wallet extends Vue {
 
   disconnect() {
     Vue.prototype.$wallet.disconnect()
+  }
+
+  onAccountChange(accountInfo: AccountInfo<Buffer>, context: Context): void {
+    console.log('onAccountChange')
+    console.log(accountInfo, context)
+  }
+
+  subWebsocket() {
+    const conn = this.$conn
+    const wallet = this.$wallet
+
+    this.accountChangeListenerId = conn?.onAccountChange(
+      wallet.publicKey,
+      this.onAccountChange,
+      'confirmed'
+    )
+  }
+
+  unsubWebsocket() {
+    const conn = this.$conn
+
+    if (this.accountChangeListenerId) {
+      conn?.removeAccountChangeListener(this.accountChangeListenerId)
+    }
   }
 }
 </script>
