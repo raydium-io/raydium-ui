@@ -17,7 +17,7 @@
         maxlength="79"
         spellcheck="false"
       />
-      <button class="fc-container" @click="onSelect">
+      <button class="fc-container" @click="$emit('onSelect')">
         <div v-if="coinName">
           <span>{{ coinName }}</span>
         </div>
@@ -70,10 +70,6 @@ const CoinInputProps = Vue.extend({
 })
 export default class CoinInput extends CoinInputProps {
   amount = ''
-
-  onSelect() {
-    this.$emit('onSelect')
-  }
 }
 </script>
 
