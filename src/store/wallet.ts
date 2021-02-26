@@ -6,6 +6,8 @@ import { formatUnits } from '@ethersproject/units'
 import logger from '@/utils/logger'
 
 export const state = () => ({
+  modalShow: false,
+
   connected: false,
   address: '',
   env: 'mainnet-beta',
@@ -17,6 +19,10 @@ export const state = () => ({
 })
 
 export const mutations = {
+  setModal(state: any, show: boolean) {
+    state.modalShow = show
+  },
+
   connected(state: any, address: any) {
     state.connected = true
     state.address = address
@@ -37,6 +43,20 @@ export const mutations = {
 }
 
 export const actions = {
+  openModal({ commit }: { commit: any }) {
+    commit('setModal', true)
+  },
+
+  closeModal({ commit }: { commit: any }) {
+    // 不延时切换会闪
+    return new Promise((resolve) => {
+      commit('setModal', false)
+      setTimeout(() => {
+        resolve(true)
+      }, 500)
+    })
+  },
+
   getTokenAccounts({ commit }: { commit: any }) {
     const conn = (this as any)._vm.$conn
     const wallet = (this as any)._vm.$wallet

@@ -41,6 +41,32 @@
           @onInput="(amount) => (toCoinAmount = amount)"
           @onSelect="openToCoinSelect"
         />
+
+        <Button
+          v-if="!wallet.connected"
+          size="large"
+          ghost
+          @click="$store.dispatch('wallet/openModal')"
+        >
+          Unlock Wallet
+        </Button>
+        <Button
+          v-else
+          size="large"
+          ghost
+          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !tradePairExist"
+          @click="swap"
+        >
+          <template v-if="!fromCoinAmount"> Enter an amount </template>
+          <template v-else-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-else-if="!tradePairExist">
+            Insufficient liquidity for this trade
+          </template>
+          <template v-else-if="fromCoinAmount > fromCoin.uiAmount">
+            Insufficient BNB balance
+          </template>
+          <template v-else>Swap</template>
+        </Button>
       </div>
     </div>
   </div>
@@ -48,7 +74,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Icon, Tooltip } from 'ant-design-vue'
+import { mapState } from 'vuex'
+import { Icon, Tooltip, Button } from 'ant-design-vue'
 
 import {
   getTokenBySymbol,
@@ -61,6 +88,7 @@ export default Vue.extend({
   components: {
     Icon,
     Tooltip,
+    Button,
   },
 
   data() {
@@ -73,7 +101,13 @@ export default Vue.extend({
       toCoin: null as TokenInfo | null,
       fromCoinAmount: '',
       toCoinAmount: '',
+
+      tradePairExist: false,
     }
+  },
+
+  computed: {
+    ...mapState(['wallet']),
   },
 
   watch: {
@@ -149,6 +183,8 @@ export default Vue.extend({
       this.fromCoinAmount = tempToCoinAmount
       this.toCoinAmount = tempFromCoinAmount
     },
+
+    swap() {},
   },
 })
 </script>

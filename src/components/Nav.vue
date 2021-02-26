@@ -63,7 +63,7 @@ export default Vue.extend({
 @import '../styles/variables';
 
 .ant-menu {
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 
 .ant-menu-horizontal {

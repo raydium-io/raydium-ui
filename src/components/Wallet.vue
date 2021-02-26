@@ -1,9 +1,13 @@
 <template>
   <div>
-    <Button v-if="!wallet.connected" ghost @click="openModal">
-      CONNECT WALLET
+    <Button
+      v-if="!wallet.connected"
+      ghost
+      @click="$store.dispatch('wallet/openModal')"
+    >
+      Connect
     </Button>
-    <Button v-else ghost @click="openModal">
+    <Button v-else ghost @click="$store.dispatch('wallet/openModal')">
       <Icon type="wallet" />
       {{ wallet.address.substr(0, 4) }}
       ...
@@ -12,9 +16,9 @@
 
     <Modal
       :title="!wallet.connected ? 'Connect to a wallet' : 'Your wallet'"
-      :visible="modalShow"
+      :visible="wallet.modalShow"
       :footer="null"
-      @cancel="closeModal"
+      @cancel="$store.dispatch('wallet/closeModal')"
     >
       <div v-if="!wallet.connected" class="select-wallet">
         <Button
@@ -83,8 +87,6 @@ export default Vue.extend({
 
       // wallet websocket listeners
       accountChangeListenerId: null as number | undefined | null,
-
-      modalShow: false,
     }
   },
 
@@ -94,19 +96,6 @@ export default Vue.extend({
 
   methods: {
     importIcon,
-
-    openModal() {
-      this.modalShow = true
-    },
-
-    closeModal() {
-      return new Promise((resolve) => {
-        this.modalShow = false
-        setTimeout(() => {
-          resolve(true)
-        }, 500)
-      })
-    },
 
     connect(walletName: string) {
       const self = this
@@ -134,7 +123,7 @@ export default Vue.extend({
       }
 
       wallet.on('connect', () => {
-        this.closeModal().then(() => {
+        this.$store.dispatch('wallet/closeModal').then(() => {
           const connection = new Connection(this.wallet.endpoint)
 
           Vue.prototype.$wallet = wallet
