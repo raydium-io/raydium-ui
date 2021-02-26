@@ -1,7 +1,7 @@
 const tokens = {
-  SOL: {
+  WSOL: {
     mintAddress: 'So11111111111111111111111111111111111111112',
-    name: 'Solana',
+    name: 'Wrapped Solana',
     decimals: 9,
   },
   ABC: {

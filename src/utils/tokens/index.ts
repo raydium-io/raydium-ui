@@ -7,7 +7,10 @@ export interface TokenInfo {
   name: string
   mintAddress: string
   decimals: number
+
   referrer?: string
+
+  tokenAccountAddress?: string
   balance?: number
 }
 
@@ -20,6 +23,13 @@ export const TOKENS: Tokens = {
   'mainnet-beta': MAINNET_TOKENS,
   devnet: DEVNET_TOKENS,
   testnet: TESTNET_TOKENS,
+}
+
+export const NATIVE_SOL: TokenInfo = {
+  symbol: 'SOL',
+  name: 'SOL',
+  mintAddress: '11111111111111111111111111111111',
+  decimals: 9,
 }
 
 /**

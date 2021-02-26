@@ -19,7 +19,9 @@
           </div>
           <span></span>
           <div class="balance">
-            <div>0.001</div>
+            <div v-if="token.tokenAccountAddress">
+              {{ token.balance }}
+            </div>
           </div>
         </div>
       </div>
@@ -34,7 +36,7 @@ import { mapState } from 'vuex'
 import { Input, Modal, Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
-import { TOKENS, TokenInfo } from '@/utils/tokens'
+import { TOKENS, TokenInfo, NATIVE_SOL } from '@/utils/tokens'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -79,6 +81,7 @@ export default class CoinSelect extends CoinSelectProps {
     this.tokenList = []
 
     let ray = {}
+    const nativeSol = NATIVE_SOL
     let sortedTokenList = []
 
     for (const symbol of Object.keys(TOKENS[(this as any).wallet.env])) {
@@ -89,6 +92,22 @@ export default class CoinSelect extends CoinSelectProps {
       } else {
         sortedTokenList.push(token)
       }
+
+      const tokenAccount = (this as any).wallet.tokenAccounts[token.mintAddress]
+
+      if (tokenAccount) {
+        token.balance = tokenAccount.balance
+        token.tokenAccountAddress = tokenAccount.tokenAccountAddress
+      }
+    }
+
+    const solAccount = (this as any).wallet.tokenAccounts[
+      NATIVE_SOL.mintAddress
+    ]
+
+    if (solAccount) {
+      nativeSol.balance = solAccount.balance
+      nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
     }
 
     sortedTokenList = sortedTokenList.sort((a, b) => {
@@ -99,7 +118,7 @@ export default class CoinSelect extends CoinSelectProps {
       sortedTokenList.reverse()
     }
 
-    this.tokenList = [...[ray], ...sortedTokenList]
+    this.tokenList = [...[ray, nativeSol], ...sortedTokenList]
   }
 
   setDesc() {

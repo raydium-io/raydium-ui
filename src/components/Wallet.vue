@@ -52,6 +52,7 @@ import SolanaWallet from '@project-serum/sol-wallet-adapter'
 
 import SolongWallet from '@/utils/solong-wallet'
 import importIcon from '@/utils/import-icon'
+import logger from '@/utils/logger'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -136,9 +137,9 @@ export default class Wallet extends Vue {
         Vue.prototype.$wallet = wallet
         Vue.prototype.$conn = connection
 
-        this.subWebsocket()
-
         self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
+
+        this.subWebsocket()
         ;(self as any).$notify.success({
           message: 'Wallet connected',
           description: '',
@@ -173,8 +174,10 @@ export default class Wallet extends Vue {
   }
 
   onAccountChange(accountInfo: AccountInfo<Buffer>, context: Context): void {
-    console.log('onAccountChange')
-    console.log(accountInfo, context)
+    logger('onAccountChange')
+    logger(accountInfo, context)
+
+    this.$store.dispatch('wallet/getTokenAccounts')
   }
 
   subWebsocket() {
@@ -186,6 +189,8 @@ export default class Wallet extends Vue {
       this.onAccountChange,
       'confirmed'
     )
+
+    this.$store.dispatch('wallet/getTokenAccounts')
   }
 
   unsubWebsocket() {
