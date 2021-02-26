@@ -48,7 +48,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Component from 'vue-class-component'
 import { Icon, Tooltip } from 'ant-design-vue'
 
 import {
@@ -58,17 +57,30 @@ import {
 } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 
-@Component({
+export default Vue.extend({
   components: {
     Icon,
     Tooltip,
+  },
+
+  data() {
+    return {
+      coinSelectShow: false,
+      // 正在弹框选择哪个的币种
+      selectFromCoin: true,
+
+      fromCoin: getTokenBySymbol('RAY') as TokenInfo | null,
+      toCoin: null as TokenInfo | null,
+      fromCoinAmount: '',
+      toCoinAmount: '',
+    }
   },
 
   watch: {
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
-          ;(this as any).fromCoinAmount = oldAmount
+          this.fromCoinAmount = oldAmount
         }
       })
     },
@@ -76,77 +88,69 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
     toCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
-          ;(this as any).toCoinAmount = oldAmount
+          this.toCoinAmount = oldAmount
         }
       })
     },
   },
+
+  methods: {
+    openFromCoinSelect() {
+      this.selectFromCoin = true
+      this.coinSelectShow = true
+    },
+
+    openToCoinSelect() {
+      this.selectFromCoin = false
+      this.coinSelectShow = true
+    },
+
+    closeCoinSelect() {
+      this.coinSelectShow = false
+    },
+
+    onCoinSelect(mintAddress: string) {
+      if (this.selectFromCoin) {
+        this.fromCoin = getTokenByMintAddress(mintAddress)
+
+        // 如果选的币种被另一个选了 把另一个重置
+        if (this.toCoin?.mintAddress === mintAddress) {
+          this.toCoin = null
+          this.changeCoinAmountPosition()
+        }
+      } else {
+        this.toCoin = getTokenByMintAddress(mintAddress)
+
+        // 如果选的币种被另一个选了 把另一个重置
+        if (this.fromCoin?.mintAddress === mintAddress) {
+          this.fromCoin = null
+          this.changeCoinAmountPosition()
+        }
+      }
+
+      this.coinSelectShow = false
+    },
+
+    changeCoinPosition() {
+      const tempFromCoin = this.fromCoin
+      const tempToCoin = this.toCoin
+
+      this.fromCoin = tempToCoin
+      this.toCoin = tempFromCoin
+
+      this.changeCoinAmountPosition()
+    },
+
+    // 切换币种金额位置
+    changeCoinAmountPosition() {
+      const tempFromCoinAmount = this.fromCoinAmount
+      const tempToCoinAmount = this.toCoinAmount
+
+      this.fromCoinAmount = tempToCoinAmount
+      this.toCoinAmount = tempFromCoinAmount
+    },
+  },
 })
-export default class Swap extends Vue {
-  coinSelectShow = false
-  // 正在弹框选择哪个的币种
-  selectFromCoin = true
-
-  fromCoin: TokenInfo | null = getTokenBySymbol('RAY')
-  toCoin: TokenInfo | null = null
-  fromCoinAmount = ''
-  toCoinAmount = ''
-
-  openFromCoinSelect() {
-    this.selectFromCoin = true
-    this.coinSelectShow = true
-  }
-
-  openToCoinSelect() {
-    this.selectFromCoin = false
-    this.coinSelectShow = true
-  }
-
-  closeCoinSelect() {
-    this.coinSelectShow = false
-  }
-
-  onCoinSelect(mintAddress: string) {
-    if (this.selectFromCoin) {
-      this.fromCoin = getTokenByMintAddress(mintAddress)
-
-      // 如果选的币种被另一个选了 把另一个重置
-      if (this.toCoin?.mintAddress === mintAddress) {
-        this.toCoin = null
-        this.changeCoinAmountPosition()
-      }
-    } else {
-      this.toCoin = getTokenByMintAddress(mintAddress)
-
-      // 如果选的币种被另一个选了 把另一个重置
-      if (this.fromCoin?.mintAddress === mintAddress) {
-        this.fromCoin = null
-        this.changeCoinAmountPosition()
-      }
-    }
-
-    this.coinSelectShow = false
-  }
-
-  changeCoinPosition() {
-    const tempFromCoin = this.fromCoin
-    const tempToCoin = this.toCoin
-
-    this.fromCoin = tempToCoin
-    this.toCoin = tempFromCoin
-
-    this.changeCoinAmountPosition()
-  }
-
-  // 切换币种金额位置
-  changeCoinAmountPosition() {
-    const tempFromCoinAmount = this.fromCoinAmount
-    const tempToCoinAmount = this.toCoinAmount
-
-    this.fromCoinAmount = tempToCoinAmount
-    this.toCoinAmount = tempFromCoinAmount
-  }
-}
 </script>
 
 <style lang="less">

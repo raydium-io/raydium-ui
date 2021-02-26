@@ -38,7 +38,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Component from 'vue-class-component'
 import { mapState } from 'vuex'
 import { Button, Modal, Icon } from 'ant-design-vue'
 import {
@@ -57,11 +56,31 @@ import logger from '@/utils/logger'
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
 
-@Component({
+export default Vue.extend({
   components: {
     Button,
     Modal,
     Icon,
+  },
+
+  data() {
+    return {
+      wallets: {
+        Solong: '',
+        // TrustWallet: '',
+        MathWallet: '',
+        Sollet: 'https://www.sollet.io',
+        // Solflare: 'https://solflare.com/access-wallet',
+        Bonfida: 'https://bonfida.com/wallet',
+        // ezDeFi: '',
+        // Coin98: '',
+      },
+
+      // wallet websocket listeners
+      accountChangeListenerId: null as number | undefined | null,
+
+      modalShow: false,
+    }
   },
 
   computed: {
@@ -70,137 +89,114 @@ Vue.use(Modal)
 
   methods: {
     importIcon,
-  },
-})
-export default class Wallet extends Vue {
-  $wallet: SolanaWallet | SolongWallet | null = null
-  $conn: Connection | null = null
 
-  wallets = {
-    Solong: '',
-    // TrustWallet: '',
-    MathWallet: '',
-    Sollet: 'https://www.sollet.io',
-    // Solflare: 'https://solflare.com/access-wallet',
-    Bonfida: 'https://bonfida.com/wallet',
-    // ezDeFi: '',
-    // Coin98: '',
-  }
+    openModal() {
+      this.modalShow = true
+    },
 
-  // wallet websocket listeners
-  accountChangeListenerId: number | undefined | null = null
+    closeModal() {
+      return new Promise((resolve) => {
+        this.modalShow = false
+        setTimeout(() => {
+          resolve(true)
+        }, 500)
+      })
+    },
 
-  modalShow = false
+    connect(walletName: string) {
+      const self = this
+      let wallet: SolanaWallet | SolongWallet | null = null
 
-  openModal() {
-    this.modalShow = true
-  }
-
-  closeModal() {
-    return new Promise((resolve) => {
-      this.modalShow = false
-      setTimeout(() => {
-        resolve(true)
-      }, 500)
-    })
-  }
-
-  connect(walletName: string) {
-    const self = this
-    let wallet: SolanaWallet | SolongWallet | null = null
-
-    switch (walletName) {
-      case 'Solong': {
-        wallet = new SolongWallet()
-        break
+      switch (walletName) {
+        case 'Solong': {
+          wallet = new SolongWallet()
+          break
+        }
+        case 'MathWallet': {
+          wallet = new SolanaWallet(window.solana, this.wallet.endpoint)
+          break
+        }
+        default: {
+          wallet = new SolanaWallet(
+            this.wallets[walletName],
+            this.wallet.endpoint
+          )
+          break
+        }
       }
-      case 'MathWallet': {
-        wallet = new SolanaWallet(
-          (window as any).solana,
-          (this as any).wallet.endpoint
-        )
-        break
-      }
-      default: {
-        wallet = new SolanaWallet(
-          (this.wallets as any)[walletName],
-          (this as any).wallet.endpoint
-        )
-        break
-      }
-    }
 
-    wallet.on('connect', () => {
-      this.closeModal().then(() => {
-        const connection = new Connection((this as any).wallet.endpoint)
+      wallet.on('connect', () => {
+        this.closeModal().then(() => {
+          const connection = new Connection(this.wallet.endpoint)
 
-        Vue.prototype.$wallet = wallet
-        Vue.prototype.$conn = connection
+          Vue.prototype.$wallet = wallet
+          Vue.prototype.$conn = connection
 
-        self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
+          self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
 
-        this.subWebsocket()
-        ;(self as any).$notify.success({
-          message: 'Wallet connected',
-          description: '',
+          this.subWebsocket()
+          self.$notify.success({
+            message: 'Wallet connected',
+            description: '',
+          })
         })
       })
-    })
 
-    wallet.on('disconnect', () => {
-      Vue.prototype.$wallet = null
-      Vue.prototype.$conn = null
+      wallet.on('disconnect', () => {
+        Vue.prototype.$wallet = null
+        Vue.prototype.$conn = null
 
-      this.unsubWebsocket()
+        this.unsubWebsocket()
 
-      this.$store.commit('wallet/disconnected')
-      ;(self as any).$notify.warning({
-        message: 'Wallet disconnected',
+        this.$store.commit('wallet/disconnected')
+        self.$notify.warning({
+          message: 'Wallet disconnected',
+        })
       })
-    })
 
-    try {
-      wallet.connect()
-    } catch (error) {
-      ;(this as any).error({
-        message: 'Connect wallet failed',
-        description: error.message,
-      })
-    }
-  }
+      try {
+        wallet.connect()
+      } catch (error) {
+        this.error({
+          message: 'Connect wallet failed',
+          description: error.message,
+        })
+      }
+    },
 
-  disconnect() {
-    Vue.prototype.$wallet.disconnect()
-  }
+    disconnect() {
+      Vue.prototype.$wallet.disconnect()
+    },
 
-  onAccountChange(accountInfo: AccountInfo<Buffer>, context: Context): void {
-    logger('onAccountChange')
-    logger(accountInfo, context)
+    onAccountChange(accountInfo: AccountInfo<Buffer>, context: Context): void {
+      logger('onAccountChange')
+      logger(accountInfo, context)
 
-    this.$store.dispatch('wallet/getTokenAccounts')
-  }
+      this.$store.dispatch('wallet/getTokenAccounts')
+    },
 
-  subWebsocket() {
-    const conn = this.$conn
-    const wallet = this.$wallet
+    subWebsocket() {
+      const conn = this.$conn
+      const wallet = this.$wallet
 
-    this.accountChangeListenerId = conn?.onAccountChange(
-      wallet.publicKey,
-      this.onAccountChange,
-      'confirmed'
-    )
+      this.accountChangeListenerId = conn?.onAccountChange(
+        wallet.publicKey,
+        this.onAccountChange,
+        'confirmed'
+      )
 
-    this.$store.dispatch('wallet/getTokenAccounts')
-  }
+      this.$store.dispatch('wallet/getTokenAccounts')
+    },
 
-  unsubWebsocket() {
-    const conn = this.$conn
+    unsubWebsocket() {
+      const conn = this.$conn
 
-    if (this.accountChangeListenerId) {
-      conn?.removeAccountChangeListener(this.accountChangeListenerId)
-    }
-  }
-}
+      if (this.accountChangeListenerId) {
+        conn?.removeAccountChangeListener(this.accountChangeListenerId)
+      }
+    },
+  },
+})
 </script>
 
 <style lang="less">

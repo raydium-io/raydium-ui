@@ -16,18 +16,27 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Component from 'vue-class-component'
-
 import { mapState } from 'vuex'
-
 import { Menu } from 'ant-design-vue'
 
 const MenuItem = Menu.Item
 
-@Component({
+export default Vue.extend({
   components: {
     Menu,
     MenuItem,
+  },
+
+  data() {
+    return {
+      navs: {
+        trading: true,
+        swap: false,
+        liquidity: false,
+        staking: false,
+        farms: false,
+      },
+    }
   },
 
   computed: {
@@ -39,22 +48,15 @@ const MenuItem = Menu.Item
       set() {},
     },
   },
-})
-export default class Index extends Vue {
-  navs: any = {
-    trading: true,
-    swap: false,
-    liquidity: false,
-    staking: false,
-    farms: false,
-  }
 
-  changeRoute({ key }: { key: string }): void {
-    if (!this.navs[key]) {
-      this.$router.push(`/${key}`)
-    }
-  }
-}
+  methods: {
+    changeRoute({ key }: { key: string }): void {
+      if (!this.navs[key]) {
+        this.$router.push(`/${key}`)
+      }
+    },
+  },
+})
 </script>
 
 <style lang="less">

@@ -35,12 +35,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Component from 'vue-class-component'
-import { Button, Icon } from 'ant-design-vue'
+import { Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
 
-const CoinInputProps = Vue.extend({
+export default Vue.extend({
+  components: {
+    Icon,
+  },
+
   model: {
     prop: 'value',
     event: 'onInput',
@@ -73,14 +76,6 @@ const CoinInputProps = Vue.extend({
     importIcon,
   },
 })
-
-@Component({
-  components: {
-    Button,
-    Icon,
-  },
-})
-export default class CoinInput extends CoinInputProps {}
 </script>
 
 <style lang="less" scoped>

@@ -1,4 +1,7 @@
 export {
+  // loading
+  LoadingOutline,
+  // close
   CloseOutline,
   // notify
   CheckCircleOutline,

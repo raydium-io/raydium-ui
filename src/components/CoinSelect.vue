@@ -19,9 +19,13 @@
           </div>
           <span></span>
           <div class="balance">
-            <div v-if="token.tokenAccountAddress">
-              {{ token.balance }}
+            <div v-if="wallet.tokenAccountsLoading">
+              <Icon type="loading" />
             </div>
+            <div v-else-if="token.tokenAccountAddress">
+              {{ formatUnits(token.balance, token.decimals).toString() }}
+            </div>
+            <div v-else></div>
           </div>
         </div>
       </div>
@@ -31,17 +35,23 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Component from 'vue-class-component'
 import { mapState } from 'vuex'
 import { Input, Modal, Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
 import { TOKENS, TokenInfo, NATIVE_SOL } from '@/utils/tokens'
+import { formatUnits } from '@ethersproject/units'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
 
-const CoinSelectProps = Vue.extend({
+export default Vue.extend({
+  components: {
+    Input,
+    Modal,
+    Icon,
+  },
+
   props: {
     close: {
       type: Function,
@@ -52,80 +62,83 @@ const CoinSelectProps = Vue.extend({
       required: true,
     },
   },
-})
 
-@Component({
-  components: {
-    Input,
-    Modal,
-    Icon,
+  data() {
+    return {
+      tokenList: [] as Array<TokenInfo>,
+      desc: false,
+    }
   },
 
   computed: {
     ...mapState(['wallet']),
   },
 
-  methods: {
-    importIcon,
+  watch: {
+    'wallet.tokenAccounts': {
+      handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
+        this.createTokenList()
+      },
+      deep: true,
+    },
   },
-})
-export default class CoinSelect extends CoinSelectProps {
-  tokenList: Array<TokenInfo> = []
-  desc = false
 
   mounted() {
     this.createTokenList()
-  }
+  },
 
-  createTokenList() {
-    this.tokenList = []
+  methods: {
+    importIcon,
+    formatUnits,
 
-    let ray = {}
-    const nativeSol = NATIVE_SOL
-    let sortedTokenList = []
+    createTokenList() {
+      this.tokenList = []
 
-    for (const symbol of Object.keys(TOKENS[(this as any).wallet.env])) {
-      const token = TOKENS[(this as any).wallet.env][symbol]
-      token.symbol = symbol
-      if (symbol === 'RAY') {
-        ray = token
-      } else {
-        sortedTokenList.push(token)
+      let ray = {}
+      const nativeSol = NATIVE_SOL
+      let sortedTokenList = []
+
+      for (const symbol of Object.keys(TOKENS[this.wallet.env])) {
+        const token = TOKENS[this.wallet.env][symbol]
+        token.symbol = symbol
+        if (symbol === 'RAY') {
+          ray = token
+        } else {
+          sortedTokenList.push(token)
+        }
+
+        const tokenAccount = this.wallet.tokenAccounts[token.mintAddress]
+
+        if (tokenAccount) {
+          token.balance = tokenAccount.balance
+          token.tokenAccountAddress = tokenAccount.tokenAccountAddress
+        }
       }
 
-      const tokenAccount = (this as any).wallet.tokenAccounts[token.mintAddress]
+      const solAccount = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
 
-      if (tokenAccount) {
-        token.balance = tokenAccount.balance
-        token.tokenAccountAddress = tokenAccount.tokenAccountAddress
+      if (solAccount) {
+        nativeSol.balance = solAccount.balance
+        nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
       }
-    }
 
-    const solAccount = (this as any).wallet.tokenAccounts[
-      NATIVE_SOL.mintAddress
-    ]
+      sortedTokenList = sortedTokenList.sort((a, b) => {
+        return a.symbol.localeCompare(b.symbol)
+      })
 
-    if (solAccount) {
-      nativeSol.balance = solAccount.balance
-      nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
-    }
+      if (this.desc) {
+        sortedTokenList.reverse()
+      }
 
-    sortedTokenList = sortedTokenList.sort((a, b) => {
-      return a.symbol.localeCompare(b.symbol)
-    })
+      this.tokenList = [...[ray, nativeSol], ...sortedTokenList]
+    },
 
-    if (this.desc) {
-      sortedTokenList.reverse()
-    }
-
-    this.tokenList = [...[ray, nativeSol], ...sortedTokenList]
-  }
-
-  setDesc() {
-    this.desc = !this.desc
-    this.createTokenList()
-  }
-}
+    setDesc() {
+      this.desc = !this.desc
+      this.createTokenList()
+    },
+  },
+})
 </script>
 
 <style lang="less" scoped>
