@@ -51,7 +51,7 @@ export default Vue.extend({
 
   methods: {
     changeRoute({ key }: { key: string }): void {
-      if (!this.navs[key]) {
+      if (!(this as any).navs[key]) {
         this.$router.push(`/${key}`)
       }
     },

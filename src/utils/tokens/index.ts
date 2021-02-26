@@ -12,6 +12,7 @@ export interface TokenInfo {
 
   tokenAccountAddress?: string
   balance?: number
+  uiAmount?: number
 }
 
 interface Tokens {
@@ -44,6 +45,10 @@ export function getTokenBySymbol(
   symbol: string,
   env = 'mainnet-beta'
 ): TokenInfo | null {
+  if (symbol === 'SOL') {
+    return NATIVE_SOL
+  }
+
   let token = TOKENS[env][symbol]
 
   if (token) {
@@ -67,6 +72,10 @@ export function getTokenByMintAddress(
   mintAddress: string,
   env = 'mainnet-beta'
 ): TokenInfo | null {
+  if (mintAddress === NATIVE_SOL.mintAddress) {
+    return NATIVE_SOL
+  }
+
   let token = null
 
   for (const symbol of Object.keys(TOKENS[env])) {

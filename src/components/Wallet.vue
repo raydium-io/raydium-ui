@@ -56,6 +56,11 @@ import logger from '@/utils/logger'
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
 
+interface Wallets {
+  [key: string]: any
+  [index: number]: any
+}
+
 export default Vue.extend({
   components: {
     Button,
@@ -74,7 +79,7 @@ export default Vue.extend({
         Bonfida: 'https://bonfida.com/wallet',
         // ezDeFi: '',
         // Coin98: '',
-      },
+      } as Wallets,
 
       // wallet websocket listeners
       accountChangeListenerId: null as number | undefined | null,
@@ -113,7 +118,10 @@ export default Vue.extend({
           break
         }
         case 'MathWallet': {
-          wallet = new SolanaWallet(window.solana, this.wallet.endpoint)
+          wallet = new SolanaWallet(
+            (window as any).solana,
+            this.wallet.endpoint
+          )
           break
         }
         default: {
@@ -135,7 +143,7 @@ export default Vue.extend({
           self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
 
           this.subWebsocket()
-          self.$notify.success({
+          ;(self as any).$notify.success({
             message: 'Wallet connected',
             description: '',
           })
@@ -149,7 +157,7 @@ export default Vue.extend({
         this.unsubWebsocket()
 
         this.$store.commit('wallet/disconnected')
-        self.$notify.warning({
+        ;(self as any).$notify.warning({
           message: 'Wallet disconnected',
         })
       })
@@ -157,7 +165,7 @@ export default Vue.extend({
       try {
         wallet.connect()
       } catch (error) {
-        this.error({
+        ;(this as any).$notify.error({
           message: 'Connect wallet failed',
           description: error.message,
         })
@@ -176,8 +184,8 @@ export default Vue.extend({
     },
 
     subWebsocket() {
-      const conn = this.$conn
-      const wallet = this.$wallet
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
 
       this.accountChangeListenerId = conn?.onAccountChange(
         wallet.publicKey,
@@ -189,7 +197,7 @@ export default Vue.extend({
     },
 
     unsubWebsocket() {
-      const conn = this.$conn
+      const conn = (this as any).$conn
 
       if (this.accountChangeListenerId) {
         conn?.removeAccountChangeListener(this.accountChangeListenerId)

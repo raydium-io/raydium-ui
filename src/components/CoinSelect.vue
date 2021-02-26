@@ -23,7 +23,7 @@
               <Icon type="loading" />
             </div>
             <div v-else-if="token.tokenAccountAddress">
-              {{ formatUnits(token.balance, token.decimals).toString() }}
+              {{ token.uiAmount }}
             </div>
             <div v-else></div>
           </div>
@@ -40,7 +40,6 @@ import { Input, Modal, Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
 import { TOKENS, TokenInfo, NATIVE_SOL } from '@/utils/tokens'
-import { formatUnits } from '@ethersproject/units'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -89,29 +88,36 @@ export default Vue.extend({
 
   methods: {
     importIcon,
-    formatUnits,
 
     createTokenList() {
       this.tokenList = []
 
       let ray = {}
       const nativeSol = NATIVE_SOL
-      let sortedTokenList = []
+
+      let hasBalance = []
+      let noBalance = []
 
       for (const symbol of Object.keys(TOKENS[this.wallet.env])) {
         const token = TOKENS[this.wallet.env][symbol]
         token.symbol = symbol
-        if (symbol === 'RAY') {
-          ray = token
-        } else {
-          sortedTokenList.push(token)
-        }
 
         const tokenAccount = this.wallet.tokenAccounts[token.mintAddress]
 
         if (tokenAccount) {
           token.balance = tokenAccount.balance
           token.tokenAccountAddress = tokenAccount.tokenAccountAddress
+          token.uiAmount = tokenAccount.uiAmount
+
+          if (token.symbol === 'RAY') {
+            ray = token
+          } else {
+            hasBalance.push(token)
+          }
+        } else if (token.symbol === 'RAY') {
+          ray = token
+        } else {
+          noBalance.push(token)
         }
       }
 
@@ -120,17 +126,29 @@ export default Vue.extend({
       if (solAccount) {
         nativeSol.balance = solAccount.balance
         nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
+        nativeSol.uiAmount = solAccount.uiAmount
       }
 
-      sortedTokenList = sortedTokenList.sort((a, b) => {
+      // 余额排序
+      hasBalance = hasBalance.sort((a, b) => {
+        return b.uiAmount - a.uiAmount
+      })
+
+      // 无余额的名字排序
+      noBalance = noBalance.sort((a, b) => {
         return a.symbol.localeCompare(b.symbol)
       })
 
-      if (this.desc) {
-        sortedTokenList.reverse()
+      // 正序 或 倒序
+      if (!this.desc) {
+        this.tokenList = [...[ray, nativeSol], ...hasBalance, ...noBalance]
+      } else {
+        this.tokenList = [
+          ...[ray, nativeSol],
+          ...noBalance.reverse(),
+          ...hasBalance,
+        ]
       }
-
-      this.tokenList = [...[ray, nativeSol], ...sortedTokenList]
     },
 
     setDesc() {
