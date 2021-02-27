@@ -51,7 +51,7 @@
           </template>
           <Icon type="info-circle" />
         </Tooltip>
-        <Icon type="setting" />
+        <Icon type="setting" @click="$store.dispatch('setting/open')" />
       </div>
     </div>
     <CoinSelect

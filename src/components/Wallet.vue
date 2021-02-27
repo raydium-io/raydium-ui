@@ -18,6 +18,7 @@
       :title="!wallet.connected ? 'Connect to a wallet' : 'Your wallet'"
       :visible="wallet.modalShow"
       :footer="null"
+      centered
       @cancel="$store.dispatch('wallet/closeModal')"
     >
       <div v-if="!wallet.connected" class="select-wallet">

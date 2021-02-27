@@ -1,6 +1,7 @@
 <template>
   <Layout>
     <Head />
+    <Setting />
 
     <Content>
       <Nuxt />
@@ -12,6 +13,7 @@
 import Vue from 'vue'
 
 import { Layout } from 'ant-design-vue'
+import Setting from '@/components/Setting.vue'
 
 const { Content } = Layout
 
@@ -19,6 +21,7 @@ export default Vue.extend({
   components: {
     Layout,
     Content,
+    Setting,
   },
 })
 </script>
