@@ -66,10 +66,15 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    'nuxt-clipboard',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
+
+  clipboard: {
+    autoSetContainer: true,
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {

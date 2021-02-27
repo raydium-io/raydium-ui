@@ -3,9 +3,51 @@
     <div class="page-head fs-container">
       <span class="title">Swap</span>
       <div class="buttons">
-        <Tooltip placement="bottom" trigger="click">
+        <Tooltip placement="bottomRight" trigger="click">
           <template slot="title">
-            <span>Address</span>
+            <h3>Addresses</h3>
+            <div class="swap-info">
+              <div v-if="fromCoin" class="info">
+                <div class="symbol">{{ fromCoin.symbol }}</div>
+                <div class="address">
+                  {{ fromCoin.mintAddress.substr(0, 14) }}
+                  ...
+                  {{
+                    fromCoin.mintAddress.substr(
+                      fromCoin.mintAddress.length - 14,
+                      14
+                    )
+                  }}
+                </div>
+                <div class="action">
+                  <Icon
+                    type="copy"
+                    @click="
+                      $store.dispatch('setting/copy', fromCoin.mintAddress)
+                    "
+                  />
+                </div>
+              </div>
+              <div v-if="toCoin" class="info">
+                <div class="symbol">{{ toCoin.symbol }}</div>
+                <div class="address">
+                  {{ toCoin.mintAddress.substr(0, 14) }}
+                  ...
+                  {{
+                    toCoin.mintAddress.substr(
+                      toCoin.mintAddress.length - 14,
+                      14
+                    )
+                  }}
+                </div>
+                <div class="action">
+                  <Icon
+                    type="copy"
+                    @click="$store.dispatch('setting/copy', toCoin.mintAddress)"
+                  />
+                </div>
+              </div>
+            </div>
           </template>
           <Icon type="info-circle" />
         </Tooltip>
@@ -189,7 +231,7 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .container {
   max-width: 450px;
 
@@ -200,6 +242,54 @@ export default Vue.extend({
       border-radius: 50%;
       background: #000829;
       cursor: pointer;
+    }
+  }
+}
+</style>
+
+<style lang="less">
+.ant-tooltip-inner {
+  display: inline-block;
+
+  h3 {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 20px;
+    color: #f1f1f2;
+  }
+
+  .swap-info {
+    font-size: 12px;
+    line-height: 20px;
+    color: #f1f1f2;
+
+    .info {
+      display: grid;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      gap: 10px;
+      grid-template-columns: minmax(auto, 1fr) auto auto;
+
+      .symbol {
+        opacity: 0.75;
+      }
+
+      .address {
+        padding: 2px 4px;
+        background: #131a35;
+        border-radius: 4px;
+        opacity: 0.75;
+      }
+
+      .action {
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+          color: #5ac4be;
+        }
+      }
     }
   }
 }

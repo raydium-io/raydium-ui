@@ -3,6 +3,8 @@ export {
   LoadingOutline,
   // close
   CloseOutline,
+  // copy
+  CopyOutline,
   // notify
   CheckCircleOutline,
   ExclamationCircleOutline,
