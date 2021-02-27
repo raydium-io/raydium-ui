@@ -101,7 +101,7 @@ export default Vue.extend({
     font-size: 16px;
     line-height: 24px;
     flex: 1 1 auto;
-    color: #fff;
+    color: @text-color;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -140,7 +140,7 @@ export default Vue.extend({
     .max-button {
       height: 32px;
       padding: 0 16px;
-      color: #5ac4be;
+      color: @primary-color;
     }
 
     .select-button {

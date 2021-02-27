@@ -1,7 +1,7 @@
 <template>
   <Modal title="Select a token" :visible="true" :footer="null" @cancel="close">
     <div class="select-token">
-      <Input size="large" placeholder="Search name or paste mint address" />
+      <input placeholder="Search name" />
       <div class="sort fs-container">
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
@@ -36,7 +36,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Input, Modal, Icon } from 'ant-design-vue'
+import { Modal, Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
 import { TOKENS, TokenInfo, NATIVE_SOL } from '@/utils/tokens'
@@ -46,7 +46,6 @@ Vue.use(Modal)
 
 export default Vue.extend({
   components: {
-    Input,
     Modal,
     Icon,
   },
@@ -160,10 +159,27 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+@import '../styles/variables';
+
 .select-token {
   display: grid;
   grid-auto-rows: auto;
   row-gap: 14px;
+
+  input {
+    padding: 16px;
+    border: 1px solid @primary-color;
+    border-radius: 4px;
+    background-color: transparent;
+    font-size: 18px;
+    color: @text-color;
+
+    &:active,
+    &:focus,
+    &:hover {
+      outline: 0;
+    }
+  }
 
   .sort {
     .title {
@@ -209,8 +225,9 @@ export default Vue.extend({
       }
     }
 
-    .token-info.disabled {
-      pointer-events: none;
+    .token-info[disabled] {
+      cursor: not-allowed;
+      // pointer-events: none;
       opacity: 0.5;
     }
   }

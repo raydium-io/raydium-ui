@@ -23,8 +23,10 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+@import '../styles/variables';
+
 .header {
-  border-bottom: 2px solid #1c274f;
+  border-bottom: 2px solid @modal-header-bg;
 
   .logo {
     height: 35px;

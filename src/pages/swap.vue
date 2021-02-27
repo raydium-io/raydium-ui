@@ -126,6 +126,8 @@ import {
 } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 
+const RAY = getTokenBySymbol('RAY')
+
 export default Vue.extend({
   components: {
     Icon,
@@ -139,7 +141,8 @@ export default Vue.extend({
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
 
-      fromCoin: getTokenBySymbol('RAY') as TokenInfo | null,
+      // 已选择的币种
+      fromCoin: RAY as TokenInfo | null,
       toCoin: null as TokenInfo | null,
       fromCoinAmount: '',
       toCoinAmount: '',
@@ -248,6 +251,8 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
+@import '../styles/variables';
+
 .ant-tooltip-inner {
   display: inline-block;
 
@@ -255,13 +260,13 @@ export default Vue.extend({
     font-weight: 600;
     font-size: 12px;
     line-height: 20px;
-    color: #f1f1f2;
+    color: @text-color;
   }
 
   .swap-info {
     font-size: 12px;
     line-height: 20px;
-    color: #f1f1f2;
+    color: @text-color;
 
     .info {
       display: grid;
@@ -277,7 +282,7 @@ export default Vue.extend({
 
       .address {
         padding: 2px 4px;
-        background: #131a35;
+        background: @bg-color;
         border-radius: 4px;
         opacity: 0.75;
       }
@@ -287,7 +292,7 @@ export default Vue.extend({
         cursor: pointer;
 
         &:hover {
-          color: #5ac4be;
+          color: @primary-color;
         }
       }
     }
