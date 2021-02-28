@@ -8,7 +8,7 @@ export interface TokenInfo {
 
   tokenAccountAddress?: string
   balance?: number
-  uiAmount?: number
+  uiBalance?: number
 }
 
 /**

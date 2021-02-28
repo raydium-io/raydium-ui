@@ -23,7 +23,7 @@
               <Icon type="loading" />
             </div>
             <div v-else-if="token.tokenAccountAddress">
-              {{ token.uiAmount }}
+              {{ token.uiBalance }}
             </div>
             <div v-else></div>
           </div>
@@ -106,7 +106,7 @@ export default Vue.extend({
         if (tokenAccount) {
           token.balance = tokenAccount.balance
           token.tokenAccountAddress = tokenAccount.tokenAccountAddress
-          token.uiAmount = tokenAccount.uiAmount
+          token.uiBalance = tokenAccount.uiBalance
 
           if (token.symbol === 'RAY') {
             ray = token
@@ -125,12 +125,12 @@ export default Vue.extend({
       if (solAccount) {
         nativeSol.balance = solAccount.balance
         nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
-        nativeSol.uiAmount = solAccount.uiAmount
+        nativeSol.uiBalance = solAccount.uiBalance
       }
 
       // 余额排序
       hasBalance = hasBalance.sort((a, b) => {
-        return b.uiAmount - a.uiAmount
+        return b.uiBalance - a.uiBalance
       })
 
       // 无余额的名字排序

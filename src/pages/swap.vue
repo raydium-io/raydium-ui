@@ -104,7 +104,7 @@
           <template v-else-if="!tradePairExist">
             Insufficient liquidity for this trade
           </template>
-          <template v-else-if="fromCoinAmount > fromCoin.uiAmount">
+          <template v-else-if="fromCoinAmount > fromCoin.uiBalance">
             Insufficient BNB balance
           </template>
           <template v-else>Swap</template>

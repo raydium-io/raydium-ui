@@ -81,7 +81,7 @@ export const actions = {
             const parsedInfo = tokenAccountInfo.account.data.parsed.info
             const mintAddress = parsedInfo.mint
             const balance = parseInt(parsedInfo.tokenAmount.amount)
-            const uiAmount = parsedInfo.tokenAmount.uiAmount
+            const uiBalance = parsedInfo.tokenAmount.uiAmount
 
             // 如果同一 mint 有多个账户
             if (
@@ -92,14 +92,14 @@ export const actions = {
                 tokenAccounts[mintAddress] = {
                   tokenAccountAddress,
                   balance,
-                  uiAmount,
+                  uiBalance,
                 }
               }
             } else {
               tokenAccounts[mintAddress] = {
                 tokenAccountAddress,
                 balance,
-                uiAmount,
+                uiBalance,
               }
             }
           }
@@ -110,7 +110,7 @@ export const actions = {
         tokenAccounts[NATIVE_SOL.mintAddress] = {
           tokenAccountAddress: wallet.publicKey.toBase58(),
           balance: solBalance,
-          uiAmount: parseFloat(formatUnits(solBalance, NATIVE_SOL.decimals)),
+          uiBalance: parseFloat(formatUnits(solBalance, NATIVE_SOL.decimals)),
         }
 
         commit('setTokenAccounts', tokenAccounts)
