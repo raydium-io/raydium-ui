@@ -82,6 +82,7 @@
           :coin-name="toCoin ? toCoin.symbol : ''"
           :ui-balance="toCoin ? toCoin.uiBalance : null"
           :show-max="false"
+          :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
           @onSelect="openToCoinSelect"
         />

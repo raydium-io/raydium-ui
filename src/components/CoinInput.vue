@@ -16,6 +16,7 @@
         minlength="1"
         maxlength="79"
         spellcheck="false"
+        :disabled="disabled"
         @input="$emit('onInput', $event.target.value)"
       />
       <button v-if="showMax && uiBalance" class="max-button">MAX</button>
@@ -68,6 +69,10 @@ export default Vue.extend({
       type: Boolean,
       default: true,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   methods: {
@@ -109,6 +114,10 @@ export default Vue.extend({
     &:hover {
       outline: 0;
     }
+  }
+
+  input[disabled] {
+    cursor: not-allowed;
   }
 
   .coin-input {
