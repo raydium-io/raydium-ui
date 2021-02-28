@@ -1,17 +1,10 @@
-<template>
-  <div class="container">
-    <Button>11</Button>
-  </div>
-</template>
-
 <script lang="ts">
 import Vue from 'vue'
 
-import { Button } from 'ant-design-vue'
-
 export default Vue.extend({
-  components: {
-    Button,
+  // https://github.com/nuxt/nuxt.js/issues/1843
+  fetch({ redirect }) {
+    redirect(302, '/swap')
   },
 })
 </script>
