@@ -240,9 +240,9 @@ export default Vue.extend({
       this.toCoinAmount = tempFromCoinAmount
     },
 
-    updateCoinInfo(newTokenAccounts: any) {
+    updateCoinInfo(tokenAccounts: any) {
       if (this.fromCoin) {
-        const fromCoin = newTokenAccounts[this.fromCoin.mintAddress]
+        const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
 
         if (fromCoin) {
           this.fromCoin = { ...this.fromCoin, ...fromCoin }
@@ -250,7 +250,7 @@ export default Vue.extend({
       }
 
       if (this.toCoin) {
-        const toCoin = newTokenAccounts[this.toCoin.mintAddress]
+        const toCoin = tokenAccounts[this.toCoin.mintAddress]
 
         if (toCoin) {
           this.toCoin = { ...this.toCoin, ...toCoin }

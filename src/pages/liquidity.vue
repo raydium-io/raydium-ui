@@ -64,7 +64,48 @@
             </div>
           </div>
         </TabPane>
-        <TabPane key="position" tab="Your Liquidity"> 1 </TabPane>
+        <TabPane key="position" tab="Your Liquidity">
+          <div class="card">
+            <div class="card-body">
+              <Collapse
+                v-for="liquidity in yourLiquidity"
+                :key="liquidity.mintAddress"
+                expand-icon-position="right"
+              >
+                <CollapsePanel class="liquidity-info" :header="liquidity.name">
+                  <div class="fs-container">
+                    <div>Pooled:</div>
+                    <div>1</div>
+                  </div>
+                  <div class="fs-container">
+                    <div>Pooled:</div>
+                    <div>1</div>
+                  </div>
+                  <div class="fs-container">
+                    <div>Your pool tokens:</div>
+                    <div>{{ liquidity.uiBalance }}</div>
+                  </div>
+                  <div class="fs-container">
+                    <div>Your pool share:</div>
+                    <div>%</div>
+                  </div>
+                  <Row :gutter="32" class="actions">
+                    <Col :span="12">
+                      <Button ghost> Add </Button>
+                    </Col>
+                    <Col :span="12">
+                      <Button ghost> Remove </Button>
+                    </Col>
+                  </Row>
+                </CollapsePanel>
+              </Collapse>
+              <span>
+                If you staked your LP tokens in a farm, unstake them to see them
+                here.
+              </span>
+            </div>
+          </div>
+        </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
           <Tooltip placement="bottomRight" trigger="click">
             <template slot="title">
@@ -131,12 +172,15 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Tabs } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Tabs, Collapse, Row, Col } from 'ant-design-vue'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
+import { getPoolByLpMintAddress } from '@/utils/pools'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 
 const { TabPane } = Tabs
+const CollapsePanel = Collapse.Panel
+
 const RAY = { ...getTokenBySymbol('RAY') }
 
 export default Vue.extend({
@@ -146,6 +190,10 @@ export default Vue.extend({
     Button,
     Tabs,
     TabPane,
+    Collapse,
+    CollapsePanel,
+    Row,
+    Col,
   },
 
   data() {
@@ -161,6 +209,9 @@ export default Vue.extend({
       toCoinAmount: '',
 
       tradePairExist: false,
+
+      // your liquidity
+      yourLiquidity: [] as any,
     }
   },
 
@@ -188,6 +239,7 @@ export default Vue.extend({
     'wallet.tokenAccounts': {
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
+        this.updateYourLiquidity(newTokenAccounts)
       },
       deep: true,
     },
@@ -195,6 +247,7 @@ export default Vue.extend({
 
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
+    this.updateYourLiquidity(this.wallet.tokenAccounts)
   },
 
   methods: {
@@ -243,9 +296,10 @@ export default Vue.extend({
       this.toCoinAmount = tempFromCoinAmount
     },
 
-    updateCoinInfo(newTokenAccounts: any) {
+    // 更新选中币种的余额
+    updateCoinInfo(tokenAccounts: any) {
       if (this.fromCoin) {
-        const fromCoin = newTokenAccounts[this.fromCoin.mintAddress]
+        const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
 
         if (fromCoin) {
           this.fromCoin = { ...this.fromCoin, ...fromCoin }
@@ -253,12 +307,31 @@ export default Vue.extend({
       }
 
       if (this.toCoin) {
-        const toCoin = newTokenAccounts[this.toCoin.mintAddress]
+        const toCoin = tokenAccounts[this.toCoin.mintAddress]
 
         if (toCoin) {
           this.toCoin = { ...this.toCoin, ...toCoin }
         }
       }
+    },
+
+    updateYourLiquidity(tokenAccounts: any) {
+      let yourLiquidity = []
+
+      for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
+        const liquidityPool = getPoolByLpMintAddress(mintAddress)
+
+        if (liquidityPool) {
+          // @ts-ignore
+          yourLiquidity.push({ ...liquidityPool, ...tokenAccount })
+        }
+      }
+
+      yourLiquidity = yourLiquidity.filter(
+        (liquidity) => liquidity.uiBalance !== 0
+      )
+
+      this.yourLiquidity = yourLiquidity
     },
 
     swap() {},
@@ -317,6 +390,24 @@ export default Vue.extend({
 
     .ant-tabs-tab-active {
       opacity: 1;
+    }
+  }
+}
+
+.liquidity-info {
+  .ant-collapse-content-box {
+    display: grid;
+    grid-auto-rows: auto;
+    row-gap: 8px;
+    font-size: 16px;
+    line-height: 24px;
+
+    .actions {
+      margin-top: 10px;
+
+      button {
+        width: 100%;
+      }
     }
   }
 }

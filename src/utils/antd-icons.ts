@@ -23,4 +23,6 @@ export {
   SwapOutline,
   // plus
   PlusOutline,
+  // collapse
+  RightOutline,
 } from '@ant-design/icons'
