@@ -115,7 +115,7 @@
             trigger="click"
           >
             <template slot="title">
-              <h3>Addresses</h3>
+              <p>Addresses</p>
               <div class="swap-info">
                 <div v-if="fromCoin" class="info">
                   <div class="symbol">{{ fromCoin.symbol }}</div>
