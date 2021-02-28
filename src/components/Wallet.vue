@@ -104,10 +104,26 @@ export default Vue.extend({
 
       switch (walletName) {
         case 'Solong': {
+          if ((window as any).solong === undefined) {
+            ;(this as any).$notify.error({
+              message: 'Connect wallet failed',
+              description: 'Please install and initialize Solong first',
+            })
+            return
+          }
+
           wallet = new SolongWallet()
           break
         }
         case 'MathWallet': {
+          if ((window as any).solana === undefined) {
+            ;(this as any).$notify.error({
+              message: 'Connect wallet failed',
+              description: 'Please install and initialize MathWallet first',
+            })
+            return
+          }
+
           wallet = new SolanaWallet(
             (window as any).solana,
             this.wallet.endpoint
