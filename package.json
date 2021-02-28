@@ -31,8 +31,7 @@
     "ant-design-vue": "^1.7.3",
     "core-js": "^3.8.3",
     "nuxt": "^2.15.2",
-    "nuxt-clipboard": "^0.0.2",
-    "vue-class-component": "^7.2.6"
+    "nuxt-clipboard": "^0.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.4",
