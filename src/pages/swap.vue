@@ -174,24 +174,14 @@ export default Vue.extend({
 
     'wallet.tokenAccounts': {
       handler(newTokenAccounts: any) {
-        if (this.fromCoin) {
-          const fromCoin = newTokenAccounts[this.fromCoin.mintAddress]
-
-          if (fromCoin) {
-            this.fromCoin = { ...this.fromCoin, ...fromCoin }
-          }
-        }
-
-        if (this.toCoin) {
-          const toCoin = newTokenAccounts[this.toCoin.mintAddress]
-
-          if (toCoin) {
-            this.toCoin = { ...this.toCoin, ...toCoin }
-          }
-        }
+        this.updateCoinInfo(newTokenAccounts)
       },
       deep: true,
     },
+  },
+
+  mounted() {
+    this.updateCoinInfo(this.wallet.tokenAccounts)
   },
 
   methods: {
@@ -250,6 +240,24 @@ export default Vue.extend({
       this.toCoinAmount = tempFromCoinAmount
     },
 
+    updateCoinInfo(newTokenAccounts: any) {
+      if (this.fromCoin) {
+        const fromCoin = newTokenAccounts[this.fromCoin.mintAddress]
+
+        if (fromCoin) {
+          this.fromCoin = { ...this.fromCoin, ...fromCoin }
+        }
+      }
+
+      if (this.toCoin) {
+        const toCoin = newTokenAccounts[this.toCoin.mintAddress]
+
+        if (toCoin) {
+          this.toCoin = { ...this.toCoin, ...toCoin }
+        }
+      }
+    },
+
     swap() {},
   },
 })
@@ -266,56 +274,6 @@ export default Vue.extend({
       border-radius: 50%;
       background: #000829;
       cursor: pointer;
-    }
-  }
-}
-</style>
-
-<style lang="less">
-@import '../styles/variables';
-
-.ant-tooltip-inner {
-  display: inline-block;
-
-  h3 {
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 20px;
-    color: @text-color;
-  }
-
-  .swap-info {
-    font-size: 12px;
-    line-height: 20px;
-    color: @text-color;
-
-    .info {
-      display: grid;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      gap: 10px;
-      grid-template-columns: minmax(auto, 1fr) auto auto;
-
-      .symbol {
-        opacity: 0.75;
-      }
-
-      .address {
-        padding: 2px 4px;
-        background: @bg-color;
-        border-radius: 4px;
-        opacity: 0.75;
-      }
-
-      .action {
-        font-size: 16px;
-        cursor: pointer;
-
-        &:hover {
-          color: @primary-color;
-        }
-      }
     }
   }
 }

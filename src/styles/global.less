@@ -1,5 +1,9 @@
 @import './variables.less';
 
+* {
+  transition: all 0.3s;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -73,5 +77,51 @@
     background-color: #131a35;
     opacity: 0.9;
     border-radius: 4px;
+  }
+}
+
+.ant-tooltip-inner {
+  display: inline-block;
+
+  h3 {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 20px;
+    color: @text-color;
+  }
+
+  .swap-info {
+    font-size: 12px;
+    line-height: 20px;
+    color: @text-color;
+
+    .info {
+      display: grid;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      gap: 10px;
+      grid-template-columns: minmax(auto, 1fr) auto auto;
+
+      .symbol {
+        opacity: 0.75;
+      }
+
+      .address {
+        padding: 2px 4px;
+        background: @bg-color;
+        border-radius: 4px;
+        opacity: 0.75;
+      }
+
+      .action {
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+          color: @primary-color;
+        }
+      }
+    }
   }
 }

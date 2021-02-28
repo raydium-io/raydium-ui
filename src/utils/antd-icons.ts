@@ -21,4 +21,6 @@ export {
   ArrowDownOutline,
   // swap
   SwapOutline,
+  // plus
+  PlusOutline,
 } from '@ant-design/icons'

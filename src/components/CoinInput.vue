@@ -20,7 +20,11 @@
         @input="$emit('onInput', $event.target.value)"
       />
       <button
-        v-if="showMax && uiBalance && parseFloat(value) < uiBalance"
+        v-if="
+          showMax &&
+          uiBalance &&
+          (isNaN(parseFloat(value)) || parseFloat(value) < uiBalance)
+        "
         class="max-button"
         @click="$emit('onMax')"
       >
