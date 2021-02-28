@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
-      <Tabs>
+      <Tabs v-model="activeTab">
         <TabPane key="add" tab="Add">
           <div class="card">
             <div class="card-body">
@@ -48,7 +48,9 @@
                 "
                 @click="swap"
               >
-                <template v-if="!fromCoin || !toCoin"> Invalid pair </template>
+                <template v-if="!fromCoin || !toCoin">
+                  Select a token
+                </template>
                 <template v-else-if="!fromCoinAmount">
                   Enter an amount
                 </template>
@@ -107,7 +109,11 @@
           </div>
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
-          <Tooltip placement="bottomRight" trigger="click">
+          <Tooltip
+            v-if="activeTab === 'add'"
+            placement="bottomRight"
+            trigger="click"
+          >
             <template slot="title">
               <h3>Addresses</h3>
               <div class="swap-info">
@@ -210,6 +216,7 @@ export default Vue.extend({
 
       tradePairExist: false,
 
+      activeTab: 'add',
       // your liquidity
       yourLiquidity: [] as any,
     }

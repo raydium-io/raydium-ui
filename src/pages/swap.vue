@@ -103,8 +103,8 @@
           :disabled="!fromCoin || !fromCoinAmount || !toCoin || !tradePairExist"
           @click="swap"
         >
-          <template v-if="!fromCoinAmount"> Enter an amount </template>
-          <template v-else-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="!tradePairExist">
             Insufficient liquidity for this trade
           </template>
