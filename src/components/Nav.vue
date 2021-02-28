@@ -39,7 +39,7 @@ export default Vue.extend({
         swap: false,
         liquidity: false,
         farms: false,
-        staking: false,
+        // staking: false,
       },
     }
   },
