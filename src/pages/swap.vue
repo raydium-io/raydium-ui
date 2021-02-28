@@ -67,6 +67,7 @@
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :ui-balance="fromCoin ? fromCoin.uiBalance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
+          @onMax="() => (fromCoinAmount = fromCoin.uiBalance.toString())"
           @onSelect="openFromCoinSelect"
         />
 

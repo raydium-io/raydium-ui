@@ -19,7 +19,13 @@
         :disabled="disabled"
         @input="$emit('onInput', $event.target.value)"
       />
-      <button v-if="showMax && uiBalance" class="max-button">MAX</button>
+      <button
+        v-if="showMax && uiBalance && parseFloat(value) < uiBalance"
+        class="max-button"
+        @click="$emit('onMax')"
+      >
+        MAX
+      </button>
       <button class="select-button fc-container" @click="$emit('onSelect')">
         <div v-if="coinName" class="fc-container">
           <img :src="importIcon(`/coins/${coinName.toLowerCase()}.png`)" />
