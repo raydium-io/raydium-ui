@@ -2,6 +2,7 @@
   <Menu
     v-model="currentRoute"
     :mode="app.isMobile ? 'inline' : 'horizontal'"
+    :theme="app.isMobile ? 'dark' : 'light'"
     @click="changeRoute"
   >
     <MenuItem v-for="(extra, name) in navs" :key="name">
@@ -83,6 +84,6 @@ export default Vue.extend({
 .ant-menu-horizontal > .ant-menu-submenu-open,
 .ant-menu-horizontal > .ant-menu-item-selected,
 .ant-menu-horizontal > .ant-menu-submenu-selected {
-  border-bottom: 2px solid #6a49fe;
+  border-bottom: 2px solid @menu-dark-item-active-bg;
 }
 </style>

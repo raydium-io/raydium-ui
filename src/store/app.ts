@@ -11,7 +11,7 @@ function enquireScreen(call: Function) {
     },
   }
 
-  enquireJs.register('only screen and (max-width: 767.99px)', handler)
+  enquireJs.register('only screen and (max-width: 922.99px)', handler)
 }
 
 export const state = () => ({
