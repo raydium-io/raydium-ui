@@ -1,8 +1,10 @@
+import LocalStorage from '@/utils/local-storage'
+
 export const state = () => ({
   show: false,
 
   // percent
-  slippage: 1,
+  slippage: LocalStorage.get('RAYDIUM_SLIPPAGE') || 1,
 })
 
 export const mutations = {
@@ -12,6 +14,7 @@ export const mutations = {
 
   setSlippage(state: any, slippage: number) {
     state.slippage = slippage
+    LocalStorage.set('RAY_SLIPPAGE', slippage)
   },
 }
 
