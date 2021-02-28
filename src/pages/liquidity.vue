@@ -70,11 +70,18 @@
           <YourLiquidity />
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
-          <Tooltip
-            v-if="activeTab === 'add'"
-            placement="bottomRight"
-            trigger="click"
-          >
+          <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
+            <template slot="title">
+              <span>Quote auto refresh countdown</span>
+            </template>
+            <Progress
+              type="circle"
+              :width="20"
+              :stroke-width="10"
+              :show-info="false"
+            />
+          </Tooltip>
+          <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
             <template slot="title">
               <p>Addresses</p>
               <div class="swap-info">
@@ -135,7 +142,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Tabs } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
@@ -151,6 +158,7 @@ export default Vue.extend({
     Button,
     Tabs,
     TabPane,
+    Progress,
   },
 
   data() {
