@@ -2,7 +2,7 @@
   <div class="coin-select">
     <div class="label fs-container">
       <span>{{ label }}</span>
-      <span v-if="balance"> Balance: {{ balance }} </span>
+      <span v-if="uiBalance"> Balance: {{ uiBalance }} </span>
     </div>
     <div class="coin-input fs-container">
       <input
@@ -18,9 +18,7 @@
         spellcheck="false"
         @input="$emit('onInput', $event.target.value)"
       />
-      <button v-if="showMax && balance && value < balance" class="max-button">
-        MAX
-      </button>
+      <button v-if="showMax && uiBalance" class="max-button">MAX</button>
       <button class="select-button fc-container" @click="$emit('onSelect')">
         <div v-if="coinName" class="fc-container">
           <img :src="importIcon(`/coins/${coinName.toLowerCase()}.png`)" />
@@ -62,13 +60,13 @@ export default Vue.extend({
       type: String,
       default: '',
     },
-    balance: {
-      type: String,
-      default: '',
+    uiBalance: {
+      type: Number,
+      default: null,
     },
     showMax: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
 

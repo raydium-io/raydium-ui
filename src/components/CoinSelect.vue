@@ -11,7 +11,7 @@
           v-for="token in tokenList"
           :key="token.symbol"
           class="token-info"
-          @click="onSelect(token.mintAddress)"
+          @click="onSelect(token)"
         >
           <img :src="importIcon(`/coins/${token.symbol.toLowerCase()}.png`)" />
           <div>
@@ -92,40 +92,38 @@ export default Vue.extend({
       this.tokenList = []
 
       let ray = {}
-      const nativeSol = NATIVE_SOL
+      let nativeSol = { ...NATIVE_SOL }
 
       let hasBalance = []
       let noBalance = []
 
       for (const symbol of Object.keys(TOKENS)) {
-        const token = TOKENS[symbol]
-        token.symbol = symbol
+        // deep copy
+        // Object.assign({}, TOKENS[symbol])
+        let tokenInfo = { ...TOKENS[symbol] }
+        tokenInfo.symbol = symbol
 
-        const tokenAccount = this.wallet.tokenAccounts[token.mintAddress]
+        const tokenAccount = this.wallet.tokenAccounts[tokenInfo.mintAddress]
 
         if (tokenAccount) {
-          token.balance = tokenAccount.balance
-          token.tokenAccountAddress = tokenAccount.tokenAccountAddress
-          token.uiBalance = tokenAccount.uiBalance
+          tokenInfo = { ...tokenInfo, ...tokenAccount }
 
-          if (token.symbol === 'RAY') {
-            ray = token
+          if (tokenInfo.symbol === 'RAY') {
+            ray = { ...tokenInfo }
           } else {
-            hasBalance.push(token)
+            hasBalance.push(tokenInfo)
           }
-        } else if (token.symbol === 'RAY') {
-          ray = token
+        } else if (tokenInfo.symbol === 'RAY') {
+          ray = { ...tokenInfo }
         } else {
-          noBalance.push(token)
+          noBalance.push(tokenInfo)
         }
       }
 
       const solAccount = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
 
       if (solAccount) {
-        nativeSol.balance = solAccount.balance
-        nativeSol.tokenAccountAddress = solAccount.tokenAccountAddress
-        nativeSol.uiBalance = solAccount.uiBalance
+        nativeSol = { ...nativeSol, ...solAccount }
       }
 
       // 余额排序

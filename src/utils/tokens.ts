@@ -67,7 +67,7 @@ interface Tokens {
 
 export const NATIVE_SOL: TokenInfo = {
   symbol: 'SOL',
-  name: 'SOL',
+  name: 'Native Solana',
   mintAddress: '11111111111111111111111111111111',
   decimals: 9,
 }

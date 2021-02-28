@@ -65,6 +65,7 @@
           v-model="fromCoinAmount"
           label="From"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
+          :ui-balance="fromCoin ? fromCoin.uiBalance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onSelect="openFromCoinSelect"
         />
@@ -79,6 +80,7 @@
           v-model="toCoinAmount"
           label="To (Estimate)"
           :coin-name="toCoin ? toCoin.symbol : ''"
+          :ui-balance="toCoin ? toCoin.uiBalance : null"
           :show-max="false"
           @onInput="(amount) => (toCoinAmount = amount)"
           @onSelect="openToCoinSelect"
@@ -119,14 +121,10 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Icon, Tooltip, Button } from 'ant-design-vue'
 
-import {
-  getTokenBySymbol,
-  getTokenByMintAddress,
-  TokenInfo,
-} from '@/utils/tokens'
+import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 
-const RAY = getTokenBySymbol('RAY')
+const RAY = { ...getTokenBySymbol('RAY') }
 
 export default Vue.extend({
   components: {
@@ -171,6 +169,27 @@ export default Vue.extend({
         }
       })
     },
+
+    'wallet.tokenAccounts': {
+      handler(newTokenAccounts: any) {
+        if (this.fromCoin) {
+          const fromCoin = newTokenAccounts[this.fromCoin.mintAddress]
+
+          if (fromCoin) {
+            this.fromCoin = { ...this.fromCoin, ...fromCoin }
+          }
+        }
+
+        if (this.toCoin) {
+          const toCoin = newTokenAccounts[this.toCoin.mintAddress]
+
+          if (toCoin) {
+            this.toCoin = { ...this.toCoin, ...toCoin }
+          }
+        }
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -188,20 +207,20 @@ export default Vue.extend({
       this.coinSelectShow = false
     },
 
-    onCoinSelect(mintAddress: string) {
+    onCoinSelect(tokenInfo: TokenInfo) {
       if (this.selectFromCoin) {
-        this.fromCoin = getTokenByMintAddress(mintAddress)
+        this.fromCoin = { ...tokenInfo }
 
         // 如果选的币种被另一个选了 把另一个重置
-        if (this.toCoin?.mintAddress === mintAddress) {
+        if (this.toCoin?.mintAddress === tokenInfo.mintAddress) {
           this.toCoin = null
           this.changeCoinAmountPosition()
         }
       } else {
-        this.toCoin = getTokenByMintAddress(mintAddress)
+        this.toCoin = { ...tokenInfo }
 
         // 如果选的币种被另一个选了 把另一个重置
-        if (this.fromCoin?.mintAddress === mintAddress) {
+        if (this.fromCoin?.mintAddress === tokenInfo.mintAddress) {
           this.fromCoin = null
           this.changeCoinAmountPosition()
         }
