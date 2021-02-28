@@ -10,18 +10,39 @@
       <h3>Slippage tolerance</h3>
       <Row class="slippage-setting" :gutter="30">
         <Col :span="6">
-          <button>0.1%</button>
+          <button
+            :class="slippage === '0.1' ? 'active' : ''"
+            @click="() => (slippage = '0.1')"
+          >
+            0.1%
+          </button>
         </Col>
         <Col :span="6">
-          <button>0.5%</button>
+          <button
+            :class="slippage === '0.5' ? 'active' : ''"
+            @click="() => (slippage = '0.5')"
+          >
+            0.5%
+          </button>
         </Col>
         <Col :span="6">
-          <button>1%</button>
+          <button
+            :class="slippage === '1' ? 'active' : ''"
+            @click="() => (slippage = '1')"
+          >
+            1%
+          </button>
         </Col>
         <Col :span="6">
-          <Input size="large" suffix="%" />
+          <Input
+            v-model="slippage"
+            :class="errorMsg ? 'has-error' : ''"
+            size="large"
+            suffix="%"
+          />
         </Col>
       </Row>
+      <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
     </div>
   </Modal>
 </template>
@@ -30,6 +51,8 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Modal, Row, Col, Input } from 'ant-design-vue'
+
+import { inputRegex, escapeRegExp } from '@/utils/regex'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -42,8 +65,42 @@ export default Vue.extend({
     Input,
   },
 
+  data() {
+    return {
+      slippage: '1',
+      errorMsg: '',
+    }
+  },
+
   computed: {
     ...mapState(['setting']),
+  },
+
+  watch: {
+    slippage(newSlippage: string, oldSlippage: string) {
+      this.$nextTick(() => {
+        if (!inputRegex.test(escapeRegExp(newSlippage))) {
+          this.slippage = oldSlippage
+        } else {
+          const slippage = parseFloat(newSlippage)
+          if (slippage >= 50) {
+            this.errorMsg = 'Enter a valid slippage percentage'
+          } else {
+            if (slippage < 1) {
+              this.errorMsg = 'Your transaction may fail'
+            } else {
+              this.errorMsg = ''
+            }
+
+            this.$store.commit('setting/setSlippage', parseFloat(newSlippage))
+          }
+        }
+      })
+    },
+  },
+
+  mounted() {
+    this.slippage = this.setting.slippage.toString()
   },
 })
 </script>
@@ -54,8 +111,8 @@ export default Vue.extend({
 .slippage {
   h3 {
     font-weight: 600;
-    font-size: 12px;
-    line-height: 20px;
+    font-size: 16px;
+    line-height: 1.5;
     color: @text-color;
   }
 
@@ -87,6 +144,18 @@ export default Vue.extend({
         outline: 0;
       }
     }
+
+    button.active {
+      background-color: @primary-color;
+    }
+  }
+
+  .error-message {
+    color: #f5222d;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-top: 8px;
   }
 }
 </style>
@@ -101,6 +170,18 @@ export default Vue.extend({
     font-size: 12px;
     line-height: 20px;
     font-weight: 600;
+  }
+}
+
+.has-error {
+  input {
+    border-color: #f5222d;
+
+    &:active,
+    &:focus,
+    &:hover {
+      border-color: #f5222d !important;
+    }
   }
 }
 </style>

@@ -1,10 +1,17 @@
 export const state = () => ({
   show: false,
+
+  // percent
+  slippage: 1,
 })
 
 export const mutations = {
   setModal(state: any, show: boolean) {
     state.show = show
+  },
+
+  setSlippage(state: any, slippage: number) {
+    state.slippage = slippage
   },
 }
 
