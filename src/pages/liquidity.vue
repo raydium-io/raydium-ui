@@ -44,9 +44,9 @@
                 size="large"
                 ghost
                 :disabled="
-                  !fromCoin || !fromCoinAmount || !toCoin || !tradePairExist
+                  !fromCoin || !fromCoinAmount || !toCoin || !liquidityPool
                 "
-                @click="swap"
+                @click="supply"
               >
                 <template v-if="!fromCoin || !toCoin">
                   Select a token
@@ -54,7 +54,7 @@
                 <template v-else-if="!fromCoinAmount">
                   Enter an amount
                 </template>
-                <template v-else-if="!tradePairExist"> Invalid pair </template>
+                <template v-else-if="!liquidityPool"> Invalid pair </template>
                 <template v-else-if="fromCoinAmount > fromCoin.uiBalance">
                   Insufficient BNB balance
                 </template>
@@ -214,7 +214,7 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      tradePairExist: false,
+      liquidityPool: null,
 
       activeTab: 'add',
       // your liquidity
@@ -341,7 +341,7 @@ export default Vue.extend({
       this.yourLiquidity = yourLiquidity
     },
 
-    swap() {},
+    supply() {},
   },
 })
 </script>

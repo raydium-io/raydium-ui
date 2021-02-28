@@ -100,12 +100,12 @@
           v-else
           size="large"
           ghost
-          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !tradePairExist"
+          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !swapPool"
           @click="swap"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-          <template v-else-if="!tradePairExist">
+          <template v-else-if="!swapPool">
             Insufficient liquidity for this trade
           </template>
           <template v-else-if="fromCoinAmount > fromCoin.uiBalance">
@@ -147,7 +147,7 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      tradePairExist: false,
+      swapPool: null,
     }
   },
 
