@@ -1,4 +1,78 @@
-const tokens = {
+export interface TokenInfo {
+  symbol?: string
+  name: string
+  mintAddress: string
+  decimals: number
+
+  referrer?: string
+
+  tokenAccountAddress?: string
+  balance?: number
+  uiAmount?: number
+}
+
+/**
+ * Get token use symbol
+
+ * @param {string} symbol
+
+ * @returns {TokenInfo | null} tokenInfo
+ */
+export function getTokenBySymbol(symbol: string): TokenInfo | null {
+  if (symbol === 'SOL') {
+    return NATIVE_SOL
+  }
+
+  let token = TOKENS[symbol]
+
+  if (token) {
+    token.symbol = symbol
+  } else {
+    token = null
+  }
+
+  return token
+}
+
+/**
+ * Get token use mint addresses
+
+ * @param {string} mintAddress
+
+ * @returns {TokenInfo | null} tokenInfo
+ */
+export function getTokenByMintAddress(mintAddress: string): TokenInfo | null {
+  if (mintAddress === NATIVE_SOL.mintAddress) {
+    return NATIVE_SOL
+  }
+
+  let token = null
+
+  for (const symbol of Object.keys(TOKENS)) {
+    const info = TOKENS[symbol]
+
+    if (info.mintAddress === mintAddress) {
+      token = info
+      token.symbol = symbol
+    }
+  }
+
+  return token
+}
+
+interface Tokens {
+  [key: string]: any
+  [index: number]: any
+}
+
+export const NATIVE_SOL: TokenInfo = {
+  symbol: 'SOL',
+  name: 'SOL',
+  mintAddress: '11111111111111111111111111111111',
+  decimals: 9,
+}
+
+export const TOKENS: Tokens = {
   WSOL: {
     mintAddress: 'So11111111111111111111111111111111111111112',
     name: 'Wrapped Solana',
@@ -193,5 +267,3 @@ const tokens = {
     referrer: 'EzKxGKPF9wF5uKDzCMQnkHmqaBhHiS22372pCLvxfmtQ',
   },
 }
-
-export default tokens

@@ -10,7 +10,6 @@ export const state = () => ({
 
   connected: false,
   address: '',
-  env: 'mainnet-beta',
   // endpoint: 'https://api.mainnet-beta.solana.com',
   endpoint: 'https://solana-api.projectserum.com',
 

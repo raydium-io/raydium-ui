@@ -97,8 +97,8 @@ export default Vue.extend({
       let hasBalance = []
       let noBalance = []
 
-      for (const symbol of Object.keys(TOKENS[this.wallet.env])) {
-        const token = TOKENS[this.wallet.env][symbol]
+      for (const symbol of Object.keys(TOKENS)) {
+        const token = TOKENS[symbol]
         token.symbol = symbol
 
         const tokenAccount = this.wallet.tokenAccounts[token.mintAddress]
