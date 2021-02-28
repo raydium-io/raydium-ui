@@ -22,9 +22,7 @@
                 <div class="action">
                   <Icon
                     type="copy"
-                    @click="
-                      $store.dispatch('setting/copy', fromCoin.mintAddress)
-                    "
+                    @click="$store.dispatch('app/copy', fromCoin.mintAddress)"
                   />
                 </div>
               </div>
@@ -43,7 +41,7 @@
                 <div class="action">
                   <Icon
                     type="copy"
-                    @click="$store.dispatch('setting/copy', toCoin.mintAddress)"
+                    @click="$store.dispatch('app/copy', toCoin.mintAddress)"
                   />
                 </div>
               </div>

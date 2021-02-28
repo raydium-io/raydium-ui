@@ -30,6 +30,7 @@
     "@solana/web3.js": "^0.92.2",
     "ant-design-vue": "^1.7.3",
     "core-js": "^3.8.3",
+    "enquire.js": "^2.1.6",
     "nuxt": "^2.15.2",
     "nuxt-clipboard": "^0.0.2"
   },

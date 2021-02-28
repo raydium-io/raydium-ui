@@ -1,5 +1,9 @@
 <template>
-  <Menu v-model="currentRoute" mode="horizontal" @click="changeRoute">
+  <Menu
+    v-model="currentRoute"
+    :mode="app.isMobile ? 'inline' : 'horizontal'"
+    @click="changeRoute"
+  >
     <MenuItem v-for="(extra, name) in navs" :key="name">
       <a
         v-if="extra"
@@ -40,7 +44,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['url']),
+    ...mapState(['app', 'url']),
     currentRoute: {
       get() {
         return [this.$store.state.route.name]

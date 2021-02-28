@@ -19,6 +19,10 @@ export default Vue.extend({
   components: {
     Header,
   },
+
+  mounted() {
+    this.$store.dispatch('app/queryIsMobile')
+  },
 })
 </script>
 
