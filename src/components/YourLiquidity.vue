@@ -14,7 +14,7 @@
           :key="liquidity.mintAddress"
           expand-icon-position="right"
         >
-          <CollapsePanel class="liquidity-info" :header="liquidity.name">
+          <CollapsePanel class="liquidity-info" :header="liquidity.pool.name">
             <div class="fs-container">
               <div>Pooled:</div>
               <div>1</div>
@@ -25,7 +25,7 @@
             </div>
             <div class="fs-container">
               <div>Your pool tokens:</div>
-              <div>{{ liquidity.uiBalance }}</div>
+              <div>{{ liquidity.user.uiBalance }}</div>
             </div>
             <div class="fs-container">
               <div>Your pool share:</div>
@@ -54,7 +54,7 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Button, Collapse, Row, Col, Spin, Icon } from 'ant-design-vue'
 
-import { getPoolByLpMintAddress } from '@/utils/pools'
+import Liquidity from '@/utils/liquidity'
 
 const CollapsePanel = Collapse.Panel
 
@@ -98,15 +98,19 @@ export default Vue.extend({
       let liquids = []
 
       for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
-        const liquidityPool = getPoolByLpMintAddress(mintAddress)
+        const liquidityPool = Liquidity.getByLpMintAddress(mintAddress)
 
         if (liquidityPool) {
           // @ts-ignore
-          liquids.push({ ...liquidityPool, ...tokenAccount })
+          liquids.push({
+            ...{ pool: liquidityPool },
+            ...{ user: tokenAccount },
+          })
         }
       }
 
-      liquids = liquids.filter((liquidity) => liquidity.uiBalance !== 0)
+      // @ts-ignore
+      liquids = liquids.filter((liquidity) => liquidity.user.uiBalance !== 0)
 
       this.liquids = liquids
     },

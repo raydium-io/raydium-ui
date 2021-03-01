@@ -31,6 +31,26 @@
                 @onSelect="openToCoinSelect"
               />
 
+              <div
+                v-if="liquidityPool && liquidityPool.hasQuote"
+                class="price-base fc-container"
+              >
+                <span v-if="coinBasePrice">
+                  1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
+                  {{ liquidityPool.getPrice() }}
+                  {{ liquidityPool.poolInfo.pc.symbol }}
+                </span>
+                <span v-else>
+                  1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
+                  {{ liquidityPool.getPrice(false) }}
+                  {{ liquidityPool.poolInfo.coin.symbol }}
+                </span>
+                <Icon
+                  type="swap"
+                  @click="() => (coinBasePrice = !coinBasePrice)"
+                />
+              </div>
+
               <Button
                 v-if="!wallet.connected"
                 size="large"
@@ -44,7 +64,13 @@
                 size="large"
                 ghost
                 :disabled="
-                  !fromCoin || !fromCoinAmount || !toCoin || !liquidityPool
+                  !fromCoin ||
+                  !fromCoinAmount ||
+                  !toCoin ||
+                  !liquidityPool ||
+                  liquidityPool.quoting ||
+                  parseFloat(fromCoinAmount) > fromCoin.uiBalance ||
+                  parseFloat(toCoinAmount) > toCoin.uiBalance
                 "
                 @click="supply"
               >
@@ -55,11 +81,18 @@
                   Enter an amount
                 </template>
                 <template v-else-if="!liquidityPool"> Invalid pair </template>
-                <template v-else-if="fromCoinAmount > fromCoin.uiBalance">
-                  Insufficient BNB balance
+                <template v-else-if="liquidityPool.quoting">
+                  Requesting pool's infomations
                 </template>
-                <template v-else-if="toCoinAmount > toCoin.uiBalance">
-                  Insufficient BNB balance
+                <template
+                  v-else-if="parseFloat(fromCoinAmount) > fromCoin.uiBalance"
+                >
+                  Insufficient {{ fromCoin.symbol }} balance
+                </template>
+                <template
+                  v-else-if="parseFloat(toCoinAmount) > toCoin.uiBalance"
+                >
+                  Insufficient {{ toCoin.symbol }} balance
                 </template>
                 <template v-else>Supply</template>
               </Button>
@@ -146,6 +179,8 @@ import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
+import Liquidity from '@/utils/liquidity'
+import logger from '@/utils/logger'
 
 const { TabPane } = Tabs
 
@@ -173,7 +208,9 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      liquidityPool: null,
+      liquidityPool: null as Liquidity | null,
+      // coin 为基准货币
+      coinBasePrice: true,
 
       activeTab: 'add',
     }
@@ -206,10 +243,20 @@ export default Vue.extend({
       },
       deep: true,
     },
+
+    fromCoin() {
+      this.findLiquidityPool()
+    },
+
+    toCoin() {
+      this.findLiquidityPool()
+    },
   },
 
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
+
+    this.updatePoolInfo()
   },
 
   methods: {
@@ -274,6 +321,43 @@ export default Vue.extend({
         if (toCoin) {
           this.toCoin = { ...this.toCoin, ...toCoin }
         }
+      }
+    },
+
+    findLiquidityPool() {
+      if (this.fromCoin && this.toCoin) {
+        const liquidityPoolInfo = Liquidity.getByTokenMintAddresses(
+          this.fromCoin.mintAddress,
+          this.toCoin.mintAddress
+        )
+        if (liquidityPoolInfo) {
+          this.liquidityPool = Liquidity.load(liquidityPoolInfo)
+        } else {
+          this.liquidityPool = null
+        }
+      } else {
+        this.liquidityPool = null
+      }
+    },
+
+    updatePoolInfo() {
+      if (this.liquidityPool) {
+        const conn = (this as any).$conn
+
+        this.liquidityPool
+          .requestQuote(conn)
+          .then()
+          .finally(() => {
+            logger('Liquidity pool quote updated')
+
+            setTimeout(() => {
+              this.updatePoolInfo()
+            }, 1000 * 10)
+          })
+      } else {
+        setTimeout(() => {
+          this.updatePoolInfo()
+        }, 1000)
       }
     },
 

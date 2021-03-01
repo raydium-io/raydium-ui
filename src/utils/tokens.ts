@@ -3,6 +3,7 @@ export interface TokenInfo {
   name: string
   mintAddress: string
   decimals: number
+  totalSupply?: number
 
   referrer?: string
 
@@ -265,5 +266,38 @@ export const TOKENS: Tokens = {
     name: 'Raydium',
     decimals: 6,
     referrer: 'EzKxGKPF9wF5uKDzCMQnkHmqaBhHiS22372pCLvxfmtQ',
+  },
+}
+
+export const LP_TOKENS: Tokens = {
+  'RAY-USDT': {
+    mintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
+    name: 'RAY-USDT LP',
+    decimals: 6,
+  },
+  'RAY-SOL': {
+    mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
+    name: 'RAY-SOL LP',
+    decimals: 6,
+  },
+  'LINK-USDT': {
+    mintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
+    name: 'LINK-USDT LP',
+    decimals: 6,
+  },
+  'ETH-USDT': {
+    mintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
+    name: 'ETH-USDT LP',
+    decimals: 6,
+  },
+  'RAY-USDC': {
+    mintAddress: 'FgmBnsF5Qrnv8X9bomQfEtQTQjNNiBCWRKGpzPnE5BDg',
+    name: 'RAY-USDC LP',
+    decimals: 6,
+  },
+  'RAY-SRM': {
+    mintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
+    name: 'RAY-SRM LP',
+    decimals: 6,
   },
 }

@@ -1,13 +1,12 @@
-import { NATIVE_SOL, TOKENS } from './tokens'
+import { LP_TOKENS, NATIVE_SOL, TOKENS, TokenInfo } from './tokens'
 
 import { SERUM_PROGRAM_IDS_V2 } from './serum'
 
 export interface LiquidityPoolInfo {
   name: string
-  coinMintAddress: string
-  pcMintAddress: string
-  lpMintAddress: string
-  lpDecimals: number
+  coin: TokenInfo
+  pc: TokenInfo
+  lp: TokenInfo
 
   ammId: string
   ammAuthority: string
@@ -37,32 +36,32 @@ export interface LiquidityPoolInfo {
 
  * @returns {LiquidityPoolInfo | undefined} poolInfo
  */
-export function getPoolByCoinMintAddresses(
+export function getPoolByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string
 ): LiquidityPoolInfo | undefined {
   return LIQUIDITY_POOLS.find(
     (pool) =>
-      (pool.coinMintAddress === coinMintAddress &&
-        pool.pcMintAddress === pcMintAddress) ||
-      (pool.coinMintAddress === pcMintAddress &&
-        pool.pcMintAddress === coinMintAddress)
+      (pool.coin.mintAddress === coinMintAddress &&
+        pool.pc.mintAddress === pcMintAddress) ||
+      (pool.coin.mintAddress === pcMintAddress &&
+        pool.pc.mintAddress === coinMintAddress)
   )
 }
 
 export function getPoolByLpMintAddress(
   lpMintAddress: string
 ): LiquidityPoolInfo | undefined {
-  return LIQUIDITY_POOLS.find((pool) => pool.lpMintAddress === lpMintAddress)
+  return LIQUIDITY_POOLS.find((pool) => pool.lp.mintAddress === lpMintAddress)
 }
 
 export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   {
     name: 'RAY-USDT',
-    coinMintAddress: TOKENS.RAY.mintAddress,
-    pcMintAddress: TOKENS.USDT.mintAddress,
-    lpMintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
-    lpDecimals: 6,
+    coin: TOKENS.RAY,
+    pc: TOKENS.USDT,
+    lp: LP_TOKENS['RAY-USDT'],
+
     ammId: '4GygMmZgSoyfM3DEBpA8HvB8pooKWnTp232bKA17ptMG',
     ammAuthority: 'E8ddPSxjVUdW8wa5rs3gbscqoXQF1o7sJrkUMFU18zMS',
     ammOpenOrders: 'Ht7CkowEPZ5yHQpQQhzhgnN8W7Dq3Gw96Z3Ph8f3tVpY',
@@ -81,10 +80,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-SOL',
-    coinMintAddress: TOKENS.RAY.mintAddress,
-    pcMintAddress: NATIVE_SOL.mintAddress,
-    lpMintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
-    lpDecimals: 6,
+    coin: TOKENS.RAY,
+    pc: NATIVE_SOL,
+    lp: LP_TOKENS['RAY-SOL'],
+
     ammId: '5Ytcen7ZQRWA8Dt4EGyVJngyqDL36ZKAGSTVKxbDGZPN',
     ammAuthority: '6LUFae1Ap44GVT9Dhw7NEqibFGSFxijdx4kzKVARsSuL',
     ammOpenOrders: '4JGNm7gSaZguaNJExYsFsL91x4GPtPyHpU7nrb5Jjygh',
@@ -103,10 +102,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'LINK-USDT',
-    coinMintAddress: TOKENS.LINK.mintAddress,
-    pcMintAddress: TOKENS.USDT.mintAddress,
-    lpMintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
-    lpDecimals: 6,
+    coin: TOKENS.LINK,
+    pc: TOKENS.USDT,
+    lp: LP_TOKENS['LINK-USDT'],
+
     ammId: 'Avkh3hMrjRRdGbm7EAmeXaJ1wWrbcwGWDGEroKq5wHJ8',
     ammAuthority: 'v1uTXS1hrW2DJkKPcQ3Dm7WwhYbGm7LhHoRE29QrHsJ',
     ammOpenOrders: 'HD7VPeJL2Sgict6oBPhb2s3DXvS9uieQmuw7KzhrfD3j',
@@ -125,10 +124,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'ETH-USDT',
-    coinMintAddress: TOKENS.ETH.mintAddress,
-    pcMintAddress: TOKENS.USDT.mintAddress,
-    lpMintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
-    lpDecimals: 6,
+    coin: TOKENS.ETH,
+    pc: TOKENS.USDT,
+    lp: LP_TOKENS['ETH-USDT'],
+
     ammId: '7PGNXqdhrpQoVS5uQs9gjT1zfY6MUzEeYHopRnryj7rm',
     ammAuthority: 'BFCEvcoD1xY1HK4psbC5wYXVXEvmgwg4wKggk89u1NWw',
     ammOpenOrders: '3QaSNxMuA9zEXazLdD2oJq7jUCfShgtvdaepuq1uJFnS',
@@ -147,10 +146,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-USDC',
-    coinMintAddress: TOKENS.RAY.mintAddress,
-    pcMintAddress: TOKENS.USDC.mintAddress,
-    lpMintAddress: 'FgmBnsF5Qrnv8X9bomQfEtQTQjNNiBCWRKGpzPnE5BDg',
-    lpDecimals: 6,
+    coin: TOKENS.RAY,
+    pc: TOKENS.USDC,
+    lp: LP_TOKENS['RAY-USDC'],
+
     ammId: 'G2PVNAKAp17xtruKiMwT1S2GWNxptWZfqK6oYrFWCXWX',
     ammAuthority: '2XTg6m9wpuUyPNhHbi8DCGfyo58bpqmAmbujEEpUykSo',
     ammOpenOrders: 'HuGmmcqH6ULntUdfaCVrx4uzuhHME55Dczt793EweoTZ',
@@ -169,10 +168,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-SRM',
-    coinMintAddress: TOKENS.RAY.mintAddress,
-    pcMintAddress: TOKENS.SRM.mintAddress,
-    lpMintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
-    lpDecimals: 6,
+    coin: TOKENS.RAY,
+    pc: TOKENS.SRM,
+    lp: LP_TOKENS['RAY-SRM'],
+
     ammId: '3Y5dpV9DtwkhewxXpiVRscFeQR2dvsHovXQonkKbuDwB',
     ammAuthority: '7iND8ysb6fGUy8tx4C8AS51wbjvRjBxxSoaaL7t1yWXX',
     ammOpenOrders: '4QXs3bK3nyauMYutJjD8qGunFphAw944SsRdSD7n8oUj',

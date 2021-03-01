@@ -25,6 +25,7 @@
   "dependencies": {
     "@ethersproject/units": "^5.0.10",
     "@nuxtjs/axios": "^5.12.5",
+    "@project-serum/serum": "^0.13.24",
     "@project-serum/sol-wallet-adapter": "^0.1.5",
     "@project-serum/token": "^0.0.1-alpha.2",
     "@solana/web3.js": "^0.92.2",
