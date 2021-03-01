@@ -1,38 +1,47 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <Collapse
-        v-for="liquidity in liquids"
-        :key="liquidity.mintAddress"
-        expand-icon-position="right"
-      >
-        <CollapsePanel class="liquidity-info" :header="liquidity.name">
-          <div class="fs-container">
-            <div>Pooled:</div>
-            <div>1</div>
-          </div>
-          <div class="fs-container">
-            <div>Pooled:</div>
-            <div>1</div>
-          </div>
-          <div class="fs-container">
-            <div>Your pool tokens:</div>
-            <div>{{ liquidity.uiBalance }}</div>
-          </div>
-          <div class="fs-container">
-            <div>Your pool share:</div>
-            <div>%</div>
-          </div>
-          <Row :gutter="32" class="actions">
-            <Col :span="12">
-              <Button ghost> Add </Button>
-            </Col>
-            <Col :span="12">
-              <Button ghost> Remove </Button>
-            </Col>
-          </Row>
-        </CollapsePanel>
-      </Collapse>
+      <div v-if="!wallet.connected" class="fc-container">
+        <Button size="large" ghost @click="$store.dispatch('wallet/openModal')">
+          Unlock Wallet
+        </Button>
+      </div>
+      <Spin v-else :spinning="wallet.tokenAccountsLoading">
+        <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
+
+        <Collapse
+          v-for="liquidity in liquids"
+          :key="liquidity.mintAddress"
+          expand-icon-position="right"
+        >
+          <CollapsePanel class="liquidity-info" :header="liquidity.name">
+            <div class="fs-container">
+              <div>Pooled:</div>
+              <div>1</div>
+            </div>
+            <div class="fs-container">
+              <div>Pooled:</div>
+              <div>1</div>
+            </div>
+            <div class="fs-container">
+              <div>Your pool tokens:</div>
+              <div>{{ liquidity.uiBalance }}</div>
+            </div>
+            <div class="fs-container">
+              <div>Your pool share:</div>
+              <div>%</div>
+            </div>
+            <Row :gutter="32" class="actions">
+              <Col :span="12">
+                <Button ghost> Add </Button>
+              </Col>
+              <Col :span="12">
+                <Button ghost> Remove </Button>
+              </Col>
+            </Row>
+          </CollapsePanel>
+        </Collapse>
+      </Spin>
       <span>
         If you staked your LP tokens in a farm, unstake them to see them here.
       </span>
@@ -43,7 +52,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Collapse, Row, Col } from 'ant-design-vue'
+import { Button, Collapse, Row, Col, Spin, Icon } from 'ant-design-vue'
 
 import { getPoolByLpMintAddress } from '@/utils/pools'
 
@@ -51,10 +60,13 @@ const CollapsePanel = Collapse.Panel
 
 export default Vue.extend({
   components: {
+    Button,
     Collapse,
     CollapsePanel,
     Row,
     Col,
+    Spin,
+    Icon,
   },
 
   data() {
@@ -104,20 +116,25 @@ export default Vue.extend({
 
 <style lang="less">
 @import '../styles/variables';
+.ant-spin-container {
+  display: grid;
+  grid-auto-rows: auto;
+  row-gap: 12px;
 
-.liquidity-info {
-  .ant-collapse-content-box {
-    display: grid;
-    grid-auto-rows: auto;
-    row-gap: 8px;
-    font-size: 16px;
-    line-height: 24px;
+  .liquidity-info {
+    .ant-collapse-content-box {
+      display: grid;
+      grid-auto-rows: auto;
+      row-gap: 8px;
+      font-size: 16px;
+      line-height: 24px;
 
-    .actions {
-      margin-top: 10px;
+      .actions {
+        margin-top: 10px;
 
-      button {
-        width: 100%;
+        button {
+          width: 100%;
+        }
       }
     }
   }
