@@ -56,7 +56,10 @@ export const actions = {
     })
   },
 
-  getTokenAccounts({ commit }: { commit: any }) {
+  getTokenAccounts(
+    { commit, dispatch }: { commit: any; dispatch: any },
+    loop = false
+  ) {
     const conn = (this as any)._vm.$conn
     const wallet = (this as any)._vm.$wallet
 
@@ -117,6 +120,13 @@ export const actions = {
         commit('loadingTokenAccounts', false)
 
         logger('TokenAccounts updated')
+      })
+      .finally(() => {
+        if (loop) {
+          setTimeout(() => {
+            dispatch('getTokenAccounts')
+          }, 1000 * 10)
+        }
       })
   },
 }
