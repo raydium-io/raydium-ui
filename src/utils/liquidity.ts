@@ -8,6 +8,7 @@ import {
 import { nu64, struct } from 'buffer-layout'
 
 import { OpenOrders } from '@project-serum/serum'
+import { TokenAmount } from '@/utils/safe-math'
 import { publicKeyLayout } from '@project-serum/serum/lib/layout'
 
 export default class Liquidity {
@@ -33,18 +34,14 @@ export default class Liquidity {
   getPrice(coinBase = true) {
     const { coin, pc } = this.poolInfo
 
-    if (!coin.balance || !pc.balance) {
+    if (!coin.uiBalance || !pc.uiBalance) {
       return NaN
     }
 
     if (coinBase) {
-      return (
-        pc.balance / 10 ** pc.decimals / (coin.balance / 10 ** coin.decimals)
-      )
+      return pc.uiBalance.dividedBy(coin.uiBalance)
     } else {
-      return (
-        coin.balance / 10 ** coin.decimals / (pc.balance / 10 ** pc.decimals)
-      )
+      return coin.uiBalance.dividedBy(pc.uiBalance)
     }
   }
 
@@ -58,13 +55,24 @@ export default class Liquidity {
       connection
     )
 
-    const { needTakePnlCoin, needTakePnlPc } = await this.getAmmInfo(connection)
+    let { needTakePnlCoin, needTakePnlPc } = await this.getAmmInfo(connection)
+    needTakePnlCoin = TokenAmount.toBigNumber(needTakePnlCoin)
+    needTakePnlPc = TokenAmount.toBigNumber(needTakePnlPc)
 
-    const coinBalance = unusedCoin + baseTokenTotal - needTakePnlCoin
-    const pcBalance = unusedPc + quoteTokenTotal - needTakePnlPc
+    const coinBalance = unusedCoin.plus(baseTokenTotal).minus(needTakePnlCoin)
+    const pcBalance = unusedPc.plus(quoteTokenTotal).minus(needTakePnlPc)
 
     this.poolInfo.coin.balance = coinBalance
+    this.poolInfo.coin.uiBalance = TokenAmount.toFloat(
+      coinBalance,
+      this.poolInfo.coin.decimals
+    )
+
     this.poolInfo.pc.balance = pcBalance
+    this.poolInfo.pc.uiBalance = TokenAmount.toFloat(
+      pcBalance,
+      this.poolInfo.pc.decimals
+    )
 
     this.quoting = false
     this.hasQuote = true
@@ -82,8 +90,8 @@ export default class Liquidity {
     )
 
     return {
-      unusedCoin: parseInt(poolCoinInfo.value.amount),
-      unusedPc: parseInt(poolPcInfo.value.amount),
+      unusedCoin: TokenAmount.toBigNumber(poolCoinInfo.value.amount),
+      unusedPc: TokenAmount.toBigNumber(poolPcInfo.value.amount),
     }
   }
 
@@ -93,8 +101,8 @@ export default class Liquidity {
       new PublicKey(this.poolInfo.ammOpenOrders)
     )
 
-    let baseTokenTotal = 0
-    let quoteTokenTotal = 0
+    let baseTokenTotal = TokenAmount.toBigNumber(0)
+    let quoteTokenTotal = TokenAmount.toBigNumber(0)
 
     if (!accountInfo) {
       return { baseTokenTotal, quoteTokenTotal }
@@ -106,8 +114,12 @@ export default class Liquidity {
       new PublicKey(this.poolInfo.serumProgramId)
     )
 
-    baseTokenTotal = openOrders.baseTokenTotal.toNumber()
-    quoteTokenTotal = openOrders.quoteTokenTotal.toNumber()
+    baseTokenTotal = TokenAmount.toBigNumber(
+      openOrders.baseTokenTotal.toNumber()
+    )
+    quoteTokenTotal = TokenAmount.toBigNumber(
+      openOrders.quoteTokenTotal.toNumber()
+    )
 
     return { baseTokenTotal, quoteTokenTotal }
   }

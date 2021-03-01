@@ -1,15 +1,18 @@
+import BigNumber from 'bignumber.js'
+
 export interface TokenInfo {
-  symbol?: string
+  symbol: string
   name: string
+
   mintAddress: string
   decimals: number
-  totalSupply?: number
+  totalSupply?: BigNumber
 
   referrer?: string
 
   tokenAccountAddress?: string
-  balance?: number
-  uiBalance?: number
+  balance?: BigNumber
+  uiBalance?: BigNumber
 }
 
 /**
@@ -21,14 +24,12 @@ export interface TokenInfo {
  */
 export function getTokenBySymbol(symbol: string): TokenInfo | null {
   if (symbol === 'SOL') {
-    return NATIVE_SOL
+    return { ...NATIVE_SOL }
   }
 
-  let token = TOKENS[symbol]
+  let token = { ...TOKENS[symbol] }
 
-  if (token) {
-    token.symbol = symbol
-  } else {
+  if (!token) {
     token = null
   }
 
@@ -44,17 +45,16 @@ export function getTokenBySymbol(symbol: string): TokenInfo | null {
  */
 export function getTokenByMintAddress(mintAddress: string): TokenInfo | null {
   if (mintAddress === NATIVE_SOL.mintAddress) {
-    return NATIVE_SOL
+    return { ...NATIVE_SOL }
   }
 
   let token = null
 
   for (const symbol of Object.keys(TOKENS)) {
-    const info = TOKENS[symbol]
+    const info = { ...TOKENS[symbol] }
 
     if (info.mintAddress === mintAddress) {
       token = info
-      token.symbol = symbol
     }
   }
 
@@ -75,195 +75,228 @@ export const NATIVE_SOL: TokenInfo = {
 
 export const TOKENS: Tokens = {
   WSOL: {
-    mintAddress: 'So11111111111111111111111111111111111111112',
+    symbol: 'WSOL',
     name: 'Wrapped Solana',
+    mintAddress: 'So11111111111111111111111111111111111111112',
     decimals: 9,
     referrer: 'HrY9PEaTvVrCwzjNqHdPqEB4KMQec8k7cttdrCsBdGbM',
   },
   BTC: {
-    mintAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
+    symbol: 'BTC',
     name: 'Wrapped Bitcoin',
+    mintAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
     decimals: 6,
     referrer: 'GZpS8cY8Nt8HuqxzJh6PXTdSxc38vFUjBmi7eEUkkQtG',
   },
   ETH: {
-    mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
+    symbol: 'ETH',
     name: 'Wrapped Ethereum',
+    mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
     decimals: 6,
     referrer: '2Vi3SmRWTnK3H1hM7419ncU4cwwgnP3jf2CcG4uagqit',
   },
   USDC: {
-    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    symbol: 'USDC',
     name: 'USDC',
+    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
     referrer: 'HAvKWceWNm8Pwp1YERjZhaCg3XjK1KocPN332mtofg9z',
   },
   YFI: {
-    mintAddress: '3JSf5tPeuscJGtaCp5giEiDhv51gQ4v3zWg8DGgyLfAB',
+    symbol: 'YFI',
     name: 'Wrapped YFI',
+    mintAddress: '3JSf5tPeuscJGtaCp5giEiDhv51gQ4v3zWg8DGgyLfAB',
     decimals: 6,
     referrer: 'DZjgzKfYzZBBSTo5vytMYvGdNF933DvuX8TftDMrThrb',
   },
   LINK: {
-    mintAddress: 'CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG',
+    symbol: 'LINK',
     name: 'Wrapped Chainlink',
+    mintAddress: 'CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG',
     decimals: 6,
     referrer: 'DRSKKsYZaPEFkRgGywo7KWBGZikf71R9aDr8tjtpr41V',
   },
   XRP: {
-    mintAddress: 'Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8',
+    symbol: 'XRP',
     name: 'Wrapped XRP',
+    mintAddress: 'Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8',
     decimals: 6,
     referrer: '6NeHPXG142tAE2Ej3gHgT2N66i1KH6PFR6PBZw6RyrwH',
   },
   USDT: {
-    mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
+    symbol: 'USDT',
     name: 'Wrapped USDT',
+    mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
     decimals: 6,
     referrer: 'GdFfrjHgRS2y3bF1cjYr6XJ5zstNBbEqKetMffn6ouVy',
   },
   SUSHI: {
-    mintAddress: 'AR1Mtgh7zAtxuxGd2XPovXPVjcSdY3i4rQYisNadjfKy',
+    symbol: 'SUSHI',
     name: 'Wrapped SUSHI',
+    mintAddress: 'AR1Mtgh7zAtxuxGd2XPovXPVjcSdY3i4rQYisNadjfKy',
     decimals: 6,
     referrer: '59QxHeHgb28tDc3gStnrW8FNKC9qWuRmRZHBaAqCerJX',
   },
   ALEPH: {
-    mintAddress: 'CsZ5LZkDS7h9TDKjrbL7VAwQZ9nsRu8vJLhRYfmGaN8K',
+    symbol: 'ALEPH',
     name: 'Wrapped ALEPH',
+    mintAddress: 'CsZ5LZkDS7h9TDKjrbL7VAwQZ9nsRu8vJLhRYfmGaN8K',
     decimals: 6,
     referrer: '8FKAKrenJMDd7V6cxnM5BsymHTjqxgodtHbLwZReMnWW',
   },
   SXP: {
-    mintAddress: 'SF3oTvfWzEP3DTwGSvUXRrGTvr75pdZNnBLAH9bzMuX',
+    symbol: 'SXP',
     name: 'Wrapped SXP',
+    mintAddress: 'SF3oTvfWzEP3DTwGSvUXRrGTvr75pdZNnBLAH9bzMuX',
     decimals: 6,
     referrer: '97Vyotr284UM2Fyq9gbfQ3azMYtgf7cjnsf8pN1PFfY9',
   },
   HGET: {
-    mintAddress: 'BtZQfWqDGbk9Wf2rXEiWyQBdBY1etnUUn6zEphvVS7yN',
+    symbol: 'HGET',
     name: 'Wrapped HGET',
+    mintAddress: 'BtZQfWqDGbk9Wf2rXEiWyQBdBY1etnUUn6zEphvVS7yN',
     decimals: 6,
     referrer: 'AGY2wy1ANzLM2jJLSkVxPUYAY5iAYXYsLMQkoQsAhucj',
   },
   CREAM: {
-    mintAddress: '5Fu5UUgbjpUvdBveb3a1JTNirL8rXtiYeSMWvKjtUNQv',
+    symbol: 'CREAM',
     name: 'Wrapped CREAM',
+    mintAddress: '5Fu5UUgbjpUvdBveb3a1JTNirL8rXtiYeSMWvKjtUNQv',
     decimals: 6,
     referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P',
   },
   UBXT: {
-    mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
+    symbol: 'UBXT',
     name: 'Wrapped UBXT',
+    mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
     decimals: 6,
     referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879',
   },
   HNT: {
-    mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
+    symbol: 'HNT',
     name: 'Wrapped HNT',
+    mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
     decimals: 6,
     referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV',
   },
   FRONT: {
-    mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
+    symbol: 'FRONT',
     name: 'Wrapped FRONT',
+    mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
     decimals: 6,
     referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h',
   },
   AKRO: {
-    mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
+    symbol: 'AKRO',
     name: 'Wrapped AKRO',
+    mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
     decimals: 6,
     referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH',
   },
   HXRO: {
-    mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
+    symbol: 'HXRO',
     name: 'Wrapped HXRO',
+    mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
     decimals: 6,
     referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC',
   },
   UNI: {
-    mintAddress: 'DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw',
+    symbol: 'UNI',
     name: 'Wrapped UNI',
+    mintAddress: 'DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw',
     decimals: 6,
     referrer: '4ntxDv95ajBbXfZyGy3UhcQDx8xmH1yJ6eKvuNNH466x',
   },
   SRM: {
-    mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
+    symbol: 'SRM',
     name: 'Serum',
+    mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
     decimals: 6,
     referrer: 'AZgyihMGNBHxMAj1AZSbfh16YXE4zq7e6pXQTSHwbTaN',
   },
   FTT: {
-    mintAddress: 'AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3',
+    symbol: 'FTT',
     name: 'Wrapped FTT',
+    mintAddress: 'AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3',
     decimals: 6,
     referrer: 'CafpgSh8KGL2GPTjdXfctD3vXngNZDJ3Q92FTfV71Hmt',
   },
   MSRM: {
-    mintAddress: 'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L',
+    symbol: 'MSRM',
     name: 'MegaSerum',
+    mintAddress: 'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L',
     decimals: 0,
     referrer: 'Ge5q9x8gDUNYqqLA1MdnCzWNJGsbj3M15Yxse2cDbw9z',
   },
   WUSDC: {
-    mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
+    symbol: 'WUSDC',
     name: 'Wrapped USDC',
+    mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
     decimals: 6,
   },
   TOMO: {
-    mintAddress: 'GXMvfY2jpQctDqZ9RoU3oWPhufKiCcFEfchvYumtX7jd',
+    symbol: 'TOMO',
     name: 'Wrapped TOMO',
+    mintAddress: 'GXMvfY2jpQctDqZ9RoU3oWPhufKiCcFEfchvYumtX7jd',
     decimals: 6,
     referrer: '9fexfN3eZomF5gfenG5L9ydbKRQkPhq6x74rb5iLrvXP',
   },
   KARMA: {
-    mintAddress: 'EcqExpGNFBve2i1cMJUTR4bPXj4ZoqmDD2rTkeCcaTFX',
+    symbol: 'KARMA',
     name: 'Wrapped KARMA',
+    mintAddress: 'EcqExpGNFBve2i1cMJUTR4bPXj4ZoqmDD2rTkeCcaTFX',
     decimals: 4,
   },
   LUA: {
-    mintAddress: 'EqWCKXfs3x47uVosDpTRgFniThL9Y8iCztJaapxbEaVX',
+    symbol: 'LUA',
     name: 'Wrapped LUA',
+    mintAddress: 'EqWCKXfs3x47uVosDpTRgFniThL9Y8iCztJaapxbEaVX',
     decimals: 6,
     referrer: 'HuZwNApjVFuFSDgrwZA8GP2JD7WMby4qt6rkWDnaMo7j',
   },
   MATH: {
-    mintAddress: 'GeDS162t9yGJuLEHPWXXGrb1zwkzinCgRwnT8vHYjKza',
+    symbol: 'MATH',
     name: 'Wrapped MATH',
+    mintAddress: 'GeDS162t9yGJuLEHPWXXGrb1zwkzinCgRwnT8vHYjKza',
     decimals: 6,
     referrer: 'C9K1M8sJX8WMdsnFT7DuzdiHHunEj79EsLuz4DixQYGm',
   },
   KEEP: {
-    mintAddress: 'GUohe4DJUA5FKPWo3joiPgsB7yzer7LpDmt1Vhzy3Zht',
+    symbol: 'KEEP',
     name: 'Wrapped KEEP',
+    mintAddress: 'GUohe4DJUA5FKPWo3joiPgsB7yzer7LpDmt1Vhzy3Zht',
     decimals: 6,
   },
   SWAG: {
-    mintAddress: '9F9fNTT6qwjsu4X4yWYKZpsbw5qT7o6yR2i57JF2jagy',
+    symbol: 'SWAG',
     name: 'Wrapped SWAG',
+    mintAddress: '9F9fNTT6qwjsu4X4yWYKZpsbw5qT7o6yR2i57JF2jagy',
     decimals: 6,
   },
   FIDA: {
-    mintAddress: 'EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp',
+    symbol: 'FIDA',
     name: 'Bonfida',
+    mintAddress: 'EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp',
     decimals: 6,
     referrer: 'AeAsG75UmyPDB271c6NHonHxXAPXfkvhcf2xjfJhReS8',
   },
   KIN: {
-    mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
+    symbol: 'KIN',
     name: 'KIN',
+    mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
     decimals: 5,
     referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9',
   },
   MAPS: {
-    mintAddress: 'MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb',
+    symbol: 'MAPS',
     name: 'MAPS',
+    mintAddress: 'MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb',
     decimals: 6,
   },
   RAY: {
-    mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
+    symbol: 'RAY',
     name: 'Raydium',
+    mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
     decimals: 6,
     referrer: 'EzKxGKPF9wF5uKDzCMQnkHmqaBhHiS22372pCLvxfmtQ',
   },
@@ -271,33 +304,39 @@ export const TOKENS: Tokens = {
 
 export const LP_TOKENS: Tokens = {
   'RAY-USDT': {
-    mintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
+    symbol: 'RAY-USDT',
     name: 'RAY-USDT LP',
+    mintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
     decimals: 6,
   },
   'RAY-SOL': {
-    mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
+    symbol: 'RAY-SOL',
     name: 'RAY-SOL LP',
+    mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
     decimals: 6,
   },
   'LINK-USDT': {
-    mintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
+    symbol: 'LINK-USDT',
     name: 'LINK-USDT LP',
+    mintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
     decimals: 6,
   },
   'ETH-USDT': {
-    mintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
+    symbol: 'ETH-USDT',
     name: 'ETH-USDT LP',
+    mintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
     decimals: 6,
   },
   'RAY-USDC': {
-    mintAddress: 'FgmBnsF5Qrnv8X9bomQfEtQTQjNNiBCWRKGpzPnE5BDg',
+    symbol: 'RAY-USDC',
     name: 'RAY-USDC LP',
+    mintAddress: 'FgmBnsF5Qrnv8X9bomQfEtQTQjNNiBCWRKGpzPnE5BDg',
     decimals: 6,
   },
   'RAY-SRM': {
-    mintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
+    symbol: 'RAY-SRM',
     name: 'RAY-SRM LP',
+    mintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
     decimals: 6,
   },
 }

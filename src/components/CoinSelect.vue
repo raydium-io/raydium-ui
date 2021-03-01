@@ -23,7 +23,7 @@
               <Icon type="loading" />
             </div>
             <div v-else-if="token.tokenAccountAddress">
-              {{ token.uiBalance }}
+              {{ token.uiBalance.toFixed() }}
             </div>
             <div v-else></div>
           </div>

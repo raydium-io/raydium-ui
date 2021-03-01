@@ -40,27 +40,41 @@ export function getPoolByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string
 ): LiquidityPoolInfo | undefined {
-  return LIQUIDITY_POOLS.find(
+  const pool = LIQUIDITY_POOLS.find(
     (pool) =>
       (pool.coin.mintAddress === coinMintAddress &&
         pool.pc.mintAddress === pcMintAddress) ||
       (pool.coin.mintAddress === pcMintAddress &&
         pool.pc.mintAddress === coinMintAddress)
   )
+
+  if (pool) {
+    return { ...pool }
+  }
+
+  return pool
 }
 
 export function getPoolByLpMintAddress(
   lpMintAddress: string
 ): LiquidityPoolInfo | undefined {
-  return LIQUIDITY_POOLS.find((pool) => pool.lp.mintAddress === lpMintAddress)
+  const pool = LIQUIDITY_POOLS.find(
+    (pool) => pool.lp.mintAddress === lpMintAddress
+  )
+
+  if (pool) {
+    return { ...pool }
+  }
+
+  return pool
 }
 
 export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   {
     name: 'RAY-USDT',
-    coin: TOKENS.RAY,
-    pc: TOKENS.USDT,
-    lp: LP_TOKENS['RAY-USDT'],
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDT },
+    lp: { ...LP_TOKENS['RAY-USDT'] },
 
     ammId: '4GygMmZgSoyfM3DEBpA8HvB8pooKWnTp232bKA17ptMG',
     ammAuthority: 'E8ddPSxjVUdW8wa5rs3gbscqoXQF1o7sJrkUMFU18zMS',
@@ -80,9 +94,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-SOL',
-    coin: TOKENS.RAY,
-    pc: NATIVE_SOL,
-    lp: LP_TOKENS['RAY-SOL'],
+    coin: { ...TOKENS.RAY },
+    pc: { ...NATIVE_SOL },
+    lp: { ...LP_TOKENS['RAY-SOL'] },
 
     ammId: '5Ytcen7ZQRWA8Dt4EGyVJngyqDL36ZKAGSTVKxbDGZPN',
     ammAuthority: '6LUFae1Ap44GVT9Dhw7NEqibFGSFxijdx4kzKVARsSuL',
@@ -102,9 +116,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'LINK-USDT',
-    coin: TOKENS.LINK,
-    pc: TOKENS.USDT,
-    lp: LP_TOKENS['LINK-USDT'],
+    coin: { ...TOKENS.LINK },
+    pc: { ...TOKENS.USDT },
+    lp: { ...LP_TOKENS['LINK-USDT'] },
 
     ammId: 'Avkh3hMrjRRdGbm7EAmeXaJ1wWrbcwGWDGEroKq5wHJ8',
     ammAuthority: 'v1uTXS1hrW2DJkKPcQ3Dm7WwhYbGm7LhHoRE29QrHsJ',
@@ -124,9 +138,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'ETH-USDT',
-    coin: TOKENS.ETH,
-    pc: TOKENS.USDT,
-    lp: LP_TOKENS['ETH-USDT'],
+    coin: { ...TOKENS.ETH },
+    pc: { ...TOKENS.USDT },
+    lp: { ...LP_TOKENS['ETH-USDT'] },
 
     ammId: '7PGNXqdhrpQoVS5uQs9gjT1zfY6MUzEeYHopRnryj7rm',
     ammAuthority: 'BFCEvcoD1xY1HK4psbC5wYXVXEvmgwg4wKggk89u1NWw',
@@ -146,9 +160,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-USDC',
-    coin: TOKENS.RAY,
-    pc: TOKENS.USDC,
-    lp: LP_TOKENS['RAY-USDC'],
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['RAY-USDC'] },
 
     ammId: 'G2PVNAKAp17xtruKiMwT1S2GWNxptWZfqK6oYrFWCXWX',
     ammAuthority: '2XTg6m9wpuUyPNhHbi8DCGfyo58bpqmAmbujEEpUykSo',
@@ -168,9 +182,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'RAY-SRM',
-    coin: TOKENS.RAY,
-    pc: TOKENS.SRM,
-    lp: LP_TOKENS['RAY-SRM'],
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SRM },
+    lp: { ...LP_TOKENS['RAY-SRM'] },
 
     ammId: '3Y5dpV9DtwkhewxXpiVRscFeQR2dvsHovXQonkKbuDwB',
     ammAuthority: '7iND8ysb6fGUy8tx4C8AS51wbjvRjBxxSoaaL7t1yWXX',

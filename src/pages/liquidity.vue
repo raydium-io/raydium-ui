@@ -11,7 +11,12 @@
                 :coin-name="fromCoin ? fromCoin.symbol : ''"
                 :ui-balance="fromCoin ? fromCoin.uiBalance : null"
                 @onInput="(amount) => (fromCoinAmount = amount)"
-                @onMax="() => (fromCoinAmount = fromCoin.uiBalance.toString())"
+                @onFocus="
+                  () => {
+                    focusFromCoin = true
+                  }
+                "
+                @onMax="() => (fromCoinAmount = fromCoin.uiBalance.toFixed())"
                 @onSelect="openFromCoinSelect"
               />
 
@@ -27,7 +32,12 @@
                 :coin-name="toCoin ? toCoin.symbol : ''"
                 :ui-balance="toCoin ? toCoin.uiBalance : null"
                 @onInput="(amount) => (toCoinAmount = amount)"
-                @onMax="() => (toCoinAmount = toCoin.uiBalance.toString())"
+                @onFocus="
+                  () => {
+                    focusFromCoin = false
+                  }
+                "
+                @onMax="() => (toCoinAmount = toCoin.uiBalance.toFixed())"
                 @onSelect="openToCoinSelect"
               />
 
@@ -37,12 +47,20 @@
               >
                 <span v-if="coinBasePrice">
                   1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
-                  {{ liquidityPool.getPrice() }}
+                  {{
+                    liquidityPool
+                      .getPrice()
+                      .toFixed(liquidityPool.poolInfo.pc.decimals)
+                  }}
                   {{ liquidityPool.poolInfo.pc.symbol }}
                 </span>
                 <span v-else>
                   1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
-                  {{ liquidityPool.getPrice(false) }}
+                  {{
+                    liquidityPool
+                      .getPrice(false)
+                      .toFixed(liquidityPool.poolInfo.coin.decimals)
+                  }}
                   {{ liquidityPool.poolInfo.coin.symbol }}
                 </span>
                 <Icon
@@ -201,6 +219,7 @@ export default Vue.extend({
       coinSelectShow: false,
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
+      focusFromCoin: true,
 
       // 已选择的币种
       fromCoin: RAY as TokenInfo | null,
