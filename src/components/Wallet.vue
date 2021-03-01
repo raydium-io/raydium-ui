@@ -57,6 +57,7 @@ import SolanaWallet from '@project-serum/sol-wallet-adapter'
 import SolongWallet from '@/utils/solong-wallet'
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
+import commitment from '@/utils/commitment'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -196,7 +197,7 @@ export default Vue.extend({
       this.accountChangeListenerId = conn?.onAccountChange(
         wallet.publicKey,
         this.onAccountChange,
-        'confirmed'
+        commitment
       )
 
       this.$store.dispatch('wallet/getTokenAccounts')

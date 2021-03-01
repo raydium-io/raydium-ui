@@ -9,6 +9,7 @@ import { nu64, struct } from 'buffer-layout'
 
 import { OpenOrders } from '@project-serum/serum'
 import { TokenAmount } from '@/utils/safe-math'
+import commitment from '@/utils/commitment'
 import { publicKeyLayout } from '@project-serum/serum/lib/layout'
 
 export default class Liquidity {
@@ -90,10 +91,12 @@ export default class Liquidity {
     const { poolCoinTokenAccount, poolPcTokenAccount } = this.poolInfo
 
     const poolCoinInfo = await connection.getTokenAccountBalance(
-      new PublicKey(poolCoinTokenAccount)
+      new PublicKey(poolCoinTokenAccount),
+      commitment
     )
     const poolPcInfo = await connection.getTokenAccountBalance(
-      new PublicKey(poolPcTokenAccount)
+      new PublicKey(poolPcTokenAccount),
+      commitment
     )
 
     return {
@@ -105,7 +108,8 @@ export default class Liquidity {
   // 获取池子挂单的余额
   async getUsedBalance(connection: Connection) {
     const accountInfo = await connection.getAccountInfo(
-      new PublicKey(this.poolInfo.ammOpenOrders)
+      new PublicKey(this.poolInfo.ammOpenOrders),
+      commitment
     )
 
     let baseTokenTotal = TokenAmount.toBigNumber(0)
@@ -135,7 +139,7 @@ export default class Liquidity {
   async getAmmInfo(connection: Connection) {
     const info = await connection.getAccountInfo(
       new PublicKey(this.poolInfo.ammId),
-      'confirmed'
+      commitment
     )
 
     return Liquidity.AmmInfoLayout.decode(info?.data)
@@ -143,7 +147,8 @@ export default class Liquidity {
 
   async getLpSupply(connection: Connection) {
     const result = await connection.getTokenSupply(
-      new PublicKey(this.poolInfo.lp.mintAddress)
+      new PublicKey(this.poolInfo.lp.mintAddress),
+      commitment
     )
 
     return TokenAmount.toBigNumber(result.value.amount)
