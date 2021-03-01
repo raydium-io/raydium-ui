@@ -74,6 +74,13 @@ export default class Liquidity {
       this.poolInfo.pc.decimals
     )
 
+    const lpSupply = await this.getLpSupply(connection)
+    this.poolInfo.lp.totalSupply = lpSupply
+    this.poolInfo.lp.uiTotalSupply = TokenAmount.toFloat(
+      lpSupply,
+      this.poolInfo.lp.decimals
+    )
+
     this.quoting = false
     this.hasQuote = true
   }
@@ -132,6 +139,14 @@ export default class Liquidity {
     )
 
     return Liquidity.AmmInfoLayout.decode(info?.data)
+  }
+
+  async getLpSupply(connection: Connection) {
+    const result = await connection.getTokenSupply(
+      new PublicKey(this.poolInfo.lp.mintAddress)
+    )
+
+    return TokenAmount.toBigNumber(result.value.amount)
   }
 
   static getByLpMintAddress(lpMint: string) {

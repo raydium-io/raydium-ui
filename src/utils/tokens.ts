@@ -7,6 +7,7 @@ export interface TokenInfo {
   mintAddress: string
   decimals: number
   totalSupply?: BigNumber
+  uiTotalSupply?: BigNumber
 
   referrer?: string
 

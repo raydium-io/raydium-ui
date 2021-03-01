@@ -43,30 +43,41 @@
 
               <div
                 v-if="liquidityPool && liquidityPool.hasQuote"
-                class="price-base fc-container"
+                class="pool-info"
               >
-                <span v-if="coinBasePrice">
-                  1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
-                  {{
-                    liquidityPool
-                      .getPrice()
-                      .toFixed(liquidityPool.poolInfo.pc.decimals)
-                  }}
-                  {{ liquidityPool.poolInfo.pc.symbol }}
-                </span>
-                <span v-else>
-                  1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
-                  {{
-                    liquidityPool
-                      .getPrice(false)
-                      .toFixed(liquidityPool.poolInfo.coin.decimals)
-                  }}
-                  {{ liquidityPool.poolInfo.coin.symbol }}
-                </span>
-                <Icon
-                  type="swap"
-                  @click="() => (coinBasePrice = !coinBasePrice)"
-                />
+                <div class="price-base fc-container">
+                  <span v-if="coinBasePrice">
+                    1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
+                    {{
+                      liquidityPool
+                        .getPrice()
+                        .toFixed(liquidityPool.poolInfo.pc.decimals)
+                    }}
+                    {{ liquidityPool.poolInfo.pc.symbol }}
+                  </span>
+                  <span v-else>
+                    1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
+                    {{
+                      liquidityPool
+                        .getPrice(false)
+                        .toFixed(liquidityPool.poolInfo.coin.decimals)
+                    }}
+                    {{ liquidityPool.poolInfo.coin.symbol }}
+                  </span>
+                  <Icon
+                    type="swap"
+                    @click="() => (coinBasePrice = !coinBasePrice)"
+                  />
+                </div>
+
+                <div class="fs-container">
+                  <span>LP supply</span>
+                  <span>{{
+                    liquidityPool.poolInfo.lp.uiTotalSupply.toFormat(
+                      liquidityPool.poolInfo.lp.decimals
+                    )
+                  }}</span>
+                </div>
               </div>
 
               <Button
@@ -351,6 +362,7 @@ export default Vue.extend({
         )
         if (liquidityPoolInfo) {
           this.liquidityPool = Liquidity.load(liquidityPoolInfo)
+          this.updatePoolInfo()
         } else {
           this.liquidityPool = null
         }
@@ -373,10 +385,6 @@ export default Vue.extend({
               this.updatePoolInfo()
             }, 1000 * 10)
           })
-      } else {
-        setTimeout(() => {
-          this.updatePoolInfo()
-        }, 1000)
       }
     },
 
