@@ -41,44 +41,7 @@
                 @onSelect="openToCoinSelect"
               />
 
-              <div
-                v-if="liquidityPool && liquidityPool.hasQuote"
-                class="pool-info"
-              >
-                <div class="price-base fc-container">
-                  <span v-if="coinBasePrice">
-                    1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
-                    {{
-                      liquidityPool
-                        .getPrice()
-                        .toFixed(liquidityPool.poolInfo.pc.decimals)
-                    }}
-                    {{ liquidityPool.poolInfo.pc.symbol }}
-                  </span>
-                  <span v-else>
-                    1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
-                    {{
-                      liquidityPool
-                        .getPrice(false)
-                        .toFixed(liquidityPool.poolInfo.coin.decimals)
-                    }}
-                    {{ liquidityPool.poolInfo.coin.symbol }}
-                  </span>
-                  <Icon
-                    type="swap"
-                    @click="() => (coinBasePrice = !coinBasePrice)"
-                  />
-                </div>
-
-                <div class="fs-container">
-                  <span>LP supply</span>
-                  <span>{{
-                    liquidityPool.poolInfo.lp.uiTotalSupply.toFormat(
-                      liquidityPool.poolInfo.lp.decimals
-                    )
-                  }}</span>
-                </div>
-              </div>
+              <LiquidityPoolInfo :liquidity-pool="liquidityPool" />
 
               <Button
                 v-if="!wallet.connected"
@@ -111,7 +74,7 @@
                 </template>
                 <template v-else-if="!liquidityPool"> Invalid pair </template>
                 <template v-else-if="liquidityPool.quoting">
-                  Requesting pool's infomations
+                  Updating pool's infomations
                 </template>
                 <template
                   v-else-if="parseFloat(fromCoinAmount) > fromCoin.uiBalance"
@@ -239,8 +202,6 @@ export default Vue.extend({
       toCoinAmount: '',
 
       liquidityPool: null as Liquidity | null,
-      // coin 为基准货币
-      coinBasePrice: true,
 
       activeTab: 'add',
     }
