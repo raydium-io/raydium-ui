@@ -13,7 +13,7 @@
                 @onInput="(amount) => (fromCoinAmount = amount)"
                 @onFocus="
                   () => {
-                    focusFromCoin = true
+                    fixedFromCoin = true
                   }
                 "
                 @onMax="() => (fromCoinAmount = fromCoin.balance.fixed())"
@@ -34,7 +34,7 @@
                 @onInput="(amount) => (toCoinAmount = amount)"
                 @onFocus="
                   () => {
-                    focusFromCoin = false
+                    fixedFromCoin = false
                   }
                 "
                 @onMax="() => (toCoinAmount = toCoin.balance.fixed())"
@@ -101,7 +101,9 @@
               type="circle"
               :width="20"
               :stroke-width="10"
+              :percent="10 * countdown"
               :show-info="false"
+              :class="liquidityPool && liquidityPool.quoting ? 'disabled' : ''"
             />
           </Tooltip>
           <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
@@ -191,7 +193,8 @@ export default Vue.extend({
       coinSelectShow: false,
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
-      focusFromCoin: true,
+      // 哪个币种的金额固定，从而动态计算另一个
+      fixedFromCoin: true,
 
       // 已选择的币种
       fromCoin: RAY as TokenInfo | null,
@@ -200,6 +203,9 @@ export default Vue.extend({
       toCoinAmount: '',
 
       liquidityPool: null as Liquidity | null,
+      // 自动刷新倒计时
+      countdown: 0,
+      timer: null as any,
 
       activeTab: 'add',
     }
@@ -245,7 +251,7 @@ export default Vue.extend({
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
-    this.updatePoolInfo()
+    this.setTimer()
   },
 
   methods: {
@@ -320,9 +326,15 @@ export default Vue.extend({
           this.toCoin.mintAddress
         )
         if (liquidityPoolInfo) {
-          // TODO 处理 老的和新的 LP 一样
-          this.liquidityPool = Liquidity.load(liquidityPoolInfo)
-          this.updatePoolInfo()
+          // 处理 老的和新的 LP 一样
+          if (
+            !this.liquidityPool ||
+            this.liquidityPool.poolInfo.lp.mintAddress !==
+              liquidityPoolInfo.lp.mintAddress
+          ) {
+            this.liquidityPool = Liquidity.load(liquidityPoolInfo)
+            this.updatePoolInfo()
+          }
         } else {
           this.liquidityPool = null
         }
@@ -331,8 +343,26 @@ export default Vue.extend({
       }
     },
 
+    setTimer() {
+      const self = this
+
+      this.timer = setInterval(function () {
+        if (self.liquidityPool && !self.liquidityPool.quoting) {
+          if (self.countdown < 10) {
+            self.countdown += 1
+
+            if (self.countdown === 10) {
+              self.updatePoolInfo()
+            }
+          }
+        }
+      }, 1000)
+    },
+
     updatePoolInfo() {
       if (this.liquidityPool) {
+        this.countdown = 10
+
         const conn = (this as any).$conn
 
         this.liquidityPool
@@ -341,9 +371,7 @@ export default Vue.extend({
           .finally(() => {
             logger('Liquidity pool quote updated')
 
-            setTimeout(() => {
-              this.updatePoolInfo()
-            }, 1000 * 10)
+            this.countdown = 0
           })
       }
     },
