@@ -1,17 +1,17 @@
+import { TokenAmount } from '@/utils/safe-math'
+
 export interface TokenInfo {
   symbol: string
   name: string
 
   mintAddress: string
   decimals: number
-  totalSupply?: number
-  uiTotalSupply?: number
+  totalSupply?: TokenAmount
 
   referrer?: string
 
   tokenAccountAddress?: string
-  balance?: number
-  uiBalance?: number
+  balance?: TokenAmount
 }
 
 /**

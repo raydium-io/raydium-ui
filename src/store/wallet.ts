@@ -1,8 +1,8 @@
 import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 
 import { NATIVE_SOL } from '@/utils/tokens'
-import { SafeMath } from '@/utils/safe-math'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TokenAmount } from '@/utils/safe-math'
 import logger from '@/utils/logger'
 
 export const state = () => ({
@@ -83,9 +83,10 @@ export const actions = {
             const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58()
             const parsedInfo = tokenAccountInfo.account.data.parsed.info
             const mintAddress = parsedInfo.mint
-            const balance = parsedInfo.tokenAmount.amount
-            const decimals = parsedInfo.tokenAmount.decimals
-            const uiBalance = SafeMath.toEther(balance, decimals)
+            const balance = new TokenAmount(
+              parsedInfo.tokenAmount.amount,
+              parsedInfo.tokenAmount.decimals
+            )
 
             // 如果同一 mint 有多个账户
             if (
@@ -96,14 +97,12 @@ export const actions = {
                 tokenAccounts[mintAddress] = {
                   tokenAccountAddress,
                   balance,
-                  uiBalance,
                 }
               }
             } else {
               tokenAccounts[mintAddress] = {
                 tokenAccountAddress,
                 balance,
-                uiBalance,
               }
             }
           }
@@ -113,8 +112,7 @@ export const actions = {
         const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
         tokenAccounts[NATIVE_SOL.mintAddress] = {
           tokenAccountAddress: wallet.publicKey.toBase58(),
-          balance: solBalance,
-          uiBalance: SafeMath.toEther(solBalance, NATIVE_SOL.decimals),
+          balance: new TokenAmount(solBalance, NATIVE_SOL.decimals),
         }
 
         commit('setTokenAccounts', tokenAccounts)

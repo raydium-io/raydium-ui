@@ -320,6 +320,7 @@ export default Vue.extend({
           this.toCoin.mintAddress
         )
         if (liquidityPoolInfo) {
+          // TODO 处理 老的和新的 LP 一样
           this.liquidityPool = Liquidity.load(liquidityPoolInfo)
           this.updatePoolInfo()
         } else {

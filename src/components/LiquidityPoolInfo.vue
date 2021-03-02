@@ -23,11 +23,11 @@
       <span class="name">Pool liquidity</span>
       <div class="info">
         <span>
-          {{ coin.uiBalance }}
+          {{ coin.balance.format() }}
           {{ coin.symbol }}
         </span>
         <span>
-          {{ pc.uiBalance }}
+          {{ pc.balance.format() }}
           {{ pc.symbol }}
         </span>
       </div>
@@ -36,7 +36,7 @@
     <div class="fs-container">
       <span class="name">LP supply</span>
       <span>
-        {{ lp.uiTotalSupply }}
+        {{ lp.totalSupply.format() }}
       </span>
     </div>
   </div>

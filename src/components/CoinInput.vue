@@ -2,7 +2,9 @@
   <div class="coin-select">
     <div class="label fs-container">
       <span>{{ label }}</span>
-      <span v-if="balance"> Balance: {{ balance }} </span>
+      <span v-if="balance && !balance.wei.isNaN()">
+        Balance: {{ balance.fixed() }}
+      </span>
     </div>
     <div class="coin-input fs-container">
       <input
@@ -48,7 +50,7 @@ import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
-import { SafeMath } from '@/utils/safe-math'
+import { TokenAmount } from '@/utils/safe-math'
 
 export default Vue.extend({
   components: {
@@ -74,7 +76,7 @@ export default Vue.extend({
       default: '',
     },
     balance: {
-      type: Number,
+      type: Object,
       default: null,
     },
     showMax: {
@@ -89,7 +91,7 @@ export default Vue.extend({
 
   methods: {
     importIcon,
-    SafeMath,
+    TokenAmount,
   },
 })
 </script>
