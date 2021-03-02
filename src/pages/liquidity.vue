@@ -9,14 +9,14 @@
                 v-model="fromCoinAmount"
                 label="Input"
                 :coin-name="fromCoin ? fromCoin.symbol : ''"
-                :ui-balance="fromCoin ? fromCoin.uiBalance : null"
+                :balance="fromCoin ? fromCoin.balance : null"
                 @onInput="(amount) => (fromCoinAmount = amount)"
                 @onFocus="
                   () => {
                     focusFromCoin = true
                   }
                 "
-                @onMax="() => (fromCoinAmount = fromCoin.uiBalance.toFixed())"
+                @onMax="() => (fromCoinAmount = fromCoin.balance.fixed())"
                 @onSelect="openFromCoinSelect"
               />
 
@@ -30,14 +30,14 @@
                 v-model="toCoinAmount"
                 label="Input"
                 :coin-name="toCoin ? toCoin.symbol : ''"
-                :ui-balance="toCoin ? toCoin.uiBalance : null"
+                :balance="toCoin ? toCoin.balance : null"
                 @onInput="(amount) => (toCoinAmount = amount)"
                 @onFocus="
                   () => {
                     focusFromCoin = false
                   }
                 "
-                @onMax="() => (toCoinAmount = toCoin.uiBalance.toFixed())"
+                @onMax="() => (toCoinAmount = toCoin.balance.fixed())"
                 @onSelect="openToCoinSelect"
               />
 
@@ -61,8 +61,8 @@
                   !toCoin ||
                   !liquidityPool ||
                   liquidityPool.quoting ||
-                  parseFloat(fromCoinAmount) > fromCoin.uiBalance ||
-                  parseFloat(toCoinAmount) > toCoin.uiBalance
+                  parseFloat(fromCoinAmount) > fromCoin.balance ||
+                  parseFloat(toCoinAmount) > toCoin.balance
                 "
                 @click="supply"
               >
@@ -77,13 +77,11 @@
                   Updating pool's infomations
                 </template>
                 <template
-                  v-else-if="parseFloat(fromCoinAmount) > fromCoin.uiBalance"
+                  v-else-if="parseFloat(fromCoinAmount) > fromCoin.balance"
                 >
                   Insufficient {{ fromCoin.symbol }} balance
                 </template>
-                <template
-                  v-else-if="parseFloat(toCoinAmount) > toCoin.uiBalance"
-                >
+                <template v-else-if="parseFloat(toCoinAmount) > toCoin.balance">
                   Insufficient {{ toCoin.symbol }} balance
                 </template>
                 <template v-else>Supply</template>

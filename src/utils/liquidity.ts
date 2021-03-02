@@ -4,13 +4,13 @@ import {
   getPoolByLpMintAddress,
   getPoolByTokenMintAddresses,
 } from '@/utils/pools'
-// @ts-ignore
-import { nu64, struct } from 'buffer-layout'
+import { MINT_LAYOUT, TOKEN_ACCOUNT_LAYOUT } from '@/utils/layouts'
+import { publicKey, struct, u64 } from '@project-serum/borsh'
 
 import { OpenOrders } from '@project-serum/serum'
-import { TokenAmount } from '@/utils/safe-math'
+import { SafeMath } from '@/utils/safe-math'
 import commitment from '@/utils/commitment'
-import { publicKeyLayout } from '@project-serum/serum/lib/layout'
+import { getMultipleAccounts } from '@/utils/web3'
 
 export default class Liquidity {
   // v2
@@ -40,9 +40,9 @@ export default class Liquidity {
     }
 
     if (coinBase) {
-      return pc.uiBalance.dividedBy(coin.uiBalance)
+      return SafeMath.div(pc.uiBalance, coin.uiBalance)
     } else {
-      return coin.uiBalance.dividedBy(pc.uiBalance)
+      return SafeMath.div(coin.uiBalance, pc.uiBalance)
     }
   }
 
@@ -50,108 +50,88 @@ export default class Liquidity {
   async requestQuote(connection: Connection) {
     this.quoting = true
 
-    const { unusedCoin, unusedPc } = await this.getUnusedBalance(connection)
+    const { poolCoinTokenAccount, poolPcTokenAccount } = this.poolInfo
 
-    const { baseTokenTotal, quoteTokenTotal } = await this.getUsedBalance(
-      connection
+    const publicKeys = [
+      // 获取池子未挂单的余额
+      new PublicKey(poolCoinTokenAccount),
+      new PublicKey(poolPcTokenAccount),
+      // 获取池子挂单的余额 open orders
+      new PublicKey(this.poolInfo.ammOpenOrders),
+      // 获取池子信息 (利润金额等等)
+      new PublicKey(this.poolInfo.ammId),
+      // getLpSupply
+      new PublicKey(this.poolInfo.lp.mintAddress),
+    ]
+
+    const multipleInfo = await getMultipleAccounts(
+      connection,
+      publicKeys,
+      commitment
     )
 
-    let { needTakePnlCoin, needTakePnlPc } = await this.getAmmInfo(connection)
-    needTakePnlCoin = TokenAmount.toBigNumber(needTakePnlCoin)
-    needTakePnlPc = TokenAmount.toBigNumber(needTakePnlPc)
+    let coinBalance = 0
+    let pcBalance = 0
 
-    const coinBalance = unusedCoin.plus(baseTokenTotal).minus(needTakePnlCoin)
-    const pcBalance = unusedPc.plus(quoteTokenTotal).minus(needTakePnlPc)
+    multipleInfo.forEach((info) => {
+      const address = info?.publicKey.toBase58()
+      // @ts-ignore
+      const data = Buffer.from(info.account.data)
+
+      // 获取池子未挂单的余额
+      if (address === poolCoinTokenAccount) {
+        const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
+
+        coinBalance = SafeMath.add(coinBalance, parsed.amount.toNumber())
+      }
+      if (address === poolPcTokenAccount) {
+        const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
+
+        pcBalance = SafeMath.add(pcBalance, parsed.amount.toNumber())
+      }
+      // 获取池子挂单的余额 open orders
+      if (address === this.poolInfo.ammOpenOrders) {
+        const OPEN_ORDERS_LAYOUT = OpenOrders.getLayout(
+          new PublicKey(this.poolInfo.serumProgramId)
+        )
+        const parsed = OPEN_ORDERS_LAYOUT.decode(data)
+
+        const { baseTokenTotal, quoteTokenTotal } = parsed
+
+        coinBalance = SafeMath.add(coinBalance, baseTokenTotal.toNumber())
+        pcBalance = SafeMath.add(pcBalance, quoteTokenTotal.toNumber())
+      }
+      // // 获取池子信息 (利润金额等等)
+      if (address === this.poolInfo.ammId) {
+        const parsed = AMM_INFO_LAYOUT.decode(data)
+
+        const { needTakePnlCoin, needTakePnlPc } = parsed
+
+        coinBalance = SafeMath.sub(coinBalance, needTakePnlCoin.toNumber())
+        pcBalance = SafeMath.sub(pcBalance, needTakePnlPc.toNumber())
+      }
+      // getLpSupply
+      if (address === this.poolInfo.lp.mintAddress) {
+        const parsed = MINT_LAYOUT.decode(data)
+
+        this.poolInfo.lp.totalSupply = parsed.supply.toNumber()
+        this.poolInfo.lp.uiTotalSupply = SafeMath.toEther(
+          parsed.supply.toNumber(),
+          this.poolInfo.lp.decimals
+        )
+
+        console.log(parsed.supply.toNumber(), this.poolInfo.lp.totalSupply)
+      }
+    })
 
     this.poolInfo.coin.balance = coinBalance
-    this.poolInfo.coin.uiBalance = TokenAmount.fromWei(
-      coinBalance,
-      this.poolInfo.coin.decimals
-    )
-
     this.poolInfo.pc.balance = pcBalance
-    this.poolInfo.pc.uiBalance = TokenAmount.fromWei(
-      pcBalance,
-      this.poolInfo.pc.decimals
-    )
 
-    const lpSupply = await this.getLpSupply(connection)
-    this.poolInfo.lp.totalSupply = lpSupply
-    this.poolInfo.lp.uiTotalSupply = TokenAmount.fromWei(
-      lpSupply,
-      this.poolInfo.lp.decimals
-    )
+    // 不加这个页面数据无法刷新
+    this.poolInfo = { ...this.poolInfo }
 
     this.quoting = false
     this.hasQuote = true
-  }
-
-  // 获取池子未挂单的余额
-  async getUnusedBalance(connection: Connection) {
-    const { poolCoinTokenAccount, poolPcTokenAccount } = this.poolInfo
-
-    const poolCoinInfo = await connection.getTokenAccountBalance(
-      new PublicKey(poolCoinTokenAccount),
-      commitment
-    )
-    const poolPcInfo = await connection.getTokenAccountBalance(
-      new PublicKey(poolPcTokenAccount),
-      commitment
-    )
-
-    return {
-      unusedCoin: TokenAmount.toBigNumber(poolCoinInfo.value.amount),
-      unusedPc: TokenAmount.toBigNumber(poolPcInfo.value.amount),
-    }
-  }
-
-  // 获取池子挂单的余额
-  async getUsedBalance(connection: Connection) {
-    const accountInfo = await connection.getAccountInfo(
-      new PublicKey(this.poolInfo.ammOpenOrders),
-      commitment
-    )
-
-    let baseTokenTotal = TokenAmount.toBigNumber(0)
-    let quoteTokenTotal = TokenAmount.toBigNumber(0)
-
-    if (!accountInfo) {
-      return { baseTokenTotal, quoteTokenTotal }
-    }
-
-    const openOrders = OpenOrders.fromAccountInfo(
-      new PublicKey(this.poolInfo.ammOpenOrders),
-      accountInfo,
-      new PublicKey(this.poolInfo.serumProgramId)
-    )
-
-    baseTokenTotal = TokenAmount.toBigNumber(
-      openOrders.baseTokenTotal.toNumber()
-    )
-    quoteTokenTotal = TokenAmount.toBigNumber(
-      openOrders.quoteTokenTotal.toNumber()
-    )
-
-    return { baseTokenTotal, quoteTokenTotal }
-  }
-
-  // 获取池子信息 (利润金额等等)
-  async getAmmInfo(connection: Connection) {
-    const info = await connection.getAccountInfo(
-      new PublicKey(this.poolInfo.ammId),
-      commitment
-    )
-
-    return Liquidity.AmmInfoLayout.decode(info?.data)
-  }
-
-  async getLpSupply(connection: Connection) {
-    const result = await connection.getTokenSupply(
-      new PublicKey(this.poolInfo.lp.mintAddress),
-      commitment
-    )
-
-    return TokenAmount.toBigNumber(result.value.amount)
   }
 
   static getByLpMintAddress(lpMint: string) {
@@ -161,43 +141,43 @@ export default class Liquidity {
   static getByTokenMintAddresses(coinMint: string, pcMint: string) {
     return getPoolByTokenMintAddresses(coinMint, pcMint)
   }
-
-  static AmmInfoLayout = struct([
-    nu64('status'),
-    nu64('nonce'),
-    nu64('orderNum'),
-    nu64('depth'),
-    nu64('coinDecimals'),
-    nu64('pcDecimals'),
-    nu64('state'),
-    nu64('resetFlag'),
-    nu64('fee'),
-    nu64('minSize'),
-    nu64('volMaxCutRatio'),
-    nu64('pnlRatio'),
-    nu64('amountWaveRatio'),
-    nu64('coinLotSize'),
-    nu64('pcLotSize'),
-    nu64('minPriceMultiplier'),
-    nu64('maxPriceMultiplier'),
-    nu64('needTakePnlCoin'),
-    nu64('needTakePnlPc'),
-    nu64('totalPnlX'),
-    nu64('totalPnlY'),
-    nu64('systemDecimalsValue'),
-    publicKeyLayout('poolCoinTokenAccount'),
-    publicKeyLayout('poolPcTokenAccount'),
-    publicKeyLayout('coinMintAddress'),
-    publicKeyLayout('pcMintAddress'),
-    publicKeyLayout('lpMintAddress'),
-    publicKeyLayout('ammOpenOrders'),
-    publicKeyLayout('serumMarket'),
-    publicKeyLayout('serumProgramId'),
-    publicKeyLayout('ammTargetOrders'),
-    publicKeyLayout('ammQuantities'),
-    publicKeyLayout('poolWithdrawQueue'),
-    publicKeyLayout('poolTempLpTokenAccount'),
-    publicKeyLayout('ammCoinPnlAccount'),
-    publicKeyLayout('ammPcPnlAccount'),
-  ])
 }
+
+const AMM_INFO_LAYOUT = struct([
+  u64('status'),
+  u64('nonce'),
+  u64('orderNum'),
+  u64('depth'),
+  u64('coinDecimals'),
+  u64('pcDecimals'),
+  u64('state'),
+  u64('resetFlag'),
+  u64('fee'),
+  u64('minSize'),
+  u64('volMaxCutRatio'),
+  u64('pnlRatio'),
+  u64('amountWaveRatio'),
+  u64('coinLotSize'),
+  u64('pcLotSize'),
+  u64('minPriceMultiplier'),
+  u64('maxPriceMultiplier'),
+  u64('needTakePnlCoin'),
+  u64('needTakePnlPc'),
+  u64('totalPnlX'),
+  u64('totalPnlY'),
+  u64('systemDecimalsValue'),
+  publicKey('poolCoinTokenAccount'),
+  publicKey('poolPcTokenAccount'),
+  publicKey('coinMintAddress'),
+  publicKey('pcMintAddress'),
+  publicKey('lpMintAddress'),
+  publicKey('ammOpenOrders'),
+  publicKey('serumMarket'),
+  publicKey('serumProgramId'),
+  publicKey('ammTargetOrders'),
+  publicKey('ammQuantities'),
+  publicKey('poolWithdrawQueue'),
+  publicKey('poolTempLpTokenAccount'),
+  publicKey('ammCoinPnlAccount'),
+  publicKey('ammPcPnlAccount'),
+])

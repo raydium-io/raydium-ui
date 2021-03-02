@@ -1,6 +1,6 @@
 import { LP_TOKENS, NATIVE_SOL, TOKENS, TokenInfo } from './tokens'
 
-import { SERUM_PROGRAM_IDS_V2 } from './serum'
+import { SERUM_PROGRAM_IDS_V2 } from './ids'
 
 export interface LiquidityPoolInfo {
   name: string

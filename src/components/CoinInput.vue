@@ -2,9 +2,7 @@
   <div class="coin-select">
     <div class="label fs-container">
       <span>{{ label }}</span>
-      <span v-if="uiBalance && !uiBalance.isNaN()">
-        Balance: {{ uiBalance.toFixed() }}
-      </span>
+      <span v-if="balance"> Balance: {{ balance }} </span>
     </div>
     <div class="coin-input fs-container">
       <input
@@ -24,7 +22,9 @@
       />
       <button
         v-if="
-          showMax && uiBalance && (!value || toBigNumber(value).lt(uiBalance))
+          showMax &&
+          balance &&
+          (!value || new TokenAmount(value).toEther().lt(balance.toEther()))
         "
         class="max-button"
         @click="$emit('onMax')"
@@ -48,10 +48,7 @@ import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
-import { TokenAmount } from '@/utils/safe-math'
-import BigNumber from 'bignumber.js'
-
-const { toBigNumber } = TokenAmount
+import { SafeMath } from '@/utils/safe-math'
 
 export default Vue.extend({
   components: {
@@ -76,8 +73,8 @@ export default Vue.extend({
       type: String,
       default: '',
     },
-    uiBalance: {
-      type: BigNumber,
+    balance: {
+      type: Number,
       default: null,
     },
     showMax: {
@@ -92,7 +89,7 @@ export default Vue.extend({
 
   methods: {
     importIcon,
-    toBigNumber,
+    SafeMath,
   },
 })
 </script>

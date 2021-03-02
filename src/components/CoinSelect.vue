@@ -23,7 +23,7 @@
               <Icon type="loading" />
             </div>
             <div v-else-if="token.tokenAccountAddress">
-              {{ token.uiBalance.toFixed() }}
+              {{ token.balance.toEther() }}
             </div>
             <div v-else></div>
           </div>
@@ -128,7 +128,7 @@ export default Vue.extend({
 
       // 余额排序
       hasBalance = hasBalance.sort((a, b) => {
-        return b.uiBalance - a.uiBalance
+        return b.balance.toEther() - a.balance.toEther()
       })
 
       // 无余额的名字排序

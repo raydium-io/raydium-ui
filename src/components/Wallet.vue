@@ -96,6 +96,10 @@ export default Vue.extend({
     ...mapState(['wallet']),
   },
 
+  mounted() {
+    Vue.prototype.$conn = new Connection(this.wallet.endpoint)
+  },
+
   methods: {
     importIcon,
 
@@ -142,10 +146,7 @@ export default Vue.extend({
 
       wallet.on('connect', () => {
         this.$store.dispatch('wallet/closeModal').then(() => {
-          const connection = new Connection(this.wallet.endpoint)
-
           Vue.prototype.$wallet = wallet
-          Vue.prototype.$conn = connection
 
           self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
 
@@ -159,7 +160,6 @@ export default Vue.extend({
 
       wallet.on('disconnect', () => {
         Vue.prototype.$wallet = null
-        Vue.prototype.$conn = null
 
         this.unsubWebsocket()
 

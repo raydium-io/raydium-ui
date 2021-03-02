@@ -1,21 +1,20 @@
 <template>
   <div v-if="liquidityPool && liquidityPool.hasQuote" class="pool-info">
+    {{
+      void ((coin = liquidityPool.poolInfo.coin),
+      (pc = liquidityPool.poolInfo.pc),
+      (lp = liquidityPool.poolInfo.lp))
+    }}
     <div class="price-base fc-container">
       <span v-if="coinBasePrice">
-        1 {{ liquidityPool.poolInfo.coin.symbol }} ≈
-        {{
-          liquidityPool.getPrice().toFixed(liquidityPool.poolInfo.pc.decimals)
-        }}
-        {{ liquidityPool.poolInfo.pc.symbol }}
+        1 {{ coin.symbol }} ≈
+        {{ liquidityPool.getPrice().toFixed(pc.decimals) }}
+        {{ pc.symbol }}
       </span>
       <span v-else>
-        1 {{ liquidityPool.poolInfo.pc.symbol }} ≈
-        {{
-          liquidityPool
-            .getPrice(false)
-            .toFixed(liquidityPool.poolInfo.coin.decimals)
-        }}
-        {{ liquidityPool.poolInfo.coin.symbol }}
+        1 {{ pc.symbol }} ≈
+        {{ liquidityPool.getPrice(false).toFixed(coin.decimals) }}
+        {{ coin.symbol }}
       </span>
       <Icon type="swap" @click="() => (coinBasePrice = !coinBasePrice)" />
     </div>
@@ -24,20 +23,12 @@
       <span class="name">Pool liquidity</span>
       <div class="info">
         <span>
-          {{
-            liquidityPool.poolInfo.coin.uiBalance.toFormat(
-              liquidityPool.poolInfo.coin.decimals
-            )
-          }}
-          {{ liquidityPool.poolInfo.coin.symbol }}
+          {{ coin.uiBalance }}
+          {{ coin.symbol }}
         </span>
         <span>
-          {{
-            liquidityPool.poolInfo.pc.uiBalance.toFormat(
-              liquidityPool.poolInfo.pc.decimals
-            )
-          }}
-          {{ liquidityPool.poolInfo.pc.symbol }}
+          {{ pc.uiBalance }}
+          {{ pc.symbol }}
         </span>
       </div>
     </div>
@@ -45,11 +36,7 @@
     <div class="fs-container">
       <span class="name">LP supply</span>
       <span>
-        {{
-          liquidityPool.poolInfo.lp.uiTotalSupply.toFormat(
-            liquidityPool.poolInfo.lp.decimals
-          )
-        }}
+        {{ lp.uiTotalSupply }}
       </span>
     </div>
   </div>
@@ -59,8 +46,6 @@
 import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
 
-import Liquidity from '@/utils/liquidity'
-
 export default Vue.extend({
   components: {
     Icon,
@@ -68,7 +53,7 @@ export default Vue.extend({
 
   props: {
     liquidityPool: {
-      type: [Liquidity || null],
+      type: [Object || null],
       default: null,
     },
   },

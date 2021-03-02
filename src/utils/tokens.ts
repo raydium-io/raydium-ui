@@ -1,19 +1,17 @@
-import BigNumber from 'bignumber.js'
-
 export interface TokenInfo {
   symbol: string
   name: string
 
   mintAddress: string
   decimals: number
-  totalSupply?: BigNumber
-  uiTotalSupply?: BigNumber
+  totalSupply?: number
+  uiTotalSupply?: number
 
   referrer?: string
 
   tokenAccountAddress?: string
-  balance?: BigNumber
-  uiBalance?: BigNumber
+  balance?: number
+  uiBalance?: number
 }
 
 /**

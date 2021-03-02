@@ -25,7 +25,7 @@
             </div>
             <div class="fs-container">
               <div>Your pool tokens:</div>
-              <div>{{ liquidity.user.uiBalance }}</div>
+              <div>{{ liquidity.user.balance.format() }}</div>
             </div>
             <div class="fs-container">
               <div>Your pool share:</div>
@@ -109,8 +109,10 @@ export default Vue.extend({
         }
       }
 
-      // @ts-ignore
-      liquids = liquids.filter((liquidity) => liquidity.user.uiBalance !== 0)
+      liquids = liquids.filter(
+        // @ts-ignore
+        (liquidity) => !liquidity.user.balance.wei.isZero()
+      )
 
       this.liquids = liquids
     },

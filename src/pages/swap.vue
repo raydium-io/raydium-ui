@@ -75,9 +75,9 @@
           v-model="fromCoinAmount"
           label="From"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
-          :ui-balance="fromCoin ? fromCoin.uiBalance : null"
+          :balance="fromCoin ? fromCoin.balance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
-          @onMax="() => (fromCoinAmount = fromCoin.uiBalance.toString())"
+          @onMax="() => (fromCoinAmount = fromCoin.balance.fixed())"
           @onSelect="openFromCoinSelect"
         />
 
@@ -91,7 +91,7 @@
           v-model="toCoinAmount"
           label="To (Estimate)"
           :coin-name="toCoin ? toCoin.symbol : ''"
-          :ui-balance="toCoin ? toCoin.uiBalance : null"
+          :balance="toCoin ? toCoin.balance : null"
           :show-max="false"
           :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
@@ -118,7 +118,7 @@
           <template v-else-if="!swapPool">
             Insufficient liquidity for this trade
           </template>
-          <template v-else-if="fromCoinAmount > fromCoin.uiBalance">
+          <template v-else-if="fromCoinAmount > fromCoin.balance">
             Insufficient BNB balance
           </template>
           <template v-else>Swap</template>
