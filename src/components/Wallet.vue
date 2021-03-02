@@ -97,7 +97,8 @@ export default Vue.extend({
   },
 
   mounted() {
-    Vue.prototype.$conn = new Connection(this.wallet.endpoint)
+    const conn = new Connection(this.wallet.endpoint)
+    Vue.prototype.$conn = conn
   },
 
   methods: {

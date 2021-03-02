@@ -93,17 +93,27 @@
           <YourLiquidity />
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
-          <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
+          <Tooltip
+            v-if="activeTab === 'add' && liquidityPool"
+            placement="bottomRight"
+          >
             <template slot="title">
-              <span>Quote auto refresh countdown</span>
+              <span>
+                Quote auto refresh countdown after
+                {{ AUTO_REFRESH - countdown }} seconds, you can click to update
+                manually
+              </span>
+              <br />
+              <span> Automatically refreshes when the pool had changed </span>
             </template>
             <Progress
               type="circle"
               :width="20"
               :stroke-width="10"
-              :percent="10 * countdown"
+              :percent="(100 / AUTO_REFRESH) * countdown"
               :show-info="false"
               :class="liquidityPool && liquidityPool.quoting ? 'disabled' : ''"
+              @click="updatePoolInfo"
             />
           </Tooltip>
           <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
@@ -148,6 +158,21 @@
                     />
                   </div>
                 </div>
+                <div v-if="liquidityPool" class="info">
+                  {{ void (lp = liquidityPool.poolInfo.lp) }}
+                  <div class="symbol">Pool</div>
+                  <div class="address">
+                    {{ lp.mintAddress.substr(0, 14) }}
+                    ...
+                    {{ lp.mintAddress.substr(lp.mintAddress.length - 14, 14) }}
+                  </div>
+                  <div class="action">
+                    <Icon
+                      type="copy"
+                      @click="$store.dispatch('app/copy', lp.mintAddress)"
+                    />
+                  </div>
+                </div>
               </div>
             </template>
             <Icon type="info-circle" />
@@ -168,15 +193,24 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
+import {
+  PublicKey,
+  // types
+  AccountInfo,
+  Context,
+} from '@solana/web3.js'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import Liquidity from '@/utils/liquidity'
 import logger from '@/utils/logger'
+import commitment from '@/utils/commitment'
 
 const { TabPane } = Tabs
 
 const RAY = { ...getTokenBySymbol('RAY') }
+
+const AUTO_REFRESH = 60
 
 export default Vue.extend({
   components: {
@@ -203,11 +237,16 @@ export default Vue.extend({
       toCoinAmount: '',
 
       liquidityPool: null as Liquidity | null,
+
+      activeTab: 'add',
+
       // 自动刷新倒计时
       countdown: 0,
       timer: null as any,
-
-      activeTab: 'add',
+      AUTO_REFRESH,
+      // 订阅池子变动
+      poolListenerId: null,
+      lastSubBlock: 0,
     }
   },
 
@@ -252,6 +291,10 @@ export default Vue.extend({
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
     this.setTimer()
+  },
+
+  destroyed() {
+    clearInterval(this.timer)
   },
 
   methods: {
@@ -334,12 +377,15 @@ export default Vue.extend({
           ) {
             this.liquidityPool = Liquidity.load(liquidityPoolInfo)
             this.updatePoolInfo()
+            this.subPoolChange()
           }
         } else {
           this.liquidityPool = null
+          this.unsubPoolChange()
         }
       } else {
         this.liquidityPool = null
+        this.unsubPoolChange()
       }
     },
 
@@ -348,10 +394,10 @@ export default Vue.extend({
 
       this.timer = setInterval(function () {
         if (self.liquidityPool && !self.liquidityPool.quoting) {
-          if (self.countdown < 10) {
+          if (self.countdown < AUTO_REFRESH) {
             self.countdown += 1
 
-            if (self.countdown === 10) {
+            if (self.countdown === AUTO_REFRESH) {
               self.updatePoolInfo()
             }
           }
@@ -359,9 +405,44 @@ export default Vue.extend({
       }, 1000)
     },
 
+    onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
+      logger('onPoolChange')
+
+      const { slot } = context
+
+      if (slot !== this.lastSubBlock) {
+        this.lastSubBlock = slot
+        this.updatePoolInfo()
+      }
+    },
+
+    subPoolChange() {
+      if (this.liquidityPool) {
+        const conn = (this as any).$conn
+
+        this.poolListenerId = conn.onAccountChange(
+          new PublicKey(this.liquidityPool.poolInfo.ammQuantities),
+          this.onPoolChange,
+          commitment
+        )
+
+        logger('subPoolChange', this.liquidityPool.poolInfo.lp.symbol)
+      }
+    },
+
+    unsubPoolChange() {
+      if (this.poolListenerId) {
+        const conn = (this as any).$conn
+
+        conn?.removeAccountChangeListener(this.poolListenerId)
+
+        logger('unsubPoolChange')
+      }
+    },
+
     updatePoolInfo() {
       if (this.liquidityPool) {
-        this.countdown = 10
+        this.countdown = AUTO_REFRESH
 
         const conn = (this as any).$conn
 
