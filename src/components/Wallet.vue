@@ -67,6 +67,8 @@ interface Wallets {
   [index: number]: any
 }
 
+const AUTO_REFRESH = 60
+
 export default Vue.extend({
   components: {
     Button,
@@ -87,8 +89,14 @@ export default Vue.extend({
         // Coin98: '',
       } as Wallets,
 
-      // wallet websocket listeners
+      // 自动刷新倒计时
+      countdown: 0,
+      timer: null as any,
+      AUTO_REFRESH,
+      // 订阅钱包变动
+      poolListenerId: null,
       accountChangeListenerId: null as number | undefined | null,
+      lastSubBlock: 0,
     }
   },
 
@@ -184,11 +192,15 @@ export default Vue.extend({
       Vue.prototype.$wallet.disconnect()
     },
 
-    onAccountChange(accountInfo: AccountInfo<Buffer>, context: Context): void {
+    onAccountChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
       logger('onAccountChange')
-      logger(accountInfo, context)
 
-      this.$store.dispatch('wallet/getTokenAccounts')
+      const { slot } = context
+
+      if (slot !== this.lastSubBlock) {
+        this.lastSubBlock = slot
+        this.$store.dispatch('wallet/getTokenAccounts')
+      }
     },
 
     subWebsocket() {

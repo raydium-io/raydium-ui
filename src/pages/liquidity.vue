@@ -377,6 +377,7 @@ export default Vue.extend({
           ) {
             this.liquidityPool = Liquidity.load(liquidityPoolInfo)
             this.updatePoolInfo()
+            this.unsubPoolChange()
             this.subPoolChange()
           }
         } else {
