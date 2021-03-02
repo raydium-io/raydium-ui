@@ -64,20 +64,20 @@ export default class Liquidity {
     const pcBalance = unusedPc.plus(quoteTokenTotal).minus(needTakePnlPc)
 
     this.poolInfo.coin.balance = coinBalance
-    this.poolInfo.coin.uiBalance = TokenAmount.toFloat(
+    this.poolInfo.coin.uiBalance = TokenAmount.fromWei(
       coinBalance,
       this.poolInfo.coin.decimals
     )
 
     this.poolInfo.pc.balance = pcBalance
-    this.poolInfo.pc.uiBalance = TokenAmount.toFloat(
+    this.poolInfo.pc.uiBalance = TokenAmount.fromWei(
       pcBalance,
       this.poolInfo.pc.decimals
     )
 
     const lpSupply = await this.getLpSupply(connection)
     this.poolInfo.lp.totalSupply = lpSupply
-    this.poolInfo.lp.uiTotalSupply = TokenAmount.toFloat(
+    this.poolInfo.lp.uiTotalSupply = TokenAmount.fromWei(
       lpSupply,
       this.poolInfo.lp.decimals
     )

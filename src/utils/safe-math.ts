@@ -5,7 +5,8 @@ export class TokenAmount {
     return new BigNumber(value)
   }
 
-  static toFloat(
+  // 采用和以太一样的命名 除以精度
+  static fromWei(
     value: number | string | BigNumber,
     decimals: number
   ): BigNumber {
@@ -19,5 +20,21 @@ export class TokenAmount {
 
     const decimal = new BigNumber(10).exponentiatedBy(decimals)
     return amount.dividedBy(decimal)
+  }
+
+  static toWei(
+    value: number | string | BigNumber,
+    decimals: number
+  ): BigNumber {
+    let amount
+
+    if (value instanceof BigNumber) {
+      amount = value
+    } else {
+      amount = new BigNumber(value)
+    }
+
+    const decimal = new BigNumber(10).exponentiatedBy(decimals)
+    return amount.multipliedBy(decimal)
   }
 }

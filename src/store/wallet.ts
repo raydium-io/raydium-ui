@@ -117,7 +117,7 @@ export const actions = {
         tokenAccounts[NATIVE_SOL.mintAddress] = {
           tokenAccountAddress: wallet.publicKey.toBase58(),
           balance: TokenAmount.toBigNumber(solBalance),
-          uiBalance: TokenAmount.toFloat(solBalance, NATIVE_SOL.decimals),
+          uiBalance: TokenAmount.fromWei(solBalance, NATIVE_SOL.decimals),
         }
 
         commit('setTokenAccounts', tokenAccounts)
