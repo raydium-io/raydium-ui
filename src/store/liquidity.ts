@@ -170,7 +170,7 @@ export const actions = {
       commit('setInfos', liquidityPools)
       commit('setInitialized')
       commit('setQuoting', false)
-      logger('Liquidity pool quote updated')
+      logger('Liquidity pool infomations updated')
     })
   },
 }

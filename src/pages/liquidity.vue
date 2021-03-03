@@ -110,7 +110,9 @@
                 you can click to update manually
               </span>
               <br />
-              <span> Automatically refreshes when the pool had changed </span>
+              <span>
+                Automatically refreshes when the current pool had changed
+              </span>
             </template>
             <Progress
               type="circle"
