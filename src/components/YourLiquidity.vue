@@ -6,7 +6,7 @@
           Unlock Wallet
         </Button>
       </div>
-      <Spin v-else :spinning="wallet.tokenAccountsLoading">
+      <Spin v-else :spinning="wallet.loading">
         <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
 
         <Collapse

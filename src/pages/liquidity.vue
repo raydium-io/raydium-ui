@@ -106,8 +106,8 @@
             <template slot="title">
               <span>
                 Quote auto refresh countdown after
-                {{ AUTO_REFRESH - countdown }} seconds, you can click to update
-                manually
+                {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds,
+                you can click to update manually
               </span>
               <br />
               <span> Automatically refreshes when the pool had changed </span>
@@ -116,7 +116,7 @@
               type="circle"
               :width="20"
               :stroke-width="10"
-              :percent="(100 / AUTO_REFRESH) * countdown"
+              :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
               :show-info="false"
               :class="lpMintAddress && liquidity.quoting ? 'disabled' : ''"
               @click="$store.dispatch('liquidity/getLiquidityPoolInfo')"
@@ -198,25 +198,23 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
-// import {
-//   PublicKey,
-//   // types
-//   AccountInfo,
-//   Context,
-// } from '@solana/web3.js'
+import {
+  PublicKey,
+  // types
+  AccountInfo,
+  Context,
+} from '@solana/web3.js'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import Liquidity from '@/utils/liquidity'
-// import logger from '@/utils/logger'
-// import commitment from '@/utils/commitment'
+import logger from '@/utils/logger'
+import commitment from '@/utils/commitment'
 import { cloneDeep } from 'lodash-es'
 
 const { TabPane } = Tabs
 
 const RAY = getTokenBySymbol('RAY')
-
-const AUTO_REFRESH = 60
 
 export default Vue.extend({
   components: {
@@ -246,10 +244,6 @@ export default Vue.extend({
 
       lpMintAddress: null as string | null,
 
-      // 自动刷新倒计时
-      countdown: 0,
-      timer: null as any,
-      AUTO_REFRESH,
       // 订阅池子变动
       poolListenerId: null,
       lastSubBlock: 0,
@@ -300,7 +294,7 @@ export default Vue.extend({
   },
 
   destroyed() {
-    clearInterval(this.timer)
+    // clearInterval(this.timer)
   },
 
   methods: {
@@ -379,82 +373,55 @@ export default Vue.extend({
           // 处理 老的和新的 LP 一样
           if (this.lpMintAddress !== lpMintAddress) {
             this.lpMintAddress = lpMintAddress
+            this.unsubPoolChange()
+            this.subPoolChange()
           }
         } else {
           this.lpMintAddress = null
-          // this.unsubPoolChange()
+          this.unsubPoolChange()
         }
       } else {
         this.lpMintAddress = null
-        // this.unsubPoolChange()
+        this.unsubPoolChange()
       }
     },
 
-    // setTimer() {
-    // const self = this
-    // this.timer = setInterval(function () {
-    //   if (self.liquidityPool && !self.liquidityPool.quoting) {
-    //     if (self.countdown < AUTO_REFRESH) {
-    //       self.countdown += 1
-    //       if (self.countdown === AUTO_REFRESH) {
-    //         self.updatePoolInfo()
-    //       }
-    //     }
-    //   }
-    // }, 1000)
-    // },
+    onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
+      logger('onPoolChange')
 
-    // onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
-    //   logger('onPoolChange')
+      const { slot } = context
 
-    //   const { slot } = context
+      if (slot !== this.liquidity.lastSubBlock) {
+        this.$store.commit('liquidity/setLastSubBlock', slot)
+        this.$store.dispatch('liquidity/getLiquidityPoolInfo')
+      }
+    },
 
-    //   if (slot !== this.lastSubBlock) {
-    //     this.lastSubBlock = slot
-    //     this.updatePoolInfo()
-    //   }
-    // },
+    subPoolChange() {
+      if (this.lpMintAddress) {
+        const conn = (this as any).$conn
 
-    // subPoolChange() {
-    //   if (this.liquidityPool) {
-    //     const conn = (this as any).$conn
+        const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-    //     this.poolListenerId = conn.onAccountChange(
-    //       new PublicKey(this.liquidityPool.poolInfo.ammQuantities),
-    //       this.onPoolChange,
-    //       commitment
-    //     )
+        this.poolListenerId = conn.onAccountChange(
+          new PublicKey(poolInfo.ammQuantities),
+          this.onPoolChange,
+          commitment
+        )
 
-    //     logger('subPoolChange', this.liquidityPool.poolInfo.lp.symbol)
-    //   }
-    // },
+        logger('subPoolChange', poolInfo.lp.symbol)
+      }
+    },
 
-    // unsubPoolChange() {
-    //   if (this.poolListenerId) {
-    //     const conn = (this as any).$conn
+    unsubPoolChange() {
+      if (this.poolListenerId) {
+        const conn = (this as any).$conn
 
-    //     conn?.removeAccountChangeListener(this.poolListenerId)
+        conn.removeAccountChangeListener(this.poolListenerId)
 
-    //     logger('unsubPoolChange')
-    //   }
-    // },
-
-    // updatePoolInfo() {
-    //   if (this.liquidityPool) {
-    //     this.countdown = AUTO_REFRESH
-
-    //     const conn = (this as any).$conn
-
-    //     this.liquidityPool
-    //       .requestQuote(conn)
-    //       .then()
-    //       .finally(() => {
-    //         logger('Liquidity pool quote updated')
-
-    //         this.countdown = 0
-    //       })
-    //   }
-    // },
+        logger('unsubPoolChange')
+      }
+    },
 
     supply() {},
   },

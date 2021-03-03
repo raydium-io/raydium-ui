@@ -8,11 +8,19 @@ import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import commitment from '@/utils/commitment'
 import { getMultipleAccounts } from '@/utils/web3'
+import logger from '@/utils/logger'
+
+const AUTO_REFRESH_TIME = 60
 
 export const state = () => ({
   initialized: false,
   quoting: false,
   infos: {},
+  // 自动刷新倒计时
+  autoRefreshTime: AUTO_REFRESH_TIME,
+  countdown: 0,
+  lastSubBlock: 0,
+  timer: null,
 })
 
 export const mutations = {
@@ -21,11 +29,27 @@ export const mutations = {
   },
 
   setQuoting(state: any, quoting: boolean) {
+    if (quoting) {
+      state.countdown = AUTO_REFRESH_TIME
+    }
+
     state.quoting = quoting
+
+    if (!quoting) {
+      state.countdown = 0
+    }
   },
 
   setInfos(state: any, infos: object) {
     state.infos = cloneDeep(infos)
+  },
+
+  setCountdown(state: any, countdown: number) {
+    state.countdown = countdown
+  },
+
+  setLastSubBlock(state: any, lastSubBlock: number) {
+    state.lastSubBlock = lastSubBlock
   },
 }
 
@@ -146,6 +170,7 @@ export const actions = {
       commit('setInfos', liquidityPools)
       commit('setInitialized')
       commit('setQuoting', false)
+      logger('Liquidity pool quote updated')
     })
   },
 }

@@ -67,8 +67,6 @@ interface Wallets {
   [index: number]: any
 }
 
-const AUTO_REFRESH = 60
-
 export default Vue.extend({
   components: {
     Button,
@@ -90,9 +88,7 @@ export default Vue.extend({
       } as Wallets,
 
       // 自动刷新倒计时
-      countdown: 0,
-      timer: null as any,
-      AUTO_REFRESH,
+      liquidityTimer: null as any,
       // 订阅钱包变动
       poolListenerId: null,
       accountChangeListenerId: null as number | undefined | null,
@@ -101,7 +97,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet']),
+    ...mapState(['wallet', 'liquidity']),
   },
 
   mounted() {
@@ -109,6 +105,12 @@ export default Vue.extend({
     Vue.prototype.$conn = conn
 
     this.$store.dispatch('liquidity/getLiquidityPoolInfo')
+
+    this.setLiquidityTimer()
+  },
+
+  destroyed() {
+    clearInterval(this.liquidityTimer)
   },
 
   methods: {
@@ -161,7 +163,7 @@ export default Vue.extend({
 
           self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
 
-          this.subWebsocket()
+          this.subWallet()
           ;(self as any).$notify.success({
             message: 'Wallet connected',
             description: '',
@@ -169,16 +171,7 @@ export default Vue.extend({
         })
       })
 
-      wallet.on('disconnect', () => {
-        Vue.prototype.$wallet = null
-
-        this.unsubWebsocket()
-
-        this.$store.commit('wallet/disconnected')
-        ;(self as any).$notify.warning({
-          message: 'Wallet disconnected',
-        })
-      })
+      wallet.on('disconnect', () => {})
 
       try {
         wallet.connect()
@@ -192,9 +185,17 @@ export default Vue.extend({
 
     disconnect() {
       Vue.prototype.$wallet.disconnect()
+      Vue.prototype.$wallet = null
+
+      this.unsubWallet()
+
+      this.$store.commit('wallet/disconnected')
+      ;(self as any).$notify.warning({
+        message: 'Wallet disconnected',
+      })
     },
 
-    onAccountChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
+    onWalletChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
       logger('onAccountChange')
 
       const { slot } = context
@@ -205,25 +206,44 @@ export default Vue.extend({
       }
     },
 
-    subWebsocket() {
+    subWallet() {
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
-      this.accountChangeListenerId = conn?.onAccountChange(
+      this.accountChangeListenerId = conn.onAccountChange(
         wallet.publicKey,
-        this.onAccountChange,
+        this.onWalletChange,
         commitment
       )
 
       this.$store.dispatch('wallet/getTokenAccounts')
     },
 
-    unsubWebsocket() {
+    unsubWallet() {
       const conn = (this as any).$conn
 
       if (this.accountChangeListenerId) {
-        conn?.removeAccountChangeListener(this.accountChangeListenerId)
+        conn.removeAccountChangeListener(this.accountChangeListenerId)
       }
+    },
+
+    setLiquidityTimer() {
+      const self = this
+
+      this.liquidityTimer = setInterval(function () {
+        if (!self.liquidity.quoting) {
+          if (self.liquidity.countdown < self.liquidity.autoRefreshTime) {
+            self.$store.commit(
+              'liquidity/setCountdown',
+              self.liquidity.countdown + 1
+            )
+
+            if (self.liquidity.countdown === self.liquidity.autoRefreshTime) {
+              self.$store.dispatch('liquidity/getLiquidityPoolInfo')
+            }
+          }
+        }
+      }, 1000)
     },
   },
 })

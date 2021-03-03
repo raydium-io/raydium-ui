@@ -13,7 +13,7 @@ export const state = () => ({
   // endpoint: 'https://api.mainnet-beta.solana.com',
   endpoint: 'https://solana-api.projectserum.com',
 
-  tokenAccountsLoading: false,
+  loading: false,
   tokenAccounts: {},
 })
 
@@ -33,7 +33,7 @@ export const mutations = {
   },
 
   loadingTokenAccounts(state: any, loading: boolean) {
-    state.tokenAccountsLoading = loading
+    state.loading = loading
   },
 
   setTokenAccounts(state: any, tokenAccounts: any) {

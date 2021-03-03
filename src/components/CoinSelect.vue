@@ -19,7 +19,7 @@
           </div>
           <span></span>
           <div class="balance">
-            <div v-if="wallet.tokenAccountsLoading">
+            <div v-if="wallet.loading">
               <Icon type="loading" />
             </div>
             <div v-else-if="token.tokenAccountAddress">
