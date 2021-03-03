@@ -68,7 +68,8 @@
                   !liquidity.initialized ||
                   liquidity.quoting ||
                   gt(fromCoinAmount, fromCoin.balance) ||
-                  gt(toCoinAmount, toCoin.balance)
+                  gt(toCoinAmount, toCoin.balance) ||
+                  suppling
                 "
                 @click="supply"
               >
@@ -195,6 +196,8 @@ export default Vue.extend({
   data() {
     return {
       activeTab: 'add',
+      // supply ing
+      suppling: false,
 
       coinSelectShow: false,
       // 正在弹框选择哪个的币种
@@ -441,10 +444,11 @@ export default Vue.extend({
     },
 
     supply() {
+      this.suppling = true
+
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
-      // const poolInfo = this.liquidity.infos[this.lpMintAddress]
       const poolInfo = get(this.liquidity.infos, this.lpMintAddress)
 
       // @ts-ignore
@@ -475,6 +479,9 @@ export default Vue.extend({
             message: 'Add liquidity failed',
             description: error.message
           })
+        })
+        .finally(() => {
+          this.suppling = false
         })
     }
   }

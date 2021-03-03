@@ -187,13 +187,110 @@ export async function addLiquidity(
       new PublicKey(poolInfo.serumMarket),
 
       userCoinTokenAccount,
-      userPcTokenAccount,
+      wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
       userLpTokenAccount,
       owner,
 
       coinAmount,
       pcAmount,
       tolerate
+    )
+  )
+
+  if (wrappedSolAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount,
+        destination: owner,
+        owner: owner
+      })
+    )
+  }
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+// 移除流动性
+export async function removeLiquidity(
+  connection: Connection | undefined | null,
+  wallet: any | undefined | null,
+  poolInfo: LiquidityPoolInfo | undefined | null,
+  lpAccount: string | undefined | null,
+  fromCoinAccount: string | undefined | null,
+  toCoinAccount: string | undefined | null,
+  amount: string | undefined | null
+) {
+  if (!connection || !wallet) throw new Error('Miss connection')
+  if (!poolInfo) {
+    throw new Error('Miss pool infomations')
+  }
+  if (!lpAccount || !fromCoinAccount || !toCoinAccount) {
+    throw new Error('Miss account infomations')
+  }
+  if (!amount) {
+    throw new Error('Miss amount infomations')
+  }
+
+  const transaction = new Transaction()
+  const signers: any = []
+
+  const owner = wallet.publicKey
+
+  const lpAmount = new TokenAmount(amount, poolInfo.lp.decimals, false).wei.toNumber()
+
+  // 如果是 NATIVE SOL 包裹一下
+  let wrappedSolAccount
+  if (poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress) {
+    const newWrappedSolAccount = new Account()
+    wrappedSolAccount = newWrappedSolAccount.publicKey
+
+    transaction.add(
+      SystemProgram.createAccount({
+        fromPubkey: owner,
+        newAccountPubkey: wrappedSolAccount,
+        lamports: await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
+        space: ACCOUNT_LAYOUT.span,
+        programId: TOKEN_PROGRAM_ID
+      })
+    )
+
+    transaction.add(
+      initializeAccount({
+        account: wrappedSolAccount,
+        mint: new PublicKey(TOKENS.WSOL.mintAddress),
+        owner: owner
+      })
+    )
+
+    signers.push(newWrappedSolAccount)
+  }
+
+  transaction.add(
+    removeLiquidityInstruction(
+      new PublicKey(poolInfo.programId),
+
+      new PublicKey(poolInfo.ammId),
+      new PublicKey(poolInfo.ammAuthority),
+      new PublicKey(poolInfo.ammOpenOrders),
+      new PublicKey(poolInfo.ammQuantities),
+      new PublicKey(poolInfo.lp.mintAddress),
+      new PublicKey(poolInfo.poolCoinTokenAccount),
+      new PublicKey(poolInfo.poolPcTokenAccount),
+      new PublicKey(poolInfo.poolWithdrawQueue),
+      new PublicKey(poolInfo.poolTempLpTokenAccount),
+
+      new PublicKey(poolInfo.serumProgramId),
+      new PublicKey(poolInfo.serumMarket),
+      new PublicKey(poolInfo.serumCoinVaultAccount),
+      new PublicKey(poolInfo.serumPcVaultAccount),
+      new PublicKey(poolInfo.serumVaultSigner),
+
+      new PublicKey(lpAccount),
+      new PublicKey(fromCoinAccount),
+      wrappedSolAccount ? wrappedSolAccount : new PublicKey(toCoinAccount),
+      owner,
+
+      lpAmount
     )
   )
 
@@ -258,6 +355,73 @@ export function addLiquidityInstruction(
       maxCoinAmount,
       maxPcAmount,
       tolerate
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function removeLiquidityInstruction(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammQuantities: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  poolWithdrawQueue: PublicKey,
+  poolTempLpTokenAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userLpTokenAccount: PublicKey,
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  amount: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammQuantities, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolWithdrawQueue, isSigner: false, isWritable: true },
+    { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: serumProgramId, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 4,
+      amount: amount
     },
     data
   )
