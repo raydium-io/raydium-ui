@@ -233,7 +233,7 @@ export default Vue.extend({
       const self = this
 
       this.walletTimer = setInterval(function () {
-        if (!self.wallet.loading) {
+        if (self.wallet.connected && !self.wallet.loading) {
           if (self.wallet.countdown < self.wallet.autoRefreshTime) {
             self.$store.commit('wallet/setCountdown', self.wallet.countdown + 1)
 

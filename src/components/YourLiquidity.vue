@@ -54,8 +54,6 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Button, Collapse, Row, Col, Spin, Icon } from 'ant-design-vue'
 
-import Liquidity from '@/utils/liquidity'
-
 const CollapsePanel = Collapse.Panel
 
 export default Vue.extend({
@@ -94,25 +92,25 @@ export default Vue.extend({
   },
 
   methods: {
-    updateLiquids(tokenAccounts: any) {
-      let liquids = []
+    updateLiquids(_tokenAccounts: any) {
+      const liquids = [] as any
 
-      for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
-        const liquidityPool = Liquidity.getByLpMintAddress(mintAddress)
+      // for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
+      //   const liquidityPool = Liquidity.getByLpMintAddress(mintAddress)
 
-        if (liquidityPool) {
-          // @ts-ignore
-          liquids.push({
-            ...{ pool: liquidityPool },
-            ...{ user: tokenAccount },
-          })
-        }
-      }
+      //   if (liquidityPool) {
+      //     // @ts-ignore
+      //     liquids.push({
+      //       ...{ pool: liquidityPool },
+      //       ...{ user: tokenAccount },
+      //     })
+      //   }
+      // }
 
-      liquids = liquids.filter(
-        // @ts-ignore
-        (liquidity) => !liquidity.user.balance.wei.isZero()
-      )
+      // liquids = liquids.filter(
+      //   // @ts-ignore
+      //   (liquidity) => !liquidity.user.balance.wei.isZero()
+      // )
 
       this.liquids = liquids
     },

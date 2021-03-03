@@ -6,50 +6,26 @@ import {
 } from '@/utils/pools'
 import { publicKey, struct, u64 } from '@project-serum/borsh'
 
-export default class Liquidity {
-  // v2
-  static programId = 'RVKd61ztZW9GUwhRbbLoYVRE5Xf1B2tVscKqwZqXgEr'
+// v2
+// export const programId = 'RVKd61ztZW9GUwhRbbLoYVRE5Xf1B2tVscKqwZqXgEr'
 
-  public poolInfo: LiquidityPoolInfo
+export {
+  getLpMintByTokenMintAddresses,
+  getPoolByLpMintAddress,
+  getPoolByTokenMintAddresses,
+}
 
-  public hasQuote: boolean
-  public quoting: boolean
+export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
+  const { coin, pc } = poolInfo
 
-  constructor(poolInfo: LiquidityPoolInfo) {
-    this.poolInfo = poolInfo
-
-    this.hasQuote = false
-    this.quoting = true
+  if (!coin.balance || !pc.balance) {
+    return NaN
   }
 
-  static load(poolInfo: LiquidityPoolInfo) {
-    return new Liquidity(poolInfo)
-  }
-
-  getPrice(coinBase = true) {
-    const { coin, pc } = this.poolInfo
-
-    if (!coin.balance || !pc.balance) {
-      return NaN
-    }
-
-    if (coinBase) {
-      return pc.balance.toEther().dividedBy(coin.balance.toEther())
-    } else {
-      return coin.balance.toEther().dividedBy(pc.balance.toEther())
-    }
-  }
-
-  static getByLpMintAddress(lpMint: string) {
-    return getPoolByLpMintAddress(lpMint)
-  }
-
-  static getByTokenMintAddresses(coinMint: string, pcMint: string) {
-    return getPoolByTokenMintAddresses(coinMint, pcMint)
-  }
-
-  static getLpMintByTokenMintAddresses(coinMint: string, pcMint: string) {
-    return getLpMintByTokenMintAddresses(coinMint, pcMint)
+  if (coinBase) {
+    return pc.balance.toEther().dividedBy(coin.balance.toEther())
+  } else {
+    return coin.balance.toEther().dividedBy(pc.balance.toEther())
   }
 }
 

@@ -209,7 +209,7 @@ import {
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import Liquidity from '@/utils/liquidity'
+import { getLpMintByTokenMintAddresses } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import commitment from '@/utils/commitment'
 import { cloneDeep } from 'lodash-es'
@@ -367,7 +367,7 @@ export default Vue.extend({
     // 根据选择的双币找池子
     findLiquidityPool() {
       if (this.fromCoin && this.toCoin) {
-        const lpMintAddress = Liquidity.getLpMintByTokenMintAddresses(
+        const lpMintAddress = getLpMintByTokenMintAddresses(
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress
         )

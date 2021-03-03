@@ -4,12 +4,12 @@
     <div class="price-base fc-container">
       <span v-if="coinBasePrice">
         1 {{ coin.symbol }} ≈
-        <!-- {{ liquidityPool.getPrice().toFixed(pc.decimals) }} -->
+        {{ getPrice(poolInfo).toFixed(pc.decimals) }}
         {{ pc.symbol }}
       </span>
       <span v-else>
         1 {{ pc.symbol }} ≈
-        <!-- {{ liquidityPool.getPrice(false).toFixed(coin.decimals) }} -->
+        {{ getPrice(poolInfo, false).toFixed(coin.decimals) }}
         {{ coin.symbol }}
       </span>
       <Icon type="swap" @click="() => (coinBasePrice = !coinBasePrice)" />
@@ -41,6 +41,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
+import { getPrice } from '@/utils/liquidity'
 
 export default Vue.extend({
   components: {
@@ -63,6 +64,10 @@ export default Vue.extend({
       // coin 为基准货币
       coinBasePrice: true,
     }
+  },
+
+  methods: {
+    getPrice,
   },
 })
 </script>
