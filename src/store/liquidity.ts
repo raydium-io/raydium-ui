@@ -20,7 +20,6 @@ export const state = () => ({
   autoRefreshTime: AUTO_REFRESH_TIME,
   countdown: 0,
   lastSubBlock: 0,
-  timer: null,
 })
 
 export const mutations = {
@@ -89,88 +88,91 @@ export const actions = {
       liquidityPools[lp.mintAddress] = poolInfo
     })
 
-    getMultipleAccounts(conn, publicKeys, commitment).then((multipleInfo) => {
-      multipleInfo.forEach((info) => {
-        if (info) {
-          const address = info.publicKey.toBase58()
-          const data = Buffer.from(info.account.data)
+    getMultipleAccounts(conn, publicKeys, commitment)
+      .then((multipleInfo) => {
+        multipleInfo.forEach((info) => {
+          if (info) {
+            const address = info.publicKey.toBase58()
+            const data = Buffer.from(info.account.data)
 
-          const { key, lpMintAddress } = getAddressForWhat(address)
+            const { key, lpMintAddress } = getAddressForWhat(address)
 
-          if (key && lpMintAddress) {
-            const poolInfo = liquidityPools[lpMintAddress]
+            if (key && lpMintAddress) {
+              const poolInfo = liquidityPools[lpMintAddress]
 
-            switch (key) {
-              // 获取池子未挂单的余额
-              case 'poolCoinTokenAccount': {
-                const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
+              switch (key) {
+                // 获取池子未挂单的余额
+                case 'poolCoinTokenAccount': {
+                  const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(
-                  parsed.amount.toNumber()
-                )
+                  poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(
+                    parsed.amount.toNumber()
+                  )
 
-                break
-              }
-              case 'poolPcTokenAccount': {
-                const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
+                  break
+                }
+                case 'poolPcTokenAccount': {
+                  const parsed = TOKEN_ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(
-                  parsed.amount.toNumber()
-                )
+                  poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(
+                    parsed.amount.toNumber()
+                  )
 
-                break
-              }
-              // 获取池子挂单的余额 open orders
-              case 'ammOpenOrders': {
-                const OPEN_ORDERS_LAYOUT = OpenOrders.getLayout(
-                  new PublicKey(poolInfo.serumProgramId)
-                )
-                const parsed = OPEN_ORDERS_LAYOUT.decode(data)
+                  break
+                }
+                // 获取池子挂单的余额 open orders
+                case 'ammOpenOrders': {
+                  const OPEN_ORDERS_LAYOUT = OpenOrders.getLayout(
+                    new PublicKey(poolInfo.serumProgramId)
+                  )
+                  const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
-                const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(
-                  baseTokenTotal.toNumber()
-                )
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(
-                  quoteTokenTotal.toNumber()
-                )
+                  const { baseTokenTotal, quoteTokenTotal } = parsed
+                  poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(
+                    baseTokenTotal.toNumber()
+                  )
+                  poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(
+                    quoteTokenTotal.toNumber()
+                  )
 
-                break
-              }
-              // 获取池子信息 (利润金额等等)
-              case 'ammId': {
-                const parsed = AMM_INFO_LAYOUT.decode(data)
+                  break
+                }
+                // 获取池子信息 (利润金额等等)
+                case 'ammId': {
+                  const parsed = AMM_INFO_LAYOUT.decode(data)
 
-                const { needTakePnlCoin, needTakePnlPc } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(
-                  needTakePnlCoin.toNumber()
-                )
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(
-                  needTakePnlPc.toNumber()
-                )
+                  const { needTakePnlCoin, needTakePnlPc } = parsed
+                  poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(
+                    needTakePnlCoin.toNumber()
+                  )
+                  poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(
+                    needTakePnlPc.toNumber()
+                  )
 
-                break
-              }
-              // getLpSupply
-              case 'lpMintAddress': {
-                const parsed = MINT_LAYOUT.decode(data)
+                  break
+                }
+                // getLpSupply
+                case 'lpMintAddress': {
+                  const parsed = MINT_LAYOUT.decode(data)
 
-                poolInfo.lp.totalSupply = new TokenAmount(
-                  parsed.supply.toNumber(),
-                  poolInfo.lp.decimals
-                )
+                  poolInfo.lp.totalSupply = new TokenAmount(
+                    parsed.supply.toNumber(),
+                    poolInfo.lp.decimals
+                  )
 
-                break
+                  break
+                }
               }
             }
           }
-        }
-      })
+        })
 
-      commit('setInfos', liquidityPools)
-      commit('setInitialized')
-      commit('setQuoting', false)
-      logger('Liquidity pool infomations updated')
-    })
+        commit('setInfos', liquidityPools)
+        logger('Liquidity pool infomations updated')
+      })
+      .finally(() => {
+        commit('setInitialized')
+        commit('setQuoting', false)
+      })
   },
 }

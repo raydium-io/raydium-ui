@@ -88,11 +88,11 @@ export default Vue.extend({
       } as Wallets,
 
       // 自动刷新倒计时
+      walletTimer: null as any,
       liquidityTimer: null as any,
-      // 订阅钱包变动
+      // 订阅变动
+      walletListenerId: null as number | undefined | null,
       poolListenerId: null,
-      accountChangeListenerId: null as number | undefined | null,
-      lastSubBlock: 0,
     }
   },
 
@@ -106,10 +106,12 @@ export default Vue.extend({
 
     this.$store.dispatch('liquidity/getLiquidityPoolInfo')
 
+    this.setWalletTimer()
     this.setLiquidityTimer()
   },
 
   destroyed() {
+    clearInterval(this.walletTimer)
     clearInterval(this.liquidityTimer)
   },
 
@@ -200,8 +202,8 @@ export default Vue.extend({
 
       const { slot } = context
 
-      if (slot !== this.lastSubBlock) {
-        this.lastSubBlock = slot
+      if (slot !== this.wallet.lastSubBlock) {
+        this.$store.commit('wallet/setLastSubBlock', slot)
         this.$store.dispatch('wallet/getTokenAccounts')
       }
     },
@@ -210,7 +212,7 @@ export default Vue.extend({
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
-      this.accountChangeListenerId = conn.onAccountChange(
+      this.walletListenerId = conn.onAccountChange(
         wallet.publicKey,
         this.onWalletChange,
         commitment
@@ -222,9 +224,25 @@ export default Vue.extend({
     unsubWallet() {
       const conn = (this as any).$conn
 
-      if (this.accountChangeListenerId) {
-        conn.removeAccountChangeListener(this.accountChangeListenerId)
+      if (this.walletListenerId) {
+        conn.removeAccountChangeListener(this.walletListenerId)
       }
+    },
+
+    setWalletTimer() {
+      const self = this
+
+      this.walletTimer = setInterval(function () {
+        if (!self.wallet.loading) {
+          if (self.wallet.countdown < self.wallet.autoRefreshTime) {
+            self.$store.commit('wallet/setCountdown', self.wallet.countdown + 1)
+
+            if (self.wallet.countdown === self.wallet.autoRefreshTime) {
+              self.$store.dispatch('wallet/getTokenAccounts')
+            }
+          }
+        }
+      }, 1000)
     },
 
     setLiquidityTimer() {

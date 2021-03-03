@@ -3,7 +3,10 @@ import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { NATIVE_SOL } from '@/utils/tokens'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
+import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
+
+const AUTO_REFRESH_TIME = 60
 
 export const state = () => ({
   modalShow: false,
@@ -15,6 +18,10 @@ export const state = () => ({
 
   loading: false,
   tokenAccounts: {},
+  // 自动刷新倒计时
+  autoRefreshTime: AUTO_REFRESH_TIME,
+  countdown: 0,
+  lastSubBlock: 0,
 })
 
 export const mutations = {
@@ -32,12 +39,28 @@ export const mutations = {
     state.address = ''
   },
 
-  loadingTokenAccounts(state: any, loading: boolean) {
+  setLoading(state: any, loading: boolean) {
+    if (loading) {
+      state.countdown = AUTO_REFRESH_TIME
+    }
+
     state.loading = loading
+
+    if (!loading) {
+      state.countdown = 0
+    }
   },
 
   setTokenAccounts(state: any, tokenAccounts: any) {
-    state.tokenAccounts = tokenAccounts
+    state.tokenAccounts = cloneDeep(tokenAccounts)
+  },
+
+  setCountdown(state: any, countdown: number) {
+    state.countdown = countdown
+  },
+
+  setLastSubBlock(state: any, lastSubBlock: number) {
+    state.lastSubBlock = lastSubBlock
   },
 }
 
@@ -56,14 +79,11 @@ export const actions = {
     })
   },
 
-  getTokenAccounts(
-    { commit, dispatch }: { commit: any; dispatch: any },
-    loop = false
-  ) {
+  getTokenAccounts({ commit }: { commit: any }) {
     const conn = (this as any)._vm.$conn
     const wallet = (this as any)._vm.$wallet
 
-    commit('loadingTokenAccounts', true)
+    commit('setLoading', true)
     conn
       .getParsedTokenAccountsByOwner(
         wallet.publicKey,
@@ -116,16 +136,10 @@ export const actions = {
         }
 
         commit('setTokenAccounts', tokenAccounts)
-        commit('loadingTokenAccounts', false)
-
-        logger('TokenAccounts updated')
+        logger('Wallet TokenAccounts updated')
       })
       .finally(() => {
-        if (loop) {
-          setTimeout(() => {
-            dispatch('getTokenAccounts')
-          }, 1000 * 10)
-        }
+        commit('setLoading', false)
       })
   },
 }
