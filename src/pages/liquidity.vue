@@ -16,7 +16,12 @@
                     fixedFromCoin = true
                   }
                 "
-                @onMax="() => (fromCoinAmount = fromCoin.balance.fixed())"
+                @onMax="
+                  () => {
+                    fixedFromCoin = true
+                    fromCoinAmount = fromCoin.balance.fixed()
+                  }
+                "
                 @onSelect="openFromCoinSelect"
               />
 
@@ -37,7 +42,12 @@
                     fixedFromCoin = false
                   }
                 "
-                @onMax="() => (toCoinAmount = toCoin.balance.fixed())"
+                @onMax="
+                  () => {
+                    fixedFromCoin = false
+                    toCoinAmount = toCoin.balance.fixed()
+                  }
+                "
                 @onSelect="openToCoinSelect"
               />
 
@@ -65,8 +75,8 @@
                   !lpMintAddress ||
                   !liquidity.initialized ||
                   liquidity.quoting ||
-                  parseFloat(fromCoinAmount) > fromCoin.balance ||
-                  parseFloat(toCoinAmount) > toCoin.balance
+                  gt(fromCoinAmount, fromCoin.balance) ||
+                  gt(toCoinAmount, toCoin.balance)
                 "
                 @click="supply"
               >
@@ -82,12 +92,10 @@
                 <template v-else-if="liquidity.quoting">
                   Updating pool's infomations
                 </template>
-                <template
-                  v-else-if="parseFloat(fromCoinAmount) > fromCoin.balance"
-                >
+                <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
                   Insufficient {{ fromCoin.symbol }} balance
                 </template>
-                <template v-else-if="parseFloat(toCoinAmount) > toCoin.balance">
+                <template v-else-if="gt(toCoinAmount, toCoin.balance)">
                   Insufficient {{ toCoin.symbol }} balance
                 </template>
                 <template v-else>Supply</template>
@@ -209,10 +217,11 @@ import {
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { getLpMintByTokenMintAddresses } from '@/utils/liquidity'
+import { getLpMintByTokenMintAddresses, getOutAmount } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import commitment from '@/utils/commitment'
 import { cloneDeep } from 'lodash-es'
+import { gt } from '@/utils/safe-math'
 
 const { TabPane } = Tabs
 
@@ -253,26 +262,33 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity']),
+    ...mapState(['wallet', 'liquidity', 'setting']),
   },
 
   watch: {
+    // 监听输入金额变动
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
           this.fromCoinAmount = oldAmount
+        } else {
+          this.updateAmounts()
         }
       })
     },
 
+    // 监听输入金额变动
     toCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
           this.toCoinAmount = oldAmount
+        } else {
+          this.updateAmounts()
         }
       })
     },
 
+    // 监听钱包余额变动
     'wallet.tokenAccounts': {
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
@@ -280,26 +296,37 @@ export default Vue.extend({
       deep: true,
     },
 
+    // 监听选择币种变动
     fromCoin() {
       this.findLiquidityPool()
     },
 
+    // 监听选择币种变动
     toCoin() {
       this.findLiquidityPool()
+    },
+
+    // 监听选择币种变动
+    lpMintAddress() {
+      this.updateAmounts()
+    },
+
+    // 监听池子状态变动
+    'liquidity.infos': {
+      handler(_newInfos: any) {
+        this.updateAmounts()
+      },
+      deep: true,
     },
   },
 
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
-
-    // this.setTimer()
-  },
-
-  destroyed() {
-    // clearInterval(this.timer)
   },
 
   methods: {
+    gt,
+
     openFromCoinSelect() {
       this.selectFromCoin = true
       this.coinSelectShow = true
@@ -388,6 +415,45 @@ export default Vue.extend({
       }
     },
 
+    // 更新输入价格
+    updateAmounts() {
+      if (this.fromCoin && this.toCoin && this.lpMintAddress) {
+        const poolInfo = this.liquidity.infos[this.lpMintAddress]
+
+        if (this.fixedFromCoin) {
+          const amount = getOutAmount(
+            poolInfo,
+            this.fromCoinAmount,
+            this.fromCoin.mintAddress,
+            this.toCoin.mintAddress,
+            this.setting.slippage
+          )
+
+          if (amount.isNaN() || !amount.isFinite()) {
+            this.toCoinAmount = ''
+          } else {
+            this.toCoinAmount = amount.toFixed(this.toCoin.decimals)
+          }
+        } else {
+          const poolInfo = this.liquidity.infos[this.lpMintAddress]
+
+          const amount = getOutAmount(
+            poolInfo,
+            this.toCoinAmount,
+            this.toCoin.mintAddress,
+            this.fromCoin.mintAddress,
+            this.setting.slippage
+          )
+
+          if (amount.isNaN() || !amount.isFinite()) {
+            this.fromCoinAmount = ''
+          } else {
+            this.fromCoinAmount = amount.toFixed(this.toCoin.decimals)
+          }
+        }
+      }
+    },
+
     onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
       logger('onPoolChange')
 
@@ -416,6 +482,7 @@ export default Vue.extend({
     },
 
     unsubPoolChange() {
+      // TODO 这里有 bug
       if (this.poolListenerId) {
         const conn = (this as any).$conn
 

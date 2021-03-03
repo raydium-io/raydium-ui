@@ -6,6 +6,8 @@ import {
 } from '@/utils/pools'
 import { publicKey, struct, u64 } from '@project-serum/borsh'
 
+import BigNumber from 'bignumber.js'
+
 // v2
 // export const programId = 'RVKd61ztZW9GUwhRbbLoYVRE5Xf1B2tVscKqwZqXgEr'
 
@@ -19,7 +21,7 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo
 
   if (!coin.balance || !pc.balance) {
-    return NaN
+    return new BigNumber(0)
   }
 
   if (coinBase) {
@@ -27,6 +29,45 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   } else {
     return coin.balance.toEther().dividedBy(pc.balance.toEther())
   }
+}
+
+export function getOutAmount(
+  poolInfo: LiquidityPoolInfo,
+  amount: string,
+  fromCoinMint: string,
+  toCoinMint: string,
+  slippage: number
+) {
+  const { coin, pc } = poolInfo
+
+  const price = getPrice(poolInfo)
+  const fromAmount = new BigNumber(amount)
+  let outAmount = new BigNumber(0)
+
+  const percent = new BigNumber(100)
+    .plus(new BigNumber(slippage))
+    .dividedBy(new BigNumber(100))
+
+  if (!coin.balance || !pc.balance) {
+    return outAmount
+  }
+
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // outcoin 是 pc
+    outAmount = fromAmount.multipliedBy(price)
+    // 滑点
+    outAmount = outAmount.multipliedBy(percent)
+  } else if (
+    fromCoinMint === pc.mintAddress &&
+    toCoinMint === coin.mintAddress
+  ) {
+    // outcoin 是 coin
+    outAmount = fromAmount.dividedBy(price)
+    // 滑点
+    outAmount = outAmount.multipliedBy(percent)
+  }
+
+  return outAmount
 }
 
 export const AMM_INFO_LAYOUT = struct([

@@ -34,4 +34,38 @@ export class TokenAmount {
 
   // + plus
   // - minus
+  // × multipliedBy
+  // ÷ dividedBy
+}
+
+// >
+export function gt(a: string | number, b: string | number) {
+  const valueA = new BigNumber(a)
+  const valueB = new BigNumber(b)
+
+  return valueA.isGreaterThan(valueB)
+}
+
+// >=
+export function gte(a: string | number, b: string | number) {
+  const valueA = new BigNumber(a)
+  const valueB = new BigNumber(b)
+
+  return valueA.isGreaterThanOrEqualTo(valueB)
+}
+
+// <
+export function lt(a: string | number, b: string | number) {
+  const valueA = new BigNumber(a)
+  const valueB = new BigNumber(b)
+
+  return valueA.isLessThan(valueB)
+}
+
+// <=
+export function lte(a: string | number, b: string | number) {
+  const valueA = new BigNumber(a)
+  const valueB = new BigNumber(b)
+
+  return valueA.isLessThanOrEqualTo(valueB)
 }
