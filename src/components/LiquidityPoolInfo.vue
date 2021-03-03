@@ -1,19 +1,15 @@
 <template>
-  <div v-if="liquidityPool && liquidityPool.hasQuote" class="pool-info">
-    {{
-      void ((coin = liquidityPool.poolInfo.coin),
-      (pc = liquidityPool.poolInfo.pc),
-      (lp = liquidityPool.poolInfo.lp))
-    }}
+  <div v-if="initialized && poolInfo" class="pool-info">
+    {{ void ((coin = poolInfo.coin), (pc = poolInfo.pc), (lp = poolInfo.lp)) }}
     <div class="price-base fc-container">
       <span v-if="coinBasePrice">
         1 {{ coin.symbol }} ≈
-        {{ liquidityPool.getPrice().toFixed(pc.decimals) }}
+        <!-- {{ liquidityPool.getPrice().toFixed(pc.decimals) }} -->
         {{ pc.symbol }}
       </span>
       <span v-else>
         1 {{ pc.symbol }} ≈
-        {{ liquidityPool.getPrice(false).toFixed(coin.decimals) }}
+        <!-- {{ liquidityPool.getPrice(false).toFixed(coin.decimals) }} -->
         {{ coin.symbol }}
       </span>
       <Icon type="swap" @click="() => (coinBasePrice = !coinBasePrice)" />
@@ -52,7 +48,11 @@ export default Vue.extend({
   },
 
   props: {
-    liquidityPool: {
+    initialized: {
+      type: Boolean,
+      default: false,
+    },
+    poolInfo: {
       type: [Object || null],
       default: null,
     },

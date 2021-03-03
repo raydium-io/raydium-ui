@@ -135,8 +135,9 @@ import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
+import { cloneDeep } from 'lodash-es'
 
-const RAY = { ...getTokenBySymbol('RAY') }
+const RAY = getTokenBySymbol('RAY')
 
 export default Vue.extend({
   components: {
@@ -212,7 +213,7 @@ export default Vue.extend({
 
     onCoinSelect(tokenInfo: TokenInfo) {
       if (this.selectFromCoin) {
-        this.fromCoin = { ...tokenInfo }
+        this.fromCoin = cloneDeep(tokenInfo)
 
         // 如果选的币种被另一个选了 把另一个重置
         if (this.toCoin?.mintAddress === tokenInfo.mintAddress) {
@@ -220,7 +221,7 @@ export default Vue.extend({
           this.changeCoinAmountPosition()
         }
       } else {
-        this.toCoin = { ...tokenInfo }
+        this.toCoin = cloneDeep(tokenInfo)
 
         // 如果选的币种被另一个选了 把另一个重置
         if (this.fromCoin?.mintAddress === tokenInfo.mintAddress) {

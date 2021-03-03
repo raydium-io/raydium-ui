@@ -1,6 +1,7 @@
 import { LP_TOKENS, NATIVE_SOL, TOKENS, TokenInfo } from './tokens'
 
 import { SERUM_PROGRAM_IDS_V2 } from './ids'
+import { cloneDeep } from 'lodash-es'
 
 export interface LiquidityPoolInfo {
   name: string
@@ -49,10 +50,29 @@ export function getPoolByTokenMintAddresses(
   )
 
   if (pool) {
-    return { ...pool }
+    return cloneDeep(pool)
   }
 
   return pool
+}
+
+export function getLpMintByTokenMintAddresses(
+  coinMintAddress: string,
+  pcMintAddress: string
+): string | null {
+  const pool = LIQUIDITY_POOLS.find(
+    (pool) =>
+      (pool.coin.mintAddress === coinMintAddress &&
+        pool.pc.mintAddress === pcMintAddress) ||
+      (pool.coin.mintAddress === pcMintAddress &&
+        pool.pc.mintAddress === coinMintAddress)
+  )
+
+  if (pool) {
+    return pool.lp.mintAddress
+  }
+
+  return null
 }
 
 export function getPoolByLpMintAddress(
@@ -63,10 +83,28 @@ export function getPoolByLpMintAddress(
   )
 
   if (pool) {
-    return { ...pool }
+    return cloneDeep(pool)
   }
 
   return pool
+}
+
+// 获取某个地址是哪个池子的哪个 key
+export function getAddressForWhat(address: string) {
+  // 不能用 forEach
+  for (const pool of LIQUIDITY_POOLS) {
+    for (const [key, value] of Object.entries(pool)) {
+      if (key === 'lp') {
+        if (value.mintAddress === address) {
+          return { key: 'lpMintAddress', lpMintAddress: pool.lp.mintAddress }
+        }
+      } else if (value === address) {
+        return { key, lpMintAddress: pool.lp.mintAddress }
+      }
+    }
+  }
+
+  return {}
 }
 
 export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [

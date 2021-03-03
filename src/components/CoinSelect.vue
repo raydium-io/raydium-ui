@@ -40,6 +40,7 @@ import { Modal, Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
 import { TOKENS, TokenInfo, NATIVE_SOL } from '@/utils/tokens'
+import { cloneDeep } from 'lodash-es'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -92,15 +93,13 @@ export default Vue.extend({
       this.tokenList = []
 
       let ray = {}
-      let nativeSol = { ...NATIVE_SOL }
+      let nativeSol = cloneDeep(NATIVE_SOL)
 
       let hasBalance = []
       let noBalance = []
 
       for (const symbol of Object.keys(TOKENS)) {
-        // deep copy
-        // Object.assign({}, TOKENS[symbol])
-        let tokenInfo = { ...TOKENS[symbol] }
+        let tokenInfo = cloneDeep(TOKENS[symbol])
         tokenInfo.symbol = symbol
 
         const tokenAccount = this.wallet.tokenAccounts[tokenInfo.mintAddress]
@@ -109,12 +108,12 @@ export default Vue.extend({
           tokenInfo = { ...tokenInfo, ...tokenAccount }
 
           if (tokenInfo.symbol === 'RAY') {
-            ray = { ...tokenInfo }
+            ray = cloneDeep(tokenInfo)
           } else {
             hasBalance.push(tokenInfo)
           }
         } else if (tokenInfo.symbol === 'RAY') {
-          ray = { ...tokenInfo }
+          ray = cloneDeep(tokenInfo)
         } else {
           noBalance.push(tokenInfo)
         }

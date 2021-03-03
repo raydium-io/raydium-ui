@@ -41,7 +41,10 @@
                 @onSelect="openToCoinSelect"
               />
 
-              <LiquidityPoolInfo :liquidity-pool="liquidityPool" />
+              <LiquidityPoolInfo
+                :initialized="liquidity.initialized"
+                :pool-info="liquidity.infos[lpMintAddress]"
+              />
 
               <Button
                 v-if="!wallet.connected"
@@ -59,8 +62,9 @@
                   !fromCoin ||
                   !fromCoinAmount ||
                   !toCoin ||
-                  !liquidityPool ||
-                  liquidityPool.quoting ||
+                  !lpMintAddress ||
+                  !liquidity.initialized ||
+                  liquidity.quoting ||
                   parseFloat(fromCoinAmount) > fromCoin.balance ||
                   parseFloat(toCoinAmount) > toCoin.balance
                 "
@@ -69,11 +73,13 @@
                 <template v-if="!fromCoin || !toCoin">
                   Select a token
                 </template>
+                <template v-else-if="!lpMintAddress || !liquidity.initialized">
+                  Invalid pair
+                </template>
                 <template v-else-if="!fromCoinAmount">
                   Enter an amount
                 </template>
-                <template v-else-if="!liquidityPool"> Invalid pair </template>
-                <template v-else-if="liquidityPool.quoting">
+                <template v-else-if="liquidity.quoting">
                   Updating pool's infomations
                 </template>
                 <template
@@ -94,7 +100,7 @@
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
           <Tooltip
-            v-if="activeTab === 'add' && liquidityPool"
+            v-if="activeTab === 'add' && lpMintAddress"
             placement="bottomRight"
           >
             <template slot="title">
@@ -112,8 +118,8 @@
               :stroke-width="10"
               :percent="(100 / AUTO_REFRESH) * countdown"
               :show-info="false"
-              :class="liquidityPool && liquidityPool.quoting ? 'disabled' : ''"
-              @click="updatePoolInfo"
+              :class="lpMintAddress && liquidity.quoting ? 'disabled' : ''"
+              @click="$store.dispatch('liquidity/getLiquidityPoolInfo')"
             />
           </Tooltip>
           <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
@@ -158,18 +164,17 @@
                     />
                   </div>
                 </div>
-                <div v-if="liquidityPool" class="info">
-                  {{ void (lp = liquidityPool.poolInfo.lp) }}
+                <div v-if="lpMintAddress" class="info">
                   <div class="symbol">Pool</div>
                   <div class="address">
-                    {{ lp.mintAddress.substr(0, 14) }}
+                    {{ lpMintAddress.substr(0, 14) }}
                     ...
-                    {{ lp.mintAddress.substr(lp.mintAddress.length - 14, 14) }}
+                    {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
                   </div>
                   <div class="action">
                     <Icon
                       type="copy"
-                      @click="$store.dispatch('app/copy', lp.mintAddress)"
+                      @click="$store.dispatch('app/copy', lpMintAddress)"
                     />
                   </div>
                 </div>
@@ -193,22 +198,23 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
-import {
-  PublicKey,
-  // types
-  AccountInfo,
-  Context,
-} from '@solana/web3.js'
+// import {
+//   PublicKey,
+//   // types
+//   AccountInfo,
+//   Context,
+// } from '@solana/web3.js'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import Liquidity from '@/utils/liquidity'
-import logger from '@/utils/logger'
-import commitment from '@/utils/commitment'
+// import logger from '@/utils/logger'
+// import commitment from '@/utils/commitment'
+import { cloneDeep } from 'lodash-es'
 
 const { TabPane } = Tabs
 
-const RAY = { ...getTokenBySymbol('RAY') }
+const RAY = getTokenBySymbol('RAY')
 
 const AUTO_REFRESH = 60
 
@@ -224,6 +230,8 @@ export default Vue.extend({
 
   data() {
     return {
+      activeTab: 'add',
+
       coinSelectShow: false,
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
@@ -236,9 +244,7 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      liquidityPool: null as Liquidity | null,
-
-      activeTab: 'add',
+      lpMintAddress: null as string | null,
 
       // 自动刷新倒计时
       countdown: 0,
@@ -251,7 +257,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet']),
+    ...mapState(['wallet', 'liquidity']),
   },
 
   watch: {
@@ -290,7 +296,7 @@ export default Vue.extend({
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
-    this.setTimer()
+    // this.setTimer()
   },
 
   destroyed() {
@@ -314,7 +320,7 @@ export default Vue.extend({
 
     onCoinSelect(tokenInfo: TokenInfo) {
       if (this.selectFromCoin) {
-        this.fromCoin = { ...tokenInfo }
+        this.fromCoin = cloneDeep(tokenInfo)
 
         // 如果选的币种被另一个选了 把另一个重置
         if (this.toCoin?.mintAddress === tokenInfo.mintAddress) {
@@ -322,7 +328,7 @@ export default Vue.extend({
           this.changeCoinAmountPosition()
         }
       } else {
-        this.toCoin = { ...tokenInfo }
+        this.toCoin = cloneDeep(tokenInfo)
 
         // 如果选的币种被另一个选了 把另一个重置
         if (this.fromCoin?.mintAddress === tokenInfo.mintAddress) {
@@ -362,101 +368,93 @@ export default Vue.extend({
       }
     },
 
+    // 根据选择的双币找池子
     findLiquidityPool() {
       if (this.fromCoin && this.toCoin) {
-        const liquidityPoolInfo = Liquidity.getByTokenMintAddresses(
+        const lpMintAddress = Liquidity.getLpMintByTokenMintAddresses(
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress
         )
-        if (liquidityPoolInfo) {
+        if (lpMintAddress) {
           // 处理 老的和新的 LP 一样
-          if (
-            !this.liquidityPool ||
-            this.liquidityPool.poolInfo.lp.mintAddress !==
-              liquidityPoolInfo.lp.mintAddress
-          ) {
-            this.liquidityPool = Liquidity.load(liquidityPoolInfo)
-            this.updatePoolInfo()
-            this.unsubPoolChange()
-            this.subPoolChange()
+          if (this.lpMintAddress !== lpMintAddress) {
+            this.lpMintAddress = lpMintAddress
           }
         } else {
-          this.liquidityPool = null
-          this.unsubPoolChange()
+          this.lpMintAddress = null
+          // this.unsubPoolChange()
         }
       } else {
-        this.liquidityPool = null
-        this.unsubPoolChange()
+        this.lpMintAddress = null
+        // this.unsubPoolChange()
       }
     },
 
-    setTimer() {
-      const self = this
+    // setTimer() {
+    // const self = this
+    // this.timer = setInterval(function () {
+    //   if (self.liquidityPool && !self.liquidityPool.quoting) {
+    //     if (self.countdown < AUTO_REFRESH) {
+    //       self.countdown += 1
+    //       if (self.countdown === AUTO_REFRESH) {
+    //         self.updatePoolInfo()
+    //       }
+    //     }
+    //   }
+    // }, 1000)
+    // },
 
-      this.timer = setInterval(function () {
-        if (self.liquidityPool && !self.liquidityPool.quoting) {
-          if (self.countdown < AUTO_REFRESH) {
-            self.countdown += 1
+    // onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
+    //   logger('onPoolChange')
 
-            if (self.countdown === AUTO_REFRESH) {
-              self.updatePoolInfo()
-            }
-          }
-        }
-      }, 1000)
-    },
+    //   const { slot } = context
 
-    onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
-      logger('onPoolChange')
+    //   if (slot !== this.lastSubBlock) {
+    //     this.lastSubBlock = slot
+    //     this.updatePoolInfo()
+    //   }
+    // },
 
-      const { slot } = context
+    // subPoolChange() {
+    //   if (this.liquidityPool) {
+    //     const conn = (this as any).$conn
 
-      if (slot !== this.lastSubBlock) {
-        this.lastSubBlock = slot
-        this.updatePoolInfo()
-      }
-    },
+    //     this.poolListenerId = conn.onAccountChange(
+    //       new PublicKey(this.liquidityPool.poolInfo.ammQuantities),
+    //       this.onPoolChange,
+    //       commitment
+    //     )
 
-    subPoolChange() {
-      if (this.liquidityPool) {
-        const conn = (this as any).$conn
+    //     logger('subPoolChange', this.liquidityPool.poolInfo.lp.symbol)
+    //   }
+    // },
 
-        this.poolListenerId = conn.onAccountChange(
-          new PublicKey(this.liquidityPool.poolInfo.ammQuantities),
-          this.onPoolChange,
-          commitment
-        )
+    // unsubPoolChange() {
+    //   if (this.poolListenerId) {
+    //     const conn = (this as any).$conn
 
-        logger('subPoolChange', this.liquidityPool.poolInfo.lp.symbol)
-      }
-    },
+    //     conn?.removeAccountChangeListener(this.poolListenerId)
 
-    unsubPoolChange() {
-      if (this.poolListenerId) {
-        const conn = (this as any).$conn
+    //     logger('unsubPoolChange')
+    //   }
+    // },
 
-        conn?.removeAccountChangeListener(this.poolListenerId)
+    // updatePoolInfo() {
+    //   if (this.liquidityPool) {
+    //     this.countdown = AUTO_REFRESH
 
-        logger('unsubPoolChange')
-      }
-    },
+    //     const conn = (this as any).$conn
 
-    updatePoolInfo() {
-      if (this.liquidityPool) {
-        this.countdown = AUTO_REFRESH
+    //     this.liquidityPool
+    //       .requestQuote(conn)
+    //       .then()
+    //       .finally(() => {
+    //         logger('Liquidity pool quote updated')
 
-        const conn = (this as any).$conn
-
-        this.liquidityPool
-          .requestQuote(conn)
-          .then()
-          .finally(() => {
-            logger('Liquidity pool quote updated')
-
-            this.countdown = 0
-          })
-      }
-    },
+    //         this.countdown = 0
+    //       })
+    //   }
+    // },
 
     supply() {},
   },

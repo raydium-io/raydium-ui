@@ -107,6 +107,8 @@ export default Vue.extend({
   mounted() {
     const conn = new Connection(this.wallet.endpoint)
     Vue.prototype.$conn = conn
+
+    this.$store.dispatch('liquidity/getLiquidityPoolInfo')
   },
 
   methods: {
