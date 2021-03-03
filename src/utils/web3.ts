@@ -1,27 +1,33 @@
-import { AccountInfo, Commitment, Connection, PublicKey } from '@solana/web3.js'
+import {
+  Account,
+  AccountInfo,
+  Commitment,
+  Connection,
+  PublicKey,
+  Transaction,
+  TransactionSignature
+} from '@solana/web3.js'
 
 import assert from 'assert'
 // eslint-disable-next-line
 import { struct } from 'superstruct'
+
+export const commitment: Commitment = 'confirmed'
+// export const commitment = 'finalized'
 
 // getMultipleAccounts
 export async function getMultipleAccounts(
   connection: Connection,
   publicKeys: PublicKey[],
   commitment?: Commitment
-): Promise<
-  Array<null | { publicKey: PublicKey; account: AccountInfo<Buffer> }>
-> {
+): Promise<Array<null | { publicKey: PublicKey; account: AccountInfo<Buffer> }>> {
   const args = [publicKeys.map((k) => k.toBase58()), { commitment }]
   // @ts-ignore
   const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
   const res = GetMultipleAccountsAndContextRpcResult(unsafeRes)
   if (res.error) {
     throw new Error(
-      'failed to get info about accounts ' +
-        publicKeys.map((k) => k.toBase58()).join(', ') +
-        ': ' +
-        res.error.message
+      'failed to get info about accounts ' + publicKeys.map((k) => k.toBase58()).join(', ') + ': ' + res.error.message
     )
   }
   assert(typeof res.result !== 'undefined')
@@ -49,7 +55,7 @@ export async function getMultipleAccounts(
         executable,
         owner: new PublicKey(owner),
         lamports,
-        data: Buffer.from(data[0], 'base64'),
+        data: Buffer.from(data[0], 'base64')
       }
     }
     if (value === null) {
@@ -63,7 +69,7 @@ export async function getMultipleAccounts(
     }
     return {
       publicKey: publicKeys[idx],
-      account,
+      account
     }
   })
 }
@@ -74,23 +80,23 @@ function jsonRpcResult(resultDescription: any) {
     struct({
       jsonrpc: jsonRpcVersion,
       id: 'string',
-      error: 'any',
+      error: 'any'
     }),
     struct({
       jsonrpc: jsonRpcVersion,
       id: 'string',
       error: 'null?',
-      result: resultDescription,
-    }),
+      result: resultDescription
+    })
   ])
 }
 
 function jsonRpcResultAndContext(resultDescription: any) {
   return jsonRpcResult({
     context: struct({
-      slot: 'number',
+      slot: 'number'
     }),
-    value: resultDescription,
+    value: resultDescription
   })
 }
 
@@ -99,9 +105,55 @@ const AccountInfoResult = struct({
   owner: 'string',
   lamports: 'number',
   data: 'any',
-  rentEpoch: 'number?',
+  rentEpoch: 'number?'
 })
 
 const GetMultipleAccountsAndContextRpcResult = jsonRpcResultAndContext(
   struct.array([struct.union(['null', AccountInfoResult])])
 )
+
+// transaction
+export async function signTransaction(
+  connection: Connection,
+  wallet: any,
+  transaction: Transaction,
+  signers: Array<Account> = []
+) {
+  transaction.recentBlockhash = (await connection.getRecentBlockhash(commitment)).blockhash
+  transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey))
+  if (signers.length > 0) {
+    transaction.partialSign(...signers)
+  }
+  return await wallet.signTransaction(transaction)
+}
+
+export async function sendTransaction(
+  connection: Connection,
+  wallet: any,
+  transaction: Transaction,
+  signers: Array<Account> = []
+) {
+  const signedTransaction = await signTransaction(connection, wallet, transaction, signers)
+  return await sendSignedTransaction(connection, signedTransaction)
+}
+
+export async function sendSignedTransaction(connection: Connection, signedTransaction: Transaction): Promise<string> {
+  const rawTransaction = signedTransaction.serialize()
+
+  const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, {
+    skipPreflight: false,
+    preflightCommitment: commitment
+  })
+
+  return txid
+}
+
+export function mergeTransactions(transactions: (Transaction | undefined)[]) {
+  const transaction = new Transaction()
+  transactions
+    .filter((t): t is Transaction => t !== undefined)
+    .forEach((t) => {
+      transaction.add(t)
+    })
+  return transaction
+}

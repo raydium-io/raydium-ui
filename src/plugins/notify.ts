@@ -4,7 +4,7 @@ import { notification } from 'ant-design-vue'
 notification.config({
   placement: 'bottomLeft',
   bottom: '10px',
-  duration: 2,
+  duration: 3
 })
 
 Vue.prototype.$notify = notification

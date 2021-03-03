@@ -21,7 +21,7 @@ export const state = () => ({
   // 自动刷新倒计时
   autoRefreshTime: AUTO_REFRESH_TIME,
   countdown: 0,
-  lastSubBlock: 0,
+  lastSubBlock: 0
 })
 
 export const mutations = {
@@ -61,7 +61,7 @@ export const mutations = {
 
   setLastSubBlock(state: any, lastSubBlock: number) {
     state.lastSubBlock = lastSubBlock
-  },
+  }
 }
 
 export const actions = {
@@ -88,7 +88,7 @@ export const actions = {
       .getParsedTokenAccountsByOwner(
         wallet.publicKey,
         {
-          programId: TOKEN_PROGRAM_ID,
+          programId: TOKEN_PROGRAM_ID
         },
         'confirmed'
       )
@@ -96,33 +96,25 @@ export const actions = {
         const tokenAccounts: any = {}
 
         parsedTokenAccounts.value.forEach(
-          (tokenAccountInfo: {
-            pubkey: PublicKey
-            account: AccountInfo<ParsedAccountData>
-          }) => {
+          (tokenAccountInfo: { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }) => {
             const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58()
             const parsedInfo = tokenAccountInfo.account.data.parsed.info
             const mintAddress = parsedInfo.mint
-            const balance = new TokenAmount(
-              parsedInfo.tokenAmount.amount,
-              parsedInfo.tokenAmount.decimals
-            )
+            const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
 
             // 如果同一 mint 有多个账户
-            if (
-              Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)
-            ) {
+            if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
               // 且老账户没余额
               if (tokenAccounts[mintAddress].balance === 0) {
                 tokenAccounts[mintAddress] = {
                   tokenAccountAddress,
-                  balance,
+                  balance
                 }
               }
             } else {
               tokenAccounts[mintAddress] = {
                 tokenAccountAddress,
-                balance,
+                balance
               }
             }
           }
@@ -132,7 +124,7 @@ export const actions = {
         const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
         tokenAccounts[NATIVE_SOL.mintAddress] = {
           tokenAccountAddress: wallet.publicKey.toBase58(),
-          balance: new TokenAmount(solBalance, NATIVE_SOL.decimals),
+          balance: new TokenAmount(solBalance, NATIVE_SOL.decimals)
         }
 
         commit('setTokenAccounts', tokenAccounts)
@@ -141,5 +133,5 @@ export const actions = {
       .finally(() => {
         commit('setLoading', false)
       })
-  },
+  }
 }

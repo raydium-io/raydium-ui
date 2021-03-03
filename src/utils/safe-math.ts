@@ -8,11 +8,19 @@ export class TokenAmount {
   public decimals: number
   public _decimals: BigNumber
 
-  constructor(wei: number | string | BigNumber, decimals: number = 0) {
-    this.wei = new BigNumber(wei)
-
+  constructor(
+    wei: number | string | BigNumber,
+    decimals: number = 0,
+    isWei = true
+  ) {
     this.decimals = decimals
     this._decimals = new BigNumber(10).exponentiatedBy(decimals)
+
+    if (isWei) {
+      this.wei = new BigNumber(wei)
+    } else {
+      this.wei = new BigNumber(wei).multipliedBy(this._decimals)
+    }
   }
 
   // 采用和以太一样的命名 除以精度

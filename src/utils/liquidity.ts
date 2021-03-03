@@ -1,22 +1,25 @@
+import { Account, Connection, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   LiquidityPoolInfo,
   getLpMintByTokenMintAddresses,
   getPoolByLpMintAddress,
-  getPoolByTokenMintAddresses,
+  getPoolByTokenMintAddresses
 } from '@/utils/pools'
-import { publicKey, struct, u64 } from '@project-serum/borsh'
+import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
+import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions'
+// @ts-ignore
+import { nu64, struct, u8 } from 'buffer-layout'
+import { publicKey, u64 } from '@project-serum/borsh'
 
+import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import BigNumber from 'bignumber.js'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TokenAmount } from '@/utils/safe-math'
+import { sendTransaction } from '@/utils/web3'
 
-// v2
-// export const programId = 'RVKd61ztZW9GUwhRbbLoYVRE5Xf1B2tVscKqwZqXgEr'
+export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
-export {
-  getLpMintByTokenMintAddresses,
-  getPoolByLpMintAddress,
-  getPoolByTokenMintAddresses,
-}
-
+// 计算价格
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo
 
@@ -31,6 +34,7 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   }
 }
 
+// 计算金额
 export function getOutAmount(
   poolInfo: LiquidityPoolInfo,
   amount: string,
@@ -44,9 +48,7 @@ export function getOutAmount(
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
 
-  const percent = new BigNumber(100)
-    .plus(new BigNumber(slippage))
-    .dividedBy(new BigNumber(100))
+  const percent = new BigNumber(100).plus(slippage).dividedBy(100)
 
   if (!coin.balance || !pc.balance) {
     return outAmount
@@ -57,10 +59,7 @@ export function getOutAmount(
     outAmount = fromAmount.multipliedBy(price)
     // 滑点
     outAmount = outAmount.multipliedBy(percent)
-  } else if (
-    fromCoinMint === pc.mintAddress &&
-    toCoinMint === coin.mintAddress
-  ) {
+  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
     // outcoin 是 coin
     outAmount = fromAmount.dividedBy(price)
     // 滑点
@@ -68,6 +67,206 @@ export function getOutAmount(
   }
 
   return outAmount
+}
+
+// 添加流动性
+/* eslint-disable */
+export async function addLiquidity(
+  connection: Connection | undefined | null,
+  wallet: any | undefined | null,
+  poolInfo: LiquidityPoolInfo | undefined | null,
+  fromCoinAccount: string | undefined | null,
+  toCoinAccount: string | undefined | null,
+  lpAccount: string | undefined | null,
+  fromCoin: TokenInfo | undefined | null,
+  toCoin: TokenInfo | undefined | null,
+  fromAmount: string | undefined | null,
+  toAmount: string | undefined | null,
+  slippage: number
+): Promise<string> {
+  if (!connection || !wallet) throw new Error('Miss connection')
+  if (!poolInfo || !fromCoin || !toCoin) {
+    throw new Error('Miss pool infomations')
+  }
+  if (!fromCoinAccount || !toCoinAccount) {
+    throw new Error('Miss account infomations')
+  }
+  if (!fromAmount || !toAmount) {
+    throw new Error('Miss amount infomations')
+  }
+
+  const transaction = new Transaction()
+  const signers: any = []
+
+  const owner = wallet.publicKey
+  const tolerate = new BigNumber(slippage).multipliedBy(100).toNumber()
+
+  const userAccounts = [new PublicKey(fromCoinAccount), new PublicKey(toCoinAccount)]
+  const userAmounts = [
+    new TokenAmount(fromAmount, poolInfo.coin.decimals, false).wei.toNumber(),
+    new TokenAmount(toAmount, poolInfo.pc.decimals, false).wei.toNumber()
+  ]
+
+  // 反转
+  if (poolInfo.coin.mintAddress === toCoin.mintAddress && poolInfo.pc.mintAddress === fromCoin.mintAddress) {
+    userAccounts.reverse()
+    userAmounts.reverse()
+  }
+
+  const userCoinTokenAccount = userAccounts[0]
+  const userPcTokenAccount = userAccounts[1]
+  const coinAmount = userAmounts[0]
+  const pcAmount = userAmounts[1]
+
+  // 如果是 NATIVE SOL 包裹一下
+  let wrappedSolAccount
+  if (poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress) {
+    const newWrappedSolAccount = new Account()
+    wrappedSolAccount = newWrappedSolAccount.publicKey
+
+    transaction.add(
+      SystemProgram.createAccount({
+        fromPubkey: owner,
+        newAccountPubkey: wrappedSolAccount,
+        lamports: (await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span)) + pcAmount,
+        space: ACCOUNT_LAYOUT.span,
+        programId: TOKEN_PROGRAM_ID
+      })
+    )
+
+    transaction.add(
+      initializeAccount({
+        account: wrappedSolAccount,
+        mint: new PublicKey(TOKENS.WSOL.mintAddress),
+        owner: owner
+      })
+    )
+
+    signers.push(newWrappedSolAccount)
+  }
+
+  // 如果没有 lp 地址 创一个
+  let userLpTokenAccount
+  if (!lpAccount) {
+    const newLpAccount = new Account()
+    userLpTokenAccount = newLpAccount.publicKey
+
+    transaction.add(
+      SystemProgram.createAccount({
+        fromPubkey: owner,
+        newAccountPubkey: userLpTokenAccount,
+        lamports: await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
+        space: ACCOUNT_LAYOUT.span,
+        programId: TOKEN_PROGRAM_ID
+      })
+    )
+    transaction.add(
+      initializeAccount({
+        account: userLpTokenAccount,
+        mint: poolInfo.lp.mintAddress,
+        owner: owner
+      })
+    )
+    signers.push(newLpAccount)
+  } else {
+    userLpTokenAccount = new PublicKey(lpAccount)
+  }
+
+  transaction.add(
+    addLiquidityInstruction(
+      new PublicKey(poolInfo.programId),
+
+      new PublicKey(poolInfo.ammId),
+      new PublicKey(poolInfo.ammAuthority),
+      new PublicKey(poolInfo.ammOpenOrders),
+      new PublicKey(poolInfo.ammQuantities),
+      new PublicKey(poolInfo.lp.mintAddress),
+      new PublicKey(poolInfo.poolCoinTokenAccount),
+      new PublicKey(poolInfo.poolPcTokenAccount),
+
+      new PublicKey(poolInfo.serumMarket),
+
+      userCoinTokenAccount,
+      userPcTokenAccount,
+      userLpTokenAccount,
+      owner,
+
+      coinAmount,
+      pcAmount,
+      tolerate
+    )
+  )
+
+  if (wrappedSolAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount,
+        destination: owner,
+        owner: owner
+      })
+    )
+  }
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+export function addLiquidityInstruction(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammQuantities: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  // serum
+  serumMarket: PublicKey,
+  // user
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userLpTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  maxCoinAmount: number,
+  maxPcAmount: number,
+  tolerate: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('tolerate')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammQuantities, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 3,
+      maxCoinAmount,
+      maxPcAmount,
+      tolerate
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
 }
 
 export const AMM_INFO_LAYOUT = struct([
@@ -106,5 +305,5 @@ export const AMM_INFO_LAYOUT = struct([
   publicKey('poolWithdrawQueue'),
   publicKey('poolTempLpTokenAccount'),
   publicKey('ammCoinPnlAccount'),
-  publicKey('ammPcPnlAccount'),
+  publicKey('ammPcPnlAccount')
 ])

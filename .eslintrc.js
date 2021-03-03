@@ -2,14 +2,14 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true,
+    node: true
   },
   extends: [
     '@nuxtjs/eslint-config-typescript',
     'prettier',
     'prettier/vue',
-    'plugin:prettier/recommended',
-    'plugin:nuxt/recommended',
+    // 'plugin:prettier/recommended',
+    'plugin:nuxt/recommended'
   ],
   plugins: ['prettier', 'import'],
   // add your custom rules here
@@ -17,15 +17,8 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: [
-          'index',
-          'sibling',
-          'parent',
-          'internal',
-          'external',
-          'builtin',
-        ],
-      },
-    ],
-  },
+        groups: ['index', 'sibling', 'parent', 'internal', 'external', 'builtin']
+      }
+    ]
+  }
 }

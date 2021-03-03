@@ -1,45 +1,19 @@
 <template>
-  <Modal
-    title="Settings"
-    :visible="setting.show"
-    :footer="null"
-    centered
-    @cancel="$store.dispatch('setting/close')"
-  >
+  <Modal title="Settings" :visible="setting.show" :footer="null" centered @cancel="$store.dispatch('setting/close')">
     <div class="slippage">
       <h3>Slippage tolerance</h3>
       <Row class="slippage-setting" :gutter="30">
         <Col :span="6">
-          <button
-            :class="slippage === '0.1' ? 'active' : ''"
-            @click="() => (slippage = '0.1')"
-          >
-            0.1%
-          </button>
+          <button :class="slippage === '0.1' ? 'active' : ''" @click="() => (slippage = '0.1')">0.1%</button>
         </Col>
         <Col :span="6">
-          <button
-            :class="slippage === '0.5' ? 'active' : ''"
-            @click="() => (slippage = '0.5')"
-          >
-            0.5%
-          </button>
+          <button :class="slippage === '0.5' ? 'active' : ''" @click="() => (slippage = '0.5')">0.5%</button>
         </Col>
         <Col :span="6">
-          <button
-            :class="slippage === '1' ? 'active' : ''"
-            @click="() => (slippage = '1')"
-          >
-            1%
-          </button>
+          <button :class="slippage === '1' ? 'active' : ''" @click="() => (slippage = '1')">1%</button>
         </Col>
         <Col :span="6">
-          <Input
-            v-model="slippage"
-            :class="errorMsg ? 'has-error' : ''"
-            size="large"
-            suffix="%"
-          />
+          <Input v-model="slippage" :class="errorMsg ? 'has-error' : ''" size="large" suffix="%" />
         </Col>
       </Row>
       <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
@@ -62,18 +36,18 @@ export default Vue.extend({
     Modal,
     Row,
     Col,
-    Input,
+    Input
   },
 
   data() {
     return {
       slippage: '1',
-      errorMsg: '',
+      errorMsg: ''
     }
   },
 
   computed: {
-    ...mapState(['setting']),
+    ...mapState(['setting'])
   },
 
   watch: {
@@ -83,7 +57,7 @@ export default Vue.extend({
           this.slippage = oldSlippage
         } else {
           const slippage = parseFloat(newSlippage)
-          if (slippage >= 50 || slippage <= 0 || isNaN(slippage)) {
+          if (slippage > 100 || slippage <= 0 || isNaN(slippage)) {
             this.errorMsg = 'Enter a valid slippage percentage'
           } else {
             if (slippage < 1) {
@@ -96,12 +70,12 @@ export default Vue.extend({
           }
         }
       })
-    },
+    }
   },
 
   mounted() {
     this.slippage = this.setting.slippage.toString()
-  },
+  }
 })
 </script>
 

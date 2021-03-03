@@ -1,12 +1,6 @@
 <template>
   <div>
-    <Button
-      v-if="!wallet.connected"
-      ghost
-      @click="$store.dispatch('wallet/openModal')"
-    >
-      Connect
-    </Button>
+    <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')"> Connect </Button>
     <Button v-else ghost @click="$store.dispatch('wallet/openModal')">
       <Icon type="wallet" />
       {{ wallet.address.substr(0, 4) }}
@@ -22,12 +16,7 @@
       @cancel="$store.dispatch('wallet/closeModal')"
     >
       <div v-if="!wallet.connected" class="select-wallet">
-        <Button
-          v-for="(providerUrl, name) in wallets"
-          :key="name"
-          ghost
-          @click="connect(name)"
-        >
+        <Button v-for="(providerUrl, name) in wallets" :key="name" ghost @click="connect(name)">
           <span>{{ name }}</span>
           <img :src="importIcon(`/wallets/${name.toLowerCase()}.png`)" />
         </Button>
@@ -49,7 +38,7 @@ import {
   Connection,
   // types
   AccountInfo,
-  Context,
+  Context
 } from '@solana/web3.js'
 // @ts-ignore
 import SolanaWallet from '@project-serum/sol-wallet-adapter'
@@ -57,7 +46,7 @@ import SolanaWallet from '@project-serum/sol-wallet-adapter'
 import SolongWallet from '@/utils/solong-wallet'
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
-import commitment from '@/utils/commitment'
+import { commitment } from '@/utils/web3'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -71,7 +60,7 @@ export default Vue.extend({
   components: {
     Button,
     Modal,
-    Icon,
+    Icon
   },
 
   data() {
@@ -82,7 +71,7 @@ export default Vue.extend({
         MathWallet: '',
         Sollet: 'https://www.sollet.io',
         // Solflare: 'https://solflare.com/access-wallet',
-        Bonfida: 'https://bonfida.com/wallet',
+        Bonfida: 'https://bonfida.com/wallet'
         // ezDeFi: '',
         // Coin98: '',
       } as Wallets,
@@ -92,12 +81,12 @@ export default Vue.extend({
       liquidityTimer: null as any,
       // 订阅变动
       walletListenerId: null as number | undefined | null,
-      poolListenerId: null,
+      poolListenerId: null
     }
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity']),
+    ...mapState(['wallet', 'liquidity'])
   },
 
   mounted() {
@@ -127,7 +116,7 @@ export default Vue.extend({
           if ((window as any).solong === undefined) {
             ;(this as any).$notify.error({
               message: 'Connect wallet failed',
-              description: 'Please install and initialize Solong first',
+              description: 'Please install and initialize Solong first'
             })
             return
           }
@@ -139,22 +128,16 @@ export default Vue.extend({
           if ((window as any).solana === undefined) {
             ;(this as any).$notify.error({
               message: 'Connect wallet failed',
-              description: 'Please install and initialize MathWallet first',
+              description: 'Please install and initialize MathWallet first'
             })
             return
           }
 
-          wallet = new SolanaWallet(
-            (window as any).solana,
-            this.wallet.endpoint
-          )
+          wallet = new SolanaWallet((window as any).solana, this.wallet.endpoint)
           break
         }
         default: {
-          wallet = new SolanaWallet(
-            this.wallets[walletName],
-            this.wallet.endpoint
-          )
+          wallet = new SolanaWallet(this.wallets[walletName], this.wallet.endpoint)
           break
         }
       }
@@ -168,7 +151,7 @@ export default Vue.extend({
           this.subWallet()
           ;(self as any).$notify.success({
             message: 'Wallet connected',
-            description: '',
+            description: ''
           })
         })
       })
@@ -180,7 +163,7 @@ export default Vue.extend({
       } catch (error) {
         ;(this as any).$notify.error({
           message: 'Connect wallet failed',
-          description: error.message,
+          description: error.message
         })
       }
     },
@@ -193,7 +176,7 @@ export default Vue.extend({
 
       this.$store.commit('wallet/disconnected')
       ;(self as any).$notify.warning({
-        message: 'Wallet disconnected',
+        message: 'Wallet disconnected'
       })
     },
 
@@ -212,11 +195,7 @@ export default Vue.extend({
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
-      this.walletListenerId = conn.onAccountChange(
-        wallet.publicKey,
-        this.onWalletChange,
-        commitment
-      )
+      this.walletListenerId = conn.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
 
       this.$store.dispatch('wallet/getTokenAccounts')
     },
@@ -251,10 +230,7 @@ export default Vue.extend({
       this.liquidityTimer = setInterval(function () {
         if (!self.liquidity.quoting) {
           if (self.liquidity.countdown < self.liquidity.autoRefreshTime) {
-            self.$store.commit(
-              'liquidity/setCountdown',
-              self.liquidity.countdown + 1
-            )
+            self.$store.commit('liquidity/setCountdown', self.liquidity.countdown + 1)
 
             if (self.liquidity.countdown === self.liquidity.autoRefreshTime) {
               self.$store.dispatch('liquidity/getLiquidityPoolInfo')
@@ -262,8 +238,8 @@ export default Vue.extend({
           }
         }
       }, 1000)
-    },
-  },
+    }
+  }
 })
 </script>
 

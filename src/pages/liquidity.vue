@@ -51,17 +51,9 @@
                 @onSelect="openToCoinSelect"
               />
 
-              <LiquidityPoolInfo
-                :initialized="liquidity.initialized"
-                :pool-info="liquidity.infos[lpMintAddress]"
-              />
+              <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
 
-              <Button
-                v-if="!wallet.connected"
-                size="large"
-                ghost
-                @click="$store.dispatch('wallet/openModal')"
-              >
+              <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
                 Unlock Wallet
               </Button>
               <Button
@@ -80,18 +72,10 @@
                 "
                 @click="supply"
               >
-                <template v-if="!fromCoin || !toCoin">
-                  Select a token
-                </template>
-                <template v-else-if="!lpMintAddress || !liquidity.initialized">
-                  Invalid pair
-                </template>
-                <template v-else-if="!fromCoinAmount">
-                  Enter an amount
-                </template>
-                <template v-else-if="liquidity.quoting">
-                  Updating pool's infomations
-                </template>
+                <template v-if="!fromCoin || !toCoin"> Select a token </template>
+                <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
+                <template v-else-if="!fromCoinAmount"> Enter an amount </template>
+                <template v-else-if="liquidity.quoting"> Updating pool's infomations </template>
                 <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
                   Insufficient {{ fromCoin.symbol }} balance
                 </template>
@@ -107,20 +91,14 @@
           <YourLiquidity />
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
-          <Tooltip
-            v-if="activeTab === 'add' && lpMintAddress"
-            placement="bottomRight"
-          >
+          <Tooltip v-if="activeTab === 'add' && lpMintAddress" placement="bottomRight">
             <template slot="title">
               <span>
                 Quote auto refresh countdown after
-                {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds,
-                you can click to update manually
+                {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds, you can click to update manually
               </span>
               <br />
-              <span>
-                Automatically refreshes when the current pool had changed
-              </span>
+              <span> Automatically refreshes when the current pool had changed </span>
             </template>
             <Progress
               type="circle"
@@ -141,18 +119,10 @@
                   <div class="address">
                     {{ fromCoin.mintAddress.substr(0, 14) }}
                     ...
-                    {{
-                      fromCoin.mintAddress.substr(
-                        fromCoin.mintAddress.length - 14,
-                        14
-                      )
-                    }}
+                    {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
                   </div>
                   <div class="action">
-                    <Icon
-                      type="copy"
-                      @click="$store.dispatch('app/copy', fromCoin.mintAddress)"
-                    />
+                    <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
                   </div>
                 </div>
                 <div v-if="toCoin" class="info">
@@ -160,18 +130,10 @@
                   <div class="address">
                     {{ toCoin.mintAddress.substr(0, 14) }}
                     ...
-                    {{
-                      toCoin.mintAddress.substr(
-                        toCoin.mintAddress.length - 14,
-                        14
-                      )
-                    }}
+                    {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
                   </div>
                   <div class="action">
-                    <Icon
-                      type="copy"
-                      @click="$store.dispatch('app/copy', toCoin.mintAddress)"
-                    />
+                    <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
                   </div>
                 </div>
                 <div v-if="lpMintAddress" class="info">
@@ -182,10 +144,7 @@
                     {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
                   </div>
                   <div class="action">
-                    <Icon
-                      type="copy"
-                      @click="$store.dispatch('app/copy', lpMintAddress)"
-                    />
+                    <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
                   </div>
                 </div>
               </div>
@@ -196,11 +155,7 @@
         </div>
       </Tabs>
     </div>
-    <CoinSelect
-      v-if="coinSelectShow"
-      :close="closeCoinSelect"
-      :on-select="onCoinSelect"
-    />
+    <CoinSelect v-if="coinSelectShow" :close="closeCoinSelect" :on-select="onCoinSelect" />
   </div>
 </template>
 
@@ -212,15 +167,15 @@ import {
   PublicKey,
   // types
   AccountInfo,
-  Context,
+  Context
 } from '@solana/web3.js'
 
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { getLpMintByTokenMintAddresses, getOutAmount } from '@/utils/liquidity'
+import { getLpMintByTokenMintAddresses, getOutAmount, addLiquidity } from '@/utils/liquidity'
 import logger from '@/utils/logger'
-import commitment from '@/utils/commitment'
-import { cloneDeep } from 'lodash-es'
+import { commitment } from '@/utils/web3'
+import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
 
 const { TabPane } = Tabs
@@ -234,7 +189,7 @@ export default Vue.extend({
     Button,
     Tabs,
     TabPane,
-    Progress,
+    Progress
   },
 
   data() {
@@ -253,16 +208,16 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      lpMintAddress: null as string | null,
+      lpMintAddress: '',
 
       // 订阅池子变动
       poolListenerId: null,
-      lastSubBlock: 0,
+      lastSubBlock: 0
     }
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity', 'setting']),
+    ...mapState(['wallet', 'liquidity', 'transaction', 'setting'])
   },
 
   watch: {
@@ -293,7 +248,7 @@ export default Vue.extend({
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
       },
-      deep: true,
+      deep: true
     },
 
     // 监听选择币种变动
@@ -316,8 +271,8 @@ export default Vue.extend({
       handler(_newInfos: any) {
         this.updateAmounts()
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
 
   mounted() {
@@ -394,10 +349,7 @@ export default Vue.extend({
     // 根据选择的双币找池子
     findLiquidityPool() {
       if (this.fromCoin && this.toCoin) {
-        const lpMintAddress = getLpMintByTokenMintAddresses(
-          this.fromCoin.mintAddress,
-          this.toCoin.mintAddress
-        )
+        const lpMintAddress = getLpMintByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
         if (lpMintAddress) {
           // 处理 老的和新的 LP 一样
           if (this.lpMintAddress !== lpMintAddress) {
@@ -406,11 +358,11 @@ export default Vue.extend({
             this.subPoolChange()
           }
         } else {
-          this.lpMintAddress = null
+          this.lpMintAddress = ''
           this.unsubPoolChange()
         }
       } else {
-        this.lpMintAddress = null
+        this.lpMintAddress = ''
         this.unsubPoolChange()
       }
     },
@@ -471,11 +423,7 @@ export default Vue.extend({
 
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-        this.poolListenerId = conn.onAccountChange(
-          new PublicKey(poolInfo.ammQuantities),
-          this.onPoolChange,
-          commitment
-        )
+        this.poolListenerId = conn.onAccountChange(new PublicKey(poolInfo.ammQuantities), this.onPoolChange, commitment)
 
         logger('subPoolChange', poolInfo.lp.symbol)
       }
@@ -492,8 +440,44 @@ export default Vue.extend({
       }
     },
 
-    supply() {},
-  },
+    supply() {
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      // const poolInfo = this.liquidity.infos[this.lpMintAddress]
+      const poolInfo = get(this.liquidity.infos, this.lpMintAddress)
+
+      // @ts-ignore
+      const fromCoinAccount = get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`)
+      // @ts-ignore
+      const toCoinAccount = get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`)
+      const lpAccount = get(this.wallet.tokenAccounts, `${this.lpMintAddress}.tokenAccountAddress`)
+
+      addLiquidity(
+        conn,
+        wallet,
+        poolInfo,
+        fromCoinAccount,
+        toCoinAccount,
+        lpAccount,
+        this.fromCoin,
+        this.toCoin,
+        this.fromCoinAmount,
+        this.toCoinAmount,
+        this.setting.slippage
+      )
+        .then((txid) => {
+          console.log(txid)
+          this.$store.dispatch('transaction/sub', txid)
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            message: 'Add liquidity failed',
+            description: error.message
+          })
+        })
+    }
+  }
 })
 </script>
 

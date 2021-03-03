@@ -1,11 +1,11 @@
 module.exports = {
   tabWidth: 2,
   useTabs: false,
-  singleQuote: false,
-  semi: true,
+  singleQuote: true,
+  semi: false,
   bracketSpacing: true,
-  trailingComma: 'all',
-  printWidth: 100,
-  arrowParens: 'avoid',
-  eslintIntegration: true,
+  trailingComma: 'none',
+  printWidth: 120,
+  arrowParens: 'always',
+  eslintIntegration: true
 }
