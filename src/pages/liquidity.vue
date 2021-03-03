@@ -472,7 +472,8 @@ export default Vue.extend({
       )
         .then((txid) => {
           console.log(txid)
-          this.$store.dispatch('transaction/sub', txid)
+          //
+          this.$store.dispatch('transaction/sub', { txid, description: '123' })
         })
         .catch((error) => {
           ;(this as any).$notify.error({

@@ -192,8 +192,18 @@ export default Vue.extend({
 
       removeLiquidity(conn, wallet, this.poolInfo, lpAccount, fromCoinAccount, toCoinAccount, value)
         .then((txid) => {
-          console.log(txid)
-          this.$store.dispatch('transaction/sub', txid)
+          const description = `Remove liquidity ${value} ${lp.name}`
+
+          this.$store.dispatch('transaction/sub', { txid, description })
+          ;(this as any).$notify.info({
+            key: txid,
+            // Check your transaction on exp here.
+            message: 'Transaction has been sent and confirmation is in progress',
+            description,
+            duration: null
+          })
+
+          this.cancelRemove()
         })
         .catch((error) => {
           ;(this as any).$notify.error({

@@ -5,31 +5,89 @@ import LocalStorage from '@/utils/local-storage'
 // import { commitment } from '@/utils/web3'
 
 export const state = () => ({
-  history: []
+  history: {}
 })
 
 export const mutations = {
-  setHistory(state: any, history: number) {
-    state.history = history
-    LocalStorage.set('RAY_TX_HISTORY', history)
-  }
+  pushTx(state: any, [txid, description]: [txid: string, description: string]) {
+    const history = { ...state.history }
 
-  // setListenerId(state: any, txid: string, listenerId: number) {}
+    history[txid] = {
+      // status pending
+      s: 'p',
+      // description
+      d: description
+    }
+
+    state.history = { ...history }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+  },
+
+  setListenerId(state: any, [txid, listenerId]: [txid: string, listenerId: number]) {
+    const history = { ...state.history }
+
+    // listenerId
+    history[txid] = { ...history[txid], ...{ i: listenerId } }
+
+    state.history = { ...history }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+  },
+
+  setTxStatus(state: any, [txid, status, block]: [txid: string, status: string, block: number]) {
+    const history = { ...state.history }
+
+    history[txid] = { ...history[txid], ...{ s: status, b: block } }
+
+    state.history = { ...history }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+  }
 }
 
 export const actions = {
-  onTransactionChange({ _commit }: { _commit: any }, signatureResult: SignatureResult, context: Context) {
-    console.log(signatureResult, context)
+  sub(
+    { commit, dispatch }: { commit: any; dispatch: any },
+    { txid, description }: { txid: string; description: string }
+  ) {
+    commit('pushTx', [txid, description])
+
+    const conn: Connection = (this as any)._vm.$conn
+    const notify = (this as any)._vm.$notify
+
+    const listenerId = conn.onSignature(
+      txid,
+      function (signatureResult: SignatureResult, context: Context) {
+        const { slot } = context
+
+        if (!signatureResult.err) {
+          // success
+          commit('setTxStatus', [txid, 's', slot])
+
+          notify.success({
+            key: txid,
+            message: 'Confirmed',
+            description,
+            duration: 3
+          })
+        } else {
+          // fail
+          commit('setTxStatus', [txid, 'f', slot])
+        }
+
+        dispatch('unsub', txid)
+      },
+      'single'
+    )
+
+    commit('setListenerId', [txid, listenerId + 1])
   },
 
-  sub({ _commit, dispatch }: { _commit: any; dispatch: any }, txid: string) {
+  unsub({ commit, state }: { commit: any; state: any }, txid: string) {
     const conn: Connection = (this as any)._vm.$conn
 
-    const listenerId = conn.onSignature(txid, dispatch('onTransactionChange'), 'single')
-    console.log(listenerId)
-  },
+    try {
+      conn.removeSignatureListener(state.history[txid].i)
+    } catch (error) {}
 
-  unsub() {
-    // const conn: Connection = (this as any)._vm.$conn
+    commit('setListenerId', [txid, null])
   }
 }
