@@ -175,7 +175,7 @@ export default Vue.extend({
       this.unsubWallet()
 
       this.$store.commit('wallet/disconnected')
-      ;(self as any).$notify.warning({
+      ;(this as any).$notify.warning({
         message: 'Wallet disconnected'
       })
     },
