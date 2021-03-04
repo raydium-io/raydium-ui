@@ -18,3 +18,7 @@ $ yarn generate
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+
+## TODO
+
+解包使用 `@project-serum/borsh` 的数据格式因为解码很方便，构造数据使用原生 `buffer-layout` 未来希望统一。

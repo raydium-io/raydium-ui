@@ -7,13 +7,7 @@
           <template slot="title">
             <span>Quote auto refresh countdown</span>
           </template>
-          <Progress
-            type="circle"
-            :width="20"
-            :stroke-width="10"
-            :percent="30"
-            :show-info="false"
-          />
+          <Progress type="circle" :width="20" :stroke-width="10" :percent="30" :show-info="false" />
         </Tooltip>
         <Tooltip placement="bottomRight">
           <template slot="title">
@@ -24,18 +18,10 @@
                 <div class="address">
                   {{ fromCoin.mintAddress.substr(0, 14) }}
                   ...
-                  {{
-                    fromCoin.mintAddress.substr(
-                      fromCoin.mintAddress.length - 14,
-                      14
-                    )
-                  }}
+                  {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon
-                    type="copy"
-                    @click="$store.dispatch('app/copy', fromCoin.mintAddress)"
-                  />
+                  <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="toCoin" class="info">
@@ -43,18 +29,10 @@
                 <div class="address">
                   {{ toCoin.mintAddress.substr(0, 14) }}
                   ...
-                  {{
-                    toCoin.mintAddress.substr(
-                      toCoin.mintAddress.length - 14,
-                      14
-                    )
-                  }}
+                  {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon
-                    type="copy"
-                    @click="$store.dispatch('app/copy', toCoin.mintAddress)"
-                  />
+                  <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
                 </div>
               </div>
             </div>
@@ -64,11 +42,8 @@
         <Icon type="setting" @click="$store.dispatch('setting/open')" />
       </div>
     </div>
-    <CoinSelect
-      v-if="coinSelectShow"
-      :close="closeCoinSelect"
-      :on-select="onCoinSelect"
-    />
+
+    <CoinSelect v-if="coinSelectShow" :close="closeCoinSelect" :on-select="onCoinSelect" />
     <div class="card">
       <div class="card-body">
         <CoinInput
@@ -98,12 +73,7 @@
           @onSelect="openToCoinSelect"
         />
 
-        <Button
-          v-if="!wallet.connected"
-          size="large"
-          ghost
-          @click="$store.dispatch('wallet/openModal')"
-        >
+        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
           Unlock Wallet
         </Button>
         <Button
@@ -115,12 +85,8 @@
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-          <template v-else-if="!swapPool">
-            Insufficient liquidity for this trade
-          </template>
-          <template v-else-if="fromCoinAmount > fromCoin.balance">
-            Insufficient BNB balance
-          </template>
+          <template v-else-if="!swapPool"> Insufficient liquidity for this trade </template>
+          <template v-else-if="fromCoinAmount > fromCoin.balance"> Insufficient BNB balance </template>
           <template v-else>Swap</template>
         </Button>
       </div>
@@ -144,7 +110,7 @@ export default Vue.extend({
     Icon,
     Tooltip,
     Button,
-    Progress,
+    Progress
   },
 
   data() {
@@ -159,12 +125,12 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      swapPool: null,
+      swapPool: null
     }
   },
 
   computed: {
-    ...mapState(['wallet']),
+    ...mapState(['wallet'])
   },
 
   watch: {
@@ -188,8 +154,8 @@ export default Vue.extend({
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
 
   mounted() {
@@ -270,8 +236,8 @@ export default Vue.extend({
       }
     },
 
-    swap() {},
-  },
+    swap() {}
+  }
 })
 </script>
 

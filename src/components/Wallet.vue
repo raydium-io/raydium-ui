@@ -86,14 +86,15 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity'])
+    ...mapState(['wallet', 'liquidity', 'farm'])
   },
 
   mounted() {
     const conn = new Connection(this.wallet.endpoint)
     Vue.prototype.$conn = conn
 
-    this.$store.dispatch('liquidity/getLiquidityPoolInfo')
+    this.$store.dispatch('liquidity/requestInfos')
+    this.$store.dispatch('farm/requestInfos')
 
     this.setWalletTimer()
     this.setLiquidityTimer()
@@ -228,12 +229,12 @@ export default Vue.extend({
       const self = this
 
       this.liquidityTimer = setInterval(function () {
-        if (!self.liquidity.quoting) {
+        if (!self.liquidity.loading) {
           if (self.liquidity.countdown < self.liquidity.autoRefreshTime) {
             self.$store.commit('liquidity/setCountdown', self.liquidity.countdown + 1)
 
             if (self.liquidity.countdown === self.liquidity.autoRefreshTime) {
-              self.$store.dispatch('liquidity/getLiquidityPoolInfo')
+              self.$store.dispatch('liquidity/requestInfos')
             }
           }
         }

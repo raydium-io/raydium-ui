@@ -95,6 +95,7 @@ export default Vue.extend({
       handler(newTokenAccounts: any) {
         this.updateLiquids(newTokenAccounts)
 
+        // 更新正在操作的 lp 余额
         this.updateCurrentLp(newTokenAccounts)
       },
       deep: true

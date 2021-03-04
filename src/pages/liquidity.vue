@@ -66,7 +66,7 @@
                   !toCoin ||
                   !lpMintAddress ||
                   !liquidity.initialized ||
-                  liquidity.quoting ||
+                  liquidity.loading ||
                   gt(fromCoinAmount, fromCoin.balance) ||
                   gt(toCoinAmount, toCoin.balance) ||
                   suppling
@@ -76,7 +76,7 @@
                 <template v-if="!fromCoin || !toCoin"> Select a token </template>
                 <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
                 <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-                <template v-else-if="liquidity.quoting"> Updating pool's infomations </template>
+                <template v-else-if="liquidity.loading"> Updating pool's infomations </template>
                 <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
                   Insufficient {{ fromCoin.symbol }} balance
                 </template>
@@ -107,8 +107,8 @@
               :stroke-width="10"
               :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
               :show-info="false"
-              :class="lpMintAddress && liquidity.quoting ? 'disabled' : ''"
-              @click="$store.dispatch('liquidity/getLiquidityPoolInfo')"
+              :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
+              @click="$store.dispatch('liquidity/requestInfos')"
             />
           </Tooltip>
           <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
@@ -416,7 +416,7 @@ export default Vue.extend({
 
       if (slot !== this.liquidity.lastSubBlock) {
         this.$store.commit('liquidity/setLastSubBlock', slot)
-        this.$store.dispatch('liquidity/getLiquidityPoolInfo')
+        this.$store.dispatch('liquidity/requestInfos')
       }
     },
 

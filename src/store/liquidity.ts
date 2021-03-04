@@ -13,7 +13,7 @@ const AUTO_REFRESH_TIME = 60
 
 export const state = () => ({
   initialized: false,
-  quoting: false,
+  loading: false,
   infos: {},
   // 自动刷新倒计时
   autoRefreshTime: AUTO_REFRESH_TIME,
@@ -26,14 +26,14 @@ export const mutations = {
     state.initialized = true
   },
 
-  setQuoting(state: any, quoting: boolean) {
-    if (quoting) {
+  setLoading(state: any, loading: boolean) {
+    if (loading) {
       state.countdown = AUTO_REFRESH_TIME
     }
 
-    state.quoting = quoting
+    state.loading = loading
 
-    if (!quoting) {
+    if (!loading) {
       state.countdown = 0
     }
   },
@@ -52,8 +52,8 @@ export const mutations = {
 }
 
 export const actions = {
-  getLiquidityPoolInfo({ commit }: { commit: any }) {
-    commit('setQuoting', true)
+  requestInfos({ commit }: { commit: any }) {
+    commit('setLoading', true)
 
     const conn = (this as any)._vm.$conn
 
@@ -146,7 +146,7 @@ export const actions = {
       })
       .finally(() => {
         commit('setInitialized')
-        commit('setQuoting', false)
+        commit('setLoading', false)
       })
   }
 }
