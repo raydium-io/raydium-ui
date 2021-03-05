@@ -195,6 +195,7 @@ export default Vue.extend({
       if (slot !== this.wallet.lastSubBlock) {
         this.$store.commit('wallet/setLastSubBlock', slot)
         this.$store.dispatch('wallet/getTokenAccounts')
+        this.$store.dispatch('farm/getStakeAccounts')
       }
     },
 
@@ -205,6 +206,7 @@ export default Vue.extend({
       this.walletListenerId = conn.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
 
       this.$store.dispatch('wallet/getTokenAccounts')
+      this.$store.dispatch('farm/getStakeAccounts')
     },
 
     unsubWallet() {

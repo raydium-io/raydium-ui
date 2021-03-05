@@ -28,33 +28,62 @@
     <div v-if="farm.initialized" class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farmInfo in farms" :key="farmInfo.poolId">
-            <div slot="header" class="farm-head">
-              <div class="icons">
-                <img :src="importIcon(`/coins/${farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                <img :src="importIcon(`/coins/${farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
-              </div>
-              <div class="lp-icons">
-                {{ farmInfo.lp.name }}
-              </div>
-
-              <div class="state">
-                <div class="title">Staked</div>
-                <div class="value">{{ farmInfo.user ? farmInfo.user.depositBalance.format() : '0' }}</div>
-              </div>
-              <div class="state">
+          <CollapsePanel v-for="farm in farms" :key="farm.poolId">
+            <Row slot="header" class="farm-head" :gutter="0">
+              <Col class="lp-icons" :span="8">
+                <div class="icons">
+                  {{ void ((names = farm.lp.symbol.split('-')), (coinSymbol = names[0]), (pcSymbol = names[1])) }}
+                  <img :src="importIcon(`/coins/${coinSymbol.toLowerCase()}.png`)" />
+                  <img :src="importIcon(`/coins/${pcSymbol.toLowerCase()}.png`)" />
+                </div>
+                {{ farm.lp.name }}
+              </Col>
+              <Col class="state" :span="4">
                 <div class="title">Pending Reward</div>
-                <div class="value">{{ farmInfo.user ? farmInfo.user.rewardDebt.format() : '0' }}</div>
-              </div>
-              <div class="state">
-                <div class="title">Apr</div>
+                <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+              </Col>
+              <Col class="state" :span="4">
+                <div class="title">Staked</div>
+                <div class="value">
+                  {{ farm.userInfo.depositBalance.format() }}
+                </div>
+              </Col>
+              <Col class="state" :span="4">
+                <div class="title">Apy</div>
                 <div class="value"></div>
-              </div>
-              <div class="state">
+              </Col>
+              <Col class="state" :span="4">
                 <div class="title">Liquidity</div>
-                <div class="value">{{ farmInfo.lp.balance.format() }}</div>
-              </div>
-            </div>
+                <div class="value">{{ farm.lp.balance.format() }}</div>
+              </Col>
+            </Row>
+
+            <Row :gutter="48">
+              <Col :span="4"> </Col>
+
+              <Col :span="10">
+                <div class="harvest">
+                  <div class="title">Pending {{ farm.reward.symbol }} Reward</div>
+                  <div class="pending fs-container">
+                    <div class="reward">
+                      <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
+                      <div class="value">0</div>
+                    </div>
+                    <Button size="large" ghost :disabled="farm.userInfo.pendingReward.wei.isZero()"> Harvest </Button>
+                  </div>
+                </div>
+              </Col>
+
+              <Col :span="10">
+                <div class="start">
+                  <div class="title">Start farming</div>
+                  <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+                    Connect Wallet
+                  </Button>
+                  <Button v-else size="large" ghost>Harvest</Button>
+                </div>
+              </Col>
+            </Row>
           </CollapsePanel>
         </Collapse>
       </div>
@@ -71,10 +100,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
-import { get } from 'lodash-es'
+import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
+import { TokenAmount } from '@/utils/safe-math'
 
 const CollapsePanel = Collapse.Panel
 
@@ -85,7 +115,10 @@ export default Vue.extend({
     Collapse,
     CollapsePanel,
     Spin,
-    Icon
+    Icon,
+    Row,
+    Col,
+    Button
   },
 
   data() {
@@ -107,7 +140,7 @@ export default Vue.extend({
       deep: true
     },
     // 监听钱包信息
-    'wallet.stakeAccounts': {
+    'farm.stakeAccounts': {
       handler() {
         this.updateFarms()
       },
@@ -121,21 +154,44 @@ export default Vue.extend({
 
   methods: {
     importIcon,
+    TokenAmount,
 
     updateFarms() {
       const farms: any = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
-        const { lp, reward } = farmInfo
+        const { lp, reward, isStake, poolInfo } = farmInfo
 
-        const user = get(this.wallet.stakeAccounts, poolId)
+        if (!isStake) {
+          let userInfo = get(this.farm.stakeAccounts, poolId)
 
-        farms.push({
-          poolId,
-          lp,
-          reward,
-          user
-        })
+          const { rewardPerShareNet } = poolInfo
+
+          if (userInfo) {
+            userInfo = cloneDeep(userInfo)
+
+            const { rewardDebt, depositBalance } = userInfo
+
+            const pendingReward = depositBalance.wei
+              .multipliedBy(rewardPerShareNet.toNumber())
+              .dividedBy(1e9)
+              .minus(rewardDebt.wei)
+
+            userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
+          } else {
+            userInfo = {
+              depositBalance: new TokenAmount(0, lp.decimals),
+              pendingReward: new TokenAmount(0, reward.decimals)
+            }
+          }
+
+          farms.push({
+            poolId,
+            lp,
+            reward,
+            userInfo
+          })
+        }
       }
 
       this.farms = farms
@@ -166,10 +222,53 @@ export default Vue.extend({
     }
   }
 
+  .harvest {
+    .reward {
+      .token {
+        font-weight: 600;
+        font-size: 20px;
+      }
+
+      .value {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .start {
+    button {
+      width: 100%;
+    }
+  }
+
+  .harvest,
+  .start {
+    padding: 16px;
+    border: 2px solid #1c274f;
+    border-radius: 4px;
+
+    .title {
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    button {
+      height: 48px;
+      padding: 0 30px;
+    }
+  }
+
   .farm-head {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto;
-    gap: 16px;
+    display: flex;
+    align-items: center;
+
+    .lp-icons {
+      .icons {
+        margin-right: 8px;
+      }
+    }
 
     .state {
       display: flex;
@@ -194,6 +293,10 @@ export default Vue.extend({
 .farm {
   .ant-collapse-header {
     padding: 24px 32px !important;
+  }
+
+  .ant-collapse-content {
+    border-top: 1px solid #1c274f;
   }
 }
 </style>

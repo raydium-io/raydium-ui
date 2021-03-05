@@ -306,54 +306,36 @@ export const LP_TOKENS: Tokens = {
   'RAY-USDT': {
     symbol: 'RAY-USDT',
     name: 'RAY-USDT LP',
-    coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDT },
-
     mintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
     decimals: 6
   },
   'RAY-SOL': {
     symbol: 'RAY-SOL',
     name: 'RAY-SOL LP',
-    coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.SOL },
-
     mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
     decimals: 6
   },
   'LINK-USDT': {
     symbol: 'LINK-USDT',
     name: 'LINK-USDT LP',
-    coin: { ...TOKENS.LINK },
-    pc: { ...TOKENS.USDT },
-
     mintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
     decimals: 6
   },
   'ETH-USDT': {
     symbol: 'ETH-USDT',
     name: 'ETH-USDT LP',
-    coin: { ...TOKENS.ETH },
-    pc: { ...TOKENS.USDT },
-
     mintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
     decimals: 6
   },
   'RAY-USDC': {
     symbol: 'RAY-USDC',
     name: 'RAY-USDC LP',
-    coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDC },
-
     mintAddress: 'FgmBnsF5Qrnv8X9bomQfEtQTQjNNiBCWRKGpzPnE5BDg',
     decimals: 6
   },
   'RAY-SRM': {
     symbol: 'RAY-SRM',
     name: 'RAY-SRM LP',
-    coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.SRM },
-
     mintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
     decimals: 6
   }

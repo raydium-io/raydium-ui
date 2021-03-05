@@ -259,6 +259,12 @@ export default Vue.extend({
         }
       }
     }
+
+    .lp-icons {
+      .icons {
+        margin-right: 14px;
+      }
+    }
   }
 }
 </style>

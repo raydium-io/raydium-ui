@@ -1,9 +1,10 @@
-import { FARMS, getAddressForWhat } from '@/utils/farms'
-import { commitment, getMultipleAccounts } from '@/utils/web3'
+import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
+import { STAKE_INFO_LAYOUT, USER_STAKE_INFO_ACCOUNT_LAYOUT } from '@/utils/stake'
+import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
-import { STAKE_INFO_LAYOUT } from '@/utils/stake'
+import { STAKE_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
@@ -14,6 +15,7 @@ export const state = () => ({
   initialized: false,
   loading: false,
   infos: {},
+  stakeAccounts: {},
   // 自动刷新倒计时
   autoRefreshTime: AUTO_REFRESH_TIME,
   countdown: 0,
@@ -41,6 +43,10 @@ export const mutations = {
     state.infos = cloneDeep(infos)
   },
 
+  setStakeAccounts(state: any, stakeAccounts: any) {
+    state.stakeAccounts = cloneDeep(stakeAccounts)
+  },
+
   setCountdown(state: any, countdown: number) {
     state.countdown = countdown
   },
@@ -51,8 +57,9 @@ export const mutations = {
 }
 
 export const actions = {
-  requestInfos({ commit }: { commit: any }) {
+  requestInfos({ commit, dispatch }: { commit: any; dispatch: any }) {
     commit('setLoading', true)
+    dispatch('getStakeAccounts')
 
     const conn = (this as any)._vm.$conn
 
@@ -112,5 +119,52 @@ export const actions = {
         commit('setInitialized')
         commit('setLoading', false)
       })
+  },
+
+  getStakeAccounts({ commit }: { commit: any }) {
+    const conn = (this as any)._vm.$conn
+    const wallet = (this as any)._vm.$wallet
+
+    if (wallet) {
+      // 获取 stake user info account
+      const stakeFilters = [
+        {
+          memcmp: {
+            offset: 40,
+            bytes: wallet.publicKey.toBase58()
+          }
+        },
+        {
+          dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span
+        }
+      ]
+      getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters).then((stakeAccountInfos) => {
+        const stakeAccounts: any = {}
+
+        stakeAccountInfos.forEach((stakeAccountInfo) => {
+          const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+          const { data } = stakeAccountInfo.accountInfo
+
+          const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+
+          const poolId = userStakeInfo.poolId.toBase58()
+          const depositBalance = userStakeInfo.depositBalance.toNumber()
+          const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+
+          const farm = getFarmByPoolId(poolId)
+
+          if (farm) {
+            stakeAccounts[poolId] = {
+              depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+              rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+              stakeAccountAddress
+            }
+          }
+        })
+
+        commit('setStakeAccounts', stakeAccounts)
+        logger('User StakeAccounts updated')
+      })
+    }
   }
 }
