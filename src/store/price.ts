@@ -1,3 +1,4 @@
+import { TOKENS } from '@/utils/tokens'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
@@ -41,10 +42,17 @@ export const mutations = {
 export const actions = {
   requestPrices({ commit }: { commit: any }) {
     commit('setLoading', true)
+
+    const tokens = ['SOL']
+
+    for (const symbol of Object.keys({ ...TOKENS })) {
+      tokens.push(symbol)
+    }
+
     ;(this as any).$axios
       .get('https://api.raydium.io/coin/price', {
         params: {
-          coins: 'usdt'
+          coins: tokens.join(',')
         }
       })
       .then((res: any) => {

@@ -233,6 +233,8 @@ export default Vue.extend({
       }
     },
 
+    getAllMarkets() {},
+
     swap() {}
   }
 })
