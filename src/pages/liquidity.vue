@@ -3,6 +3,8 @@
     <div class="page-head fs-container">
       <Tabs v-model="activeTab">
         <TabPane key="add" tab="Add">
+          <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
+
           <div class="card">
             <div class="card-body">
               <CoinInput
@@ -156,7 +158,6 @@
         </div>
       </Tabs>
     </div>
-    <CoinSelect v-if="coinSelectShow" :close="closeCoinSelect" :on-select="onCoinSelect" />
   </div>
 </template>
 
@@ -293,10 +294,6 @@ export default Vue.extend({
     openToCoinSelect() {
       this.selectFromCoin = false
       this.coinSelectShow = true
-    },
-
-    closeCoinSelect() {
-      this.coinSelectShow = false
     },
 
     onCoinSelect(tokenInfo: TokenInfo) {

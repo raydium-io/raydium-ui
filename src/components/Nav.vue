@@ -6,12 +6,7 @@
     @click="changeRoute"
   >
     <MenuItem v-for="(extra, name) in navs" :key="name">
-      <a
-        v-if="extra"
-        :href="url[name]"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a v-if="extra" :href="url[name]" target="_blank" rel="noopener noreferrer">
         {{ name }}
       </a>
       <span v-else> {{ name }} </span>
@@ -29,7 +24,7 @@ const MenuItem = Menu.Item
 export default Vue.extend({
   components: {
     Menu,
-    MenuItem,
+    MenuItem
   },
 
   data() {
@@ -38,9 +33,9 @@ export default Vue.extend({
         trading: true,
         swap: false,
         liquidity: false,
-        farms: false,
+        farms: false
         // staking: false,
-      },
+      }
     }
   },
 
@@ -50,8 +45,8 @@ export default Vue.extend({
       get() {
         return [this.$store.state.route.name]
       },
-      set() {},
-    },
+      set() {}
+    }
   },
 
   methods: {
@@ -59,8 +54,10 @@ export default Vue.extend({
       if (!(this as any).navs[key]) {
         this.$router.push(`/${key}`)
       }
-    },
-  },
+
+      this.$emit('onSelect')
+    }
+  }
 })
 </script>
 

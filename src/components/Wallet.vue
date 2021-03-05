@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')"> Connect </Button>
+    <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
+      <Icon type="wallet" />
+      Connect
+    </Button>
     <Button v-else ghost @click="$store.dispatch('wallet/openModal')">
       <Icon type="wallet" />
       {{ wallet.address.substr(0, 4) }}

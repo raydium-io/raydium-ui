@@ -2,11 +2,8 @@
   <Header class="header fs-container" :class="app.isMobile ? 'mobile' : ''">
     <img class="logo" src="@/assets/icons/logo-text.svg" />
 
-    <div
-      v-if="app.isMobile ? (navOpened ? true : false) : true"
-      :class="app.isMobile ? 'mobile-nav' : ''"
-    >
-      <Nav />
+    <div v-if="app.isMobile ? (navOpened ? true : false) : true" :class="app.isMobile ? 'mobile-nav' : ''">
+      <Nav @onSelect="() => (navOpened = false)" />
     </div>
 
     <div class="fs-container">
@@ -36,22 +33,22 @@ const { Header } = Layout
 
 export default Vue.extend({
   components: {
-    Header,
+    Header
   },
 
   data() {
     return {
-      navOpened: false,
+      navOpened: false
     }
   },
 
   computed: {
-    ...mapState(['app']),
+    ...mapState(['app'])
   },
 
   mounted() {
     this.$store.dispatch('app/queryIsMobile')
-  },
+  }
 })
 </script>
 

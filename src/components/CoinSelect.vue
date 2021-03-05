@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Select a token" :visible="true" :footer="null" @cancel="close">
+  <Modal title="Select a token" :visible="true" :footer="null" @cancel="$emit('onClose')">
     <div class="select-token">
       <input placeholder="Search name" />
       <div class="sort fs-container">
@@ -7,12 +7,7 @@
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
       <div class="token-list">
-        <div
-          v-for="token in tokenList"
-          :key="token.symbol"
-          class="token-info"
-          @click="onSelect(token)"
-        >
+        <div v-for="token in tokenList" :key="token.symbol" class="token-info" @click="$emit('onSelect', token)">
           <img :src="importIcon(`/coins/${token.symbol.toLowerCase()}.png`)" />
           <div>
             <div>{{ token.symbol }}</div>
@@ -48,29 +43,18 @@ Vue.use(Modal)
 export default Vue.extend({
   components: {
     Modal,
-    Icon,
-  },
-
-  props: {
-    close: {
-      type: Function,
-      required: true,
-    },
-    onSelect: {
-      type: Function,
-      required: true,
-    },
+    Icon
   },
 
   data() {
     return {
       tokenList: [] as Array<TokenInfo>,
-      desc: false,
+      desc: false
     }
   },
 
   computed: {
-    ...mapState(['wallet']),
+    ...mapState(['wallet'])
   },
 
   watch: {
@@ -78,8 +62,8 @@ export default Vue.extend({
       handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
         this.createTokenList()
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
 
   mounted() {
@@ -139,19 +123,15 @@ export default Vue.extend({
       if (!this.desc) {
         this.tokenList = [...[ray, nativeSol], ...hasBalance, ...noBalance]
       } else {
-        this.tokenList = [
-          ...[ray, nativeSol],
-          ...noBalance.reverse(),
-          ...hasBalance,
-        ]
+        this.tokenList = [...[ray, nativeSol], ...noBalance.reverse(), ...hasBalance]
       }
     },
 
     setDesc() {
       this.desc = !this.desc
       this.createTokenList()
-    },
-  },
+    }
+  }
 })
 </script>
 

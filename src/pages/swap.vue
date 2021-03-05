@@ -43,7 +43,8 @@
       </div>
     </div>
 
-    <CoinSelect v-if="coinSelectShow" :close="closeCoinSelect" :on-select="onCoinSelect" />
+    <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
+
     <div class="card">
       <div class="card-body">
         <CoinInput
@@ -171,10 +172,6 @@ export default Vue.extend({
     openToCoinSelect() {
       this.selectFromCoin = false
       this.coinSelectShow = true
-    },
-
-    closeCoinSelect() {
-      this.coinSelectShow = false
     },
 
     onCoinSelect(tokenInfo: TokenInfo) {
