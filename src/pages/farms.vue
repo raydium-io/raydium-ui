@@ -111,6 +111,7 @@
                   </Button>
                   <div v-else class="fs-container">
                     <Button
+                      v-if="!farm.userInfo.depositBalance.wei.isZero()"
                       class="unstake"
                       size="large"
                       ghost
@@ -282,7 +283,6 @@ export default Vue.extend({
     },
 
     harvest(farmInfo: FarmInfo) {
-      console.log(farmInfo)
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 

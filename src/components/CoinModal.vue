@@ -33,6 +33,7 @@
       </Col>
       <Col :span="12">
         <Button
+          :loading="loading"
           :disabled="loading || !value || !lte(value, coin.balance.toEther())"
           ghost
           @click="$emit('onOk', value)"

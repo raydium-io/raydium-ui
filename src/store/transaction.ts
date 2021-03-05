@@ -1,6 +1,7 @@
 import { Connection, Context, SignatureResult } from '@solana/web3.js'
 
 import LocalStorage from '@/utils/local-storage'
+import logger from '@/utils/logger'
 
 // import { commitment } from '@/utils/web3'
 
@@ -49,6 +50,7 @@ export const actions = {
     { txid, description }: { txid: string; description: string }
   ) {
     commit('pushTx', [txid, description])
+    logger('Sub', txid)
 
     const conn: Connection = (this as any)._vm.$conn
     const notify = (this as any)._vm.$notify
@@ -64,9 +66,8 @@ export const actions = {
 
           notify.success({
             key: txid,
-            message: 'Confirmed',
-            description,
-            duration: 3
+            message: 'Transaction has been confirmed',
+            description
           })
         } else {
           // fail

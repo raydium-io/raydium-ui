@@ -73,6 +73,7 @@
                   gt(toCoinAmount, toCoin.balance) ||
                   suppling
                 "
+                :loading="suppling"
                 @click="supply"
               >
                 <template v-if="!fromCoin || !toCoin"> Select a token </template>
@@ -179,7 +180,7 @@ import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
-import { sleep } from '@/utils'
+import { sleep, getUnixTs } from '@/utils'
 
 const { TabPane } = Tabs
 
@@ -495,6 +496,13 @@ export default Vue.extend({
       const toCoinAccount = get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`)
       const lpAccount = get(this.wallet.tokenAccounts, `${this.lpMintAddress}.tokenAccountAddress`)
 
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
       addLiquidity(
         conn,
         wallet,
@@ -509,12 +517,18 @@ export default Vue.extend({
         this.setting.slippage
       )
         .then((txid) => {
-          console.log(txid)
-          //
-          this.$store.dispatch('transaction/sub', { txid, description: '123' })
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: 'Transaction has been sent and confirmation is in progress. Check your transaction on here.'
+          })
+
+          const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
+          this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
           ;(this as any).$notify.error({
+            key,
             message: 'Add liquidity failed',
             description: error.message
           })

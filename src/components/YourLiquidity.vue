@@ -74,6 +74,7 @@ import { TokenAmount } from '@/utils/safe-math'
 import { LiquidityPoolInfo } from '@/utils/pools'
 import { removeLiquidity } from '@/utils/liquidity'
 import importIcon from '@/utils/import-icon'
+import { getUnixTs } from '@/utils'
 
 const CollapsePanel = Collapse.Panel
 
@@ -206,24 +207,31 @@ export default Vue.extend({
       const fromCoinAccount = get(this.wallet.tokenAccounts, `${coin.mintAddress}.tokenAccountAddress`)
       const toCoinAccount = get(this.wallet.tokenAccounts, `${pc.mintAddress}.tokenAccountAddress`)
 
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
       removeLiquidity(conn, wallet, this.poolInfo, lpAccount, fromCoinAccount, toCoinAccount, value)
         .then((txid) => {
-          const description = `Remove liquidity ${value} ${lp.name}`
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: 'Transaction has been sent and confirmation is in progress. Check your transaction on here.'
+          })
+
+          const description = `Remove liquidity for ${value} ${lp.name}`
 
           this.$store.dispatch('transaction/sub', { txid, description })
-          ;(this as any).$notify.info({
-            key: txid,
-            // Check your transaction on exp here.
-            message: 'Transaction has been sent and confirmation is in progress',
-            description,
-            duration: null
-          })
 
           this.cancelRemove()
         })
         .catch((error) => {
           ;(this as any).$notify.error({
-            message: 'Add liquidity failed',
+            key,
+            message: 'Remove liquidity failed',
             description: error.message
           })
         })
