@@ -7,9 +7,9 @@
       <div class="fc-container">
         <Alert type="warning" message="IMPORTANT" show-icon closable>
           <div slot="description">
-            Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools. Check 'Your
-            Liquidity' below, if you are still in a pool marked 'Legacy pool', click 'Remove & Migrate'. More info
-            <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
+            IMPORTANT: Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools and
+            rewards for legacy farms will gradually decline. To simplify the process, use the
+            <NuxtLink to="/migrate">migration tool</NuxtLink>.
           </div>
         </Alert>
       </div>
