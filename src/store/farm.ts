@@ -1,8 +1,10 @@
 import { FARMS, getAddressForWhat } from '@/utils/farms'
 import { commitment, getMultipleAccounts } from '@/utils/web3'
 
+import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
 import { STAKE_INFO_LAYOUT } from '@/utils/stake'
+import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
@@ -58,13 +60,15 @@ export const actions = {
     const publicKeys = [] as any
 
     FARMS.forEach((farm) => {
-      const { poolId, lp } = farm
+      const { lp, poolId, poolLpTokenAccount } = farm
 
-      publicKeys.push(new PublicKey(poolId))
+      publicKeys.push(new PublicKey(poolId), new PublicKey(poolLpTokenAccount))
 
       const farmInfo = cloneDeep(farm)
 
-      farms[lp.mintAddress] = farmInfo
+      farmInfo.lp.balance = new TokenAmount(0, lp.decimals)
+
+      farms[poolId] = farmInfo
     })
 
     getMultipleAccounts(conn, publicKeys, commitment)
@@ -74,17 +78,25 @@ export const actions = {
             const address = info.publicKey.toBase58()
             const data = Buffer.from(info.account.data)
 
-            const { key, lpMintAddress } = getAddressForWhat(address)
+            const { key, poolId } = getAddressForWhat(address)
 
-            if (key && lpMintAddress) {
-              const farmInfo = farms[lpMintAddress]
+            if (key && poolId) {
+              const farmInfo = farms[poolId]
 
               switch (key) {
-                // 获取池子未挂单的余额
+                // 获取池子信息
                 case 'poolId': {
                   const parsed = STAKE_INFO_LAYOUT.decode(data)
 
                   farmInfo.poolInfo = parsed
+
+                  break
+                }
+                // 获取 staked 余额
+                case 'poolLpTokenAccount': {
+                  const parsed = ACCOUNT_LAYOUT.decode(data)
+
+                  farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
 
                   break
                 }
@@ -94,7 +106,7 @@ export const actions = {
         })
 
         commit('setInfos', farms)
-        logger('Liquidity pool infomations updated')
+        logger('Farm&Stake pool infomations updated')
       })
       .finally(() => {
         commit('setInitialized')

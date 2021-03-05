@@ -7,6 +7,7 @@ export interface FarmInfo {
   name: string
   lp: TokenInfo
   reward: TokenInfo
+  isStake: boolean
 
   programId: string
 
@@ -18,8 +19,7 @@ export interface FarmInfo {
 
   nonce: number
 
-  poolInfo?: object
-  userInfo?: object
+  user?: object
 }
 
 export function getFarmByLpMintAddress(lpMintAddress: string): FarmInfo | undefined {
@@ -42,21 +42,33 @@ export function getFarmByRewardMintAddress(lpMintAddress: string): FarmInfo | un
   return farm
 }
 
+export function getFarmByPoolId(poolId: string): FarmInfo | undefined {
+  const farm = FARMS.find((farm) => farm.poolId === poolId)
+
+  if (farm) {
+    return cloneDeep(farm)
+  }
+
+  return farm
+}
+
 // 获取某个地址是哪个池子的哪个 key
 export function getAddressForWhat(address: string) {
   // 不能用 forEach
   for (const farm of FARMS) {
     for (const [key, value] of Object.entries(farm)) {
-      if (key === 'lp') {
-        if (value.mintAddress === address) {
-          return { key: 'lpMintAddress', lpMintAddress: farm.lp.mintAddress }
-        }
-      } else if (key === 'reward') {
-        if (value.mintAddress === address) {
-          return { key: 'rewardMintAddress', lpMintAddress: farm.lp.mintAddress }
-        }
-      } else if (value === address) {
-        return { key, lpMintAddress: farm.lp.mintAddress }
+      // if (key === 'lp') {
+      //   if (value.mintAddress === address) {
+      //     return { key: 'poolId', poolId: farm.poolId }
+      //   }
+      // } else if (key === 'reward') {
+      //   if (value.mintAddress === address) {
+      //     return { key: 'rewardMintAddress', poolId: farm.poolId }
+      //   }
+      // } else
+
+      if (value === address) {
+        return { key, poolId: farm.poolId }
       }
     }
   }
@@ -69,6 +81,7 @@ export const FARMS: FarmInfo[] = [
     name: 'RAY-USDT',
     lp: { ...LP_TOKENS['RAY-USDT'] },
     reward: { ...TOKENS.RAY },
+    isStake: false,
 
     programId: STAKE_PROGRAM_ID,
 
@@ -85,6 +98,7 @@ export const FARMS: FarmInfo[] = [
     name: 'RAY-USDC',
     lp: { ...LP_TOKENS['RAY-USDC'] },
     reward: { ...TOKENS.RAY },
+    isStake: false,
 
     programId: STAKE_PROGRAM_ID,
 
@@ -101,6 +115,7 @@ export const FARMS: FarmInfo[] = [
     name: 'RAY-SRM',
     lp: { ...LP_TOKENS['RAY-SRM'] },
     reward: { ...TOKENS.RAY },
+    isStake: false,
 
     programId: STAKE_PROGRAM_ID,
 
@@ -116,6 +131,7 @@ export const FARMS: FarmInfo[] = [
     name: 'RAY-SOL',
     lp: { ...LP_TOKENS['RAY-SOL'] },
     reward: { ...TOKENS.RAY },
+    isStake: false,
 
     programId: STAKE_PROGRAM_ID,
 
@@ -127,5 +143,22 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccount: 'Gbr1WCU7pAgQiSqKCuhwEgG3yiXfAhMhNDNTe58z1gN3', // reward vault
 
     nonce: 254
+  },
+  // stake
+  {
+    name: 'RAY',
+    lp: { ...TOKENS.RAY },
+    reward: { ...TOKENS.RAY },
+    isStake: true,
+
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: '4EwbZo8BZXP5313z5A2H11MRBP15M5n6YxfmkjXESKAW',
+    poolAuthority: '4qD717qKoj3Sm8YfHMSR7tSKjWn5An817nArA6nGdcUR',
+    poolLpTokenAccount: '8tnpAECxAT9nHBqR1Ba494Ar5dQMPGhL31MmPJz1zZvY', // lp vault
+
+    poolRewardTokenAccount: 'BihEG2r7hYax6EherbRmuLLrySBuSXx4PYGd9gAsktKY', // reward vault
+
+    nonce: 255
   }
 ]

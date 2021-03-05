@@ -15,7 +15,27 @@
     <div class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farm in farms" :key="farm.lp.mintAddress" :header="farm.lp.name"> </CollapsePanel>
+          <CollapsePanel v-for="farm in farms" :key="farm.poolId">
+            <div slot="header" class="farm-head">
+              <div>{{ farm.lp.name }}</div>
+              <div class="state">
+                <div class="title">Staked</div>
+                <div class="value">{{ farm.user ? farm.user.depositBalance.format() : '0' }}</div>
+              </div>
+              <div class="state">
+                <div class="title">Pending Reward</div>
+                <div class="value">{{ farm.user ? farm.user.rewardDebt.format() : '0' }}</div>
+              </div>
+              <div class="state">
+                <div class="title">Apr</div>
+                <div class="value"></div>
+              </div>
+              <div class="state">
+                <div class="title">Liquidity</div>
+                <div class="value">{{ farm.lp.balance.format() }}</div>
+              </div>
+            </div>
+          </CollapsePanel>
         </Collapse>
       </div>
     </div>
@@ -27,7 +47,7 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Tooltip, Progress, Collapse } from 'ant-design-vue'
 
-import { FarmInfo } from '@/utils/farms'
+import { get } from 'lodash-es'
 
 const CollapsePanel = Collapse.Panel
 
@@ -52,27 +72,38 @@ export default Vue.extend({
   watch: {
     // 监听池子状态变动
     'farm.infos': {
-      handler(newInfos: any) {
-        this.updateFarms(newInfos)
+      handler() {
+        this.updateFarms()
+      },
+      deep: true
+    },
+    // 监听钱包信息
+    'wallet.stakeAccounts': {
+      handler() {
+        this.updateFarms()
       },
       deep: true
     }
   },
 
   mounted() {
-    this.updateFarms(this.farm.infos)
+    this.updateFarms()
   },
 
   methods: {
-    updateFarms(farmInfos: FarmInfo) {
+    updateFarms() {
       const farms: any = []
 
-      for (const [mintAddress, farmInfo] of Object.entries(farmInfos)) {
-        const { lp } = farmInfo
-        console.log(mintAddress, farmInfo)
+      for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
+        const { lp, reward } = farmInfo
+
+        const user = get(this.wallet.stakeAccounts, poolId)
 
         farms.push({
-          lp
+          poolId,
+          lp,
+          reward,
+          user
         })
       }
 
@@ -100,6 +131,28 @@ export default Vue.extend({
         .ant-collapse-item:not(:last-child) {
           border-bottom: 1px solid #d9d9d9;
         }
+      }
+    }
+  }
+
+  .farm-head {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
+    gap: 16px;
+
+    .state {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+
+      .title {
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .value {
+        font-size: 16px;
+        line-height: 24px;
       }
     }
   }

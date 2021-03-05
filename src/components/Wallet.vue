@@ -79,9 +79,9 @@ export default Vue.extend({
       // 自动刷新倒计时
       walletTimer: null as any,
       liquidityTimer: null as any,
+      farmTimer: null as any,
       // 订阅变动
-      walletListenerId: null as number | undefined | null,
-      poolListenerId: null
+      walletListenerId: null as number | undefined | null
     }
   },
 
@@ -97,12 +97,15 @@ export default Vue.extend({
     this.$store.dispatch('farm/requestInfos')
 
     this.setWalletTimer()
+
     this.setLiquidityTimer()
+    this.setFarmTimer()
   },
 
   destroyed() {
     clearInterval(this.walletTimer)
     clearInterval(this.liquidityTimer)
+    clearInterval(this.farmTimer)
   },
 
   methods: {
@@ -235,6 +238,22 @@ export default Vue.extend({
 
             if (self.liquidity.countdown === self.liquidity.autoRefreshTime) {
               self.$store.dispatch('liquidity/requestInfos')
+            }
+          }
+        }
+      }, 1000)
+    },
+
+    setFarmTimer() {
+      const self = this
+
+      this.farmTimer = setInterval(function () {
+        if (!self.farm.loading) {
+          if (self.farm.countdown < self.farm.autoRefreshTime) {
+            self.$store.commit('farm/setCountdown', self.farm.countdown + 1)
+
+            if (self.farm.countdown === self.farm.autoRefreshTime) {
+              self.$store.dispatch('farm/requestInfos')
             }
           }
         }

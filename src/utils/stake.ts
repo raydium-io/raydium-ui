@@ -17,3 +17,11 @@ export const STAKE_INFO_LAYOUT = struct([
   u64('lastBlock'),
   u64('rewardPerBlock')
 ])
+
+export const USER_STAKE_INFO_ACCOUNT_LAYOUT = struct([
+  u64('state'),
+  publicKey('poolId'),
+  publicKey('stakerOwner'),
+  u64('depositBalance'),
+  u64('rewardDebt')
+])
