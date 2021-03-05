@@ -78,7 +78,7 @@
                     <Button
                       size="large"
                       ghost
-                      :disabled="farm.userInfo.pendingReward.wei.isZero()"
+                      :disabled="farm.userInfo.pendingReward.isNullOrZero()"
                       @click="harvest(farm.farmInfo)"
                     >
                       Harvest
@@ -111,7 +111,7 @@
                   </Button>
                   <div v-else class="fs-container">
                     <Button
-                      v-if="!farm.userInfo.depositBalance.wei.isZero()"
+                      v-if="!farm.userInfo.depositBalance.isNullOrZero()"
                       class="unstake"
                       size="large"
                       ghost

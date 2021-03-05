@@ -1,6 +1,7 @@
 import { Connection, Context, SignatureResult } from '@solana/web3.js'
 
 import LocalStorage from '@/utils/local-storage'
+import { getUnixTs } from '@/utils'
 import logger from '@/utils/logger'
 
 // import { commitment } from '@/utils/web3'
@@ -17,7 +18,9 @@ export const mutations = {
       // status pending
       s: 'p',
       // description
-      d: description
+      d: description,
+      // time
+      t: getUnixTs()
     }
 
     state.history = { ...history }
@@ -72,6 +75,12 @@ export const actions = {
         } else {
           // fail
           commit('setTxStatus', [txid, 'f', slot])
+
+          notify.error({
+            key: txid,
+            message: 'Transaction has been failed',
+            description
+          })
         }
 
         dispatch('unsub', txid)

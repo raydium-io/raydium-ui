@@ -8,11 +8,7 @@ export class TokenAmount {
   public decimals: number
   public _decimals: BigNumber
 
-  constructor(
-    wei: number | string | BigNumber,
-    decimals: number = 0,
-    isWei = true
-  ) {
+  constructor(wei: number | string | BigNumber, decimals: number = 0, isWei = true) {
     this.decimals = decimals
     this._decimals = new BigNumber(10).exponentiatedBy(decimals)
 
@@ -40,6 +36,9 @@ export class TokenAmount {
     return this.wei.dividedBy(this._decimals).toFixed(this.decimals)
   }
 
+  isNullOrZero() {
+    return this.wei.isNaN() || this.wei.isZero()
+  }
   // + plus
   // - minus
   // × multipliedBy
@@ -76,4 +75,10 @@ export function lte(a: string | number, b: string | number) {
   const valueB = new BigNumber(b)
 
   return valueA.isLessThanOrEqualTo(valueB)
+}
+
+export function isNullOrZero(value: string | number) {
+  const amount = new BigNumber(value)
+
+  return amount.isNaN() || amount.isZero()
 }

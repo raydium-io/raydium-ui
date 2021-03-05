@@ -157,7 +157,7 @@ export default Vue.extend({
       }
 
       liquids = liquids
-        .filter((liquidity: any) => !liquidity.userLpBalance.wei.isZero())
+        .filter((liquidity: any) => !liquidity.userLpBalance.isNullOrZero())
         .sort((a: any, b: any) => {
           return b.userLpBalance.toEther() - a.userLpBalance.toEther()
         })

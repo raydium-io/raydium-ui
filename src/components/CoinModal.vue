@@ -18,7 +18,11 @@
           maxlength="79"
           spellcheck="false"
         />
-        <button v-if="coin.balance && (!value || lt(value, coin.balance.toEther()))" class="max-button" @click="setMax">
+        <button
+          v-if="coin.balance && (isNullOrZero(value) || lt(value, coin.balance.toEther()))"
+          class="max-button"
+          @click="setMax"
+        >
           MAX
         </button>
         <div v-if="coin.symbol" class="coin-name">
@@ -34,7 +38,7 @@
       <Col :span="12">
         <Button
           :loading="loading"
-          :disabled="loading || !value || !lte(value, coin.balance.toEther())"
+          :disabled="loading || isNullOrZero(value) || !lte(value, coin.balance.toEther())"
           ghost
           @click="$emit('onOk', value)"
         >
@@ -50,7 +54,7 @@ import Vue from 'vue'
 import { Modal, Row, Col, Button } from 'ant-design-vue'
 
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { lt, lte } from '@/utils/safe-math'
+import { lt, lte, isNullOrZero } from '@/utils/safe-math'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -98,6 +102,7 @@ export default Vue.extend({
   methods: {
     lt,
     lte,
+    isNullOrZero,
 
     setMax() {
       this.value = this.coin.balance.fixed()
