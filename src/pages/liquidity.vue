@@ -91,7 +91,7 @@
           </div>
         </TabPane>
         <TabPane key="position" tab="Your Liquidity">
-          <YourLiquidity />
+          <YourLiquidity @onAdd="setCoinFromMint" />
         </TabPane>
         <div slot="tabBarExtraContent" class="buttons">
           <Tooltip v-if="activeTab === 'add' && lpMintAddress" placement="bottomRight">
@@ -172,13 +172,14 @@ import {
   Context
 } from '@solana/web3.js'
 
-import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
+import { getTokenBySymbol, getTokenByMintAddress, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getLpMintByTokenMintAddresses, getOutAmount, addLiquidity } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
+import { sleep } from '@/utils'
 
 const { TabPane } = Tabs
 
@@ -281,6 +282,9 @@ export default Vue.extend({
 
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
+
+    const { from, to } = this.$route.query
+    this.setCoinFromMint(from, to, true)
   },
 
   methods: {
@@ -316,6 +320,42 @@ export default Vue.extend({
       }
 
       this.coinSelectShow = false
+    },
+
+    async setCoinFromMint(from: string | undefined, to: string | undefined, fixRoute = false) {
+      let fromCoin, toCoin
+
+      if (from) {
+        fromCoin = getTokenByMintAddress(from)
+      }
+
+      if (to) {
+        toCoin = getTokenByMintAddress(to)
+      }
+
+      if (fromCoin || toCoin) {
+        while (true) {
+          if (this.$conn) {
+            if (fromCoin) {
+              this.fromCoin = fromCoin
+            }
+
+            if (toCoin) {
+              this.toCoin = toCoin
+            }
+
+            if (fixRoute) {
+              this.$router.replace({ path: '/liquidity' })
+            } else {
+              this.activeTab = 'add'
+            }
+
+            return
+          }
+
+          await sleep(1000)
+        }
+      }
     },
 
     // 切换币种金额位置

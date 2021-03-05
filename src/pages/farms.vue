@@ -59,7 +59,12 @@
             </Row>
 
             <Row :gutter="48">
-              <Col :span="4"> </Col>
+              <Col :span="4">
+                Add
+                <NuxtLink :to="`/liquidity?from=${farm.lp.coin.mintAddress}&to=${farm.lp.pc.mintAddress}`">
+                  {{ farm.lp.name }}
+                </NuxtLink>
+              </Col>
 
               <Col :span="10">
                 <div class="harvest">

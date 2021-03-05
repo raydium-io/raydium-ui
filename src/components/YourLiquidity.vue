@@ -49,7 +49,7 @@
             </div>
             <Row :gutter="32" class="actions">
               <Col :span="12">
-                <Button ghost> Add </Button>
+                <Button ghost @click="$emit('onAdd', info.coin.mintAddress, info.pc.mintAddress)"> Add </Button>
               </Col>
               <Col :span="12">
                 <Button ghost @click="openModal(info.poolInfo, info.lp, info.userLpBalance)"> Remove </Button>
