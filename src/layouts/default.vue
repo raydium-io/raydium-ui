@@ -7,8 +7,8 @@
       <div class="fc-container">
         <Alert type="warning" message="IMPORTANT" show-icon closable>
           <div slot="description">
-            IMPORTANT: Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools and
-            rewards for legacy farms will gradually decline. To simplify the process, use the
+            Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools and rewards for
+            legacy farms will gradually decline. To simplify the process, use the
             <NuxtLink to="/migrate">migration tool</NuxtLink>.
           </div>
         </Alert>
