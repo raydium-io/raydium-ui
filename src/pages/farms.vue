@@ -78,7 +78,8 @@
                     <Button
                       size="large"
                       ghost
-                      :disabled="farm.userInfo.pendingReward.isNullOrZero()"
+                      :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
+                      :loading="harvesting"
                       @click="harvest(farm.farmInfo)"
                     >
                       Harvest
@@ -148,7 +149,8 @@ import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { deposit } from '@/utils/stake'
+import { deposit, withdraw } from '@/utils/stake'
+import { getUnixTs } from '@/utils'
 
 const CollapsePanel = Collapse.Panel
 
@@ -171,6 +173,7 @@ export default Vue.extend({
 
       lp: null,
       farmInfo: null as any,
+      harvesting: false,
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
@@ -179,10 +182,17 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'farm'])
+    ...mapState(['wallet', 'farm', 'url'])
   },
 
   watch: {
+    'wallet.tokenAccounts': {
+      handler(newTokenAccounts: any) {
+        // 更新正在操作的 lp 余额
+        this.updateCurrentLp(newTokenAccounts)
+      },
+      deep: true
+    },
     // 监听池子状态变动
     'farm.infos': {
       handler() {
@@ -247,6 +257,19 @@ export default Vue.extend({
       this.farms = farms
     },
 
+    // 更新正在移除流动性的币种余额
+    updateCurrentLp(newTokenAccounts: any) {
+      if (this.lp) {
+        const coin = cloneDeep(this.lp)
+        // @ts-ignore
+        const lpBalance = get(newTokenAccounts, `${this.lp.mintAddress}.balance`)
+        // @ts-ignore
+        coin.balance = lpBalance
+
+        this.lp = coin
+      }
+    },
+
     openStakeModal(poolInfo: FarmInfo, lp: any) {
       const coin = cloneDeep(lp)
       const lpBalance = get(this.wallet.tokenAccounts, `${lp.mintAddress}.balance`)
@@ -257,7 +280,49 @@ export default Vue.extend({
       this.stakeModalOpening = true
     },
 
-    stake() {},
+    stake(amount: string) {
+      this.staking = true
+
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
+      const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
+      deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Stake ${amount} ${this.farmInfo.lp.name}`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Stake failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.staking = false
+        })
+    },
 
     cancelStake() {
       this.lp = null
@@ -274,7 +339,49 @@ export default Vue.extend({
       this.unstakeModalOpening = true
     },
 
-    unstake() {},
+    unstake(amount: string) {
+      this.unstaking = true
+
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
+      const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
+      withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Stake ${amount} ${this.farmInfo.lp.name}`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Stake failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.unstaking = false
+        })
+    },
 
     cancelUnstake() {
       this.lp = null
@@ -283,6 +390,8 @@ export default Vue.extend({
     },
 
     harvest(farmInfo: FarmInfo) {
+      this.harvesting = true
+
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
@@ -290,19 +399,38 @@ export default Vue.extend({
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
 
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
       deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
         .then((txid) => {
-          console.log(txid)
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
 
-          this.$store.dispatch('transaction/sub', { txid, description: '123' })
+          const description = `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
+          this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
           ;(this as any).$notify.error({
+            key,
             message: 'Harvest failed',
             description: error.message
           })
         })
-        .finally(() => {})
+        .finally(() => {
+          this.harvesting = false
+        })
     }
   }
 })

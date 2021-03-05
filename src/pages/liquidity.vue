@@ -223,7 +223,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity', 'transaction', 'setting'])
+    ...mapState(['wallet', 'liquidity', 'transaction', 'setting', 'url'])
   },
 
   watch: {
@@ -520,7 +520,11 @@ export default Vue.extend({
           ;(this as any).$notify.info({
             key,
             message: 'Transaction has been sent',
-            description: 'Transaction has been sent and confirmation is in progress. Check your transaction on here.'
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
           })
 
           const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
