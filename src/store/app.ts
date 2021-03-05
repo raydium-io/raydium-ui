@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es'
 // @ts-ignore
 import enquireJs from 'enquire.js'
 
@@ -8,7 +9,7 @@ function enquireScreen(call: Function) {
     },
     unmatch() {
       call && call(false)
-    },
+    }
   }
 
   enquireJs.register('only screen and (max-width: 922.99px)', handler)
@@ -16,12 +17,17 @@ function enquireScreen(call: Function) {
 
 export const state = () => ({
   isMobile: false,
+  prices: {}
 })
 
 export const mutations = {
   setIsMobile(state: any, isMobile: boolean) {
     state.isMobile = isMobile
   },
+
+  setPrices(state: any, prices: object) {
+    state.prices = cloneDeep(prices)
+  }
 }
 
 export const actions = {
@@ -37,14 +43,14 @@ export const actions = {
       .then(() => {
         notify.success({
           message: 'Copy success',
-          description: '',
+          description: ''
         })
       })
       .catch(() => {
         notify.error({
           message: 'Copy failed',
-          description: '',
+          description: ''
         })
       })
-  },
+  }
 }

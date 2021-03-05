@@ -189,15 +189,11 @@ export async function removeLiquidity(
   amount: string | undefined | null
 ) {
   if (!connection || !wallet) throw new Error('Miss connection')
-  if (!poolInfo) {
-    throw new Error('Miss pool infomations')
-  }
-  if (!lpAccount || !fromCoinAccount || !toCoinAccount) {
-    throw new Error('Miss account infomations')
-  }
-  if (!amount) {
-    throw new Error('Miss amount infomations')
-  }
+  if (!poolInfo) throw new Error('Miss pool infomations')
+
+  if (!lpAccount || !fromCoinAccount || !toCoinAccount) throw new Error('Miss account infomations')
+
+  if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
   const signers: any = []

@@ -19,15 +19,9 @@ export async function deposit(
   amount: string | undefined | null
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
-  if (!farmInfo) {
-    throw new Error('Miss pool infomations')
-  }
-  if (!lpAccount) {
-    throw new Error('Miss account infomations')
-  }
-  if (!amount) {
-    throw new Error('Miss amount infomations')
-  }
+  if (!farmInfo) throw new Error('Miss pool infomations')
+  if (!lpAccount) throw new Error('Miss account infomations')
+  if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
   const signers: any = []
@@ -87,15 +81,9 @@ export async function withdraw(
   amount: string | undefined | null
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
-  if (!farmInfo) {
-    throw new Error('Miss pool infomations')
-  }
-  if (!lpAccount || !infoAccount) {
-    throw new Error('Miss account infomations')
-  }
-  if (!amount) {
-    throw new Error('Miss amount infomations')
-  }
+  if (!farmInfo) throw new Error('Miss pool infomations')
+  if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+  if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
   const signers: any = []
@@ -133,7 +121,7 @@ export async function withdraw(
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
-function depositInstruction(
+export function depositInstruction(
   programId: PublicKey,
   // staking pool
   poolId: PublicKey,
@@ -179,7 +167,7 @@ function depositInstruction(
   })
 }
 
-function withdrawInstruction(
+export function withdrawInstruction(
   programId: PublicKey,
   // staking pool
   poolId: PublicKey,

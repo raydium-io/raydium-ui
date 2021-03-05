@@ -99,6 +99,8 @@ export default Vue.extend({
     this.$store.dispatch('liquidity/requestInfos')
     this.$store.dispatch('farm/requestInfos')
 
+    this.getPrices()
+
     this.setWalletTimer()
 
     this.setLiquidityTimer()
@@ -215,6 +217,18 @@ export default Vue.extend({
       if (this.walletListenerId) {
         conn.removeAccountChangeListener(this.walletListenerId)
       }
+    },
+
+    getPrices() {
+      this.$axios
+        .get('https://api.raydium.io/coin/price', {
+          params: {
+            coins: 'usdt'
+          }
+        })
+        .then((prices) => {
+          console.log(prices)
+        })
     },
 
     setWalletTimer() {

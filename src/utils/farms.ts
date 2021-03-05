@@ -127,23 +127,6 @@ export const FARMS: FarmInfo[] = [
 
     nonce: 255
   },
-  {
-    name: 'RAY-SOL',
-    lp: { ...LP_TOKENS['RAY-SOL'] },
-    reward: { ...TOKENS.RAY },
-    isStake: false,
-
-    programId: STAKE_PROGRAM_ID,
-
-    poolId: '7aH1yGBfa4ezP2sx3N8xmMin5jhzPain7pCgJLRM1DFP',
-    poolAuthority: 'FHbV9ACEjbTqNkfJokWqsLLCLCdD4V44W4RyLezX2tRk',
-
-    poolLpTokenAccount: '9tXm2wCZiV2dHYvkyWZMfJm4Konhf7RxX2pHYD2kcTYV', // lp vault
-
-    poolRewardTokenAccount: 'Gbr1WCU7pAgQiSqKCuhwEgG3yiXfAhMhNDNTe58z1gN3', // reward vault
-
-    nonce: 254
-  },
   // stake
   {
     name: 'RAY',
