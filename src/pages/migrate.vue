@@ -6,7 +6,11 @@
 
     <div class="card">
       <div class="card-body">
-        <p>Migrate your v2 LP tokens for v3.</p>
+        <p>
+          Raydium is upgrading from Serum DEX2 to DEX3. As part of the upgrade, liquidity in legacy DEX2 pools must
+          migrate to new pools. This tool simplifies the process. For more info click
+          <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
+        </p>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
           Connect Wallet
@@ -16,7 +20,7 @@
             <Step>
               <div slot="title">Unstake</div>
               <div slot="description" class="action">
-                Your's all LP tokens will unstake from farms
+                All staked LP tokens will be unstaked from legacy pools
 
                 <h6 v-for="farm in farms" :key="farm.farmInfo.poolId">
                   {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
@@ -28,7 +32,7 @@
             <Step>
               <div slot="title">Remove liquidity</div>
               <div slot="description" class="action">
-                Remove liquidity for LP tokens
+                Remove liquidity for all legacy LP tokens
 
                 <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
                   <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
@@ -45,11 +49,11 @@
               </div>
             </Step>
             <Step>
-              <div slot="title">Add liquidity (Optional)</div>
+              <div slot="title">Add liquidity to new pools (Optional)</div>
               <div slot="description" class="action">
-                Earn RAY by staking v3 LP tokens in the new liquidity pools.
+                Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
 
-                <Button ghost @click="$router.replace({ path: '/liquidity' })">Go to V3 Liquidity</Button>
+                <Button ghost @click="$router.replace({ path: '/liquidity' })">Go to DEX3 liquidity</Button>
               </div>
             </Step>
           </Steps>
@@ -286,8 +290,11 @@ export default Vue.extend({
   width: auto !important;
 }
 
-.ant-steps-item-title,
-.ant-steps-item-description {
+.ant-steps-item-title {
   color: #f1f1f2 !important;
+}
+
+.ant-steps-item-description {
+  color: #85858d !important;
 }
 </style>

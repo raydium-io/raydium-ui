@@ -79,7 +79,7 @@
                 <template v-if="!fromCoin || !toCoin"> Select a token </template>
                 <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
                 <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-                <template v-else-if="liquidity.loading"> Updating pool's infomations </template>
+                <template v-else-if="liquidity.loading"> Updating pool information </template>
                 <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
                   Insufficient {{ fromCoin.symbol }} balance
                 </template>

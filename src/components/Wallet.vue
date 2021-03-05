@@ -76,7 +76,8 @@ export default Vue.extend({
         // Solflare: 'https://solflare.com/access-wallet',
         Bonfida: 'https://bonfida.com/wallet'
         // ezDeFi: '',
-        // Coin98: '',
+        // https://docs.coin98.app/coin98-extension/developer-guide
+        // Coin98: ''
       } as Wallets,
 
       // 自动刷新倒计时
@@ -125,7 +126,7 @@ export default Vue.extend({
           if ((window as any).solong === undefined) {
             ;(this as any).$notify.error({
               message: 'Connect wallet failed',
-              description: 'Please install and initialize Solong first'
+              description: 'Please install and initialize Solong wallet first'
             })
             return
           }
@@ -137,12 +138,24 @@ export default Vue.extend({
           if ((window as any).solana === undefined) {
             ;(this as any).$notify.error({
               message: 'Connect wallet failed',
-              description: 'Please install and initialize MathWallet first'
+              description: 'Please install and initialize Math wallet first'
             })
             return
           }
 
           wallet = new SolanaWallet((window as any).solana, this.wallet.endpoint)
+          break
+        }
+        case 'Coin98': {
+          if ((window as any).coin98 === undefined) {
+            ;(this as any).$notify.error({
+              message: 'Connect wallet failed',
+              description: 'Please install and initialize Coin98 wallet first'
+            })
+            return
+          }
+
+          wallet = new SolanaWallet((window as any).coin98, this.wallet.endpoint)
           break
         }
         default: {
@@ -301,6 +314,8 @@ export default Vue.extend({
 
     img {
       height: 32px;
+      width: 32px;
+      border-radius: 50%;
     }
   }
 
