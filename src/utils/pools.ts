@@ -57,14 +57,18 @@ export function getPoolByTokenMintAddresses(
   return pool
 }
 
-export function getLpMintByTokenMintAddresses(coinMintAddress: string, pcMintAddress: string): string | null {
+export function getLpMintByTokenMintAddresses(
+  coinMintAddress: string,
+  pcMintAddress: string,
+  version = 3
+): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
       (pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
       (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)
   )
 
-  if (pool) {
+  if (pool && pool.version === version) {
     return pool.lp.mintAddress
   }
 
