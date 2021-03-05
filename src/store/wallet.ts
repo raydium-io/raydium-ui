@@ -19,6 +19,7 @@ export const state = () => ({
   // endpoint: 'https://api.mainnet-beta.solana.com',
   endpoint: 'https://solana-api.projectserum.com',
 
+  initialized: false,
   loading: false,
   tokenAccounts: {},
   stakeAccounts: {},
@@ -41,6 +42,10 @@ export const mutations = {
   disconnected(state: any) {
     state.connected = false
     state.address = ''
+  },
+
+  setInitialized(state: any) {
+    state.initialized = true
   },
 
   setLoading(state: any, loading: boolean) {
@@ -179,6 +184,7 @@ export const actions = {
         logger('Wallet TokenAccounts updated')
       })
       .finally(() => {
+        commit('setInitialized')
         commit('setLoading', false)
       })
   }

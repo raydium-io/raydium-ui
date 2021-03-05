@@ -4,7 +4,12 @@
       <div v-if="!wallet.connected" class="fc-container">
         <Button size="large" ghost @click="$store.dispatch('wallet/openModal')"> Unlock Wallet </Button>
       </div>
-      <Spin v-else :spinning="wallet.loading">
+      <div v-else-if="!wallet.initialized" class="fc-container">
+        <Spin :spinning="true">
+          <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
+        </Spin>
+      </div>
+      <div v-else class="your-liquidity">
         <CoinModal
           v-if="modalOpening"
           title="Remove Liquidity"
@@ -13,8 +18,6 @@
           @onOk="remove"
           @onCancel="cancelRemove"
         />
-
-        <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
 
         <Collapse v-for="info in liquids" :key="info.lp.mintAddress" expand-icon-position="right">
           <CollapsePanel class="liquidity-info" :header="info.lp.symbol">
@@ -46,7 +49,8 @@
             </Row>
           </CollapsePanel>
         </Collapse>
-      </Spin>
+      </div>
+
       <span> If you staked your LP tokens in a farm, unstake them to see them here. </span>
     </div>
   </div>
@@ -222,7 +226,8 @@ export default Vue.extend({
 
 <style lang="less">
 @import '../styles/variables';
-.ant-spin-container {
+
+.your-liquidity {
   display: grid;
   grid-auto-rows: auto;
   row-gap: 12px;

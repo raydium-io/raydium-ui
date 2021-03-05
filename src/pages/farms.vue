@@ -1,18 +1,31 @@
 <template>
-  <div class="container">
+  <div class="farm container">
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
-        <Tooltip placement="bottomRight">
+        <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
-            <span>Quote auto refresh countdown</span>
+            <span>
+              Quote auto refresh countdown after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+            </span>
+            <br />
+            <span> Automatically refreshes when the current pool had changed </span>
           </template>
-          <Progress type="circle" :width="20" :stroke-width="10" :percent="30" :show-info="false" />
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / farm.autoRefreshTime) * farm.countdown"
+            :show-info="false"
+            :class="farm.loading ? 'disabled' : ''"
+            @click="$store.dispatch('farm/requestInfos')"
+          />
         </Tooltip>
       </div>
     </div>
 
-    <div class="card">
+    <div v-if="farm.initialized" class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
           <CollapsePanel v-for="farm in farms" :key="farm.poolId">
@@ -39,13 +52,19 @@
         </Collapse>
       </div>
     </div>
+
+    <div v-else class="fc-container">
+      <Spin :spinning="true">
+        <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
+      </Spin>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon } from 'ant-design-vue'
 
 import { get } from 'lodash-es'
 
@@ -56,7 +75,9 @@ export default Vue.extend({
     Tooltip,
     Progress,
     Collapse,
-    CollapsePanel
+    CollapsePanel,
+    Spin,
+    Icon
   },
 
   data() {
@@ -114,7 +135,7 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.container {
+.farm.container {
   max-width: 1200px;
 
   .card {
@@ -160,7 +181,9 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
-.ant-collapse-header {
-  padding: 24px 32px !important;
+.farm {
+  .ant-collapse-header {
+    padding: 24px 32px !important;
+  }
 }
 </style>

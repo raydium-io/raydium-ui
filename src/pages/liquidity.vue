@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="liquidity container">
     <div class="page-head fs-container">
       <Tabs v-model="activeTab">
         <TabPane key="add" tab="Add">
@@ -490,7 +490,7 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.container {
+.liquidity.container {
   max-width: 450px;
 
   .add-icon {
@@ -507,39 +507,41 @@ export default Vue.extend({
 <style lang="less">
 @import '../styles/variables';
 
-.ant-tabs {
-  width: 100%;
+.liquidity {
+  .ant-tabs {
+    width: 100%;
 
-  .ant-tabs-bar {
-    border: none;
+    .ant-tabs-bar {
+      border: none;
 
-    .ant-tabs-nav-container {
-      margin-bottom: 0;
-      line-height: 40px;
-
-      .ant-tabs-nav-wrap {
+      .ant-tabs-nav-container {
         margin-bottom: 0;
+        line-height: 40px;
+
+        .ant-tabs-nav-wrap {
+          margin-bottom: 0;
+        }
       }
-    }
 
-    .ant-tabs-extra-content {
-      line-height: 1;
-    }
+      .ant-tabs-extra-content {
+        line-height: 1;
+      }
 
-    .ant-tabs-tab {
-      font-weight: 600;
-      opacity: 0.5;
+      .ant-tabs-tab {
+        font-weight: 600;
+        opacity: 0.5;
 
-      &:active,
-      &:focus,
-      &:hover {
-        color: @text-color;
+        &:active,
+        &:focus,
+        &:hover {
+          color: @text-color;
+          opacity: 1;
+        }
+      }
+
+      .ant-tabs-tab-active {
         opacity: 1;
       }
-    }
-
-    .ant-tabs-tab-active {
-      opacity: 1;
     }
   }
 }
