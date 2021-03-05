@@ -25,4 +25,6 @@ export {
   PlusOutline,
   // collapse
   RightOutline,
+  // remove
+  MinusOutline
 } from '@ant-design/icons'

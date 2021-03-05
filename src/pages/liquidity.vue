@@ -284,6 +284,7 @@ export default Vue.extend({
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
     const { from, to } = this.$route.query
+    // @ts-ignore
     this.setCoinFromMint(from, to, true)
   },
 
@@ -335,7 +336,7 @@ export default Vue.extend({
 
       if (fromCoin || toCoin) {
         while (true) {
-          if (this.$conn) {
+          if ((this as any).$conn) {
             if (fromCoin) {
               this.fromCoin = fromCoin
             }

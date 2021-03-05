@@ -92,9 +92,9 @@ export default Vue.extend({
     return {
       liquids: [] as any,
 
-      modalOpening: false,
       lp: null,
       poolInfo: null as any,
+      modalOpening: false,
       removing: false
     }
   },

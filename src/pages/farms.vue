@@ -87,13 +87,41 @@
                 </div>
               </Col>
 
+              <CoinModal
+                v-if="stakeModalOpening"
+                title="Stake LP"
+                :coin="lp"
+                :loading="staking"
+                @onOk="stake"
+                @onCancel="cancelStake"
+              />
+              <CoinModal
+                v-if="unstakeModalOpening"
+                title="Unstake LP"
+                :coin="lp"
+                :loading="unstaking"
+                @onOk="unstake"
+                @onCancel="cancelUnstake"
+              />
               <Col :span="10">
                 <div class="start">
                   <div class="title">Start farming</div>
                   <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
                     Connect Wallet
                   </Button>
-                  <Button v-else size="large" ghost>Harvest</Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      class="unstake"
+                      size="large"
+                      ghost
+                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                    >
+                      <Icon type="minus" />
+                    </Button>
+                    <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
+                      Stake LP
+                    </Button>
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -138,7 +166,14 @@ export default Vue.extend({
 
   data() {
     return {
-      farms: [] as any
+      farms: [] as any,
+
+      lp: null,
+      farmInfo: null as any,
+      stakeModalOpening: false,
+      staking: false,
+      unstakeModalOpening: false,
+      unstaking: false
     }
   },
 
@@ -175,9 +210,10 @@ export default Vue.extend({
       const farms: any = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
+        // @ts-ignore
         if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
-
+          // @ts-ignore
           const { rewardPerShareNet } = farmInfo.poolInfo
 
           if (userInfo) {
@@ -193,7 +229,9 @@ export default Vue.extend({
             userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
           } else {
             userInfo = {
+              // @ts-ignore
               depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
+              // @ts-ignore
               pendingReward: new TokenAmount(0, farmInfo.reward.decimals)
             }
           }
@@ -206,6 +244,41 @@ export default Vue.extend({
       }
 
       this.farms = farms
+    },
+
+    openStakeModal(poolInfo: FarmInfo, lp: any) {
+      const coin = cloneDeep(lp)
+      const lpBalance = get(this.wallet.tokenAccounts, `${lp.mintAddress}.balance`)
+      coin.balance = lpBalance
+
+      this.lp = coin
+      this.farmInfo = cloneDeep(poolInfo)
+      this.stakeModalOpening = true
+    },
+
+    stake() {},
+
+    cancelStake() {
+      this.lp = null
+      this.farmInfo = null
+      this.stakeModalOpening = false
+    },
+
+    openUnstakeModal(poolInfo: FarmInfo, lp: any, lpBalance: any) {
+      const coin = cloneDeep(lp)
+      coin.balance = lpBalance
+
+      this.lp = coin
+      this.farmInfo = cloneDeep(poolInfo)
+      this.unstakeModalOpening = true
+    },
+
+    unstake() {},
+
+    cancelUnstake() {
+      this.lp = null
+      this.farmInfo = null
+      this.unstakeModalOpening = false
     },
 
     harvest(farmInfo: FarmInfo) {
@@ -268,9 +341,18 @@ export default Vue.extend({
         font-size: 12px;
       }
     }
+
+    button {
+      padding: 0 30px;
+    }
   }
 
   .start {
+    .unstake {
+      width: 48px;
+      margin-right: 10px;
+    }
+
     button {
       width: 100%;
     }
@@ -291,7 +373,6 @@ export default Vue.extend({
 
     button {
       height: 48px;
-      padding: 0 30px;
     }
   }
 
