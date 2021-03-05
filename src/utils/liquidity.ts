@@ -1,4 +1,4 @@
-import { Account, Connection, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   LiquidityPoolInfo,
   getLpMintByTokenMintAddresses,
@@ -6,16 +6,15 @@ import {
   getPoolByTokenMintAddresses
 } from '@/utils/pools'
 import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
-import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions'
+import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8 } from 'buffer-layout'
 import { publicKey, u64 } from '@project-serum/borsh'
 
-import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import BigNumber from 'bignumber.js'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
-import { sendTransaction } from '@/utils/web3'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
@@ -121,56 +120,25 @@ export async function addLiquidity(
   // 如果是 NATIVE SOL 包裹一下
   let wrappedSolAccount
   if (poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress) {
-    const newWrappedSolAccount = new Account()
-    wrappedSolAccount = newWrappedSolAccount.publicKey
-
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: wrappedSolAccount,
-        lamports: (await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span)) + pcAmount,
-        space: ACCOUNT_LAYOUT.span,
-        programId: TOKEN_PROGRAM_ID
-      })
+    wrappedSolAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      transaction,
+      signers
     )
-
-    transaction.add(
-      initializeAccount({
-        account: wrappedSolAccount,
-        mint: new PublicKey(TOKENS.WSOL.mintAddress),
-        owner: owner
-      })
-    )
-
-    signers.push(newWrappedSolAccount)
   }
 
   // 如果没有 lp 地址 创一个
-  let userLpTokenAccount
-  if (!lpAccount) {
-    const newLpAccount = new Account()
-    userLpTokenAccount = newLpAccount.publicKey
-
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: userLpTokenAccount,
-        lamports: await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
-        space: ACCOUNT_LAYOUT.span,
-        programId: TOKEN_PROGRAM_ID
-      })
-    )
-    transaction.add(
-      initializeAccount({
-        account: userLpTokenAccount,
-        mint: poolInfo.lp.mintAddress,
-        owner: owner
-      })
-    )
-    signers.push(newLpAccount)
-  } else {
-    userLpTokenAccount = new PublicKey(lpAccount)
-  }
+  let userLpTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    lpAccount,
+    owner,
+    poolInfo.lp.mintAddress,
+    transaction,
+    signers
+  )
 
   transaction.add(
     addLiquidityInstruction(
@@ -241,28 +209,14 @@ export async function removeLiquidity(
   // 如果是 NATIVE SOL 包裹一下
   let wrappedSolAccount
   if (poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress) {
-    const newWrappedSolAccount = new Account()
-    wrappedSolAccount = newWrappedSolAccount.publicKey
-
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: wrappedSolAccount,
-        lamports: await connection.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
-        space: ACCOUNT_LAYOUT.span,
-        programId: TOKEN_PROGRAM_ID
-      })
+    wrappedSolAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      transaction,
+      signers
     )
-
-    transaction.add(
-      initializeAccount({
-        account: wrappedSolAccount,
-        mint: new PublicKey(TOKENS.WSOL.mintAddress),
-        owner: owner
-      })
-    )
-
-    signers.push(newWrappedSolAccount)
   }
 
   transaction.add(

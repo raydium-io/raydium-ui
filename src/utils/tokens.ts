@@ -316,7 +316,7 @@ export const LP_TOKENS: Tokens = {
     symbol: 'RAY-SOL',
     name: 'RAY-SOL LP',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.SOL },
+    pc: { ...NATIVE_SOL },
 
     mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
     decimals: 6

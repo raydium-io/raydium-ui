@@ -28,15 +28,14 @@
     <div v-if="farm.initialized" class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farm in farms" :key="farm.poolId">
+          <CollapsePanel v-for="farm in farms" :key="farm.farmInfo.poolId">
             <Row slot="header" class="farm-head" :gutter="0">
               <Col class="lp-icons" :span="8">
                 <div class="icons">
-                  {{ void ((names = farm.lp.symbol.split('-')), (coinSymbol = names[0]), (pcSymbol = names[1])) }}
-                  <img :src="importIcon(`/coins/${coinSymbol.toLowerCase()}.png`)" />
-                  <img :src="importIcon(`/coins/${pcSymbol.toLowerCase()}.png`)" />
+                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
+                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                 </div>
-                {{ farm.lp.name }}
+                {{ farm.farmInfo.lp.name }}
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Pending Reward</div>
@@ -54,27 +53,36 @@
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Liquidity</div>
-                <div class="value">{{ farm.lp.balance.format() }}</div>
+                <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
               </Col>
             </Row>
 
             <Row :gutter="48">
               <Col :span="4">
                 Add
-                <NuxtLink :to="`/liquidity?from=${farm.lp.coin.mintAddress}&to=${farm.lp.pc.mintAddress}`">
-                  {{ farm.lp.name }}
+                <NuxtLink
+                  :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
+                >
+                  {{ farm.farmInfo.lp.name }}
                 </NuxtLink>
               </Col>
 
               <Col :span="10">
                 <div class="harvest">
-                  <div class="title">Pending {{ farm.reward.symbol }} Reward</div>
+                  <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                   <div class="pending fs-container">
                     <div class="reward">
                       <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
                       <div class="value">0</div>
                     </div>
-                    <Button size="large" ghost :disabled="farm.userInfo.pendingReward.wei.isZero()"> Harvest </Button>
+                    <Button
+                      size="large"
+                      ghost
+                      :disabled="farm.userInfo.pendingReward.wei.isZero()"
+                      @click="harvest(farm.farmInfo)"
+                    >
+                      Harvest
+                    </Button>
                   </div>
                 </div>
               </Col>
@@ -110,6 +118,8 @@ import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-d
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
+import { FarmInfo } from '@/utils/farms'
+import { deposit } from '@/utils/stake'
 
 const CollapsePanel = Collapse.Panel
 
@@ -165,12 +175,10 @@ export default Vue.extend({
       const farms: any = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
-        const { lp, reward, isStake, poolInfo } = farmInfo
-
-        if (!isStake) {
+        if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
 
-          const { rewardPerShareNet } = poolInfo
+          const { rewardPerShareNet } = farmInfo.poolInfo
 
           if (userInfo) {
             userInfo = cloneDeep(userInfo)
@@ -185,21 +193,43 @@ export default Vue.extend({
             userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
           } else {
             userInfo = {
-              depositBalance: new TokenAmount(0, lp.decimals),
-              pendingReward: new TokenAmount(0, reward.decimals)
+              depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
+              pendingReward: new TokenAmount(0, farmInfo.reward.decimals)
             }
           }
 
           farms.push({
-            poolId,
-            lp,
-            reward,
-            userInfo
+            userInfo,
+            farmInfo
           })
         }
       }
 
       this.farms = farms
+    },
+
+    harvest(farmInfo: FarmInfo) {
+      console.log(farmInfo)
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
+      const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+
+      deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+        .then((txid) => {
+          console.log(txid)
+
+          this.$store.dispatch('transaction/sub', { txid, description: '123' })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            message: 'Harvest failed',
+            description: error.message
+          })
+        })
+        .finally(() => {})
     }
   }
 })

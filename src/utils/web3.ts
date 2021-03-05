@@ -4,16 +4,91 @@ import {
   Commitment,
   Connection,
   PublicKey,
+  SystemProgram,
   Transaction,
   TransactionSignature
 } from '@solana/web3.js'
 
-import assert from 'assert'
+import { ACCOUNT_LAYOUT } from '@/utils/layouts'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 // eslint-disable-next-line
+import assert from 'assert'
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
+
+// 如果传进来的账户为空 创新的
+export async function createTokenAccountIfNotExist(
+  connection: Connection,
+  account: string | undefined | null,
+  owner: PublicKey,
+  mintAddress: string,
+
+  transaction: Transaction,
+  signer: Array<Account>
+) {
+  let publicKey
+
+  if (account) {
+    publicKey = new PublicKey(account)
+  } else {
+    publicKey = await createProgramAccountIfNotExist(
+      connection,
+      account,
+      owner,
+      TOKEN_PROGRAM_ID,
+      ACCOUNT_LAYOUT,
+      transaction,
+      signer
+    )
+
+    transaction.add(
+      initializeAccount({
+        account: publicKey,
+        mint: new PublicKey(mintAddress),
+        owner
+      })
+    )
+  }
+
+  return publicKey
+}
+
+export async function createProgramAccountIfNotExist(
+  connection: Connection,
+  account: string | undefined | null,
+  owner: PublicKey,
+  programId: PublicKey,
+  layout: any,
+
+  transaction: Transaction,
+  signer: Array<Account>
+) {
+  let publicKey
+
+  if (account) {
+    publicKey = new PublicKey(account)
+  } else {
+    const newAccount = new Account()
+    publicKey = newAccount.publicKey
+
+    transaction.add(
+      SystemProgram.createAccount({
+        fromPubkey: owner,
+        newAccountPubkey: publicKey,
+        lamports: await connection.getMinimumBalanceForRentExemption(layout.span),
+        space: layout.span,
+        programId
+      })
+    )
+
+    signer.push(newAccount)
+  }
+
+  return publicKey
+}
 
 export async function getFilteredProgramAccounts(
   connection: Connection,
