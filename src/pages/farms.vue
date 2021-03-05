@@ -25,110 +25,155 @@
       </div>
     </div>
 
-    <div v-if="farm.initialized" class="card">
-      <div class="card-body">
-        <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farm in farms" :key="farm.farmInfo.poolId">
-            <Row slot="header" class="farm-head" :gutter="0">
-              <Col class="lp-icons" :span="8">
-                <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
-                </div>
-                {{ farm.farmInfo.lp.name }}
-              </Col>
-              <Col class="state" :span="4">
-                <div class="title">Pending Reward</div>
-                <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
-              </Col>
-              <Col class="state" :span="4">
-                <div class="title">Staked</div>
-                <div class="value">
-                  {{ farm.userInfo.depositBalance.format() }}
-                </div>
-              </Col>
-              <Col class="state" :span="4">
-                <div class="title">Apy</div>
-                <div class="value"></div>
-              </Col>
-              <Col class="state" :span="4">
-                <div class="title">Liquidity</div>
-                <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
-              </Col>
-            </Row>
-
-            <Row :gutter="48">
-              <Col :span="4">
-                Add
-                <NuxtLink
-                  :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
-                >
-                  {{ farm.farmInfo.lp.name }}
-                </NuxtLink>
-              </Col>
-
-              <Col :span="10">
-                <div class="harvest">
-                  <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
-                  <div class="pending fs-container">
-                    <div class="reward">
-                      <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
-                      <div class="value">0</div>
-                    </div>
-                    <Button
-                      size="large"
-                      ghost
-                      :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
-                      :loading="harvesting"
-                      @click="harvest(farm.farmInfo)"
-                    >
-                      Harvest
-                    </Button>
+    <div v-if="farm.initialized">
+      <div class="card">
+        <div class="card-body">
+          <Collapse expand-icon-position="right">
+            <CollapsePanel v-for="farm in farms" v-show="farm.farmInfo.version === 3" :key="farm.farmInfo.poolId">
+              <Row slot="header" class="farm-head" :gutter="0">
+                <Col class="lp-icons" :span="8">
+                  <div class="icons">
+                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
+                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                   </div>
-                </div>
-              </Col>
+                  {{ farm.farmInfo.lp.name }}
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Pending Reward</div>
+                  <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Staked</div>
+                  <div class="value">
+                    {{ farm.userInfo.depositBalance.format() }}
+                  </div>
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Apy</div>
+                  <div class="value"></div>
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Liquidity</div>
+                  <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
+                </Col>
+              </Row>
 
-              <CoinModal
-                v-if="stakeModalOpening"
-                title="Stake LP"
-                :coin="lp"
-                :loading="staking"
-                @onOk="stake"
-                @onCancel="cancelStake"
-              />
-              <CoinModal
-                v-if="unstakeModalOpening"
-                title="Unstake LP"
-                :coin="lp"
-                :loading="unstaking"
-                @onOk="unstake"
-                @onCancel="cancelUnstake"
-              />
-              <Col :span="10">
-                <div class="start">
-                  <div class="title">Start farming</div>
-                  <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+              <Row :gutter="48">
+                <Col :span="4">
+                  Add
+                  <NuxtLink
+                    :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
+                  >
+                    {{ farm.farmInfo.lp.name }}
+                  </NuxtLink>
+                </Col>
+
+                <Col :span="10">
+                  <div class="harvest">
+                    <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
+                    <div class="pending fs-container">
+                      <div class="reward">
+                        <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
+                        <div class="value">0</div>
+                      </div>
+                      <Button
+                        size="large"
+                        ghost
+                        :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
+                        :loading="harvesting"
+                        @click="harvest(farm.farmInfo)"
+                      >
+                        Harvest
+                      </Button>
+                    </div>
+                  </div>
+                </Col>
+
+                <CoinModal
+                  v-if="stakeModalOpening"
+                  title="Stake LP"
+                  :coin="lp"
+                  :loading="staking"
+                  @onOk="stake"
+                  @onCancel="cancelStake"
+                />
+                <CoinModal
+                  v-if="unstakeModalOpening"
+                  title="Unstake LP"
+                  :coin="lp"
+                  :loading="unstaking"
+                  @onOk="unstake"
+                  @onCancel="cancelUnstake"
+                />
+                <Col :span="10">
+                  <div class="start">
+                    <div class="title">Start farming</div>
+                    <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+                      Connect Wallet
+                    </Button>
+                    <div v-else class="fs-container">
+                      <Button
+                        v-if="!farm.userInfo.depositBalance.isNullOrZero()"
+                        class="unstake"
+                        size="large"
+                        ghost
+                        @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                      >
+                        <Icon type="minus" />
+                      </Button>
+                      <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
+                        Stake LP
+                      </Button>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </CollapsePanel>
+          </Collapse>
+        </div>
+      </div>
+
+      <div class="page-head fs-container">
+        <span class="title">Legacy Farms</span>
+        <div class="buttons"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div v-for="farm in farms" :key="farm.farmInfo.poolId" :showArrow="false">
+            <template v-if="farm.farmInfo.version === 2">
+              <Row class="farm-head" :gutter="0">
+                <Col class="lp-icons" :span="8">
+                  <div class="icons">
+                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
+                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                  </div>
+                  {{ farm.farmInfo.lp.name }}
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Pending Reward</div>
+                  <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Staked</div>
+                  <div class="value">
+                    {{ farm.userInfo.depositBalance.format() }}
+                  </div>
+                </Col>
+                <Col class="state" :span="4">
+                  <div class="title">Apy</div>
+                  <div class="value"></div>
+                </Col>
+                <Col class="fc-container">
+                  <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
                     Connect Wallet
                   </Button>
-                  <div v-else class="fs-container">
-                    <Button
-                      v-if="!farm.userInfo.depositBalance.isNullOrZero()"
-                      class="unstake"
-                      size="large"
-                      ghost
-                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                    >
-                      <Icon type="minus" />
-                    </Button>
-                    <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
-                      Stake LP
-                    </Button>
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </CollapsePanel>
-        </Collapse>
+                  <Button v-else ghost @click="$router.replace({ path: '/migrate' })"> Unstake & Migrate </Button>
+                </Col>
+              </Row>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -222,7 +267,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake && farmInfo.version === 3) {
+        if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
           const { rewardPerShareNet } = farmInfo.poolInfo
@@ -535,7 +580,8 @@ export default Vue.extend({
 
 <style lang="less">
 .farm {
-  .ant-collapse-header {
+  .ant-collapse-header,
+  .farm-head {
     padding: 24px 32px !important;
   }
 

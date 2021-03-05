@@ -1,171 +1,170 @@
 <template>
   <div class="liquidity container">
     <div class="page-head fs-container">
-      <Tabs v-model="activeTab">
-        <TabPane key="add" tab="Add">
-          <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
-
-          <div class="card">
-            <div class="card-body">
-              <CoinInput
-                v-model="fromCoinAmount"
-                label="Input"
-                :coin-name="fromCoin ? fromCoin.symbol : ''"
-                :balance="fromCoin ? fromCoin.balance : null"
-                @onInput="(amount) => (fromCoinAmount = amount)"
-                @onFocus="
-                  () => {
-                    fixedFromCoin = true
-                  }
-                "
-                @onMax="
-                  () => {
-                    fixedFromCoin = true
-                    fromCoinAmount = fromCoin.balance.fixed()
-                  }
-                "
-                @onSelect="openFromCoinSelect"
-              />
-
-              <div class="add-icon fc-container">
-                <div class="fc-container">
-                  <Icon type="plus" />
+      <span class="title">Add Liquidity</span>
+      <div class="buttons">
+        <Tooltip v-if="activeTab === 'add' && lpMintAddress" placement="bottomRight">
+          <template slot="title">
+            <span>
+              Quote auto refresh countdown after
+              {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds, you can click to update manually
+            </span>
+            <br />
+            <span> Automatically refreshes when the current pool had changed </span>
+          </template>
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
+            :show-info="false"
+            :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
+            @click="$store.dispatch('liquidity/requestInfos')"
+          />
+        </Tooltip>
+        <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
+          <template slot="title">
+            <p>Addresses</p>
+            <div class="swap-info">
+              <div v-if="fromCoin" class="info">
+                <div class="symbol">{{ fromCoin.symbol }}</div>
+                <div class="address">
+                  {{ fromCoin.mintAddress.substr(0, 14) }}
+                  ...
+                  {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
+                </div>
+                <div class="action">
+                  <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
                 </div>
               </div>
-
-              <CoinInput
-                v-model="toCoinAmount"
-                label="Input"
-                :coin-name="toCoin ? toCoin.symbol : ''"
-                :balance="toCoin ? toCoin.balance : null"
-                @onInput="(amount) => (toCoinAmount = amount)"
-                @onFocus="
-                  () => {
-                    fixedFromCoin = false
-                  }
-                "
-                @onMax="
-                  () => {
-                    fixedFromCoin = false
-                    toCoinAmount = toCoin.balance.fixed()
-                  }
-                "
-                @onSelect="openToCoinSelect"
-              />
-
-              <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
-
-              <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
-                Connect Wallet
-              </Button>
-              <Button
-                v-else
-                size="large"
-                ghost
-                :disabled="
-                  !fromCoin ||
-                  !fromCoinAmount ||
-                  !toCoin ||
-                  !lpMintAddress ||
-                  !liquidity.initialized ||
-                  liquidity.loading ||
-                  gt(fromCoinAmount, fromCoin.balance) ||
-                  gt(toCoinAmount, toCoin.balance) ||
-                  suppling
-                "
-                :loading="suppling"
-                @click="supply"
-              >
-                <template v-if="!fromCoin || !toCoin"> Select a token </template>
-                <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
-                <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-                <template v-else-if="liquidity.loading"> Updating pool information </template>
-                <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
-                  Insufficient {{ fromCoin.symbol }} balance
-                </template>
-                <template v-else-if="gt(toCoinAmount, toCoin.balance)">
-                  Insufficient {{ toCoin.symbol }} balance
-                </template>
-                <template v-else>Supply</template>
-              </Button>
+              <div v-if="toCoin" class="info">
+                <div class="symbol">{{ toCoin.symbol }}</div>
+                <div class="address">
+                  {{ toCoin.mintAddress.substr(0, 14) }}
+                  ...
+                  {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
+                </div>
+                <div class="action">
+                  <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
+                </div>
+              </div>
+              <div v-if="lpMintAddress" class="info">
+                <div class="symbol">Pool</div>
+                <div class="address">
+                  {{ lpMintAddress.substr(0, 14) }}
+                  ...
+                  {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
+                </div>
+                <div class="action">
+                  <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
+                </div>
+              </div>
             </div>
-          </div>
-        </TabPane>
-        <TabPane key="position" tab="Your Liquidity">
-          <YourLiquidity @onAdd="setCoinFromMint" />
-        </TabPane>
-        <div slot="tabBarExtraContent" class="buttons">
-          <Tooltip v-if="activeTab === 'add' && lpMintAddress" placement="bottomRight">
-            <template slot="title">
-              <span>
-                Quote auto refresh countdown after
-                {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds, you can click to update manually
-              </span>
-              <br />
-              <span> Automatically refreshes when the current pool had changed </span>
-            </template>
-            <Progress
-              type="circle"
-              :width="20"
-              :stroke-width="10"
-              :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
-              :show-info="false"
-              :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
-              @click="$store.dispatch('liquidity/requestInfos')"
-            />
-          </Tooltip>
-          <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
-            <template slot="title">
-              <p>Addresses</p>
-              <div class="swap-info">
-                <div v-if="fromCoin" class="info">
-                  <div class="symbol">{{ fromCoin.symbol }}</div>
-                  <div class="address">
-                    {{ fromCoin.mintAddress.substr(0, 14) }}
-                    ...
-                    {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
-                  </div>
-                  <div class="action">
-                    <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
-                  </div>
-                </div>
-                <div v-if="toCoin" class="info">
-                  <div class="symbol">{{ toCoin.symbol }}</div>
-                  <div class="address">
-                    {{ toCoin.mintAddress.substr(0, 14) }}
-                    ...
-                    {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
-                  </div>
-                  <div class="action">
-                    <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
-                  </div>
-                </div>
-                <div v-if="lpMintAddress" class="info">
-                  <div class="symbol">Pool</div>
-                  <div class="address">
-                    {{ lpMintAddress.substr(0, 14) }}
-                    ...
-                    {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
-                  </div>
-                  <div class="action">
-                    <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
-                  </div>
-                </div>
-              </div>
-            </template>
-            <Icon type="info-circle" />
-          </Tooltip>
-          <Icon type="setting" @click="$store.dispatch('setting/open')" />
-        </div>
-      </Tabs>
+          </template>
+          <Icon type="info-circle" />
+        </Tooltip>
+        <Icon type="setting" @click="$store.dispatch('setting/open')" />
+      </div>
     </div>
+
+    <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
+
+    <div class="card">
+      <div class="card-body">
+        <CoinInput
+          v-model="fromCoinAmount"
+          label="Input"
+          :coin-name="fromCoin ? fromCoin.symbol : ''"
+          :balance="fromCoin ? fromCoin.balance : null"
+          @onInput="(amount) => (fromCoinAmount = amount)"
+          @onFocus="
+            () => {
+              fixedFromCoin = true
+            }
+          "
+          @onMax="
+            () => {
+              fixedFromCoin = true
+              fromCoinAmount = fromCoin.balance.fixed()
+            }
+          "
+          @onSelect="openFromCoinSelect"
+        />
+
+        <div class="add-icon fc-container">
+          <div class="fc-container">
+            <Icon type="plus" />
+          </div>
+        </div>
+
+        <CoinInput
+          v-model="toCoinAmount"
+          label="Input"
+          :coin-name="toCoin ? toCoin.symbol : ''"
+          :balance="toCoin ? toCoin.balance : null"
+          @onInput="(amount) => (toCoinAmount = amount)"
+          @onFocus="
+            () => {
+              fixedFromCoin = false
+            }
+          "
+          @onMax="
+            () => {
+              fixedFromCoin = false
+              toCoinAmount = toCoin.balance.fixed()
+            }
+          "
+          @onSelect="openToCoinSelect"
+        />
+
+        <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
+
+        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+          Connect Wallet
+        </Button>
+        <Button
+          v-else
+          size="large"
+          ghost
+          :disabled="
+            !fromCoin ||
+            !fromCoinAmount ||
+            !toCoin ||
+            !lpMintAddress ||
+            !liquidity.initialized ||
+            liquidity.loading ||
+            gt(fromCoinAmount, fromCoin.balance) ||
+            gt(toCoinAmount, toCoin.balance) ||
+            suppling
+          "
+          :loading="suppling"
+          @click="supply"
+        >
+          <template v-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
+          <template v-else-if="!fromCoinAmount"> Enter an amount </template>
+          <template v-else-if="liquidity.loading"> Updating pool information </template>
+          <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
+            Insufficient {{ fromCoin.symbol }} balance
+          </template>
+          <template v-else-if="gt(toCoinAmount, toCoin.balance)"> Insufficient {{ toCoin.symbol }} balance </template>
+          <template v-else>Supply</template>
+        </Button>
+      </div>
+    </div>
+
+    <div class="page-head your-liquidity fs-container">
+      <span class="title">Your Liquidity</span>
+    </div>
+
+    <YourLiquidity @onAdd="setCoinFromMint" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Tabs, Progress } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 import {
   PublicKey,
   // types
@@ -182,8 +181,6 @@ import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
 import { sleep, getUnixTs } from '@/utils'
 
-const { TabPane } = Tabs
-
 const RAY = getTokenBySymbol('RAY')
 
 export default Vue.extend({
@@ -191,8 +188,6 @@ export default Vue.extend({
     Icon,
     Tooltip,
     Button,
-    Tabs,
-    TabPane,
     Progress
   },
 
@@ -549,55 +544,16 @@ export default Vue.extend({
 .liquidity.container {
   max-width: 450px;
 
+  .your-liquidity {
+    margin-top: 40px !important;
+  }
+
   .add-icon {
     div {
       height: 32px;
       width: 32px;
       border-radius: 50%;
       background: #000829;
-    }
-  }
-}
-</style>
-
-<style lang="less">
-@import '../styles/variables';
-
-.liquidity {
-  .ant-tabs {
-    width: 100%;
-
-    .ant-tabs-bar {
-      border: none;
-
-      .ant-tabs-nav-container {
-        margin-bottom: 0;
-        line-height: 40px;
-
-        .ant-tabs-nav-wrap {
-          margin-bottom: 0;
-        }
-      }
-
-      .ant-tabs-extra-content {
-        line-height: 1;
-      }
-
-      .ant-tabs-tab {
-        font-weight: 600;
-        opacity: 0.5;
-
-        &:active,
-        &:focus,
-        &:hover {
-          color: @text-color;
-          opacity: 1;
-        }
-      }
-
-      .ant-tabs-tab-active {
-        opacity: 1;
-      }
     }
   }
 }

@@ -27,6 +27,7 @@
                 <img :src="importIcon(`/coins/${info.pc.symbol.toLowerCase()}.png`)" />
               </div>
               {{ info.lp.symbol }}
+              <Tag v-if="info.poolInfo.version === 2" color="pink">Legacy</Tag>
             </div>
 
             <div class="fs-container">
@@ -47,12 +48,17 @@
                 ≈ {{ info.percent.isLessThan(0.0001) ? '&lt;0.01' : info.percent.multipliedBy(100).toFixed(2) }}%
               </div>
             </div>
-            <Row :gutter="32" class="actions">
+            <Row v-if="info.poolInfo.version === 3" :gutter="32" class="actions">
               <Col :span="12">
                 <Button ghost @click="$emit('onAdd', info.coin.mintAddress, info.pc.mintAddress)"> Add </Button>
               </Col>
               <Col :span="12">
                 <Button ghost @click="openModal(info.poolInfo, info.lp, info.userLpBalance)"> Remove </Button>
+              </Col>
+            </Row>
+            <Row v-else :gutter="32" class="actions">
+              <Col :span="24">
+                <Button ghost @click="$router.replace({ path: '/migrate' })"> Remove & Migrate </Button>
               </Col>
             </Row>
           </CollapsePanel>
@@ -67,7 +73,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Button, Collapse, Row, Col, Spin, Icon } from 'ant-design-vue'
+import { Button, Collapse, Row, Col, Spin, Icon, Tag } from 'ant-design-vue'
 import { cloneDeep, get } from 'lodash-es'
 
 import { TokenAmount } from '@/utils/safe-math'
@@ -86,7 +92,8 @@ export default Vue.extend({
     Row,
     Col,
     Spin,
-    Icon
+    Icon,
+    Tag
   },
 
   data() {
@@ -129,7 +136,7 @@ export default Vue.extend({
       for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
         const poolInfo = get(this.liquidity.infos, mintAddress)
 
-        if (poolInfo && poolInfo.version === 3) {
+        if (poolInfo) {
           const lp = cloneDeep(poolInfo.lp)
           const coin = cloneDeep(poolInfo.coin)
           const pc = cloneDeep(poolInfo.pc)
@@ -276,6 +283,13 @@ export default Vue.extend({
         margin-right: 14px;
       }
     }
+  }
+
+  .ant-tag-pink {
+    position: absolute;
+    right: 24px;
+    background: transparent;
+    border-color: #eb2f96;
   }
 }
 </style>
