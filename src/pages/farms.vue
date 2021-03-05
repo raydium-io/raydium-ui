@@ -28,16 +28,23 @@
     <div v-if="farm.initialized" class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farm in farms" :key="farm.poolId">
+          <CollapsePanel v-for="farmInfo in farms" :key="farmInfo.poolId">
             <div slot="header" class="farm-head">
-              <div>{{ farm.lp.name }}</div>
+              <div class="icons">
+                <img :src="importIcon(`/coins/${farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
+                <img :src="importIcon(`/coins/${farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+              </div>
+              <div class="lp-icons">
+                {{ farmInfo.lp.name }}
+              </div>
+
               <div class="state">
                 <div class="title">Staked</div>
-                <div class="value">{{ farm.user ? farm.user.depositBalance.format() : '0' }}</div>
+                <div class="value">{{ farmInfo.user ? farmInfo.user.depositBalance.format() : '0' }}</div>
               </div>
               <div class="state">
                 <div class="title">Pending Reward</div>
-                <div class="value">{{ farm.user ? farm.user.rewardDebt.format() : '0' }}</div>
+                <div class="value">{{ farmInfo.user ? farmInfo.user.rewardDebt.format() : '0' }}</div>
               </div>
               <div class="state">
                 <div class="title">Apr</div>
@@ -45,7 +52,7 @@
               </div>
               <div class="state">
                 <div class="title">Liquidity</div>
-                <div class="value">{{ farm.lp.balance.format() }}</div>
+                <div class="value">{{ farmInfo.lp.balance.format() }}</div>
               </div>
             </div>
           </CollapsePanel>
@@ -67,6 +74,7 @@ import { mapState } from 'vuex'
 import { Tooltip, Progress, Collapse, Spin, Icon } from 'ant-design-vue'
 
 import { get } from 'lodash-es'
+import importIcon from '@/utils/import-icon'
 
 const CollapsePanel = Collapse.Panel
 
@@ -112,6 +120,8 @@ export default Vue.extend({
   },
 
   methods: {
+    importIcon,
+
     updateFarms() {
       const farms: any = []
 

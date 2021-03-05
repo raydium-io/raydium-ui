@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <div v-if="!wallet.connected" class="fc-container">
-        <Button size="large" ghost @click="$store.dispatch('wallet/openModal')"> Unlock Wallet </Button>
+        <Button size="large" ghost @click="$store.dispatch('wallet/openModal')"> Connect Wallet </Button>
       </div>
       <div v-else-if="!wallet.initialized" class="fc-container">
         <Spin :spinning="true">
@@ -20,7 +20,15 @@
         />
 
         <Collapse v-for="info in liquids" :key="info.lp.mintAddress" expand-icon-position="right">
-          <CollapsePanel class="liquidity-info" :header="info.lp.symbol">
+          <CollapsePanel class="liquidity-info">
+            <div slot="header" class="lp-icons">
+              <div class="icons">
+                <img :src="importIcon(`/coins/${info.coin.symbol.toLowerCase()}.png`)" />
+                <img :src="importIcon(`/coins/${info.pc.symbol.toLowerCase()}.png`)" />
+              </div>
+              {{ info.lp.symbol }}
+            </div>
+
             <div class="fs-container">
               <div>Pooled:</div>
               <div>≈ {{ info.userCoinBalance.format() }} {{ info.coin.symbol }}</div>
@@ -65,6 +73,7 @@ import { cloneDeep, get } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { LiquidityPoolInfo } from '@/utils/pools'
 import { removeLiquidity } from '@/utils/liquidity'
+import importIcon from '@/utils/import-icon'
 
 const CollapsePanel = Collapse.Panel
 
@@ -111,6 +120,8 @@ export default Vue.extend({
   },
 
   methods: {
+    importIcon,
+
     updateLiquids(tokenAccounts: any) {
       let liquids = [] as any
 

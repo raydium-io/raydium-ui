@@ -56,7 +56,7 @@
               <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
 
               <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
-                Unlock Wallet
+                Connect Wallet
               </Button>
               <Button
                 v-else
