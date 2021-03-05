@@ -1,7 +1,7 @@
 <template>
-  <div class="farm container">
+  <div class="staking container">
     <div class="page-head fs-container">
-      <span class="title">Farms</span>
+      <span class="title">Staking</span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
@@ -32,10 +32,9 @@
             <Row slot="header" class="farm-head" :gutter="0">
               <Col class="lp-icons" :span="8">
                 <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.symbol.toLowerCase()}.png`)" />
                 </div>
-                {{ farm.farmInfo.lp.name }}
+                {{ farm.farmInfo.lp.symbol }}
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Pending Reward</div>
@@ -57,17 +56,8 @@
               </Col>
             </Row>
 
-            <Row :gutter="48">
-              <Col :span="4">
-                Add
-                <NuxtLink
-                  :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
-                >
-                  {{ farm.farmInfo.lp.name }}
-                </NuxtLink>
-              </Col>
-
-              <Col :span="10">
+            <Row :gutter="16">
+              <Col :span="12">
                 <div class="harvest">
                   <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                   <div class="pending fs-container">
@@ -104,7 +94,7 @@
                 @onOk="unstake"
                 @onCancel="cancelUnstake"
               />
-              <Col :span="10">
+              <Col :span="12">
                 <div class="start">
                   <div class="title">Start farming</div>
                   <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
@@ -222,7 +212,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake) {
+        if (farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
           const { rewardPerShareNet } = farmInfo.poolInfo
@@ -309,7 +299,7 @@ export default Vue.extend({
               ])
           })
 
-          const description = `Stake ${amount} ${this.farmInfo.lp.name}`
+          const description = `Stake ${amount} ${this.farmInfo.lp.symbol}`
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
@@ -368,7 +358,7 @@ export default Vue.extend({
               ])
           })
 
-          const description = `Unstake ${amount} ${this.farmInfo.lp.name}`
+          const description = `Unstake ${amount} ${this.farmInfo.lp.symbol}`
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
@@ -418,7 +408,7 @@ export default Vue.extend({
               ])
           })
 
-          const description = `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
+          const description = `Harvest ${farmInfo.reward.symbol}`
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
@@ -437,7 +427,7 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.farm.container {
+.staking.container {
   max-width: 1200px;
 
   .card {
@@ -534,7 +524,7 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
-.farm {
+.staking {
   .ant-collapse-header {
     padding: 24px 32px !important;
   }
