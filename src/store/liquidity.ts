@@ -144,6 +144,7 @@ export const actions = {
         commit('setInfos', liquidityPools)
         logger('Liquidity pool infomations updated')
       })
+      .catch()
       .finally(() => {
         commit('setInitialized')
         commit('setLoading', false)

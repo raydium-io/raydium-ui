@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash-es'
 // @ts-ignore
 import enquireJs from 'enquire.js'
 
@@ -16,17 +15,12 @@ function enquireScreen(call: Function) {
 }
 
 export const state = () => ({
-  isMobile: false,
-  prices: {}
+  isMobile: false
 })
 
 export const mutations = {
   setIsMobile(state: any, isMobile: boolean) {
     state.isMobile = isMobile
-  },
-
-  setPrices(state: any, prices: object) {
-    state.prices = cloneDeep(prices)
   }
 }
 

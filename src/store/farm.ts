@@ -115,6 +115,7 @@ export const actions = {
         commit('setInfos', farms)
         logger('Farm&Stake pool infomations updated')
       })
+      .catch()
       .finally(() => {
         commit('setInitialized')
         commit('setLoading', false)
@@ -138,33 +139,35 @@ export const actions = {
           dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span
         }
       ]
-      getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters).then((stakeAccountInfos) => {
-        const stakeAccounts: any = {}
+      getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
+        .then((stakeAccountInfos) => {
+          const stakeAccounts: any = {}
 
-        stakeAccountInfos.forEach((stakeAccountInfo) => {
-          const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-          const { data } = stakeAccountInfo.accountInfo
+          stakeAccountInfos.forEach((stakeAccountInfo) => {
+            const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+            const { data } = stakeAccountInfo.accountInfo
 
-          const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+            const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
 
-          const poolId = userStakeInfo.poolId.toBase58()
-          const depositBalance = userStakeInfo.depositBalance.toNumber()
-          const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+            const poolId = userStakeInfo.poolId.toBase58()
+            const depositBalance = userStakeInfo.depositBalance.toNumber()
+            const rewardDebt = userStakeInfo.rewardDebt.toNumber()
 
-          const farm = getFarmByPoolId(poolId)
+            const farm = getFarmByPoolId(poolId)
 
-          if (farm) {
-            stakeAccounts[poolId] = {
-              depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-              rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-              stakeAccountAddress
+            if (farm) {
+              stakeAccounts[poolId] = {
+                depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                stakeAccountAddress
+              }
             }
-          }
-        })
+          })
 
-        commit('setStakeAccounts', stakeAccounts)
-        logger('User StakeAccounts updated')
-      })
+          commit('setStakeAccounts', stakeAccounts)
+          logger('User StakeAccounts updated')
+        })
+        .catch()
     }
   }
 }

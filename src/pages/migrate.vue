@@ -28,7 +28,7 @@
             <Step>
               <div slot="title">Remove liquidity</div>
               <div slot="description" class="action">
-                Remove liquidity for all LP tokens
+                Remove liquidity for LP tokens
 
                 <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
                   <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>

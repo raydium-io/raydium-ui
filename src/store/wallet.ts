@@ -136,6 +136,7 @@ export const actions = {
         commit('setTokenAccounts', tokenAccounts)
         logger('Wallet TokenAccounts updated')
       })
+      .catch()
       .finally(() => {
         commit('setInitialized')
         commit('setLoading', false)

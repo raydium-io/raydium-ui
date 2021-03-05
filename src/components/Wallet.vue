@@ -81,6 +81,7 @@ export default Vue.extend({
 
       // 自动刷新倒计时
       walletTimer: null as any,
+      priceTimer: null as any,
       liquidityTimer: null as any,
       farmTimer: null as any,
       // 订阅变动
@@ -89,26 +90,26 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity', 'farm'])
+    ...mapState(['wallet', 'price', 'liquidity', 'farm'])
   },
 
   mounted() {
     const conn = new Connection(this.wallet.endpoint)
     Vue.prototype.$conn = conn
 
+    this.$store.dispatch('price/requestPrices')
     this.$store.dispatch('liquidity/requestInfos')
     this.$store.dispatch('farm/requestInfos')
 
-    this.getPrices()
-
     this.setWalletTimer()
-
+    this.setPriceTimer()
     this.setLiquidityTimer()
     this.setFarmTimer()
   },
 
   destroyed() {
     clearInterval(this.walletTimer)
+    clearInterval(this.priceTimer)
     clearInterval(this.liquidityTimer)
     clearInterval(this.farmTimer)
   },
@@ -117,7 +118,6 @@ export default Vue.extend({
     importIcon,
 
     connect(walletName: string) {
-      const self = this
       let wallet: SolanaWallet | SolongWallet | null = null
 
       switch (walletName) {
@@ -155,10 +155,10 @@ export default Vue.extend({
         this.$store.dispatch('wallet/closeModal').then(() => {
           Vue.prototype.$wallet = wallet
 
-          self.$store.commit('wallet/connected', wallet.publicKey.toBase58())
+          this.$store.commit('wallet/connected', wallet.publicKey.toBase58())
 
           this.subWallet()
-          ;(self as any).$notify.success({
+          ;(this as any).$notify.success({
             message: 'Wallet connected',
             description: ''
           })
@@ -219,28 +219,28 @@ export default Vue.extend({
       }
     },
 
-    getPrices() {
-      this.$axios
-        .get('https://api.raydium.io/coin/price', {
-          params: {
-            coins: 'usdt'
+    setWalletTimer() {
+      this.walletTimer = setInterval(() => {
+        if (this.wallet.connected && !this.wallet.loading) {
+          if (this.wallet.countdown < this.wallet.autoRefreshTime) {
+            this.$store.commit('wallet/setCountdown', this.wallet.countdown + 1)
+
+            if (this.wallet.countdown === this.wallet.autoRefreshTime) {
+              this.$store.dispatch('wallet/getTokenAccounts')
+            }
           }
-        })
-        .then((prices) => {
-          console.log(prices)
-        })
+        }
+      }, 1000)
     },
 
-    setWalletTimer() {
-      const self = this
+    setPriceTimer() {
+      this.priceTimer = setInterval(() => {
+        if (!this.price.loading) {
+          if (this.price.countdown < this.price.autoRefreshTime) {
+            this.$store.commit('price/setCountdown', this.price.countdown + 1)
 
-      this.walletTimer = setInterval(function () {
-        if (self.wallet.connected && !self.wallet.loading) {
-          if (self.wallet.countdown < self.wallet.autoRefreshTime) {
-            self.$store.commit('wallet/setCountdown', self.wallet.countdown + 1)
-
-            if (self.wallet.countdown === self.wallet.autoRefreshTime) {
-              self.$store.dispatch('wallet/getTokenAccounts')
+            if (this.price.countdown === this.price.autoRefreshTime) {
+              this.$store.dispatch('price/requestPrices')
             }
           }
         }
@@ -248,15 +248,13 @@ export default Vue.extend({
     },
 
     setLiquidityTimer() {
-      const self = this
+      this.liquidityTimer = setInterval(() => {
+        if (!this.liquidity.loading) {
+          if (this.liquidity.countdown < this.liquidity.autoRefreshTime) {
+            this.$store.commit('liquidity/setCountdown', this.liquidity.countdown + 1)
 
-      this.liquidityTimer = setInterval(function () {
-        if (!self.liquidity.loading) {
-          if (self.liquidity.countdown < self.liquidity.autoRefreshTime) {
-            self.$store.commit('liquidity/setCountdown', self.liquidity.countdown + 1)
-
-            if (self.liquidity.countdown === self.liquidity.autoRefreshTime) {
-              self.$store.dispatch('liquidity/requestInfos')
+            if (this.liquidity.countdown === this.liquidity.autoRefreshTime) {
+              this.$store.dispatch('liquidity/requestInfos')
             }
           }
         }
@@ -264,15 +262,13 @@ export default Vue.extend({
     },
 
     setFarmTimer() {
-      const self = this
+      this.farmTimer = setInterval(() => {
+        if (!this.farm.loading) {
+          if (this.farm.countdown < this.farm.autoRefreshTime) {
+            this.$store.commit('farm/setCountdown', this.farm.countdown + 1)
 
-      this.farmTimer = setInterval(function () {
-        if (!self.farm.loading) {
-          if (self.farm.countdown < self.farm.autoRefreshTime) {
-            self.$store.commit('farm/setCountdown', self.farm.countdown + 1)
-
-            if (self.farm.countdown === self.farm.autoRefreshTime) {
-              self.$store.dispatch('farm/requestInfos')
+            if (this.farm.countdown === this.farm.autoRefreshTime) {
+              this.$store.dispatch('farm/requestInfos')
             }
           }
         }

@@ -94,9 +94,7 @@ export const actions = {
   unsub({ commit, state }: { commit: any; state: any }, txid: string) {
     const conn: Connection = (this as any)._vm.$conn
 
-    try {
-      conn.removeSignatureListener(state.history[txid].i)
-    } catch (error) {}
+    conn.removeSignatureListener(state.history[txid].i).catch()
 
     commit('setListenerId', [txid, null])
   }

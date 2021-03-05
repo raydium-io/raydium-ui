@@ -26,5 +26,7 @@ export {
   // collapse
   RightOutline,
   // remove
-  MinusOutline
+  MinusOutline,
+  // apy
+  CalculatorOutline
 } from '@ant-design/icons'
