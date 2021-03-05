@@ -49,7 +49,7 @@
               </div>
             </Step>
             <Step>
-              <div slot="title">Add liquidity to new pools (Optional)</div>
+              <div slot="title">Add liquidity to new pools</div>
               <div slot="description" class="action">
                 Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
 
