@@ -9,6 +9,7 @@ export interface LiquidityPoolInfo {
   pc: TokenInfo
   lp: TokenInfo
 
+  version: number
   programId: string
 
   ammId: string
@@ -45,10 +46,8 @@ export function getPoolByTokenMintAddresses(
 ): LiquidityPoolInfo | undefined {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
-      (pool.coin.mintAddress === coinMintAddress &&
-        pool.pc.mintAddress === pcMintAddress) ||
-      (pool.coin.mintAddress === pcMintAddress &&
-        pool.pc.mintAddress === coinMintAddress)
+      (pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
+      (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)
   )
 
   if (pool) {
@@ -58,16 +57,11 @@ export function getPoolByTokenMintAddresses(
   return pool
 }
 
-export function getLpMintByTokenMintAddresses(
-  coinMintAddress: string,
-  pcMintAddress: string
-): string | null {
+export function getLpMintByTokenMintAddresses(coinMintAddress: string, pcMintAddress: string): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
-      (pool.coin.mintAddress === coinMintAddress &&
-        pool.pc.mintAddress === pcMintAddress) ||
-      (pool.coin.mintAddress === pcMintAddress &&
-        pool.pc.mintAddress === coinMintAddress)
+      (pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
+      (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)
   )
 
   if (pool) {
@@ -77,12 +71,8 @@ export function getLpMintByTokenMintAddresses(
   return null
 }
 
-export function getPoolByLpMintAddress(
-  lpMintAddress: string
-): LiquidityPoolInfo | undefined {
-  const pool = LIQUIDITY_POOLS.find(
-    (pool) => pool.lp.mintAddress === lpMintAddress
-  )
+export function getPoolByLpMintAddress(lpMintAddress: string): LiquidityPoolInfo | undefined {
+  const pool = LIQUIDITY_POOLS.find((pool) => pool.lp.mintAddress === lpMintAddress)
 
   if (pool) {
     return cloneDeep(pool)
@@ -116,6 +106,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...TOKENS.USDT },
     lp: { ...LP_TOKENS['RAY-USDT'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: '4GygMmZgSoyfM3DEBpA8HvB8pooKWnTp232bKA17ptMG',
@@ -132,7 +123,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '56KzKfd9LvsY4QuMZcGxcGCd78ZBFQ7JcyMFwgqpXH12',
     serumPcVaultAccount: 'GLntTfM7RHeg5RuAuXcudT4NV7d4BGPrEFq7mmMxn29E',
     serumVaultSigner: '6FYUBnwRVxxYCv1kpad4FaFLJAzLYuevFWmpVp7hViTn',
-    nonce: 255,
+    nonce: 255
   },
   {
     name: 'RAY-SOL',
@@ -140,6 +131,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...NATIVE_SOL },
     lp: { ...LP_TOKENS['RAY-SOL'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: '5Ytcen7ZQRWA8Dt4EGyVJngyqDL36ZKAGSTVKxbDGZPN',
@@ -156,7 +148,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '6dDDqzNsLx8u2Prk384Rs1jUxFPFQsKHne5oQxnf4kog',
     serumPcVaultAccount: 'AzxRBcig9mGTfdbUgEdKq48eiNZ2M4ynwQQH4Pvxbcy2',
     serumVaultSigner: 'FhTczYTxkXMyofPMDQFJGHxjcnPrjrEGQMexob4BVwXD',
-    nonce: 255,
+    nonce: 255
   },
   {
     name: 'LINK-USDT',
@@ -164,6 +156,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...TOKENS.USDT },
     lp: { ...LP_TOKENS['LINK-USDT'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: 'Avkh3hMrjRRdGbm7EAmeXaJ1wWrbcwGWDGEroKq5wHJ8',
@@ -180,7 +173,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '8ZP84HpFb5k4paAgDGgXaMtne537LDFaxEWP89WKBPD1',
     serumPcVaultAccount: 'E3X7J1vyogGKZSySEo3WTS9GzipyTGVd5KKiXeFy1YHu',
     serumVaultSigner: '7bwfaV98FDNtWvgPMo7wY3nE7cE8tKfXkFAVzCxtkw6w',
-    nonce: 255,
+    nonce: 255
   },
   {
     name: 'ETH-USDT',
@@ -188,6 +181,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...TOKENS.USDT },
     lp: { ...LP_TOKENS['ETH-USDT'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: '7PGNXqdhrpQoVS5uQs9gjT1zfY6MUzEeYHopRnryj7rm',
@@ -204,7 +198,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: 'Gwna45N1JGLmUMGhFVP1ELz8szVSajp12RgPqCbk46n7',
     serumPcVaultAccount: '8uqjWjNQiZvoieaGSoCRkGZExrqMpaYJL5huknCEHBcP',
     serumVaultSigner: '4fgnxw343cfYgcNgWvan8H6j6pNBskBmGX4XMbhxtFbi',
-    nonce: 255,
+    nonce: 255
   },
   {
     name: 'RAY-USDC',
@@ -212,6 +206,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...TOKENS.USDC },
     lp: { ...LP_TOKENS['RAY-USDC'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: 'G2PVNAKAp17xtruKiMwT1S2GWNxptWZfqK6oYrFWCXWX',
@@ -228,7 +223,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: 'BuMsEd7Ub6MtCCh1eT8pvL6zcBPbiifa1idVWa1BeE2R',
     serumPcVaultAccount: 'G7i7ZKx7rfMXGreLYzvR3ZZERgaGK7646nAgi8yjE8iN',
     serumVaultSigner: 'Aj6H2siiKsnAdAS5YVwuJPdXrHaLodsSyKs7ZiEtEZQN',
-    nonce: 255,
+    nonce: 255
   },
   {
     name: 'RAY-SRM',
@@ -236,6 +231,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     pc: { ...TOKENS.SRM },
     lp: { ...LP_TOKENS['RAY-SRM'] },
 
+    version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
 
     ammId: '3Y5dpV9DtwkhewxXpiVRscFeQR2dvsHovXQonkKbuDwB',
@@ -252,6 +248,6 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '6wXCSGvFvWLVoiRaXJheHoXec4LiJhiCWnxmQbYc9kv5',
     serumPcVaultAccount: 'G8KH5rE5EqeTpnLjTTNgKhVp47yRHCN28wH27vYFkWCR',
     serumVaultSigner: 'EXZnYg9QCzujDwm621N286d4KLAZiMwpUv64GdECcxbm',
-    nonce: 255,
-  },
+    nonce: 255
+  }
 ]

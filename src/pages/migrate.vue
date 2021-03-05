@@ -30,13 +30,18 @@
               <div slot="description" class="action">
                 Remove liquidity for all LP tokens
 
-                <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name">
-                  {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }}
-                </h6>
+                <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
+                  <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
 
-                <Button ghost :loading="removeing" :disabled="liquids.length === 0" @click="remove">
-                  Remove all liquidity
-                </Button>
+                  <Button
+                    ghost
+                    :loading="removing"
+                    :disabled="liquids.length === 0"
+                    @click="remove(liquid.poolInfo, liquid.userLpBalance)"
+                  >
+                    Remove liquidity
+                  </Button>
+                </h6>
               </div>
             </Step>
             <Step>
@@ -44,7 +49,7 @@
               <div slot="description" class="action">
                 Earn RAY by staking v3 LP tokens in the new liquidity pools.
 
-                <Button ghost>Go to V3 Liquidity</Button>
+                <Button ghost @click="$router.replace({ path: '/liquidity' })">Go to V3 Liquidity</Button>
               </div>
             </Step>
           </Steps>
@@ -60,7 +65,8 @@ import { mapState } from 'vuex'
 import { Button, Steps } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import { unstakeAll, removeAll } from '@/utils/migrate'
+import { unstakeAll } from '@/utils/migrate'
+import { removeLiquidity } from '@/utils/liquidity'
 import { getUnixTs } from '@/utils'
 
 const { Step } = Steps
@@ -72,18 +78,18 @@ export default Vue.extend({
     Step
   },
 
-  computed: {
-    ...mapState(['wallet', 'liquidity', 'farm', 'url'])
-  },
-
   data() {
     return {
       farms: [] as any,
       liquids: [] as any,
 
       unstaking: false,
-      removeing: false
+      removing: false
     }
+  },
+
+  computed: {
+    ...mapState(['wallet', 'liquidity', 'farm', 'url'])
   },
 
   watch: {
@@ -114,7 +120,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake) {
+        if (!farmInfo.isStake && farmInfo.version === 2) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
 
           if (userInfo) {
@@ -198,7 +204,7 @@ export default Vue.extend({
       for (const [mintAddress, tokenAccount] of Object.entries(this.wallet.tokenAccounts)) {
         const poolInfo = get(this.liquidity.infos, mintAddress)
 
-        if (poolInfo) {
+        if (poolInfo && poolInfo.version === 2) {
           const userLpBalance = cloneDeep((tokenAccount as any).balance)
 
           if (!userLpBalance.isNullOrZero()) {
@@ -213,28 +219,15 @@ export default Vue.extend({
       this.liquids = liquids
     },
 
-    remove() {
-      this.removeing = true
+    remove(poolInfo: any, lpBalance: any) {
+      this.removing = true
 
       const conn = (this as any).$conn
       const wallet = (this as any).$wallet
 
-      const liquids = [] as any
-      this.liquids.forEach((liquid: any) => {
-        const { poolInfo, userLpBalance } = liquid
-
-        const lpAccount = get(this.wallet.tokenAccounts, `${poolInfo.lp.mintAddress}.tokenAccountAddress`)
-        const fromCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.coin.mintAddress}.tokenAccountAddress`)
-        const toCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.pc.mintAddress}.tokenAccountAddress`)
-
-        liquids.push({
-          poolInfo,
-          lpAccount,
-          fromCoinAccount,
-          toCoinAccount,
-          amount: userLpBalance
-        })
-      })
+      const lpAccount = get(this.wallet.tokenAccounts, `${poolInfo.lp.mintAddress}.tokenAccountAddress`)
+      const fromCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.coin.mintAddress}.tokenAccountAddress`)
+      const toCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.pc.mintAddress}.tokenAccountAddress`)
 
       const key = getUnixTs()
       ;(this as any).$notify.info({
@@ -243,7 +236,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      removeAll(conn, wallet, liquids)
+      removeLiquidity(conn, wallet, poolInfo, lpAccount, fromCoinAccount, toCoinAccount, lpBalance.format())
         .then((txid) => {
           ;(this as any).$notify.info({
             key,
@@ -255,18 +248,19 @@ export default Vue.extend({
               ])
           })
 
-          const description = `Remove all liquidity`
+          const description = `Remove liquidity for ${lpBalance.format()} ${poolInfo.lp.name}`
+
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
           ;(this as any).$notify.error({
             key,
-            message: 'Remove all liquidity failed',
+            message: 'Remove liquidity failed',
             description: error.message
           })
         })
         .finally(() => {
-          this.removeing = false
+          this.removing = false
         })
     }
   }

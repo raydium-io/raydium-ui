@@ -129,7 +129,7 @@ export default Vue.extend({
       for (const [mintAddress, tokenAccount] of Object.entries(tokenAccounts)) {
         const poolInfo = get(this.liquidity.infos, mintAddress)
 
-        if (poolInfo) {
+        if (poolInfo && poolInfo.version === 3) {
           const lp = cloneDeep(poolInfo.lp)
           const coin = cloneDeep(poolInfo.coin)
           const pc = cloneDeep(poolInfo.pc)

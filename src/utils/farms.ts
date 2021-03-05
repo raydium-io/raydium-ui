@@ -9,6 +9,7 @@ export interface FarmInfo {
   reward: TokenInfo
   isStake: boolean
 
+  version: number
   programId: string
 
   poolId: string
@@ -83,6 +84,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    version: 2,
     programId: STAKE_PROGRAM_ID,
 
     poolId: '5w3itB5PVAPAiPFpBcMyGZJWukmcuRtwFRkQJF3WzHdj',
@@ -100,6 +102,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    version: 2,
     programId: STAKE_PROGRAM_ID,
 
     poolId: '3j7qWosyu3cVNgbwdWRxEf4SxJKNWoWqgpAEn4RLpMrR',
@@ -117,6 +120,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    version: 2,
     programId: STAKE_PROGRAM_ID,
 
     poolId: 'GLQwyMF1txnAdEnoYuPTPsWdXqUuxgTMsWEV38njk48C',
@@ -134,6 +138,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: true,
 
+    version: 2,
     programId: STAKE_PROGRAM_ID,
 
     poolId: '4EwbZo8BZXP5313z5A2H11MRBP15M5n6YxfmkjXESKAW',
