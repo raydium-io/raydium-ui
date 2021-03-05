@@ -229,8 +229,6 @@ export default Vue.extend({
           const description = `Remove liquidity for ${value} ${lp.name}`
 
           this.$store.dispatch('transaction/sub', { txid, description })
-
-          this.cancelRemove()
         })
         .catch((error) => {
           ;(this as any).$notify.error({
@@ -241,6 +239,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.removing = false
+          this.cancelRemove()
         })
     }
   }

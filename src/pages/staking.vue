@@ -96,7 +96,7 @@
               />
               <Col :span="12">
                 <div class="start">
-                  <div class="title">Start farming</div>
+                  <div class="title">Start staking</div>
                   <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
                     Connect Wallet
                   </Button>
@@ -111,7 +111,7 @@
                       <Icon type="minus" />
                     </Button>
                     <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
-                      Stake LP
+                      Stake {{ farm.farmInfo.lp.symbol }}
                     </Button>
                   </div>
                 </div>
@@ -311,6 +311,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.cancelStake()
         })
     },
 
@@ -370,6 +371,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.cancelUnstake()
         })
     },
 

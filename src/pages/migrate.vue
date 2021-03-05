@@ -249,7 +249,6 @@ export default Vue.extend({
           })
 
           const description = `Remove liquidity for ${lpBalance.format()} ${poolInfo.lp.name}`
-
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
