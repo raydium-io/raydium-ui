@@ -102,6 +102,7 @@
           label="To (Estimate)"
           :coin-name="toCoin ? toCoin.symbol : ''"
           :balance="toCoin ? toCoin.balance : null"
+          :show-max="false"
           :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
           @onFocus="
