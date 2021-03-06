@@ -124,7 +124,7 @@ export async function addLiquidity(
       wrappedSolAccount,
       owner,
       TOKENS.WSOL.mintAddress,
-      null,
+      pcAmount + 1e7,
       transaction,
       signers
     )

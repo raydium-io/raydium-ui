@@ -119,16 +119,8 @@
           @onSelect="openToCoinSelect"
         />
         <div
+          v-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
           class="price-base fc-container"
-          v-if="
-            this.fromCoin &&
-            this.toCoin &&
-            this.marketAddress &&
-            this.market &&
-            this.asks &&
-            this.bids &&
-            this.fromCoinAmount
-          "
         >
           <span>
             1 {{ fromCoin.symbol }} ≈

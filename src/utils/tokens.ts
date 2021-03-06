@@ -384,5 +384,23 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'DSX5E21RE9FB9hM8Nh8xcXQfPK6SzRaJiywemHBSsfup',
     decimals: 6
+  },
+  'RAY-SOL-V3': {
+    symbol: 'RAY-SOL',
+    name: 'RAY-SOL LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'F5PPQHGcznZ2FxD9JaxJMXaf7XkaFFJ6zzTBcW8osQjw',
+    decimals: 6
+  },
+  'RAY-ETH-V3': {
+    symbol: 'RAY-ETH',
+    name: 'RAY-ETH LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.ETH },
+
+    mintAddress: '8Q6MKy5Yxb9vG1mWzppMtMb2nrhNuCRNUkJTeiE3fuwD',
+    decimals: 6
   }
 }
