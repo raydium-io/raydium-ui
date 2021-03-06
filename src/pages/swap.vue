@@ -134,7 +134,6 @@
             !initialized ||
             loading ||
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
-            gt(toCoinAmount, toCoin.balance.fixed()) ||
             swaping
           "
           :loading="swaping"
@@ -146,9 +145,6 @@
           <template v-else-if="loading"> Updating price information </template>
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
             Insufficient {{ fromCoin.symbol }} balance
-          </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
-            Insufficient {{ toCoin.symbol }} balance
           </template>
           <template v-else>Swap</template>
         </Button>
@@ -230,15 +226,15 @@ export default Vue.extend({
     },
 
     // 监听输入金额变动
-    toCoinAmount(newAmount: string, oldAmount: string) {
-      this.$nextTick(() => {
-        if (!inputRegex.test(escapeRegExp(newAmount))) {
-          this.toCoinAmount = oldAmount
-        } else {
-          this.updateAmounts()
-        }
-      })
-    },
+    // toCoinAmount(newAmount: string, oldAmount: string) {
+    //   this.$nextTick(() => {
+    //     if (!inputRegex.test(escapeRegExp(newAmount))) {
+    //       this.toCoinAmount = oldAmount
+    //     } else {
+    //       this.updateAmounts()
+    //     }
+    //   })
+    // },
 
     // 监听钱包余额变动
     'wallet.tokenAccounts': {
