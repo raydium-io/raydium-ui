@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.5",
+    "@nuxtjs/gtm": "^2.4.0",
     "@project-serum/borsh": "^0.1.0",
     "@project-serum/serum": "^0.13.24",
     "@project-serum/sol-wallet-adapter": "^0.1.5",

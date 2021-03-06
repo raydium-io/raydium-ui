@@ -69,7 +69,8 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    'nuxt-clipboard'
+    'nuxt-clipboard',
+    '@nuxtjs/gtm'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -77,6 +78,11 @@ export default {
 
   clipboard: {
     autoSetContainer: true
+  },
+
+  gtm: {
+    id: 'GTM-MN4HVBS',
+    enable: true
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
