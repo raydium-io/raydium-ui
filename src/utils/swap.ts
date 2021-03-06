@@ -214,7 +214,26 @@ export async function swap(
     toMint = TOKENS.WSOL.mintAddress
   }
 
-  const userAccounts = [new PublicKey(fromTokenAccount), new PublicKey(toTokenAccount)]
+  const newFromTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    fromTokenAccount,
+    owner,
+    fromMint,
+    null,
+    transaction,
+    signers
+  )
+  const newToTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    toTokenAccount,
+    owner,
+    toMint,
+    null,
+    transaction,
+    signers
+  )
+
+  const userAccounts = [newFromTokenAccount, newToTokenAccount]
   // 反转
   if (market.baseMintAddress.toBase58() === toMint && market.quoteMintAddress.toBase58() === fromMint) {
     userAccounts.reverse()
