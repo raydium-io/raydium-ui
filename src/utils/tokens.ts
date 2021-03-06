@@ -356,5 +356,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5QXBMXuCL7zfAk39jEVVEvcrz1AvBGgT9wAhLLHLyyUJ',
     decimals: 6
+  },
+  // v3
+  'RAY-USDT-V3': {
+    symbol: 'RAY-USDT',
+    name: 'RAY-USDT LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: 'FdhKXYjCou2jQfgKWcNY7jb8F2DPLU1teTTTRfLBD2v1',
+    decimals: 6
   }
 }

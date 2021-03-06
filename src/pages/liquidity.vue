@@ -508,7 +508,7 @@ export default Vue.extend({
         this.toCoin,
         this.fromCoinAmount,
         this.toCoinAmount,
-        this.setting.slippage
+        this.fixedFromCoin
       )
         .then((txid) => {
           ;(this as any).$notify.info({

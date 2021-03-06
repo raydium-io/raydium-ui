@@ -1,8 +1,8 @@
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
+import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3 } from '@/utils/liquidity'
 import { LIQUIDITY_POOLS, getAddressForWhat } from '@/utils/pools'
 import { commitment, getMultipleAccounts } from '@/utils/web3'
 
-import { AMM_INFO_LAYOUT } from '@/utils/liquidity'
 import { OpenOrders } from '@project-serum/serum'
 import { PublicKey } from '@solana/web3.js'
 import { TokenAmount } from '@/utils/safe-math'
@@ -86,7 +86,7 @@ export const actions = {
             const address = info.publicKey.toBase58()
             const data = Buffer.from(info.account.data)
 
-            const { key, lpMintAddress } = getAddressForWhat(address)
+            const { key, lpMintAddress, version } = getAddressForWhat(address)
 
             if (key && lpMintAddress) {
               const poolInfo = liquidityPools[lpMintAddress]
@@ -120,7 +120,12 @@ export const actions = {
                 }
                 // 获取池子信息 (利润金额等等)
                 case 'ammId': {
-                  const parsed = AMM_INFO_LAYOUT.decode(data)
+                  let parsed
+                  if (version === 2) {
+                    parsed = AMM_INFO_LAYOUT.decode(data)
+                  } else {
+                    parsed = AMM_INFO_LAYOUT_V3.decode(data)
+                  }
 
                   const { needTakePnlCoin, needTakePnlPc } = parsed
                   poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(needTakePnlCoin.toNumber())

@@ -81,7 +81,7 @@ export async function addLiquidity(
   toCoin: TokenInfo | undefined | null,
   fromAmount: string | undefined | null,
   toAmount: string | undefined | null,
-  slippage: number
+  fixedFromCoin: boolean
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo || !fromCoin || !toCoin) {
@@ -98,7 +98,6 @@ export async function addLiquidity(
   const signers: any = []
 
   const owner = wallet.publicKey
-  const tolerate = new BigNumber(slippage).multipliedBy(100).toNumber()
 
   const userAccounts = [new PublicKey(fromCoinAccount), new PublicKey(toCoinAccount)]
   const userAmounts = [
@@ -163,7 +162,7 @@ export async function addLiquidity(
 
       coinAmount,
       pcAmount,
-      tolerate
+      fixedFromCoin && fromCoin.mintAddress === poolInfo.coin.mintAddress ? 0 : 1
     )
   )
 
@@ -281,9 +280,9 @@ export function addLiquidityInstruction(
 
   maxCoinAmount: number,
   maxPcAmount: number,
-  tolerate: number
+  fixedFromCoin: number
 ): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('tolerate')])
+  const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
 
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
@@ -307,7 +306,7 @@ export function addLiquidityInstruction(
       instruction: 3,
       maxCoinAmount,
       maxPcAmount,
-      tolerate
+      fixedFromCoin
     },
     data
   )
@@ -421,6 +420,47 @@ export const AMM_INFO_LAYOUT = struct([
   publicKey('ammQuantities'),
   publicKey('poolWithdrawQueue'),
   publicKey('poolTempLpTokenAccount'),
-  publicKey('ammCoinPnlAccount'),
-  publicKey('ammPcPnlAccount')
+  publicKey('ammOwner'),
+  publicKey('pnlOwner')
+])
+
+export const AMM_INFO_LAYOUT_V3 = struct([
+  u64('status'),
+  u64('nonce'),
+  u64('orderNum'),
+  u64('depth'),
+  u64('coinDecimals'),
+  u64('pcDecimals'),
+  u64('state'),
+  u64('resetFlag'),
+  u64('fee'),
+  u64('min_separate'),
+  u64('minSize'),
+  u64('volMaxCutRatio'),
+  u64('pnlRatio'),
+  u64('amountWaveRatio'),
+  u64('coinLotSize'),
+  u64('pcLotSize'),
+  u64('minPriceMultiplier'),
+  u64('maxPriceMultiplier'),
+  u64('needTakePnlCoin'),
+  u64('needTakePnlPc'),
+  u64('totalPnlX'),
+  u64('totalPnlY'),
+  u64('systemDecimalsValue'),
+  publicKey('poolCoinTokenAccount'),
+  publicKey('poolPcTokenAccount'),
+  publicKey('coinMintAddress'),
+  publicKey('pcMintAddress'),
+  publicKey('lpMintAddress'),
+  publicKey('ammOpenOrders'),
+  publicKey('serumMarket'),
+  publicKey('serumProgramId'),
+  publicKey('ammTargetOrders'),
+  publicKey('ammQuantities'),
+  publicKey('poolWithdrawQueue'),
+  publicKey('poolTempLpTokenAccount'),
+  publicKey('ammOwner'),
+  publicKey('pnlOwner'),
+  publicKey('srmTokenAccount')
 ])

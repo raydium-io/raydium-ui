@@ -1,4 +1,9 @@
-import { LIQUIDITY_POOL_PROGRAM_ID_V2, SERUM_PROGRAM_ID_V2 } from './ids'
+import {
+  LIQUIDITY_POOL_PROGRAM_ID_V2,
+  LIQUIDITY_POOL_PROGRAM_ID_V3,
+  SERUM_PROGRAM_ID_V2,
+  SERUM_PROGRAM_ID_V3
+} from './ids'
 import { LP_TOKENS, NATIVE_SOL, TOKENS, TokenInfo } from './tokens'
 
 import { cloneDeep } from 'lodash-es'
@@ -64,11 +69,12 @@ export function getLpMintByTokenMintAddresses(
 ): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
-      (pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
-      (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)
+      ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
+        (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
+      pool.version === version
   )
 
-  if (pool && pool.version === version) {
+  if (pool) {
     return pool.lp.mintAddress
   }
 
@@ -92,10 +98,10 @@ export function getAddressForWhat(address: string) {
     for (const [key, value] of Object.entries(pool)) {
       if (key === 'lp') {
         if (value.mintAddress === address) {
-          return { key: 'lpMintAddress', lpMintAddress: pool.lp.mintAddress }
+          return { key: 'lpMintAddress', lpMintAddress: pool.lp.mintAddress, version: pool.version }
         }
       } else if (value === address) {
-        return { key, lpMintAddress: pool.lp.mintAddress }
+        return { key, lpMintAddress: pool.lp.mintAddress, version: pool.version }
       }
     }
   }
@@ -253,5 +259,30 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumPcVaultAccount: 'G8KH5rE5EqeTpnLjTTNgKhVp47yRHCN28wH27vYFkWCR',
     serumVaultSigner: 'EXZnYg9QCzujDwm621N286d4KLAZiMwpUv64GdECcxbm',
     nonce: 255
+  },
+  {
+    name: 'RAY-USDT',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDT },
+    lp: { ...LP_TOKENS['RAY-USDT-V3'] },
+
+    version: 3,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V3,
+
+    ammId: 'FEAkBF4GhYKrYbxMa7tFcujvzxKrueC7xHT2NdyC9vxm',
+    ammAuthority: 'CgvoNxNc93c91zYkPTAkBsYxjcAn8bRsnLM5ZxNKUpDj',
+    ammOpenOrders: '2nzyzD5sdDKkP5pN5V5HGDmacpQJPEkMHqA1vopuRupY',
+    ammTargetOrders: 'BYCxxFuPB6MjLmpBoA7XMXHKk87LP1V62HPFh5BaobBd',
+    ammQuantities: 'H8P2YR1MTFgcRKnGHYWk6Aitqf72aXCN3ZKM29mRQqqe',
+    poolCoinTokenAccount: 'DTQTBTSy3tiy7kZZWgaczWxs9snnTVTi8DBYBzjaVwbj',
+    poolPcTokenAccount: 'Bk2G4zhjB7VmRsaBwh2ijPwq6tavMHALEq4guogxsosT',
+    poolWithdrawQueue: '9JnsD9Pm8YQhMMAKBV7RgPcdVnRTuwJW5PXdWx7T2K8C',
+    poolTempLpTokenAccount: 'FfNM2Szi8xKWj3SUAjYpsHKuyQsd9NuW8ARkMqyNYPiJ',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'C4z32zw9WKaGPhNuU54ohzrV4CE1Uau3cFx6T8RLjxYC',
+    serumCoinVaultAccount: '6hCHQufQsxsHDkHYNmw79WvfsAGXvomdZnkzWN7MYz8f',
+    serumPcVaultAccount: '7qM644QyBzMvqLLiEYhJksyPzwUpuQj44EodLb1va8aG',
+    serumVaultSigner: '2hzqYES4AcwVkuMdNsNNqi1jqjfKSyL2BNus4kimVXNk',
+    nonce: 254
   }
 ]
