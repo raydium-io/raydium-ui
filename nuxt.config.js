@@ -5,7 +5,7 @@ const lessVariables = lessToJson('src/styles/variables.less')
 
 export default {
   server: {
-    host: '0'
+    host: '0.0.0.0'
   },
 
   srcDir: './src/',
