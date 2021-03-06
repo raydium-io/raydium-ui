@@ -171,6 +171,7 @@ import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { getOutAmount, swap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
+import { getUnixTs } from '@/utils'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -212,7 +213,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'swap', 'setting'])
+    ...mapState(['wallet', 'swap', 'url', 'setting'])
   },
 
   watch: {
@@ -481,6 +482,15 @@ export default Vue.extend({
     },
 
     placeOrder() {
+      this.swaping = true
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
       swap(
         // @ts-ignore
         this.$conn,
@@ -499,9 +509,31 @@ export default Vue.extend({
         get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
         this.fromCoinAmount,
         this.setting.slippage
-      ).then((txid) => {
-        console.log(txid)
-      })
+      )
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Swap failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.swaping = false
+        })
     }
   }
 })
