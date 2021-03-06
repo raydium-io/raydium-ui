@@ -39,6 +39,7 @@ export async function unstakeAll(
       rewardAccount,
       owner,
       farmInfo.reward.mintAddress,
+      null,
       transaction,
       signers
     )

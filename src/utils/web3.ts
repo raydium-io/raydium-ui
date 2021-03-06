@@ -25,6 +25,7 @@ export async function createTokenAccountIfNotExist(
   account: string | undefined | null,
   owner: PublicKey,
   mintAddress: string,
+  lamports: number | null,
 
   transaction: Transaction,
   signer: Array<Account>
@@ -39,6 +40,7 @@ export async function createTokenAccountIfNotExist(
       account,
       owner,
       TOKEN_PROGRAM_ID,
+      lamports,
       ACCOUNT_LAYOUT,
       transaction,
       signer
@@ -61,6 +63,7 @@ export async function createProgramAccountIfNotExist(
   account: string | undefined | null,
   owner: PublicKey,
   programId: PublicKey,
+  lamports: number | null,
   layout: any,
 
   transaction: Transaction,
@@ -78,7 +81,7 @@ export async function createProgramAccountIfNotExist(
       SystemProgram.createAccount({
         fromPubkey: owner,
         newAccountPubkey: publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(layout.span),
+        lamports: lamports ?? (await connection.getMinimumBalanceForRentExemption(layout.span)),
         space: layout.span,
         programId
       })

@@ -125,13 +125,30 @@
           v-else
           size="large"
           ghost
-          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !marketAddress"
+          :disabled="
+            !fromCoin ||
+            !fromCoinAmount ||
+            !toCoin ||
+            !marketAddress ||
+            !initialized ||
+            loading ||
+            gt(fromCoinAmount, fromCoin.balance.fixed()) ||
+            gt(toCoinAmount, toCoin.balance.fixed()) ||
+            swaping
+          "
+          :loading="swaping"
           @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-else-if="!marketAddress || !initialized"> Insufficient liquidity for this trade </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-          <template v-else-if="!marketAddress"> Insufficient liquidity for this trade </template>
-          <template v-else-if="fromCoinAmount > fromCoin.balance"> Insufficient BNB balance </template>
+          <template v-else-if="loading"> Updating price information </template>
+          <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
+            Insufficient {{ fromCoin.symbol }} balance
+          </template>
+          <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
+            Insufficient {{ toCoin.symbol }} balance
+          </template>
           <template v-else>Swap</template>
         </Button>
       </div>
@@ -145,11 +162,15 @@ import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
-import { Orderbook } from '@project-serum/serum/lib/market.js'
+import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
-import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
+import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
+import { PublicKey } from '@solana/web3.js'
+import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
+import { getOutAmount, swap } from '@/utils/swap'
+import { TokenAmount, gt } from '@/utils/safe-math'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -165,6 +186,8 @@ export default Vue.extend({
     return {
       autoRefreshTime: 60,
       countdown: 0,
+      marketTimer: null as any,
+      initialized: false,
       loading: false,
       // swap ing
       swaping: false,
@@ -183,12 +206,13 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
+      market: null as any,
       marketAddress: ''
     }
   },
 
   computed: {
-    ...mapState(['wallet', 'swap'])
+    ...mapState(['wallet', 'swap', 'setting'])
   },
 
   watch: {
@@ -197,6 +221,8 @@ export default Vue.extend({
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
           this.fromCoinAmount = oldAmount
+        } else {
+          this.updateAmounts()
         }
       })
     },
@@ -206,6 +232,8 @@ export default Vue.extend({
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
           this.toCoinAmount = oldAmount
+        } else {
+          this.updateAmounts()
         }
       })
     },
@@ -226,14 +254,30 @@ export default Vue.extend({
     // 监听选择币种变动
     toCoin() {
       this.findMarket()
+    },
+
+    marketAddress() {
+      this.updateAmounts()
+    },
+
+    asks() {
+      this.updateAmounts()
+    },
+
+    bids() {
+      this.updateAmounts()
     }
   },
 
   mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
+
+    this.setMarketTimer()
   },
 
   methods: {
+    gt,
+
     openFromCoinSelect() {
       this.selectFromCoin = true
       this.coinSelectShow = true
@@ -310,11 +354,19 @@ export default Vue.extend({
         for (const address of Object.keys(this.swap.markets)) {
           const info = cloneDeep(this.swap.markets[address])
 
+          let fromMint = this.fromCoin.mintAddress
+          let toMint = this.toCoin.mintAddress
+
+          if (fromMint === NATIVE_SOL.mintAddress) {
+            fromMint = TOKENS.WSOL.mintAddress
+          }
+          if (toMint === NATIVE_SOL.mintAddress) {
+            toMint = TOKENS.WSOL.mintAddress
+          }
+
           if (
-            (info.baseMint.toBase58() === this.fromCoin.mintAddress &&
-              info.quoteMint.toBase58() === this.toCoin.mintAddress) ||
-            (info.baseMint.toBase58() === this.toCoin.mintAddress &&
-              info.quoteMint.toBase58() === this.fromCoin.mintAddress)
+            (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
+            (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
           ) {
             marketAddress = address
           }
@@ -324,49 +376,133 @@ export default Vue.extend({
           // 处理 老的和新的市场一样
           if (this.marketAddress !== marketAddress) {
             this.marketAddress = marketAddress
+            // @ts-ignore
+            Market.load(this.$conn, new PublicKey(marketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
+              (market) => {
+                this.market = market
+                this.getOrderBooks()
+              }
+            )
+
             // this.unsubPoolChange()
             // this.subPoolChange()
           }
         } else {
           this.marketAddress = ''
+          this.market = null
           // this.unsubPoolChange()
         }
       } else {
         this.marketAddress = ''
+        this.market = null
         // this.unsubPoolChange()
       }
     },
 
     getOrderBooks() {
       this.loading = true
+      this.countdown = this.autoRefreshTime
 
+      // @ts-ignore
       const conn = this.$conn
 
-      const marketInfo = get(this.swap.markets, this.marketAddress)
-      const { bids, asks } = marketInfo
+      if (this.marketAddress) {
+        const marketInfo = get(this.swap.markets, this.marketAddress)
+        const { bids, asks } = marketInfo
 
-      getMultipleAccounts(conn, [bids, asks], commitment)
-        .then((infos) => {
-          infos.forEach((info) => {
-            const data = info.account.data
+        getMultipleAccounts(conn, [bids, asks], commitment)
+          .then((infos) => {
+            infos.forEach((info) => {
+              // @ts-ignore
+              const data = info.account.data
 
-            const orderbook = Orderbook.decode(marketInfo, data)
+              const orderbook = Orderbook.decode(marketInfo, data)
 
-            const { isBids, slab } = orderbook
+              const { isBids, slab } = orderbook
 
-            if (isBids) {
-              this.bids = slab
-            } else {
-              this.asks = slab
-            }
+              if (isBids) {
+                this.bids = slab
+              } else {
+                this.asks = slab
+              }
+            })
           })
-        })
-        .finally(() => {
-          this.loading = false
-        })
+          .finally(() => {
+            this.initialized = true
+            this.loading = false
+            this.countdown = 0
+          })
+      }
     },
 
-    placeOrder() {}
+    // 更新输入价格
+    updateAmounts() {
+      if (
+        this.fromCoin &&
+        this.toCoin &&
+        this.marketAddress &&
+        this.market &&
+        this.asks &&
+        this.bids &&
+        this.fromCoinAmount
+      ) {
+        const { amountOut } = getOutAmount(
+          this.market,
+          this.asks,
+          this.bids,
+          this.fromCoin.mintAddress,
+          this.toCoin.mintAddress,
+          this.fromCoinAmount,
+          this.setting.slippage
+        )
+
+        const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
+
+        if (out.isNullOrZero()) {
+          this.toCoinAmount = ''
+        } else {
+          this.toCoinAmount = out.fixed()
+        }
+      }
+    },
+
+    setMarketTimer() {
+      this.marketTimer = setInterval(() => {
+        if (!this.loading) {
+          if (this.countdown < this.autoRefreshTime) {
+            this.countdown += 1
+
+            if (this.countdown === this.autoRefreshTime) {
+              this.getOrderBooks()
+            }
+          }
+        }
+      }, 1000)
+    },
+
+    placeOrder() {
+      swap(
+        // @ts-ignore
+        this.$conn,
+        // @ts-ignore
+        this.$wallet,
+        this.market,
+        this.asks,
+        this.bids,
+        // @ts-ignore
+        this.fromCoin.mintAddress,
+        // @ts-ignore
+        this.toCoin.mintAddress,
+        // @ts-ignore
+        get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+        // @ts-ignore
+        get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+        this.fromCoinAmount,
+        this.setting.slippage
+      ).then((txid) => {
+        console.log(txid)
+      })
+    }
   }
 })
 </script>

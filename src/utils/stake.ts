@@ -34,6 +34,7 @@ export async function deposit(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
+    null,
     transaction,
     signers
   )
@@ -45,6 +46,7 @@ export async function deposit(
     infoAccount,
     owner,
     programId,
+    null,
     USER_STAKE_INFO_ACCOUNT_LAYOUT,
     transaction,
     signers
@@ -96,6 +98,7 @@ export async function withdraw(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
+    null,
     transaction,
     signers
   )

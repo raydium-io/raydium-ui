@@ -133,8 +133,8 @@
             !lpMintAddress ||
             !liquidity.initialized ||
             liquidity.loading ||
-            gt(fromCoinAmount, fromCoin.balance) ||
-            gt(toCoinAmount, toCoin.balance) ||
+            gt(fromCoinAmount, fromCoin.balance.fixed()) ||
+            gt(toCoinAmount, toCoin.balance.fixed()) ||
             suppling
           "
           :loading="suppling"
@@ -144,10 +144,12 @@
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance)">
+          <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance)"> Insufficient {{ toCoin.symbol }} balance </template>
+          <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
+            Insufficient {{ toCoin.symbol }} balance
+          </template>
           <template v-else>Supply</template>
         </Button>
       </div>

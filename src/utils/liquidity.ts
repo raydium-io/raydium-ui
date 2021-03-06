@@ -125,6 +125,7 @@ export async function addLiquidity(
       wrappedSolAccount,
       owner,
       TOKENS.WSOL.mintAddress,
+      null,
       transaction,
       signers
     )
@@ -136,6 +137,7 @@ export async function addLiquidity(
     lpAccount,
     owner,
     poolInfo.lp.mintAddress,
+    null,
     transaction,
     signers
   )
@@ -210,6 +212,7 @@ export async function removeLiquidity(
       wrappedSolAccount,
       owner,
       TOKENS.WSOL.mintAddress,
+      null,
       transaction,
       signers
     )
