@@ -118,7 +118,25 @@
           "
           @onSelect="openToCoinSelect"
         />
-
+        <div
+          class="price-base fc-container"
+          v-if="
+            this.fromCoin &&
+            this.toCoin &&
+            this.marketAddress &&
+            this.market &&
+            this.asks &&
+            this.bids &&
+            this.fromCoinAmount
+          "
+        >
+          <span>
+            1 {{ fromCoin.symbol }} ≈
+            {{ outToPirceValue }}
+            {{ toCoin.symbol }}
+          </span>
+          <Icon type="swap" @click="() => (coinBasePrice = !coinBasePrice)" />
+        </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
           Connect Wallet
         </Button>
@@ -205,7 +223,10 @@ export default Vue.extend({
       toCoinAmount: '',
 
       market: null as any,
-      marketAddress: ''
+      marketAddress: '',
+      // coin 为基准货币
+      coinBasePrice: true,
+      outToPirceValue: null as any
     }
   },
 
@@ -460,6 +481,11 @@ export default Vue.extend({
           this.toCoinAmount = ''
         } else {
           this.toCoinAmount = out.fixed()
+          this.outToPirceValue = new TokenAmount(
+            amountOut / parseFloat(this.fromCoinAmount),
+            this.toCoin.decimals,
+            false
+          ).format()
         }
       }
     },

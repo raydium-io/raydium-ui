@@ -20,7 +20,11 @@
             >
           </div>
           <div class="button_div_line button_div" style="display: inline-block">
-            <a href="https://raydium.gitbook.io/raydium/" style="display: inline-block; width: 100%; height: 100%">
+            <a
+              href="https://raydium.gitbook.io/raydium/"
+              target="_blank"
+              style="display: inline-block; width: 100%; height: 100%"
+            >
               <div class="" style="padding: 0; height: 100%">
                 <div class="button_font">READ MORE</div>
               </div></a
