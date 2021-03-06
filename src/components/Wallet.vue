@@ -91,7 +91,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'price', 'liquidity', 'farm'])
+    ...mapState(['wallet', 'price', 'swap', 'liquidity', 'farm'])
   },
 
   mounted() {
@@ -99,6 +99,7 @@ export default Vue.extend({
     Vue.prototype.$conn = conn
 
     this.$store.dispatch('price/requestPrices')
+    this.$store.dispatch('swap/getMarkets')
     this.$store.dispatch('liquidity/requestInfos')
     this.$store.dispatch('farm/requestInfos')
 

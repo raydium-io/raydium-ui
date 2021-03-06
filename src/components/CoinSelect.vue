@@ -1,7 +1,7 @@
 <template>
   <Modal title="Select a token" :visible="true" :footer="null" @cancel="$emit('onClose')">
     <div class="select-token">
-      <input placeholder="Search name" />
+      <input v-model="keyword" placeholder="Search name" />
       <div class="sort fs-container">
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
@@ -48,6 +48,7 @@ export default Vue.extend({
 
   data() {
     return {
+      keyword: '',
       tokenList: [] as Array<TokenInfo>,
       desc: false
     }
@@ -58,6 +59,10 @@ export default Vue.extend({
   },
 
   watch: {
+    keyword(newKeyword) {
+      this.createTokenList(newKeyword)
+    },
+
     'wallet.tokenAccounts': {
       handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
         this.createTokenList()
@@ -73,8 +78,8 @@ export default Vue.extend({
   methods: {
     importIcon,
 
-    createTokenList() {
-      this.tokenList = []
+    createTokenList(keyword = '') {
+      let tokenList = []
 
       let ray = {}
       let nativeSol = cloneDeep(NATIVE_SOL)
@@ -121,10 +126,16 @@ export default Vue.extend({
 
       // 正序 或 倒序
       if (!this.desc) {
-        this.tokenList = [...[ray, nativeSol], ...hasBalance, ...noBalance]
+        tokenList = [...[ray, nativeSol], ...hasBalance, ...noBalance]
       } else {
-        this.tokenList = [...[ray, nativeSol], ...noBalance.reverse(), ...hasBalance]
+        tokenList = [...[ray, nativeSol], ...noBalance.reverse(), ...hasBalance]
       }
+
+      if (keyword) {
+        tokenList = tokenList.filter((token) => token.symbol.includes(keyword.toUpperCase()))
+      }
+
+      this.tokenList = cloneDeep(tokenList)
     },
 
     setDesc() {

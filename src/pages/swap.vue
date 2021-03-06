@@ -3,11 +3,24 @@
     <div class="page-head fs-container">
       <span class="title">Swap</span>
       <div class="buttons">
-        <Tooltip placement="bottomRight">
+        <Tooltip v-if="marketAddress" placement="bottomRight">
           <template slot="title">
-            <span>Quote auto refresh countdown</span>
+            <span>
+              Quote auto refresh countdown after
+              {{ autoRefreshTime - countdown }} seconds, you can click to update manually
+            </span>
+            <br />
+            <span> Automatically refreshes when the current pool had changed </span>
           </template>
-          <Progress type="circle" :width="20" :stroke-width="10" :percent="30" :show-info="false" />
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / autoRefreshTime) * countdown"
+            :show-info="false"
+            :class="marketAddress && loading ? 'disabled' : ''"
+            @click="getOrderBooks"
+          />
         </Tooltip>
         <Tooltip placement="bottomRight">
           <template slot="title">
@@ -35,6 +48,17 @@
                   <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
                 </div>
               </div>
+              <div v-if="marketAddress" class="info">
+                <div class="symbol">Market</div>
+                <div class="address">
+                  {{ marketAddress.substr(0, 14) }}
+                  ...
+                  {{ marketAddress.substr(marketAddress.length - 14, 14) }}
+                </div>
+                <div class="action">
+                  <Icon type="copy" @click="$store.dispatch('app/copy', marketAddress)" />
+                </div>
+              </div>
             </div>
           </template>
           <Icon type="info-circle" />
@@ -53,7 +77,17 @@
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
-          @onMax="() => (fromCoinAmount = fromCoin.balance.fixed())"
+          @onFocus="
+            () => {
+              fixedFromCoin = true
+            }
+          "
+          @onMax="
+            () => {
+              fixedFromCoin = true
+              fromCoinAmount = fromCoin.balance.fixed()
+            }
+          "
           @onSelect="openFromCoinSelect"
         />
 
@@ -68,9 +102,19 @@
           label="To (Estimate)"
           :coin-name="toCoin ? toCoin.symbol : ''"
           :balance="toCoin ? toCoin.balance : null"
-          :show-max="false"
           :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
+          @onFocus="
+            () => {
+              fixedFromCoin = false
+            }
+          "
+          @onMax="
+            () => {
+              fixedFromCoin = false
+              toCoinAmount = toCoin.balance.fixed()
+            }
+          "
           @onSelect="openToCoinSelect"
         />
 
@@ -81,12 +125,12 @@
           v-else
           size="large"
           ghost
-          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !swapPool"
-          @click="swap"
+          :disabled="!fromCoin || !fromCoinAmount || !toCoin || !marketAddress"
+          @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
-          <template v-else-if="!swapPool"> Insufficient liquidity for this trade </template>
+          <template v-else-if="!marketAddress"> Insufficient liquidity for this trade </template>
           <template v-else-if="fromCoinAmount > fromCoin.balance"> Insufficient BNB balance </template>
           <template v-else>Swap</template>
         </Button>
@@ -100,9 +144,12 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 
+import { cloneDeep, get } from 'lodash-es'
+import { Orderbook } from '@project-serum/serum/lib/market.js'
+
 import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { cloneDeep } from 'lodash-es'
+import { getMultipleAccounts, commitment } from '@/utils/web3'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -116,9 +163,19 @@ export default Vue.extend({
 
   data() {
     return {
+      autoRefreshTime: 60,
+      countdown: 0,
+      loading: false,
+      // swap ing
+      swaping: false,
+      asks: {} as any,
+      bids: {} as any,
+
       coinSelectShow: false,
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
+      // 哪个币种的金额固定，从而动态计算另一个
+      fixedFromCoin: true,
 
       // 已选择的币种
       fromCoin: RAY as TokenInfo | null,
@@ -126,15 +183,16 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      swapPool: null
+      marketAddress: ''
     }
   },
 
   computed: {
-    ...mapState(['wallet'])
+    ...mapState(['wallet', 'swap'])
   },
 
   watch: {
+    // 监听输入金额变动
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
@@ -143,6 +201,7 @@ export default Vue.extend({
       })
     },
 
+    // 监听输入金额变动
     toCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
@@ -151,11 +210,22 @@ export default Vue.extend({
       })
     },
 
+    // 监听钱包余额变动
     'wallet.tokenAccounts': {
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
       },
       deep: true
+    },
+
+    // 监听选择币种变动
+    fromCoin() {
+      this.findMarket()
+    },
+
+    // 监听选择币种变动
+    toCoin() {
+      this.findMarket()
     }
   },
 
@@ -233,9 +303,70 @@ export default Vue.extend({
       }
     },
 
-    getAllMarkets() {},
+    findMarket() {
+      if (this.fromCoin && this.toCoin) {
+        let marketAddress = ''
 
-    swap() {}
+        for (const address of Object.keys(this.swap.markets)) {
+          const info = cloneDeep(this.swap.markets[address])
+
+          if (
+            (info.baseMint.toBase58() === this.fromCoin.mintAddress &&
+              info.quoteMint.toBase58() === this.toCoin.mintAddress) ||
+            (info.baseMint.toBase58() === this.toCoin.mintAddress &&
+              info.quoteMint.toBase58() === this.fromCoin.mintAddress)
+          ) {
+            marketAddress = address
+          }
+        }
+
+        if (marketAddress) {
+          // 处理 老的和新的市场一样
+          if (this.marketAddress !== marketAddress) {
+            this.marketAddress = marketAddress
+            // this.unsubPoolChange()
+            // this.subPoolChange()
+          }
+        } else {
+          this.marketAddress = ''
+          // this.unsubPoolChange()
+        }
+      } else {
+        this.marketAddress = ''
+        // this.unsubPoolChange()
+      }
+    },
+
+    getOrderBooks() {
+      this.loading = true
+
+      const conn = this.$conn
+
+      const marketInfo = get(this.swap.markets, this.marketAddress)
+      const { bids, asks } = marketInfo
+
+      getMultipleAccounts(conn, [bids, asks], commitment)
+        .then((infos) => {
+          infos.forEach((info) => {
+            const data = info.account.data
+
+            const orderbook = Orderbook.decode(marketInfo, data)
+
+            const { isBids, slab } = orderbook
+
+            if (isBids) {
+              this.bids = slab
+            } else {
+              this.asks = slab
+            }
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
+
+    placeOrder() {}
   }
 })
 </script>

@@ -3,7 +3,7 @@
     <div class="page-head fs-container">
       <span class="title">Add Liquidity</span>
       <div class="buttons">
-        <Tooltip v-if="activeTab === 'add' && lpMintAddress" placement="bottomRight">
+        <Tooltip v-if="lpMintAddress" placement="bottomRight">
           <template slot="title">
             <span>
               Quote auto refresh countdown after
@@ -22,7 +22,7 @@
             @click="$store.dispatch('liquidity/requestInfos')"
           />
         </Tooltip>
-        <Tooltip v-if="activeTab === 'add'" placement="bottomRight">
+        <Tooltip placement="bottomRight">
           <template slot="title">
             <p>Addresses</p>
             <div class="swap-info">
@@ -193,7 +193,6 @@ export default Vue.extend({
 
   data() {
     return {
-      activeTab: 'add',
       // supply ing
       suppling: false,
 
@@ -343,8 +342,6 @@ export default Vue.extend({
 
             if (fixRoute) {
               this.$router.replace({ path: '/liquidity' })
-            } else {
-              this.activeTab = 'add'
             }
 
             return
