@@ -48,7 +48,7 @@
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Apy</div>
-                <div class="value"></div>
+                <div class="value">{{ farm.farmInfo.apy }}</div>
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Liquidity</div>
@@ -172,7 +172,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'farm', 'url'])
+    ...mapState(['wallet', 'farm', 'url', 'price', 'liquidity'])
   },
 
   watch: {
@@ -215,7 +215,24 @@ export default Vue.extend({
         if (farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
-          const { rewardPerShareNet } = farmInfo.poolInfo
+          const { rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo
+          // @ts-ignore
+          const { reward, lp } = farmInfo
+
+          const rewardPerBlockAmount = new TokenAmount(rewardPerBlock.toNumber(), reward.decimals)
+          const rewardPerBlockAmountTotalValue =
+            rewardPerBlockAmount.toEther().toNumber() * 2 * 60 * 60 * 24 * 365 * get(this.price.prices, lp.symbol)
+
+          const liquidityItemValue = get(this.price.prices, lp.symbol)
+
+          const apy = (
+            (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
+            100
+          ).toFixed(2)
+          const newFarmInfo = cloneDeep(farmInfo)
+          // @ts-ignore
+          newFarmInfo.apy = apy
+          console.log(apy)
 
           if (userInfo) {
             userInfo = cloneDeep(userInfo)
@@ -239,7 +256,7 @@ export default Vue.extend({
 
           farms.push({
             userInfo,
-            farmInfo
+            farmInfo: newFarmInfo
           })
         }
       }

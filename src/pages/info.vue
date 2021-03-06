@@ -287,9 +287,11 @@ export default Vue.extend({
     liquidity_infos_flush() {
       let valueData = 0
       for (const itemInfo of Object.values(this.liquidity.infos)) {
-        valueData += (itemInfo as any).coin.balance.wei * this.price.prices[(itemInfo as any).coin.symbol] * 2
+        valueData +=
+          ((itemInfo as any).coin.balance.wei * this.price.prices[(itemInfo as any).coin.symbol] * 2) /
+          (itemInfo as any).coin.balance.decimals
       }
-      this.tvl_farm = valueData / 10 ** 6
+      this.tvl_farm = valueData
     },
     price_prices_flush() {
       this.ray_price = this.price.prices?.RAY
@@ -298,7 +300,9 @@ export default Vue.extend({
       let stakeData = 0
       for (const item of Object.values(this.farm.infos)) {
         if ((item as any).isStake) {
-          stakeData += ((item as any).lp.balance.wei / 10 ** 6) * this.price.prices[(item as any).name]
+          stakeData +=
+            ((item as any).lp.balance.wei / 10 ** (item as any).lp.balance.decimals) *
+            this.price.prices[(item as any).name]
         }
       }
       this.tvl_stake = stakeData
