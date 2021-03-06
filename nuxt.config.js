@@ -27,7 +27,7 @@ export default {
         name: 'viewport',
         content: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no'
       },
-      { hid: 'description', name: 'description', content: '' }
+      { hid: 'description', name: 'description', content: 'An avenue for the evolution of DeFi' }
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
