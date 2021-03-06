@@ -366,5 +366,23 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'FdhKXYjCou2jQfgKWcNY7jb8F2DPLU1teTTTRfLBD2v1',
     decimals: 6
+  },
+  'RAY-USDC-V3': {
+    symbol: 'RAY-USDC',
+    name: 'RAY-USDC LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'BZFGfXMrjG2sS7QT2eiCDEevPFnkYYF7kzJpWfYxPbcx',
+    decimals: 6
+  },
+  'RAY-SRM-V3': {
+    symbol: 'RAY-SRM',
+    name: 'RAY-SRM LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'DSX5E21RE9FB9hM8Nh8xcXQfPK6SzRaJiywemHBSsfup',
+    decimals: 6
   }
 }

@@ -50,7 +50,7 @@
                 </Col>
                 <Col class="state" :span="4">
                   <div class="title">Apy</div>
-                  <div class="value"></div>
+                  <div class="value">{{ farm.farmInfo.apy }}%</div>
                 </Col>
                 <Col class="state" :span="4">
                   <div class="title">Liquidity</div>
@@ -273,36 +273,41 @@ export default Vue.extend({
           const { rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo
           // @ts-ignore
           const { reward, lp } = farmInfo
-          const rewardPerBlockAmount = new TokenAmount(rewardPerBlock.toNumber(), reward.decimals)
-          const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
 
-          const rewardPerBlockAmountTotalValue =
-            rewardPerBlockAmount.toEther().toNumber() *
-            2 *
-            60 *
-            60 *
-            24 *
-            365 *
-            this.price.prices[liquidityItem?.coin.symbol as string]
-
-          const liquidityCoinValue =
-            (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
-            this.price.prices[liquidityItem?.coin.symbol as string]
-          const liquidityPcValue =
-            (liquidityItem?.pc.balance as TokenAmount).toEther().toNumber() *
-            this.price.prices[liquidityItem?.pc.symbol as string]
-
-          const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
-          const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
-          const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
-
-          const apy = (
-            (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
-            100
-          ).toFixed(2)
           const newFarmInfo = cloneDeep(farmInfo)
-          // @ts-ignore
-          newFarmInfo.apy = apy
+
+          if (reward && lp) {
+            const rewardPerBlockAmount = new TokenAmount(rewardPerBlock.toNumber(), reward.decimals)
+            const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
+
+            const rewardPerBlockAmountTotalValue =
+              rewardPerBlockAmount.toEther().toNumber() *
+              2 *
+              60 *
+              60 *
+              24 *
+              365 *
+              this.price.prices[liquidityItem?.coin.symbol as string]
+
+            const liquidityCoinValue =
+              (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
+              this.price.prices[liquidityItem?.coin.symbol as string]
+            const liquidityPcValue =
+              (liquidityItem?.pc.balance as TokenAmount).toEther().toNumber() *
+              this.price.prices[liquidityItem?.pc.symbol as string]
+
+            const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
+            const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
+            const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
+
+            const apy = (
+              (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
+              100
+            ).toFixed(2)
+
+            // @ts-ignore
+            newFarmInfo.apy = apy
+          }
 
           if (userInfo) {
             userInfo = cloneDeep(userInfo)
@@ -612,9 +617,16 @@ export default Vue.extend({
 
 <style lang="less">
 .farm {
-  .ant-collapse-header,
   .farm-head {
     padding: 24px 32px !important;
+  }
+
+  .ant-collapse-header {
+    padding: 0 !important;
+
+    .farm-head {
+      padding: 24px 32px !important;
+    }
   }
 
   .ant-collapse-content {

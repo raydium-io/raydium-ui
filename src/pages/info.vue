@@ -240,10 +240,6 @@ export default Vue.extend({
 
   layout: 'no_head',
 
-  computed: {
-    ...mapState(['wallet', 'liquidity', 'price', 'farm'])
-  },
-
   data() {
     return {
       ray_price: 0,
@@ -252,6 +248,10 @@ export default Vue.extend({
       timer: null as any,
       tvl_stake: 0
     }
+  },
+
+  computed: {
+    ...mapState(['wallet', 'liquidity', 'price', 'farm'])
   },
 
   watch: {
@@ -273,6 +273,10 @@ export default Vue.extend({
       },
       deep: true
     }
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timer)
   },
 
   mounted() {
@@ -316,9 +320,6 @@ export default Vue.extend({
           this.hour_volume_24 = parseFloat(res.data)
         })
     }
-  },
-  beforeDestroy() {
-    clearInterval(this.timer)
   }
 })
 </script>

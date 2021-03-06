@@ -232,7 +232,6 @@ export default Vue.extend({
           const newFarmInfo = cloneDeep(farmInfo)
           // @ts-ignore
           newFarmInfo.apy = apy
-          console.log(apy)
 
           if (userInfo) {
             userInfo = cloneDeep(userInfo)
