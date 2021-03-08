@@ -240,7 +240,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      removeLiquidity(conn, wallet, poolInfo, lpAccount, fromCoinAccount, toCoinAccount, lpBalance.format())
+      removeLiquidity(conn, wallet, poolInfo, lpAccount, fromCoinAccount, toCoinAccount, lpBalance.fixed())
         .then((txid) => {
           ;(this as any).$notify.info({
             key,
