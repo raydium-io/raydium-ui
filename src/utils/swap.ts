@@ -1,7 +1,7 @@
 import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
 import { Market, OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from '@project-serum/serum/lib/market'
 // eslint-disable-next-line
-import { NATIVE_SOL, TOKENS } from './tokens'
+import { NATIVE_SOL, TOKENS, getTokenByMintAddress } from './tokens'
 import {
   createProgramAccountIfNotExist,
   createTokenAccountIfNotExist,
@@ -241,11 +241,20 @@ export async function swap(
   const baseTokenAccount = userAccounts[0]
   const quoteTokenAccount = userAccounts[1]
 
+  let referrerQuoteWallet: PublicKey | null = null
+  if (market.supportsReferralFees) {
+    const quoteToken = getTokenByMintAddress(market.quoteMintAddress.toBase58())
+    if (quoteToken?.referrer) {
+      referrerQuoteWallet = new PublicKey(quoteToken?.referrer)
+    }
+  }
+
   const settleTransactions = await market.makeSettleFundsTransaction(
     connection,
     new OpenOrders(openOrdersAddress, { owner }, new PublicKey(SERUM_PROGRAM_ID_V3)),
     baseTokenAccount,
-    quoteTokenAccount
+    quoteTokenAccount,
+    referrerQuoteWallet
   )
 
   return await sendTransaction(connection, wallet, mergeTransactions([transaction, settleTransactions.transaction]), [

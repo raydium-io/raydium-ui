@@ -47,6 +47,7 @@ import {
 import SolanaWallet from '@project-serum/sol-wallet-adapter'
 
 import SolongWallet from '@/utils/solong-wallet'
+import Coin98Wallet from '@/utils/coin98-wallet'
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
@@ -75,9 +76,9 @@ export default Vue.extend({
         Sollet: 'https://www.sollet.io',
         // Solflare: 'https://solflare.com/access-wallet',
         Bonfida: 'https://bonfida.com/wallet'
-        // ezDeFi: '',
         // https://docs.coin98.app/coin98-extension/developer-guide
         // Coin98: ''
+        // ezDeFi: '',
       } as Wallets,
 
       // 自动刷新倒计时
@@ -156,7 +157,7 @@ export default Vue.extend({
             return
           }
 
-          wallet = new SolanaWallet((window as any).coin98, this.wallet.endpoint)
+          wallet = new Coin98Wallet(this.wallet.endpoint)
           break
         }
         default: {

@@ -49,8 +49,8 @@
                   </div>
                 </Col>
                 <Col class="state" :span="4">
-                  <div class="title">Apy</div>
-                  <div class="value">{{ farm.farmInfo.apy }}%</div>
+                  <div class="title">Apr</div>
+                  <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
                 <Col class="state" :span="4">
                   <div class="title">Liquidity</div>
@@ -60,7 +60,7 @@
 
               <Row :gutter="48">
                 <Col :span="4">
-                  Add
+                  <p>Add liquidity:</p>
                   <NuxtLink
                     :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
                   >
@@ -161,8 +161,8 @@
                   </div>
                 </Col>
                 <Col class="state" :span="4">
-                  <div class="title">Apy</div>
-                  <div class="value">{{ farm.farmInfo.apy }}%</div>
+                  <div class="title">Apr</div>
+                  <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
                 <Col class="fc-container">
                   <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
@@ -300,13 +300,13 @@ export default Vue.extend({
             const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
             const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
 
-            const apy = (
+            const apr = (
               (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
               100
             ).toFixed(2)
 
             // @ts-ignore
-            newFarmInfo.apy = apy
+            newFarmInfo.apr = apr
           }
 
           if (userInfo) {
@@ -611,6 +611,10 @@ export default Vue.extend({
         line-height: 24px;
       }
     }
+  }
+
+  p {
+    margin-bottom: 0;
   }
 }
 </style>

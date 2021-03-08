@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import { PublicKey } from '@solana/web3.js'
 
-export default class SolongWallet extends EventEmitter {
+export default class Coin98Wallet extends EventEmitter {
   _publicKey: any
   _onProcess: boolean
   // eslint-disable-next-line
@@ -18,7 +18,7 @@ export default class SolongWallet extends EventEmitter {
   }
 
   async signTransaction(transaction: any) {
-    const trx = await (window as any).solong.signTransaction(transaction).catch(() => {
+    const trx = await (window as any).coin98.signTransaction(transaction).catch(() => {
       throw new Error('User reject sign request')
     })
     return trx
@@ -30,10 +30,15 @@ export default class SolongWallet extends EventEmitter {
     }
 
     this._onProcess = true
-    ;(window as any).solong
-      .selectAccount()
-      .then((account: any) => {
-        this._publicKey = new PublicKey(account)
+    ;(window as any).coin98
+      .connect({
+        name: 'Raydium',
+        logo: ''
+      })
+      .then((event: any) => {
+        const { data } = event.detail
+        const address = data[0].address
+        this._publicKey = new PublicKey(address)
         this.emit('connect', this._publicKey)
       })
       .catch(() => {

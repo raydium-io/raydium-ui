@@ -47,8 +47,8 @@
                 </div>
               </Col>
               <Col class="state" :span="4">
-                <div class="title">Apy</div>
-                <div class="value">{{ farm.farmInfo.apy }}</div>
+                <div class="title">Apr</div>
+                <div class="value">{{ farm.farmInfo.apr }}%</div>
               </Col>
               <Col class="state" :span="4">
                 <div class="title">Liquidity</div>
@@ -225,13 +225,13 @@ export default Vue.extend({
 
           const liquidityItemValue = get(this.price.prices, lp.symbol)
 
-          const apy = (
+          const apr = (
             (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
             100
           ).toFixed(2)
           const newFarmInfo = cloneDeep(farmInfo)
           // @ts-ignore
-          newFarmInfo.apy = apy
+          newFarmInfo.apr = apr
 
           if (userInfo) {
             userInfo = cloneDeep(userInfo)
