@@ -79,7 +79,7 @@ export const TOKENS: Tokens = {
     name: 'Wrapped Solana',
     mintAddress: 'So11111111111111111111111111111111111111112',
     decimals: 9,
-    referrer: 'HrY9PEaTvVrCwzjNqHdPqEB4KMQec8k7cttdrCsBdGbM'
+    referrer: '3rEtFGNAL39KP6pbFHQtvKQqJNoZ1cVHDdWELkz5jMxU'
   },
   BTC: {
     symbol: 'BTC',
