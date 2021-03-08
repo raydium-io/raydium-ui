@@ -3,10 +3,12 @@
     <div class="big_div image_div">
       <img src="../assets/background/info_background.svg" class="image" />
       <div class="node_div" style="padding-top: 70px">
-        <img src="../assets/icons/logo-text.svg" width="260" height="80" />
+        <a href="/">
+          <img src="../assets/icons/logo-text.svg" width="260" height="80" />
+        </a>
       </div>
     </div>
-    <div class="big_div" style="padding-top: 100px; padding-bottom: 120px">
+    <div class="big_div" style="padding-top: 100px; padding-bottom: 120px; background: #131a35">
       <div class="node_div">
         <div class="font_center">
           <div class="data_div">
@@ -38,11 +40,11 @@
           <div style="clear: both"></div>
         </div>
         <div style="font-size: 65px; padding-top: 100px" class="font_color_1">Raydium</div>
-        <div style="font-size: 32px; width: 950px">
+        <div style="font-size: 32px; width: 950px" class="font_color_3">
           Raydium is an on-chain order book automated market maker (AMM) that enables lightning-fast trades, shared
           liquidity and new features for earning yield.
         </div>
-        <div style="font-size: 20px; width: 850px; padding-top: 25px">
+        <div style="font-size: 20px; width: 850px; padding-top: 25px" class="font_color_2">
           Raydium provides on-chain liquidity to Serum's central limit order book, meaning that Raydium's users and
           liquidity pools have access to the order flow and liquidity of the entire Serum ecosystem, and vice versa. All
           of this is supercharged by building on Solana, an incredibly fast and efficient blockchain.
@@ -324,19 +326,6 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.container {
-  max-width: 450px;
-
-  .change-side {
-    div {
-      height: 32px;
-      width: 32px;
-      border-radius: 50%;
-      background: #000829;
-      cursor: pointer;
-    }
-  }
-}
 .big_div {
   width: 100%;
 }
@@ -395,7 +384,7 @@ export default Vue.extend({
     height: 780.35px;
     right: 0;
     top: 0;
-    z-index: -1;
+    z-index: 1;
   }
   .image2 {
     position: absolute;

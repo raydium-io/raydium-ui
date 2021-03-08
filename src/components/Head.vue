@@ -1,6 +1,6 @@
 <template>
   <Header class="header fs-container" :class="app.isMobile ? 'mobile' : ''">
-    <img class="logo" src="@/assets/icons/logo-text.svg" />
+    <a href="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></a>
 
     <div v-if="app.isMobile ? (navOpened ? true : false) : true" :class="app.isMobile ? 'mobile-nav' : ''">
       <Nav @onSelect="() => (navOpened = false)" />
