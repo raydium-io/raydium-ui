@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="big_div image_div">
+    <div class="big_div image_div" style="background: rgb(19, 26, 53)">
       <img src="../assets/background/info_background.svg" class="image" />
       <div class="node_div" style="padding-top: 70px">
         <a href="/">
