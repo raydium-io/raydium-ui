@@ -79,7 +79,7 @@ export const TOKENS: Tokens = {
     name: 'Wrapped Solana',
     mintAddress: 'So11111111111111111111111111111111111111112',
     decimals: 9,
-    referrer: '3rEtFGNAL39KP6pbFHQtvKQqJNoZ1cVHDdWELkz5jMxU'
+    referrer: 'HTcarLHe7WRxBQCWvhVB8AP56pnEtJUV2jDGvcpY3xo5'
   },
   BTC: {
     symbol: 'BTC',
@@ -93,14 +93,14 @@ export const TOKENS: Tokens = {
     name: 'Wrapped Ethereum',
     mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
     decimals: 6,
-    referrer: '2Vi3SmRWTnK3H1hM7419ncU4cwwgnP3jf2CcG4uagqit'
+    referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN'
   },
   USDC: {
     symbol: 'USDC',
     name: 'USDC',
     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
-    referrer: 'HAvKWceWNm8Pwp1YERjZhaCg3XjK1KocPN332mtofg9z'
+    referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
   },
   YFI: {
     symbol: 'YFI',
@@ -128,7 +128,7 @@ export const TOKENS: Tokens = {
     name: 'Wrapped USDT',
     mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
     decimals: 6,
-    referrer: 'GdFfrjHgRS2y3bF1cjYr6XJ5zstNBbEqKetMffn6ouVy'
+    referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3'
   },
   SUSHI: {
     symbol: 'SUSHI',
@@ -212,7 +212,7 @@ export const TOKENS: Tokens = {
     name: 'Serum',
     mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
     decimals: 6,
-    referrer: 'AZgyihMGNBHxMAj1AZSbfh16YXE4zq7e6pXQTSHwbTaN'
+    referrer: 'HYxa4Ea1dz7ya17Cx18rEGUA1WbCvKjXjFKrnu8CwugH'
   },
   FTT: {
     symbol: 'FTT',

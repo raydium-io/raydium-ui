@@ -86,10 +86,11 @@ import Vue from 'vue'
 import { Button } from 'ant-design-vue'
 
 export default Vue.extend({
-  layout: 'no_head',
   components: {
     Button
-  }
+  },
+
+  layout: 'no_head'
 })
 </script>
 
