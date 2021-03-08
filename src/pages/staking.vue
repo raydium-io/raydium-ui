@@ -36,28 +36,28 @@
                 </div>
                 {{ farm.farmInfo.lp.symbol }}
               </Col>
-              <Col class="state" :span="4">
-                <div class="title">Pending Reward</div>
+              <Col class="state" :span="app.isMobile ? 8 : 4">
+                <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
                 <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
               </Col>
-              <Col class="state" :span="4">
+              <Col v-if="!app.isMobile" class="state" :span="4">
                 <div class="title">Staked</div>
                 <div class="value">
                   {{ farm.userInfo.depositBalance.format() }}
                 </div>
               </Col>
-              <Col class="state" :span="4">
+              <Col class="state" :span="app.isMobile ? 8 : 4">
                 <div class="title">Apr</div>
                 <div class="value">{{ farm.farmInfo.apr }}%</div>
               </Col>
-              <Col class="state" :span="4">
+              <Col v-if="!app.isMobile" class="state" :span="4">
                 <div class="title">Liquidity</div>
                 <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
               </Col>
             </Row>
 
-            <Row :gutter="16">
-              <Col :span="12">
+            <Row :class="app.isMobile ? 'is-mobile' : ''" :gutter="16">
+              <Col :span="app.isMobile ? 24 : 12">
                 <div class="harvest">
                   <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                   <div class="pending fs-container">
@@ -94,7 +94,7 @@
                 @onOk="unstake"
                 @onCancel="cancelUnstake"
               />
-              <Col :span="12">
+              <Col :span="app.isMobile ? 24 : 12">
                 <div class="start">
                   <div class="title">Start staking</div>
                   <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
@@ -172,7 +172,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'farm', 'url', 'price', 'liquidity'])
+    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
   },
 
   watch: {
@@ -536,6 +536,12 @@ export default Vue.extend({
         font-size: 16px;
         line-height: 24px;
       }
+    }
+  }
+
+  .is-mobile {
+    .harvest {
+      margin-bottom: 16px;
     }
   }
 }

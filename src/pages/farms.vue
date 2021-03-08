@@ -30,36 +30,36 @@
         <div class="card-body">
           <Collapse expand-icon-position="right">
             <CollapsePanel v-for="farm in farms" v-show="farm.farmInfo.version === 3" :key="farm.farmInfo.poolId">
-              <Row slot="header" class="farm-head" :gutter="0">
-                <Col class="lp-icons" :span="8">
+              <Row slot="header" class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
+                <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
                   <div class="icons">
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                   </div>
-                  {{ farm.farmInfo.lp.name }}
+                  {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                 </Col>
-                <Col class="state" :span="4">
-                  <div class="title">Pending Reward</div>
+                <Col class="state" :span="app.isMobile ? 6 : 4">
+                  <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
                 </Col>
-                <Col class="state" :span="4">
+                <Col v-if="!app.isMobile" class="state" :span="4">
                   <div class="title">Staked</div>
                   <div class="value">
                     {{ farm.userInfo.depositBalance.format() }}
                   </div>
                 </Col>
-                <Col class="state" :span="4">
+                <Col class="state" :span="app.isMobile ? 6 : 4">
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col class="state" :span="4">
+                <Col v-if="!app.isMobile" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
                 </Col>
               </Row>
 
-              <Row :gutter="48">
-                <Col :span="4">
+              <Row :class="app.isMobile ? 'is-mobile' : ''" :gutter="48">
+                <Col :span="app.isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
                   <NuxtLink
                     :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
@@ -68,7 +68,7 @@
                   </NuxtLink>
                 </Col>
 
-                <Col :span="10">
+                <Col :span="app.isMobile ? 24 : 10">
                   <div class="harvest">
                     <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                     <div class="pending fs-container">
@@ -105,7 +105,7 @@
                   @onOk="unstake"
                   @onCancel="cancelUnstake"
                 />
-                <Col :span="10">
+                <Col :span="app.isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
                     <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
@@ -142,29 +142,29 @@
         <div class="card-body">
           <div v-for="farm in farms" :key="farm.farmInfo.poolId" :showArrow="false">
             <template v-if="farm.farmInfo.version === 2">
-              <Row class="farm-head" :gutter="0">
-                <Col class="lp-icons" :span="8">
+              <Row class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
+                <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
                   <div class="icons">
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                   </div>
-                  {{ farm.farmInfo.lp.name }}
+                  {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                 </Col>
-                <Col class="state" :span="4">
-                  <div class="title">Pending Reward</div>
+                <Col v-if="!app.isMobile" class="state" :span="4">
+                  <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
                 </Col>
-                <Col class="state" :span="4">
+                <Col v-if="!app.isMobile" class="state" :span="4">
                   <div class="title">Staked</div>
                   <div class="value">
                     {{ farm.userInfo.depositBalance.format() }}
                   </div>
                 </Col>
-                <Col class="state" :span="4">
+                <Col v-if="!app.isMobile" class="state" :span="4">
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col class="fc-container">
+                <Col class="fc-container" :span="app.isMobile ? 12 : 4">
                   <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
                     Connect Wallet
                   </Button>
@@ -227,7 +227,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'farm', 'url', 'price', 'liquidity'])
+    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
   },
 
   watch: {
@@ -610,6 +610,17 @@ export default Vue.extend({
         font-size: 16px;
         line-height: 24px;
       }
+    }
+  }
+
+  .farm-head.is-mobile {
+    padding: 24px 16px !important;
+  }
+
+  .is-mobile {
+    .harvest,
+    .start {
+      margin-top: 16px;
     }
   }
 

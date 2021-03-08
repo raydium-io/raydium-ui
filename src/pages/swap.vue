@@ -127,7 +127,6 @@
             {{ outToPirceValue }}
             {{ toCoin.symbol }}
           </span>
-          <Icon type="swap" @click="() => (coinBasePrice = !coinBasePrice)" />
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
           Connect Wallet
