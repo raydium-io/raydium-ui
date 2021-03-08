@@ -292,8 +292,7 @@ export default Vue.extend({
       let valueData = 0
       for (const itemInfo of Object.values(this.liquidity.infos)) {
         valueData +=
-          ((itemInfo as any).coin.balance.wei * this.price.prices[(itemInfo as any).coin.symbol] * 2) /
-          (itemInfo as any).coin.balance.decimals
+          (itemInfo as any).coin.balance.toEther().toNumber() * this.price.prices[(itemInfo as any).coin.symbol] * 2
       }
       this.tvl_farm = valueData
     },
