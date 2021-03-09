@@ -54,7 +54,13 @@
                 </Col>
                 <Col v-if="!app.isMobile" class="state" :span="4">
                   <div class="title">Liquidity</div>
-                  <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
+                  <div class="value">
+                    ${{
+                      Math.round(farm.farmInfo.liquidityUsdValue)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    }}
+                  </div>
                 </Col>
               </Row>
 
@@ -300,13 +306,13 @@ export default Vue.extend({
             const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
             const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
 
-            const apr = (
-              (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
-              100
-            ).toFixed(2)
+            const liquidityUsdValue = lp.balance.toEther().toNumber() * liquidityItemValue
+            const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
 
             // @ts-ignore
             newFarmInfo.apr = apr
+            // @ts-ignore
+            newFarmInfo.liquidityUsdValue = liquidityUsdValue
           }
 
           if (userInfo) {

@@ -76,7 +76,7 @@ export default Vue.extend({
       width: 100%;
       text-align: center;
       font-size: 14px;
-      color: rgba(241, 241, 242, 1);
+      color: #84879c;
       padding-top: 16px;
     }
   }
@@ -93,12 +93,16 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   .link_menu {
-    span {
+    a {
       display: inline-block;
       width: 100px;
       text-align: center;
       font-size: 14px;
-      color: rgba(241, 241, 242, 1);
+      color: #84879c;
+
+      &:hover {
+        color: #fff;
+      }
     }
   }
 }

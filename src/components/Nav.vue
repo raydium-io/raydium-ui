@@ -35,8 +35,8 @@ export default Vue.extend({
         liquidity: false,
         farms: false,
         staking: false,
-        migrate: false,
-        info: false
+        migrate: false
+        // info: false
       }
     }
   },
