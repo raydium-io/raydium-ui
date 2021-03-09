@@ -1,26 +1,33 @@
 <template>
-  <Header class="header fs-container" :class="app.isMobile ? 'mobile' : ''">
-    <a href="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></a>
-
-    <div v-if="app.isMobile ? (navOpened ? true : false) : true" :class="app.isMobile ? 'mobile-nav' : ''">
-      <Nav @onSelect="() => (navOpened = false)" />
+  <Footer :class="app.isMobile ? 'mobile' : 'pc'">
+    <div class="logo" v-if="!app.isMobile">
+      <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
     </div>
-
-    <div class="fs-container">
-      <Wallet />
-      <div
-        v-if="app.isMobile"
-        class="nav-button"
-        :class="navOpened ? 'opened' : ''"
-        @click="() => (navOpened = !navOpened)"
-      >
-        <span />
-        <span />
-        <span />
-        <span />
-      </div>
+    <div class="link_menu">
+      <a :href="link_url.home"><span>Home</span></a>
+      <img class="logo" src="@/assets/icons/round.svg" v-if="!app.isMobile" />
+      <a :href="link_url.app"><span>App</span></a>
+      <img class="logo" src="@/assets/icons/round.svg" v-if="!app.isMobile" />
+      <a :href="link_url.info"><span>Info</span></a>
     </div>
-  </Header>
+    <div class="icon_list">
+      <a :href="link_url.twitter" target="_blank" style="margin-left: 10px"
+        ><img src="@/assets/icons/twitter.svg" width="20" height="20"
+      /></a>
+      <a :href="link_url.discord" target="_blank" style="margin-left: 10px"
+        ><img src="@/assets/icons/discord.png" width="20" height="20"
+      /></a>
+      <a :href="link_url.telegram" target="_blank" style="margin-left: 10px"
+        ><img src="@/assets/icons/telegram.svg" width="20" height="20"
+      /></a>
+      <a :href="link_url.medium" target="_blank" style="margin-left: 10px"
+        ><img src="@/assets/icons/medium.svg" width="20" height="20"
+      /></a>
+    </div>
+    <div class="logo" v-if="app.isMobile">
+      <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
+    </div>
+  </Footer>
 </template>
 
 <script lang="ts">
@@ -29,16 +36,25 @@ import { mapState } from 'vuex'
 
 import { Layout } from 'ant-design-vue'
 
-const { Header } = Layout
+const { Footer } = Layout
 
 export default Vue.extend({
   components: {
-    Header
+    Footer
   },
 
   data() {
     return {
-      navOpened: false
+      navOpened: false,
+      link_url: {
+        home: '/',
+        app: '/swap',
+        info: '/info',
+        twitter: 'https://twitter.com/RaydiumProtocol',
+        discord: 'https://discord.com/invite/6EvFwvCfpx',
+        telegram: 'https://t.me/raydiumprotocol',
+        medium: 'https://raydium.medium.com/'
+      }
     }
   },
 
@@ -53,88 +69,37 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-@import '../styles/variables';
-
-.header {
-  border-bottom: 2px solid @modal-header-bg;
-
-  .logo {
-    height: 35px;
-  }
-
-  .mobile-nav {
-    position: absolute;
-    width: 100vw;
-    top: 64px;
-    left: 0;
-    text-align: center;
-    z-index: 99;
-  }
-
-  .nav-button {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 16px;
-    width: 24px;
-    height: 20px;
-    position: relative;
-    transform: rotate(0deg);
-    transition: 0.5s ease-in-out;
-    cursor: pointer;
-
+.mobile {
+  .link_menu {
     span {
-      background-color: #fff;
-      display: block;
-      position: absolute;
-      height: 3px;
+      display: inline-block;
       width: 100%;
-      border-radius: 3px;
-      opacity: 1;
-      left: 0;
-      transform: rotate(0deg);
-      transition: 0.25s ease-in-out;
-    }
-
-    span:first-child {
-      top: 0;
-      transform-origin: left top;
-    }
-
-    span:nth-child(2),
-    span:nth-child(3) {
-      top: 50%;
-      transform: translateY(-50%);
-      transform-origin: center center;
-    }
-
-    span:nth-child(4) {
-      bottom: 0;
-      transform-origin: left bottom;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(241, 241, 242, 1);
+      padding-top: 16px;
     }
   }
-
-  .nav-button.opened {
-    span:first-child {
-      width: 0%;
-      left: 50%;
-    }
-
-    span:nth-child(2) {
-      transform: rotate(45deg);
-    }
-
-    span:nth-child(3) {
-      transform: rotate(-45deg);
-    }
-
-    span:nth-child(4) {
-      width: 0%;
-      left: 50%;
-    }
+  .icon_list {
+    text-align: center;
+    margin: 48px 0;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 50px;
   }
 }
-
-.header.mobile {
-  padding: 0 20px;
+.pc {
+  display: flex;
+  justify-content: space-between;
+  .link_menu {
+    span {
+      display: inline-block;
+      width: 100px;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(241, 241, 242, 1);
+    }
+  }
 }
 </style>
