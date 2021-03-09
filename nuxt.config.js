@@ -70,7 +70,8 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'nuxt-clipboard',
-    '@nuxtjs/gtm'
+    '@nuxtjs/gtm',
+    '@nuxtjs/sentry'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -83,6 +84,11 @@ export default {
   gtm: {
     id: 'GTM-MN4HVBS',
     enable: true
+  },
+
+  sentry: {
+    dsn: 'https://4dc8fd3050f0448a9f766c5e4b9f17f8@o545668.ingest.sentry.io/5667989',
+    config: {}
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
