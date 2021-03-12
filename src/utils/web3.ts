@@ -248,7 +248,7 @@ export async function sendSignedTransaction(connection: Connection, signedTransa
   const rawTransaction = signedTransaction.serialize()
 
   const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, {
-    skipPreflight: false,
+    skipPreflight: true,
     preflightCommitment: commitment
   })
 
