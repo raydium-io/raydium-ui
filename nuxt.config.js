@@ -70,7 +70,6 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'nuxt-clipboard',
-    '@nuxtjs/gtm',
     '@nuxtjs/google-gtag',
     '@nuxtjs/sentry'
   ],
@@ -80,11 +79,6 @@ export default {
 
   clipboard: {
     autoSetContainer: true
-  },
-
-  gtm: {
-    id: 'GTM-MN4HVBS',
-    enable: true
   },
 
   'google-gtag': {
