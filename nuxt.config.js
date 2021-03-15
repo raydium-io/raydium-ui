@@ -71,6 +71,7 @@ export default {
     '@nuxtjs/axios',
     'nuxt-clipboard',
     '@nuxtjs/gtm',
+    '@nuxtjs/google-gtag',
     '@nuxtjs/sentry'
   ],
 
@@ -84,6 +85,10 @@ export default {
   gtm: {
     id: 'GTM-MN4HVBS',
     enable: true
+  },
+
+  'google-gtag': {
+    id: 'G-78BZ5BGCV5'
   },
 
   sentry: {
