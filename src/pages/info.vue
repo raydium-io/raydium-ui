@@ -15,7 +15,7 @@
             <div class="data_div_title font_color_3">Total Value Locked</div>
             <div class="data_div_num">
               ${{
-                Math.round(tvl_farm + tvl_stake)
+                Math.round(tvl)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               }}
@@ -242,32 +242,19 @@ export default Vue.extend({
     return {
       ray_price: 0,
       hour_volume_24: 0,
-      tvl_farm: 0,
       timer: null as any,
-      tvl_stake: 0
+      tvl: 0
     }
   },
 
   computed: {
-    ...mapState(['wallet', 'liquidity', 'price', 'farm', 'app'])
+    ...mapState(['wallet', 'price', 'app'])
   },
 
   watch: {
-    'liquidity.infos': {
-      handler() {
-        this.liquidity_infos_flush()
-      },
-      deep: true
-    },
     'price.prices': {
       handler() {
         this.price_prices_flush()
-      },
-      deep: true
-    },
-    'farm.infos': {
-      handler() {
-        this.farm_infos_flush()
       },
       deep: true
     }
@@ -279,34 +266,14 @@ export default Vue.extend({
 
   mounted() {
     this.get_request_data()
-    this.liquidity_infos_flush()
-    this.farm_infos_flush()
+    this.get_tvl()
     this.price_prices_flush()
     this.timer = setInterval(this.get_request_data, 1000 * 30)
   },
 
   methods: {
-    liquidity_infos_flush() {
-      let valueData = 0
-      for (const itemInfo of Object.values(this.liquidity.infos)) {
-        valueData +=
-          (itemInfo as any).coin.balance.toEther().toNumber() * this.price.prices[(itemInfo as any).coin.symbol] * 2
-      }
-      this.tvl_farm = valueData
-    },
     price_prices_flush() {
       this.ray_price = this.price.prices?.RAY
-    },
-    farm_infos_flush() {
-      let stakeData = 0
-      for (const item of Object.values(this.farm.infos)) {
-        if ((item as any).isStake) {
-          stakeData +=
-            ((item as any).lp.balance.wei / 10 ** (item as any).lp.balance.decimals) *
-            this.price.prices[(item as any).name]
-        }
-      }
-      this.tvl_stake = stakeData
     },
     get_request_data() {
       this.$axios
@@ -315,6 +282,15 @@ export default Vue.extend({
         })
         .then((res: any) => {
           this.hour_volume_24 = parseFloat(res.data)
+        })
+    },
+    get_tvl() {
+      this.$axios
+        .get('https://api.raydium.io/tvl', {
+          params: {}
+        })
+        .then((res: any) => {
+          this.tvl = parseFloat(res.data)
         })
     }
   }
