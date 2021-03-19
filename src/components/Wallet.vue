@@ -44,13 +44,12 @@ import {
   Context
 } from '@solana/web3.js'
 // @ts-ignore
-import SolanaWallet from '@project-serum/sol-wallet-adapter'
+import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
-import SolongWallet from '@/utils/solong-wallet'
-import Coin98Wallet from '@/utils/coin98-wallet'
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
+import { WalletAdapter, SolongWalletAdapter, MathWalletAdapter, LedgerWalletAdapter } from '@/wallets'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -70,6 +69,7 @@ export default Vue.extend({
   data() {
     return {
       wallets: {
+        Ledger: '',
         Solong: '',
         // TrustWallet: '',
         MathWallet: '',
@@ -121,9 +121,13 @@ export default Vue.extend({
     importIcon,
 
     connect(walletName: string) {
-      let wallet: SolanaWallet | SolongWallet | null = null
+      let wallet: WalletAdapter | null = null
 
       switch (walletName) {
+        case 'Ledger': {
+          wallet = new LedgerWalletAdapter()
+          break
+        }
         case 'Solong': {
           if ((window as any).solong === undefined) {
             ;(this as any).$notify.error({
@@ -133,11 +137,11 @@ export default Vue.extend({
             return
           }
 
-          wallet = new SolongWallet()
+          wallet = new SolongWalletAdapter()
           break
         }
         case 'MathWallet': {
-          if ((window as any).solana === undefined) {
+          if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
             ;(this as any).$notify.error({
               message: 'Connect wallet failed',
               description: 'Please install and initialize Math wallet first'
@@ -145,32 +149,20 @@ export default Vue.extend({
             return
           }
 
-          wallet = new SolanaWallet((window as any).solana, this.wallet.endpoint)
-          break
-        }
-        case 'Coin98': {
-          if ((window as any).coin98 === undefined) {
-            ;(this as any).$notify.error({
-              message: 'Connect wallet failed',
-              description: 'Please install and initialize Coin98 wallet first'
-            })
-            return
-          }
-
-          wallet = new Coin98Wallet(this.wallet.endpoint)
+          wallet = new MathWalletAdapter()
           break
         }
         default: {
-          wallet = new SolanaWallet(this.wallets[walletName], this.wallet.endpoint)
+          wallet = new SolanaWalletAdapter(this.wallets[walletName], this.wallet.endpoint)
           break
         }
       }
 
-      wallet.on('connect', () => {
+      wallet?.on('connect', () => {
         this.$store.dispatch('wallet/closeModal').then(() => {
           Vue.prototype.$wallet = wallet
 
-          this.$store.commit('wallet/connected', wallet.publicKey.toBase58())
+          this.$store.commit('wallet/connected', wallet?.publicKey.toBase58())
 
           this.subWallet()
           ;(this as any).$notify.success({
@@ -180,10 +172,10 @@ export default Vue.extend({
         })
       })
 
-      wallet.on('disconnect', () => {})
+      wallet?.on('disconnect', () => {})
 
       try {
-        wallet.connect()
+        wallet?.connect()
       } catch (error) {
         ;(this as any).$notify.error({
           message: 'Connect wallet failed',

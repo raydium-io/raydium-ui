@@ -23,6 +23,7 @@
     }
   },
   "dependencies": {
+    "@ledgerhq/hw-transport-webusb": "^5.41.0",
     "@nuxtjs/axios": "^5.12.5",
     "@nuxtjs/google-gtag": "^1.0.4",
     "@nuxtjs/sentry": "^5.0.2",
@@ -45,6 +46,8 @@
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/stylelint-module": "^4.0.0",
+    "@types/ledgerhq__hw-transport": "^4.21.3",
+    "@types/ledgerhq__hw-transport-webusb": "^4.70.1",
     "@types/lodash-es": "^4.17.4",
     "@vue/test-utils": "^1.1.2",
     "babel-core": "7.0.0-bridge.0",
