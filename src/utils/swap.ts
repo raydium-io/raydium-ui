@@ -1,4 +1,6 @@
-import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js'
+import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+// @ts-ignore
+import { u8, nu64, struct } from 'buffer-layout'
 import { Market, OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from '@project-serum/serum/lib/market'
 // eslint-disable-next-line
 import { NATIVE_SOL, TOKENS, getTokenByMintAddress } from './tokens'
@@ -10,7 +12,7 @@ import {
 } from '@/utils/web3'
 import { TokenAmount } from '@/utils/safe-math'
 // eslint-disable-next-line
-import { SERUM_PROGRAM_ID_V3 } from './ids'
+import { TOKEN_PROGRAM_ID, SERUM_PROGRAM_ID_V3 } from './ids'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 
 // 计算金额
@@ -68,18 +70,18 @@ export function getSwapOutAmount(
     // coin2pc
     const fromAmount = new TokenAmount(amount, coin.decimals, false)
     const denominator = coin.balance.wei.plus(fromAmount.wei)
-    const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
+    const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return new TokenAmount(amountOutWithSlippage, pc.decimals)
+    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, pc.decimals) }
   } else {
     // pc2coin
     const fromAmount = new TokenAmount(amount, pc.decimals, false)
     const denominator = pc.balance.wei.plus(fromAmount.wei)
-    const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
+    const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return new TokenAmount(amountOutWithSlippage, coin.decimals)
+    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, coin.decimals) }
   }
 }
 
@@ -155,6 +157,81 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
 }
 
 export async function swap(
+  connection: Connection,
+  wallet: any,
+  poolInfo: any,
+  fromCoinMint: string,
+  toCoinMint: string,
+  fromTokenAccount: string,
+  toTokenAccount: string,
+  amount: string,
+  slippage: number
+) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  const { amountIn, amountOut } = getSwapOutAmount(poolInfo, fromCoinMint, toCoinMint, amount, slippage)
+
+  let fromMint = fromCoinMint
+  let toMint = toCoinMint
+
+  if (fromMint === NATIVE_SOL.mintAddress) {
+    fromMint = TOKENS.WSOL.mintAddress
+  }
+  if (toMint === NATIVE_SOL.mintAddress) {
+    toMint = TOKENS.WSOL.mintAddress
+  }
+
+  const newFromTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    fromTokenAccount,
+    owner,
+    fromMint,
+    null,
+    transaction,
+    signers
+  )
+  const newToTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    toTokenAccount,
+    owner,
+    toMint,
+    null,
+    transaction,
+    signers
+  )
+
+  transaction.add(
+    swapInstruction(
+      new PublicKey(poolInfo.programId),
+      new PublicKey(poolInfo.ammId),
+      new PublicKey(poolInfo.ammAuthority),
+      new PublicKey(poolInfo.ammOpenOrders),
+      new PublicKey(poolInfo.ammTargetOrders),
+      new PublicKey(poolInfo.poolCoinTokenAccount),
+      new PublicKey(poolInfo.poolPcTokenAccount),
+      new PublicKey(poolInfo.serumProgramId),
+      new PublicKey(poolInfo.serumMarket),
+      new PublicKey(poolInfo.serumBids),
+      new PublicKey(poolInfo.serumAsks),
+      new PublicKey(poolInfo.serumEventQueue),
+      new PublicKey(poolInfo.serumCoinVaultAccount),
+      new PublicKey(poolInfo.serumPcVaultAccount),
+      new PublicKey(poolInfo.serumVaultSigner),
+      newFromTokenAccount,
+      newToTokenAccount,
+      owner,
+      ~~amountIn.toWei().toNumber(),
+      ~~amountOut.toWei().toNumber()
+    )
+  )
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+export async function place(
   connection: Connection,
   wallet: any,
   market: Market,
@@ -301,4 +378,74 @@ export async function swap(
     ...signers,
     ...settleTransactions.signers
   ])
+}
+
+export function swapInstruction(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammTargetOrders: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
+  serumEventQueue: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userSourceTokenAccount: PublicKey,
+  userDestTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  amountIn: number,
+  minAmountOut: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amountIn'), nu64('minAmountOut')])
+
+  const keys = [
+    // spl token
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    // amm
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    // serum
+    { pubkey: serumProgramId, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumBids, isSigner: false, isWritable: true },
+    { pubkey: serumAsks, isSigner: false, isWritable: true },
+    { pubkey: serumEventQueue, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: true },
+    { pubkey: userSourceTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userDestTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 9,
+      amountIn,
+      minAmountOut
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
 }

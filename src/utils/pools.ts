@@ -31,6 +31,9 @@ export interface LiquidityPoolInfo {
 
   serumProgramId: string
   serumMarket: string
+  serumBids?: string
+  serumAsks?: string
+  serumEventQueue?: string
   serumCoinVaultAccount: string
   serumPcVaultAccount: string
   serumVaultSigner: string
@@ -395,6 +398,9 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     poolTempLpTokenAccount: 'Bp7LNZH44vecbv69kY35bjmsTjboGbEKy62p7iRT8az',
     serumProgramId: SERUM_PROGRAM_ID_V3,
     serumMarket: '9wH4Krv8Vim3op3JAu5NGZQdGxU8HLGAHZh3K77CemxC',
+    serumBids: 'E2FEkqPVcQZgRaE7KabcHGbpNkpycnvVZMan2MPNGKeM',
+    serumAsks: '5TXqn1N2kpCWWV4AcXtFYJw8WqLrXP62qenxiSfhxJiD',
+    serumEventQueue: '58qMcacA2Qk4Tc4Rut3Lnao91JvvWJJ26f5kojKnMRen',
     serumCoinVaultAccount: 'A2SMhqA1kMTudVeAeWdzCaYYeG6Dts19iEZd4ZQQAcUm',
     serumPcVaultAccount: 'GhpccNwfein8qP6uhWnP4vuRva1iLivuQQHUTM7tW58r',
     serumVaultSigner: 'F7VdEoWQGmdFK35SD21wAbDWtnkVpcrxM3DPVnmG8Q3i'

@@ -150,7 +150,7 @@
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
-            !marketAddress ||
+            (!marketAddress && !lpMintAddress) ||
             !initialized ||
             loading ||
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
@@ -160,7 +160,9 @@
           @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="!marketAddress || !initialized"> Insufficient liquidity for this trade </template>
+          <template v-else-if="(!marketAddress && !lpMintAddress) || !initialized">
+            Insufficient liquidity for this trade
+          </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
@@ -186,7 +188,7 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { getOutAmount, getSwapOutAmount, swap } from '@/utils/swap'
+import { getOutAmount, getSwapOutAmount, place, swap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getPoolByTokenMintAddresses } from '@/utils/liquidity'
@@ -380,6 +382,7 @@ export default Vue.extend({
         const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
         if (pool && pool.version === 4) {
           this.lpMintAddress = pool.lp.mintAddress
+          this.initialized = true
           return
         }
 
@@ -472,7 +475,7 @@ export default Vue.extend({
     // 更新输入价格
     updateAmounts() {
       if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
-        const amountOut = getSwapOutAmount(
+        const { amountOut } = getSwapOutAmount(
           get(this.liquidity.infos, this.lpMintAddress),
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
@@ -551,49 +554,93 @@ export default Vue.extend({
         duration: 0
       })
 
-      swap(
-        // @ts-ignore
-        this.$conn,
-        // @ts-ignore
-        this.$wallet,
-        this.market,
-        this.asks,
-        this.bids,
-        // @ts-ignore
-        this.fromCoin.mintAddress,
-        // @ts-ignore
-        this.toCoin.mintAddress,
-        // @ts-ignore
-        get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
-        // @ts-ignore
-        get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
-        this.fromCoinAmount,
-        this.setting.slippage
-      )
-        .then((txid) => {
-          ;(this as any).$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
+      if (this.lpMintAddress) {
+        swap(
+          // @ts-ignore
+          this.$conn,
+          // @ts-ignore
+          this.$wallet,
+          get(this.liquidity.infos, this.lpMintAddress),
+          // @ts-ignore
+          this.fromCoin.mintAddress,
+          // @ts-ignore
+          this.toCoin.mintAddress,
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          this.fromCoinAmount,
+          this.setting.slippage
+        )
+          .then((txid) => {
+            ;(this as any).$notify.info({
+              key,
+              message: 'Transaction has been sent',
+              description: (h: any) =>
+                h('div', [
+                  'Confirmation is in progress.  Check your transaction on ',
+                  h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                ])
+            })
 
-          const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-          this.$store.dispatch('transaction/sub', { txid, description })
-        })
-        .catch((error) => {
-          ;(this as any).$notify.error({
-            key,
-            message: 'Swap failed',
-            description: error.message
+            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            this.$store.dispatch('transaction/sub', { txid, description })
           })
-        })
-        .finally(() => {
-          this.swaping = false
-        })
+          .catch((error) => {
+            ;(this as any).$notify.error({
+              key,
+              message: 'Swap failed',
+              description: error.message
+            })
+          })
+          .finally(() => {
+            this.swaping = false
+          })
+      } else {
+        place(
+          // @ts-ignore
+          this.$conn,
+          // @ts-ignore
+          this.$wallet,
+          this.market,
+          this.asks,
+          this.bids,
+          // @ts-ignore
+          this.fromCoin.mintAddress,
+          // @ts-ignore
+          this.toCoin.mintAddress,
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          this.fromCoinAmount,
+          this.setting.slippage
+        )
+          .then((txid) => {
+            ;(this as any).$notify.info({
+              key,
+              message: 'Transaction has been sent',
+              description: (h: any) =>
+                h('div', [
+                  'Confirmation is in progress.  Check your transaction on ',
+                  h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                ])
+            })
+
+            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            this.$store.dispatch('transaction/sub', { txid, description })
+          })
+          .catch((error) => {
+            ;(this as any).$notify.error({
+              key,
+              message: 'Swap failed',
+              description: error.message
+            })
+          })
+          .finally(() => {
+            this.swaping = false
+          })
+      }
     }
   }
 })
