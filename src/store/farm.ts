@@ -1,10 +1,15 @@
 import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
-import { STAKE_INFO_LAYOUT, STAKE_INFO_LAYOUT_V4, USER_STAKE_INFO_ACCOUNT_LAYOUT } from '@/utils/stake'
+import {
+  STAKE_INFO_LAYOUT,
+  STAKE_INFO_LAYOUT_V4,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT_V4
+} from '@/utils/stake'
 import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
-import { STAKE_PROGRAM_ID } from '@/utils/ids'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4 } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
@@ -145,10 +150,11 @@ export const actions = {
           dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span
         }
       ]
+
+      const stakeAccounts: any = {}
+
       getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
         .then((stakeAccountInfos) => {
-          const stakeAccounts: any = {}
-
           stakeAccountInfos.forEach((stakeAccountInfo) => {
             const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
             const { data } = stakeAccountInfo.accountInfo
@@ -169,8 +175,51 @@ export const actions = {
               }
             }
           })
+        })
+        .catch()
 
-          commit('setStakeAccounts', stakeAccounts)
+      // 获取 stake user info account v4
+      const stakeFiltersV4 = [
+        {
+          memcmp: {
+            offset: 40,
+            bytes: wallet.publicKey.toBase58()
+          }
+        },
+        {
+          dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
+        }
+      ]
+
+      const stakeAccountsV4: any = {}
+
+      getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
+        .then((stakeAccountInfos) => {
+          stakeAccountInfos.forEach((stakeAccountInfo) => {
+            const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+            const { data } = stakeAccountInfo.accountInfo
+
+            const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+            const poolId = userStakeInfo.poolId.toBase58()
+            const depositBalance = userStakeInfo.depositBalance.toNumber()
+            const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+            const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+
+            const farm = getFarmByPoolId(poolId)
+
+            if (farm) {
+              stakeAccountsV4[poolId] = {
+                depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                // @ts-ignore
+                rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                stakeAccountAddress
+              }
+            }
+          })
+
+          commit('setStakeAccounts', { ...stakeAccounts, ...stakeAccountsV4 })
           logger('User StakeAccounts updated')
         })
         .catch()

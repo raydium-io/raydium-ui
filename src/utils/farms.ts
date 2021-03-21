@@ -209,7 +209,7 @@ export const FARMS: FarmInfo[] = [
   // Reward double
   {
     name: 'FIDA-RAY',
-    lp: { ...TOKENS['FIDA-RAY-V4'] },
+    lp: { ...LP_TOKENS['FIDA-RAY-V4'] },
     reward: { ...TOKENS.RAY },
     rewardB: { ...TOKENS.FIDA },
     isStake: false,
@@ -217,10 +217,10 @@ export const FARMS: FarmInfo[] = [
     version: 4,
     programId: STAKE_PROGRAM_ID_V4,
 
-    poolId: 'ijtz7jvzZfvp8BmKda2ibTLpAp26aMujUyo49JFcK1z',
-    poolAuthority: 'JDg8urQgUfD8surY3h9ma2BtFVNEfV4YUh9WMHo2pXHo',
-    poolLpTokenAccount: 'KKACzUPaWS5DGz7hirT1r3fYyXMt6NafYD7xUcYSDgm', // lp vault
-    poolRewardTokenAccount: 'Bm93c9teARy3WN8j2qhfinctgmAAoGEYvgNYdw3gd5yq', // reward vault A
-    poolRewardTokenAccountB: 'Fk9LMVw2HTM1dbKygHrbqYchkfUQT63ZEQVs77W18RUP' // reward vault B
+    poolId: '8rAdapvcC5vYNLXzChMgt56s6HCQGE6Lbo469g3WRTUh',
+    poolAuthority: 'EcCKf3mgPtL6dNNAVG4gQQtLkAoTAUdf5vzFukkrviWq',
+    poolLpTokenAccount: 'H6kzwNNg9zbgC1YBjvCN4BdebtA4NusvgUhUSDZoz8rP', // lp vault
+    poolRewardTokenAccount: '7vnPTB2HAXFUAV5iiVZTNHgAnVYjgXcdumbbqfeK6ugp', // reward vault A
+    poolRewardTokenAccountB: 'EGHdQm9KGLz6nw7W4rK13DyAMMJcGP9RpzCJaXiq75kQ' // reward vault B
   }
 ]
