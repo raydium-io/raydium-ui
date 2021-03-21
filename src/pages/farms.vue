@@ -1,5 +1,15 @@
 <template>
   <div class="farm container">
+    <div class="fc-container">
+      <Alert type="warning" message="IMPORTANT" show-icon closable>
+        <div slot="description">
+          Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools and rewards for legacy
+          farms will gradually decline. To simplify the process, use the
+          <NuxtLink to="/migrate">migration tool</NuxtLink>.
+        </div>
+      </Alert>
+    </div>
+
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
@@ -194,7 +204,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -215,7 +225,8 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    Alert
   },
 
   data() {
@@ -652,6 +663,17 @@ export default Vue.extend({
 
   .ant-collapse-content {
     border-top: 1px solid #1c274f;
+  }
+}
+
+.ant-alert-warning {
+  width: 500px;
+  margin-top: 30px;
+  background-color: transparent;
+  border: 1px solid #85858d;
+
+  .anticon-close {
+    color: #fff;
   }
 }
 </style>
