@@ -405,5 +405,89 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: 'A2SMhqA1kMTudVeAeWdzCaYYeG6Dts19iEZd4ZQQAcUm',
     serumPcVaultAccount: 'GhpccNwfein8qP6uhWnP4vuRva1iLivuQQHUTM7tW58r',
     serumVaultSigner: 'F7VdEoWQGmdFK35SD21wAbDWtnkVpcrxM3DPVnmG8Q3i'
+  },
+  {
+    name: 'OXY-RAY',
+    coin: { ...TOKENS.OXY },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['OXY-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'B5ZguAWAGC3GXVtJZVfoMtzvEvDnDKBPCevsUKMy4DTZ',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'FVb13WU1W1vFouhRXZWVZWGkQdK5jo35EnaCrMzFqzyd',
+    ammTargetOrders: 'FYPP5v8SLHPPcivgBJPE9FgrN6o2QVMB627n3XcZ8rCS',
+    // 随便取的
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '6ttf7G7FR9GWqxiyCLFNaBTvwYzTLPdbbrNcRvShaqtS',
+    poolPcTokenAccount: '8orrvb6rHB776KbQmszcxPH44cZHdCTYC1fr2a3oHufC',
+    poolWithdrawQueue: '4Q9bNJsWreAGhkwhKYL7ApyhEBuwNxiPkcEQNmUjQGHZ',
+    poolTempLpTokenAccount: 'E12sRQvEHArCULaJu8xppoJKQgJsuDuwPVJZJRrUKYFu',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'HcVjkXmvA1815Es3pSiibsRaFw8r9Gy7BhyzZX83Zhjx',
+    serumBids: 'DaGRz2TAdcVcPwPmYF5JJ7d7kPWvLN68vuBTTMwnoM3T',
+    serumAsks: '3ZRtPBQVcjCpVmCt4xPPeJJiUnDDbrc5jommVHGsDLnT',
+    serumEventQueue: 'C5SGEXUCmN1LxmxapPn2XaHX1FF7fAuQG5Wu4yuu8VK6',
+    serumCoinVaultAccount: 'FcDWM8eKUEny2wxopDMrZqgmPr3Tmoen9Dckh3MoVX9N',
+    serumPcVaultAccount: '9ya4Hv4XdzntjiLwxpgqnX8eP4MtFf8YWEssF6C5Pqhq',
+    serumVaultSigner: 'Bf9MhS6hwAGSWVJ4uLWKSU6fqPAEroRsHX6ithEjGXiG'
+  },
+  {
+    name: 'MAPS-RAY',
+    coin: { ...TOKENS.MAPS },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['MAPS-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '5VyLSjUvaRxsubirbvbfJMbrKZRx1b7JZzuCAfyqgimf',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'HViBtwESRNKLZY7qLQxP68b5vLdUQa1XMAKz19LbSHjx',
+    ammTargetOrders: '8Cwm1Z75hQdUpFUxCuoWmWBLcAaZvKMAn2xKeuotC4eC',
+    // 随便取的
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '6rYv6kLfhAVKZw1xN2S9NWNgp8EfUVvYKi1Hgzd5x9XE',
+    poolPcTokenAccount: '8HfvN4VyAQjX6MhziRxMg5LjbMh9Fw889yf3sDgrXakw',
+    poolWithdrawQueue: 'HnzkiYgZg22ZaQGdeTHiCgJaoW138CLqCb8tr6QJFkU4',
+    poolTempLpTokenAccount: 'DnTQwA9PdwLSibsiQFZ35yJJDNJfG9fNbHspPmb8v8TQ',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '7Q4hee42y8ZGguqKmwLhpFNqVTjeVNNBqhx8nt32VF85',
+    serumBids: 'J9ZmfF71eMMzisvaYW12EK87UaopZ4hgND2nr61YwmKw',
+    serumAsks: '9ah4Mewrh841gmfaX1v1wCByHU3rbCuUmWUgt2TBAfnb',
+    serumEventQueue: 'EtimVRtnRUAfv9tXVAHpGCGvtYezcpmzbkwZLuwWAYqe',
+    serumCoinVaultAccount: '2zriJ5sVApLD9TC9PxbXK41AkVCQBaRreeXtGx7AGE41',
+    serumPcVaultAccount: '2qAKnjzokKR4sL6Xtp1nZYKXTmsraXW9CL3HuBZx3qpA',
+    serumVaultSigner: 'CH76NgZMpUJ8QQqVNpjyCSpQmZBNZLXW6a5vDHj3aUUC'
+  },
+  {
+    name: 'KIN-RAY',
+    coin: { ...TOKENS.KIN },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['KIN-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '6kmMMacvoCKBkBrqssLEdFuEZu2wqtLdNQxh9VjtzfwT',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'DiP4F6FTR5jiTar8fwuwRVuYop5wYRqy2EjbiKTXPrHw',
+    ammTargetOrders: '2ak4VVyS19sVESvvBuPZRMAhvY4vVCZCxeELYAybA7wk',
+    // 随便取的
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 's7LP6qptF1wufA9neYhekmVPqhav8Ak85AV5ip5h8wK',
+    poolPcTokenAccount: '9Q1Xs1s8tCirX3Ky3qo9UjvSqSoGinZvWaUMFXY5r2HF',
+    poolWithdrawQueue: 'DeHaCJ8KL5uwBGenkUwa39JyhacxPDqDqHAp5HLqgd1i',
+    poolTempLpTokenAccount: 'T2acWsGDQ4ZRXs4WXVi7vCeH4TxzgjcL6s14xFNuT26',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'Fcxy8qYgs8MZqiLx2pijjay6LHsSUqXW47pwMGysa3i9',
+    serumBids: 'HKWdSptDBeXTURKpQQ2AGPmT2B9LGNBVteq44UzDxKBh',
+    serumAsks: '2ceQrRfuNWL8kR2fockPo7C31uDeTyXTs4EyA28FD2kg',
+    serumEventQueue: 'GwnDyxFnHSnzDdu8dom3vydtTpSu443oZPKepXww5zNB',
+    serumCoinVaultAccount: '2sCJ5YZtwEbpXiw7HSXVx8Qot8hwyCpXNEkswZCssi2J',
+    serumPcVaultAccount: 'H6B59E77WZt4JLfaXdZQBKdATRcWaKy5N6Ki1ZRo1Mcv',
+    serumVaultSigner: '5V7FCcvmGtqkMJXHiTSeo61MS5LSMUFK1Esr5kn46cEv'
   }
 ]

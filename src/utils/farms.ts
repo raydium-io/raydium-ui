@@ -222,5 +222,53 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'H6kzwNNg9zbgC1YBjvCN4BdebtA4NusvgUhUSDZoz8rP', // lp vault
     poolRewardTokenAccount: '7vnPTB2HAXFUAV5iiVZTNHgAnVYjgXcdumbbqfeK6ugp', // reward vault A
     poolRewardTokenAccountB: 'EGHdQm9KGLz6nw7W4rK13DyAMMJcGP9RpzCJaXiq75kQ' // reward vault B
+  },
+  {
+    name: 'OXY-RAY',
+    lp: { ...LP_TOKENS['OXY-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.OXY },
+    isStake: false,
+
+    version: 4,
+    programId: STAKE_PROGRAM_ID_V4,
+
+    poolId: '7Hug9fKfTrasG3hHonXTfSnvv37mDeyoBHbVwyDjw693',
+    poolAuthority: 'CcD7KXVhjoeFpbkXeBgPpZChafEfTZ4zJL47LqmKdqwz',
+    poolLpTokenAccount: 'GtXoFnVRATaasBP6sroNaC54uLQfVAwGXsfKzgFqNiUc', // lp vault
+    poolRewardTokenAccount: 'GKC7BcGs1515CQx6hiK562u29dFQxBw8HWwJUxqi7xf1', // reward vault A
+    poolRewardTokenAccountB: 'DXDjRiC7EUUh9cj93tgBtX2jRkmnwtCMEAQD9GrYK2f6' // reward vault B
+  },
+  {
+    name: 'MAPS-RAY',
+    lp: { ...LP_TOKENS['MAPS-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MAPS },
+    isStake: false,
+
+    version: 4,
+    programId: STAKE_PROGRAM_ID_V4,
+
+    poolId: 'Chb6atEWGmH2NitCqrCEMHB8uKWYQiiVaBnmJQDudm87',
+    poolAuthority: 'BcmgQZXCDPCduv3reT8LDQNqvGeGMZtFhBxyLYdrnCjE',
+    poolLpTokenAccount: '5uaBAwu1Sff58KNKGTwfacsjsrMU3wg6jtGtMWwiZd5B', // lp vault
+    poolRewardTokenAccount: '4LVikvk3gZEHaTUNh7L8bsx5By6NNnkqpKfcdJTWTD7Z', // reward vault A
+    poolRewardTokenAccountB: '3UWGpEe2NLD9oWPW1zdXGZRCvJxkNSC2puUWooNEugdS' // reward vault B
+  },
+  {
+    name: 'KIN-RAY',
+    lp: { ...LP_TOKENS['KIN-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.KIN },
+    isStake: false,
+
+    version: 4,
+    programId: STAKE_PROGRAM_ID_V4,
+
+    poolId: '7RFY9eMaD3nsV7EBTzVzuKBr4X4cLuDh3JaoWZTcGiJK',
+    poolAuthority: 'q42hNDzfBDQ1WzKjxkueEtBzX1VPJ2hnikJXFjSYC91',
+    poolLpTokenAccount: 'DgCSAJiicdEggHJxM7Vs2j59yM5wMJMCGzUHALiVDhtX', // lp vault
+    poolRewardTokenAccount: '3BGPPWYJMSFaWmq21x8Feqvgsii1fVmJiivRuPJSgXe1', // reward vault A
+    poolRewardTokenAccountB: '5uX6ceRRxDRrcARddFkypCZV5MXz5KUQDr7Zf9ZnSSLf' // reward vault B
   }
 ]

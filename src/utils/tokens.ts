@@ -293,6 +293,12 @@ export const TOKENS: Tokens = {
     mintAddress: 'MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb',
     decimals: 6
   },
+  OXY: {
+    symbol: 'OXY',
+    name: 'OXY',
+    mintAddress: 'z3dn17yLaGMKffVogeFHQ9zWVcXgqgf3PQnDsNs2g6M',
+    decimals: 6
+  },
   RAY: {
     symbol: 'RAY',
     name: 'Raydium',
@@ -411,6 +417,33 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.RAY },
 
     mintAddress: 'DsBuznXRTmzvEdb36Dx3aVLVo1XmH7r1PRZUFugLPTFv',
+    decimals: 6
+  },
+  'OXY-RAY-V4': {
+    symbol: 'OXY-RAY',
+    name: 'OXY-RAY LP',
+    coin: { ...TOKENS.OXY },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'FwaX9W7iThTZH5MFeasxdLpxTVxRcM7ZHieTCnYog8Yb',
+    decimals: 6
+  },
+  'MAPS-RAY-V4': {
+    symbol: 'MAPS-RAY',
+    name: 'MAPS-RAY LP',
+    coin: { ...TOKENS.MAPS },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'CcKK8srfVdTSsFGV3VLBb2YDbzF4T4NM2C3UEjC39RLP',
+    decimals: 6
+  },
+  'KIN-RAY-V4': {
+    symbol: 'KIN-RAY',
+    name: 'KIN-RAY LP',
+    coin: { ...TOKENS.KIN },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'CHT8sft3h3gpLYbCcZ9o27mT5s3Z6VifBVbUiDvprHPW',
     decimals: 6
   }
 }
