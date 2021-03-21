@@ -1,7 +1,7 @@
 <template>
-  <div class="farm container">
+  <div class="fusion container">
     <div class="page-head fs-container">
-      <span class="title">Farms</span>
+      <span class="title">Fusion</span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
@@ -273,7 +273,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake && farmInfo.version !== 4) {
+        if (!farmInfo.isStake && farmInfo.version === 4) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
           const { rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo
@@ -525,7 +525,7 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.farm.container {
+.fusion.container {
   max-width: 1200px;
 
   .card {
@@ -637,7 +637,7 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
-.farm {
+.fusion {
   .farm-head {
     padding: 24px 32px !important;
   }

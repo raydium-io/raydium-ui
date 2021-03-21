@@ -8,7 +8,7 @@ import {
 import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
 import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout'
+import { nu64, struct, u8, blob } from 'buffer-layout'
 import { publicKey, u64 } from '@project-serum/borsh'
 
 import BigNumber from 'bignumber.js'
@@ -463,4 +463,45 @@ export const AMM_INFO_LAYOUT_V3 = struct([
   publicKey('ammOwner'),
   publicKey('pnlOwner'),
   publicKey('srmTokenAccount')
+])
+
+export const AMM_INFO_LAYOUT_V4 = struct([
+  u64('status'),
+  u64('nonce'),
+  u64('orderNum'),
+  u64('depth'),
+  u64('coinDecimals'),
+  u64('pcDecimals'),
+  u64('state'),
+  u64('resetFlag'),
+  u64('minSize'),
+  u64('volMaxCutRatio'),
+  u64('amountWaveRatio'),
+  u64('coinLotSize'),
+  u64('pcLotSize'),
+  u64('minPriceMultiplier'),
+  u64('maxPriceMultiplier'),
+  u64('systemDecimalsValue'),
+  u64('minSeparateNumerator'),
+  u64('minSeparateDenominator'),
+  u64('tradeFeeNumerator'),
+  u64('tradeFeeDenominator'),
+  u64('pnlNumerator'),
+  u64('pnlDenominator'),
+  u64('swapFeeNumerator'),
+  u64('swapFeeDenominator'),
+  blob(144, 'outPut'),
+  publicKey('poolCoinTokenAccount'),
+  publicKey('poolPcTokenAccount'),
+  publicKey('coinMintAddress'),
+  publicKey('pcMintAddress'),
+  publicKey('lpMintAddress'),
+  publicKey('ammOpenOrders'),
+  publicKey('serumMarket'),
+  publicKey('serumProgramId'),
+  publicKey('ammTargetOrders'),
+  publicKey('poolWithdrawQueue'),
+  publicKey('poolTempLpTokenAccount'),
+  publicKey('ammOwner'),
+  publicKey('pnlOwner')
 ])

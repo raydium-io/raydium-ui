@@ -1,12 +1,13 @@
 import { LP_TOKENS, TOKENS, TokenInfo } from '@/utils/tokens'
 
-import { STAKE_PROGRAM_ID } from '@/utils/ids'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4 } from '@/utils/ids'
 import { cloneDeep } from 'lodash-es'
 
 export interface FarmInfo {
   name: string
   lp: TokenInfo
   reward: TokenInfo
+  rewardB?: TokenInfo
   isStake: boolean
 
   version: number
@@ -17,6 +18,7 @@ export interface FarmInfo {
 
   poolLpTokenAccount: string
   poolRewardTokenAccount: string
+  poolRewardTokenAccountB?: string
 
   user?: object
 }
@@ -203,5 +205,22 @@ export const FARMS: FarmInfo[] = [
     poolAuthority: '4qD717qKoj3Sm8YfHMSR7tSKjWn5An817nArA6nGdcUR',
     poolLpTokenAccount: '8tnpAECxAT9nHBqR1Ba494Ar5dQMPGhL31MmPJz1zZvY', // lp vault
     poolRewardTokenAccount: 'BihEG2r7hYax6EherbRmuLLrySBuSXx4PYGd9gAsktKY' // reward vault
+  },
+  // Reward double
+  {
+    name: 'FIDA-RAY',
+    lp: { ...TOKENS['FIDA-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.FIDA },
+    isStake: false,
+
+    version: 4,
+    programId: STAKE_PROGRAM_ID_V4,
+
+    poolId: 'ijtz7jvzZfvp8BmKda2ibTLpAp26aMujUyo49JFcK1z',
+    poolAuthority: 'JDg8urQgUfD8surY3h9ma2BtFVNEfV4YUh9WMHo2pXHo',
+    poolLpTokenAccount: 'KKACzUPaWS5DGz7hirT1r3fYyXMt6NafYD7xUcYSDgm', // lp vault
+    poolRewardTokenAccount: 'Bm93c9teARy3WN8j2qhfinctgmAAoGEYvgNYdw3gd5yq', // reward vault A
+    poolRewardTokenAccountB: 'Fk9LMVw2HTM1dbKygHrbqYchkfUQT63ZEQVs77W18RUP' // reward vault B
   }
 ]

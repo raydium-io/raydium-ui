@@ -1,7 +1,7 @@
 import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { createProgramAccountIfNotExist, createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout'
+import { nu64, struct, u8, blob } from 'buffer-layout'
 import { publicKey, u128, u64 } from '@project-serum/borsh'
 
 import { FarmInfo } from '@/utils/farms'
@@ -231,10 +231,37 @@ export const STAKE_INFO_LAYOUT = struct([
   u64('rewardPerBlock')
 ])
 
+export const STAKE_INFO_LAYOUT_V4 = struct([
+  u64('state'),
+  u64('nonce'),
+  publicKey('poolLpTokenAccount'),
+  publicKey('poolRewardTokenAccount'),
+  u64('totalReward'),
+  u128('perShare'),
+  u64('perBlock'),
+  u8('option'),
+  publicKey('poolRewardTokenAccountB'),
+  blob(7),
+  u64('totalRewardB'),
+  u128('perShareB'),
+  u64('perBlockB'),
+  u64('lastBlock'),
+  publicKey('owner')
+])
+
 export const USER_STAKE_INFO_ACCOUNT_LAYOUT = struct([
   u64('state'),
   publicKey('poolId'),
   publicKey('stakerOwner'),
   u64('depositBalance'),
   u64('rewardDebt')
+])
+
+export const USER_STAKE_INFO_ACCOUNT_LAYOUT_V4 = struct([
+  u64('state'),
+  publicKey('poolId'),
+  publicKey('stakerOwner'),
+  u64('depositBalance'),
+  u64('rewardDebt'),
+  u64('rewardDebtB')
 ])

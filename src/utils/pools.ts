@@ -1,6 +1,7 @@
 import {
   LIQUIDITY_POOL_PROGRAM_ID_V2,
   LIQUIDITY_POOL_PROGRAM_ID_V3,
+  LIQUIDITY_POOL_PROGRAM_ID_V4,
   SERUM_PROGRAM_ID_V2,
   SERUM_PROGRAM_ID_V3
 } from './ids'
@@ -372,5 +373,30 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: 'EVVtYo4AeCbmn2dYS1UnhtfjpzCXCcN26G1HmuHwMo7w',
     serumPcVaultAccount: '6ZT6KwvjLnJLpFdVfiRD9ifVUo4gv4MUie7VvPTuk69v',
     serumVaultSigner: 'HXbRDLcX2FyqWJY95apnsTgBoRHyp7SWYXcMYod6EBrQ'
+  },
+  // v4
+  {
+    name: 'FIDA-RAY',
+    coin: { ...TOKENS.FIDA },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['FIDA-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '2dRNngAm729NzLbb1pzgHtfHvPqR4XHFmFyYK78EfEeX',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'DUVSNpoCNyGDP9ef9gJC5Dg53khxTyM1pQrKVetmaW8R',
+    ammTargetOrders: '89HcsFvCQaUdorVF712EhNhecvVM7Dk6XAdPbaykB3q2',
+    ammQuantities: '',
+    poolCoinTokenAccount: '6YeEo7ZTRHotXd89JTBJKRXERBjv3N3ofgsgJ4FoAa39',
+    poolPcTokenAccount: 'DDNURcWy3CU3CpkCnDoGXwQAeCg1mp2CC8WqvwHp5Fdt',
+    poolWithdrawQueue: 'H8gZ2f4hp6LfaszDN5uHAeDwZ1qJ4M4s2A59i7nMFFkN',
+    poolTempLpTokenAccount: 'Bp7LNZH44vecbv69kY35bjmsTjboGbEKy62p7iRT8az',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '9wH4Krv8Vim3op3JAu5NGZQdGxU8HLGAHZh3K77CemxC',
+    serumCoinVaultAccount: 'A2SMhqA1kMTudVeAeWdzCaYYeG6Dts19iEZd4ZQQAcUm',
+    serumPcVaultAccount: 'GhpccNwfein8qP6uhWnP4vuRva1iLivuQQHUTM7tW58r',
+    serumVaultSigner: 'F7VdEoWQGmdFK35SD21wAbDWtnkVpcrxM3DPVnmG8Q3i'
   }
 ]

@@ -402,5 +402,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '8Q6MKy5Yxb9vG1mWzppMtMb2nrhNuCRNUkJTeiE3fuwD',
     decimals: 6
+  },
+  // v4
+  'FIDA-RAY-V4': {
+    symbol: 'FIDA-RAY',
+    name: 'FIDA-RAY LP',
+    coin: { ...TOKENS.FIDA },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'DsBuznXRTmzvEdb36Dx3aVLVo1XmH7r1PRZUFugLPTFv',
+    decimals: 6
   }
 }

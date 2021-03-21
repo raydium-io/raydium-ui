@@ -1,5 +1,5 @@
 import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
-import { STAKE_INFO_LAYOUT, USER_STAKE_INFO_ACCOUNT_LAYOUT } from '@/utils/stake'
+import { STAKE_INFO_LAYOUT, STAKE_INFO_LAYOUT_V4, USER_STAKE_INFO_ACCOUNT_LAYOUT } from '@/utils/stake'
 import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
@@ -93,7 +93,13 @@ export const actions = {
               switch (key) {
                 // 获取池子信息
                 case 'poolId': {
-                  const parsed = STAKE_INFO_LAYOUT.decode(data)
+                  let parsed
+
+                  if (farmInfo.version === 4) {
+                    parsed = STAKE_INFO_LAYOUT_V4.decode(data)
+                  } else {
+                    parsed = STAKE_INFO_LAYOUT.decode(data)
+                  }
 
                   farmInfo.poolInfo = parsed
 
