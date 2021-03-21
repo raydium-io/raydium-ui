@@ -486,8 +486,8 @@ export default Vue.extend({
                 h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
               ])
           })
-
-          const description = `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
+          // @ts-ignore
+          const description = `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
           this.$store.dispatch('transaction/sub', { txid, description })
         })
         .catch((error) => {
