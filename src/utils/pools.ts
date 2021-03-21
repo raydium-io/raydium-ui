@@ -67,13 +67,13 @@ export function getPoolByTokenMintAddresses(
 export function getLpMintByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
-  version = 3
+  version = [3, 4]
 ): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
       ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
         (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
-      pool.version === version
+      version.includes(pool.version)
   )
 
   if (pool) {
@@ -391,7 +391,8 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
     ammOpenOrders: 'DUVSNpoCNyGDP9ef9gJC5Dg53khxTyM1pQrKVetmaW8R',
     ammTargetOrders: '89HcsFvCQaUdorVF712EhNhecvVM7Dk6XAdPbaykB3q2',
-    ammQuantities: '',
+    // 随便取的
+    ammQuantities: NATIVE_SOL.mintAddress,
     poolCoinTokenAccount: '6YeEo7ZTRHotXd89JTBJKRXERBjv3N3ofgsgJ4FoAa39',
     poolPcTokenAccount: 'DDNURcWy3CU3CpkCnDoGXwQAeCg1mp2CC8WqvwHp5Fdt',
     poolWithdrawQueue: 'H8gZ2f4hp6LfaszDN5uHAeDwZ1qJ4M4s2A59i7nMFFkN',

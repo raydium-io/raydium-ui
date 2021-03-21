@@ -48,7 +48,7 @@
                 ≈ {{ info.percent.isLessThan(0.0001) ? '&lt;0.01' : info.percent.multipliedBy(100).toFixed(2) }}%
               </div>
             </div>
-            <Row v-if="info.poolInfo.version === 3" :gutter="32" class="actions">
+            <Row v-if="[3, 4].includes(info.poolInfo.version)" :gutter="32" class="actions">
               <Col :span="12">
                 <Button ghost @click="$emit('onAdd', info.coin.mintAddress, info.pc.mintAddress)"> Add </Button>
               </Col>

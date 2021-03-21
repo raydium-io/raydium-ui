@@ -129,8 +129,15 @@
           "
           @onSelect="openToCoinSelect"
         />
+        <div v-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
+          <span>
+            1 {{ fromCoin.symbol }} ≈
+            {{ outToPirceValue }}
+            {{ toCoin.symbol }}
+          </span>
+        </div>
         <div
-          v-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
+          v-else-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
           class="price-base fc-container"
         >
           <span>
@@ -469,6 +476,8 @@ export default Vue.extend({
             this.loading = false
             this.countdown = 0
           })
+      } else {
+        this.loading = false
       }
     },
 
