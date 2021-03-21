@@ -79,12 +79,12 @@
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
-              fixedFromCoin = true
+              fixedCoin = fromCoin.mintAddress
             }
           "
           @onMax="
             () => {
-              fixedFromCoin = true
+              fixedCoin = fromCoin.mintAddress
               fromCoinAmount = fromCoin.balance.fixed()
             }
           "
@@ -105,12 +105,12 @@
           @onInput="(amount) => (toCoinAmount = amount)"
           @onFocus="
             () => {
-              fixedFromCoin = false
+              fixedCoin = toCoin.mintAddress
             }
           "
           @onMax="
             () => {
-              fixedFromCoin = false
+              fixedCoin = toCoin.mintAddress
               toCoinAmount = toCoin.balance.fixed()
             }
           "
@@ -202,7 +202,7 @@ export default Vue.extend({
       // 正在弹框选择哪个的币种
       selectFromCoin: true,
       // 哪个币种的金额固定，从而动态计算另一个
-      fixedFromCoin: true,
+      fixedCoin: '',
 
       // 已选择的币种
       fromCoin: RAY as TokenInfo | null,
@@ -408,7 +408,7 @@ export default Vue.extend({
       if (this.fromCoin && this.toCoin && this.lpMintAddress) {
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-        if (this.fixedFromCoin) {
+        if (this.fixedCoin === this.fromCoin.mintAddress) {
           const amount = getOutAmount(
             poolInfo,
             this.fromCoinAmount,
@@ -508,7 +508,7 @@ export default Vue.extend({
         this.toCoin,
         this.fromCoinAmount,
         this.toCoinAmount,
-        this.fixedFromCoin
+        this.fixedCoin
       )
         .then((txid) => {
           ;(this as any).$notify.info({

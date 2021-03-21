@@ -81,7 +81,7 @@ export async function addLiquidity(
   toCoin: TokenInfo | undefined | null,
   fromAmount: string | undefined | null,
   toAmount: string | undefined | null,
-  fixedFromCoin: boolean
+  fixedCoin: string
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo || !fromCoin || !toCoin) {
@@ -163,7 +163,7 @@ export async function addLiquidity(
 
           coinAmount,
           pcAmount,
-          fixedFromCoin && fromCoin.mintAddress === poolInfo.coin.mintAddress ? 0 : 1
+          fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
         )
       : addLiquidityInstruction(
           new PublicKey(poolInfo.programId),
@@ -185,7 +185,7 @@ export async function addLiquidity(
 
           coinAmount,
           pcAmount,
-          fixedFromCoin && fromCoin.mintAddress === poolInfo.coin.mintAddress ? 0 : 1
+          fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
         )
   )
 
