@@ -1,5 +1,5 @@
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
-import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3 } from '@/utils/liquidity'
+import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { LIQUIDITY_POOLS, getAddressForWhat } from '@/utils/pools'
 import { commitment, getMultipleAccounts } from '@/utils/web3'
 
@@ -123,8 +123,16 @@ export const actions = {
                   let parsed
                   if (version === 2) {
                     parsed = AMM_INFO_LAYOUT.decode(data)
-                  } else {
+                  } else if (version === 3) {
                     parsed = AMM_INFO_LAYOUT_V3.decode(data)
+                  } else {
+                    parsed = AMM_INFO_LAYOUT_V4.decode(data)
+
+                    const { swapFeeNumerator, swapFeeDenominator } = parsed
+                    poolInfo.fees = {
+                      swapFeeNumerator: swapFeeNumerator.toNumber(),
+                      swapFeeDenominator: swapFeeDenominator.toNumber()
+                    }
                   }
 
                   const { needTakePnlCoin, needTakePnlPc } = parsed

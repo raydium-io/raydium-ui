@@ -8,8 +8,8 @@ import {
 import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
 import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
-import { nu64, struct, u8, blob } from 'buffer-layout'
-import { publicKey, u64 } from '@project-serum/borsh'
+import { nu64, struct, u8 } from 'buffer-layout'
+import { publicKey, u64, u128 } from '@project-serum/borsh'
 
 import BigNumber from 'bignumber.js'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
@@ -482,6 +482,7 @@ export const AMM_INFO_LAYOUT_V4 = struct([
   u64('minPriceMultiplier'),
   u64('maxPriceMultiplier'),
   u64('systemDecimalsValue'),
+  // Fees
   u64('minSeparateNumerator'),
   u64('minSeparateDenominator'),
   u64('tradeFeeNumerator'),
@@ -490,7 +491,20 @@ export const AMM_INFO_LAYOUT_V4 = struct([
   u64('pnlDenominator'),
   u64('swapFeeNumerator'),
   u64('swapFeeDenominator'),
-  blob(144, 'outPut'),
+  // OutPutData
+  u64('needTakePnlCoin'),
+  u64('needTakePnlPc'),
+  u64('totalPnlPc'),
+  u64('totalPnlCoin'),
+  u128('poolTotalDepositPc'),
+  u128('poolTotalDepositCoin'),
+  u128('swapCoinInAmount'),
+  u128('swapPcOutAmount'),
+  u64('swapCoin2PcFee'),
+  u128('swapPcInAmount'),
+  u128('swapCoinOutAmount'),
+  u64('swapPc2CoinFee'),
+
   publicKey('poolCoinTokenAccount'),
   publicKey('poolPcTokenAccount'),
   publicKey('coinMintAddress'),

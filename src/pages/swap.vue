@@ -48,7 +48,18 @@
                   <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
                 </div>
               </div>
-              <div v-if="marketAddress" class="info">
+              <div v-if="lpMintAddress" class="info">
+                <div class="symbol">Pool</div>
+                <div class="address">
+                  {{ lpMintAddress.substr(0, 14) }}
+                  ...
+                  {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
+                </div>
+                <div class="action">
+                  <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
+                </div>
+              </div>
+              <div v-else-if="marketAddress" class="info">
                 <div class="symbol">Market</div>
                 <div class="address">
                   {{ marketAddress.substr(0, 14) }}
@@ -175,9 +186,10 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { getOutAmount, swap } from '@/utils/swap'
+import { getOutAmount, getSwapOutAmount, swap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
+import { getPoolByTokenMintAddresses } from '@/utils/liquidity'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -213,8 +225,11 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
+      // serum
       market: null as any,
       marketAddress: '',
+      // 内部消化
+      lpMintAddress: '',
       // coin 为基准货币
       coinBasePrice: true,
       outToPirceValue: null as any
@@ -222,7 +237,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'swap', 'url', 'setting'])
+    ...mapState(['wallet', 'swap', 'liquidity', 'url', 'setting'])
   },
 
   watch: {
@@ -361,6 +376,14 @@ export default Vue.extend({
       if (this.fromCoin && this.toCoin) {
         let marketAddress = ''
 
+        // 如果有自有池 内部消化
+        const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
+        if (pool && pool.version === 4) {
+          this.lpMintAddress = pool.lp.mintAddress
+          return
+        }
+
+        // 否则走 serum 池子
         for (const address of Object.keys(this.swap.markets)) {
           const info = cloneDeep(this.swap.markets[address])
 
@@ -405,6 +428,7 @@ export default Vue.extend({
       } else {
         this.marketAddress = ''
         this.market = null
+        this.lpMintAddress = ''
         // this.unsubPoolChange()
       }
     },
@@ -447,7 +471,27 @@ export default Vue.extend({
 
     // 更新输入价格
     updateAmounts() {
-      if (
+      if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
+        const amountOut = getSwapOutAmount(
+          get(this.liquidity.infos, this.lpMintAddress),
+          this.fromCoin.mintAddress,
+          this.toCoin.mintAddress,
+          this.fromCoinAmount,
+          this.setting.slippage
+        )
+        if (amountOut.isNullOrZero()) {
+          this.toCoinAmount = ''
+        } else {
+          const toCoinAmount = amountOut.fixed()
+
+          this.toCoinAmount = toCoinAmount
+          this.outToPirceValue = new TokenAmount(
+            parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
+            this.toCoin.decimals,
+            false
+          ).format()
+        }
+      } else if (
         this.fromCoin &&
         this.toCoin &&
         this.marketAddress &&
@@ -478,6 +522,8 @@ export default Vue.extend({
             false
           ).format()
         }
+      } else {
+        this.toCoinAmount = ''
       }
     },
 

@@ -8,7 +8,7 @@ import {
   mergeTransactions,
   sendTransaction
 } from '@/utils/web3'
-
+import { TokenAmount } from '@/utils/safe-math'
 // eslint-disable-next-line
 import { SERUM_PROGRAM_ID_V3 } from './ids'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
@@ -40,6 +40,46 @@ export function getOutAmount(
     return forecastBuy(market, asks, fromAmount, slippage)
   } else {
     return forecastSell(market, bids, fromAmount, slippage)
+  }
+}
+
+// 计算 swap 金额
+export function getSwapOutAmount(
+  poolInfo: any,
+  fromCoinMint: string,
+  toCoinMint: string,
+  amount: string,
+  slippage: number
+) {
+  const { coin, pc, fees } = poolInfo
+  const { swapFeeNumerator, swapFeeDenominator } = fees
+
+  let fromMint = fromCoinMint
+  let toMint = toCoinMint
+
+  if (fromMint === NATIVE_SOL.mintAddress) {
+    fromMint = TOKENS.WSOL.mintAddress
+  }
+  if (toMint === NATIVE_SOL.mintAddress) {
+    toMint = TOKENS.WSOL.mintAddress
+  }
+
+  if (fromMint === coin.mintAddress && toMint === pc.mintAddress) {
+    // coin2pc
+    const fromAmount = new TokenAmount(amount, coin.decimals, false)
+    const denominator = coin.balance.wei.plus(fromAmount.wei)
+    const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
+    const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+    return new TokenAmount(amountOutWithSlippage, pc.decimals)
+  } else {
+    // pc2coin
+    const fromAmount = new TokenAmount(amount, pc.decimals, false)
+    const denominator = pc.balance.wei.plus(fromAmount.wei)
+    const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
+    const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+    return new TokenAmount(amountOutWithSlippage, coin.decimals)
   }
 }
 
