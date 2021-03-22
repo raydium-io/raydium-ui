@@ -95,6 +95,8 @@ export default Vue.extend({
     ...mapState(['wallet', 'price', 'swap', 'liquidity', 'farm'])
   },
 
+  watch: {},
+
   mounted() {
     const conn = new Connection(this.wallet.endpoint)
     Vue.prototype.$conn = conn
