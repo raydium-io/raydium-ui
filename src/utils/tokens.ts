@@ -95,12 +95,32 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN'
   },
+  USDT: {
+    symbol: 'USDT',
+    name: 'USDT',
+    mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    decimals: 6,
+    referrer: '8DwwDNagph8SdwMUdcXS5L9YAyutTyDJmK6cTKrmNFk3'
+  },
+  WUSDT: {
+    symbol: 'WUSDT',
+    name: 'Wrapped USDT',
+    mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
+    decimals: 6,
+    referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3'
+  },
   USDC: {
     symbol: 'USDC',
     name: 'USDC',
     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
+  },
+  WUSDC: {
+    symbol: 'WUSDC',
+    name: 'Wrapped USDC',
+    mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
+    decimals: 6
   },
   YFI: {
     symbol: 'YFI',
@@ -122,13 +142,6 @@ export const TOKENS: Tokens = {
     mintAddress: 'Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8',
     decimals: 6,
     referrer: '6NeHPXG142tAE2Ej3gHgT2N66i1KH6PFR6PBZw6RyrwH'
-  },
-  USDT: {
-    symbol: 'USDT',
-    name: 'Wrapped USDT',
-    mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
-    decimals: 6,
-    referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3'
   },
   SUSHI: {
     symbol: 'SUSHI',
@@ -227,12 +240,6 @@ export const TOKENS: Tokens = {
     mintAddress: 'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L',
     decimals: 0,
     referrer: 'Ge5q9x8gDUNYqqLA1MdnCzWNJGsbj3M15Yxse2cDbw9z'
-  },
-  WUSDC: {
-    symbol: 'WUSDC',
-    name: 'Wrapped USDC',
-    mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
-    decimals: 6
   },
   TOMO: {
     symbol: 'TOMO',
