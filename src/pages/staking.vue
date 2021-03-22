@@ -25,6 +25,23 @@
       </div>
     </div>
 
+    <CoinModal
+      v-if="stakeModalOpening"
+      title="Stake RAY"
+      :coin="lp"
+      :loading="staking"
+      @onOk="stake"
+      @onCancel="cancelStake"
+    />
+    <CoinModal
+      v-if="unstakeModalOpening"
+      title="Unstake RAY"
+      :coin="lp"
+      :loading="unstaking"
+      @onOk="unstake"
+      @onCancel="cancelUnstake"
+    />
+
     <div v-if="farm.initialized" class="card">
       <div class="card-body">
         <Collapse expand-icon-position="right">
@@ -78,22 +95,6 @@
                 </div>
               </Col>
 
-              <CoinModal
-                v-if="stakeModalOpening"
-                title="Stake RAY"
-                :coin="lp"
-                :loading="staking"
-                @onOk="stake"
-                @onCancel="cancelStake"
-              />
-              <CoinModal
-                v-if="unstakeModalOpening"
-                title="Unstake RAY"
-                :coin="lp"
-                :loading="unstaking"
-                @onOk="unstake"
-                @onCancel="cancelUnstake"
-              />
               <Col :span="app.isMobile ? 24 : 12">
                 <div class="start">
                   <div class="title">Start staking</div>

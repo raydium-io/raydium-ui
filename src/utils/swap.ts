@@ -223,8 +223,8 @@ export async function swap(
       newFromTokenAccount,
       newToTokenAccount,
       owner,
-      ~~amountIn.toWei().toNumber(),
-      ~~amountOut.toWei().toNumber()
+      Math.floor(amountIn.toWei().toNumber()),
+      Math.floor(amountOut.toWei().toNumber())
     )
   )
 

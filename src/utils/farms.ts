@@ -10,6 +10,7 @@ export interface FarmInfo {
   rewardB?: TokenInfo
   isStake: boolean
 
+  legacy: boolean
   version: number
   programId: string
 
@@ -84,6 +85,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: true,
     version: 2,
     programId: STAKE_PROGRAM_ID,
 
@@ -98,6 +100,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: true,
     version: 2,
     programId: STAKE_PROGRAM_ID,
 
@@ -112,6 +115,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: true,
     version: 2,
     programId: STAKE_PROGRAM_ID,
 
@@ -127,6 +131,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
 
@@ -141,6 +146,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
 
@@ -155,6 +161,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
 
@@ -169,6 +176,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
 
@@ -183,6 +191,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: false,
 
+    legacy: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
 
@@ -198,6 +207,7 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.RAY },
     isStake: true,
 
+    legacy: false,
     version: 2,
     programId: STAKE_PROGRAM_ID,
 
@@ -214,6 +224,7 @@ export const FARMS: FarmInfo[] = [
     rewardB: { ...TOKENS.FIDA },
     isStake: false,
 
+    legacy: false,
     version: 4,
     programId: STAKE_PROGRAM_ID_V4,
 
@@ -230,6 +241,7 @@ export const FARMS: FarmInfo[] = [
     rewardB: { ...TOKENS.OXY },
     isStake: false,
 
+    legacy: false,
     version: 4,
     programId: STAKE_PROGRAM_ID_V4,
 
@@ -246,6 +258,7 @@ export const FARMS: FarmInfo[] = [
     rewardB: { ...TOKENS.MAPS },
     isStake: false,
 
+    legacy: false,
     version: 4,
     programId: STAKE_PROGRAM_ID_V4,
 
@@ -262,6 +275,7 @@ export const FARMS: FarmInfo[] = [
     rewardB: { ...TOKENS.KIN },
     isStake: false,
 
+    legacy: true,
     version: 4,
     programId: STAKE_PROGRAM_ID_V4,
 

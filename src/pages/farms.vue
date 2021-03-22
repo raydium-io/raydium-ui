@@ -35,11 +35,32 @@
       </div>
     </div>
 
+    <CoinModal
+      v-if="stakeModalOpening"
+      title="Stake LP"
+      :coin="lp"
+      :loading="staking"
+      @onOk="stake"
+      @onCancel="cancelStake"
+    />
+    <CoinModal
+      v-if="unstakeModalOpening"
+      title="Unstake LP"
+      :coin="lp"
+      :loading="unstaking"
+      @onOk="unstake"
+      @onCancel="cancelUnstake"
+    />
+
     <div v-if="farm.initialized">
       <div class="card">
         <div class="card-body">
           <Collapse expand-icon-position="right">
-            <CollapsePanel v-for="farm in farms" v-show="farm.farmInfo.version === 3" :key="farm.farmInfo.poolId">
+            <CollapsePanel
+              v-for="farm in farms"
+              v-show="farm.farmInfo.version === 3 && !farm.farmInfo.legacy"
+              :key="farm.farmInfo.poolId"
+            >
               <Row slot="header" class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
                   <div class="icons">
@@ -105,22 +126,6 @@
                   </div>
                 </Col>
 
-                <CoinModal
-                  v-if="stakeModalOpening"
-                  title="Stake LP"
-                  :coin="lp"
-                  :loading="staking"
-                  @onOk="stake"
-                  @onCancel="cancelStake"
-                />
-                <CoinModal
-                  v-if="unstakeModalOpening"
-                  title="Unstake LP"
-                  :coin="lp"
-                  :loading="unstaking"
-                  @onOk="unstake"
-                  @onCancel="cancelUnstake"
-                />
                 <Col :span="app.isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
@@ -156,39 +161,43 @@
 
       <div class="card">
         <div class="card-body">
-          <div v-for="farm in farms" :key="farm.farmInfo.poolId" :showArrow="false">
-            <template v-if="farm.farmInfo.version === 2">
-              <Row class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
-                <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
-                  <div class="icons">
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
-                  </div>
-                  {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-                </Col>
-                <Col v-if="!app.isMobile" class="state" :span="4">
-                  <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                  <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
-                </Col>
-                <Col v-if="!app.isMobile" class="state" :span="4">
-                  <div class="title">Staked</div>
-                  <div class="value">
-                    {{ farm.userInfo.depositBalance.format() }}
-                  </div>
-                </Col>
-                <Col v-if="!app.isMobile" class="state" :span="4">
-                  <div class="title">Apr</div>
-                  <div class="value">{{ farm.farmInfo.apr }}%</div>
-                </Col>
-                <Col class="fc-container" :span="app.isMobile ? 12 : 4">
-                  <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
-                    Connect Wallet
-                  </Button>
-                  <Button v-else ghost @click="$router.replace({ path: '/migrate' })"> Unstake & Migrate </Button>
-                </Col>
-              </Row>
-            </template>
-          </div>
+          <template v-for="farm in farms">
+            <Row
+              v-if="farm.farmInfo.version === 2 && farm.farmInfo.legacy"
+              :key="farm.farmInfo.poolId"
+              class="farm-head"
+              :class="app.isMobile ? 'is-mobile' : ''"
+              :gutter="0"
+            >
+              <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
+                <div class="icons">
+                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
+                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                </div>
+                {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
+              </Col>
+              <Col v-if="!app.isMobile" class="state" :span="4">
+                <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
+                <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+              </Col>
+              <Col v-if="!app.isMobile" class="state" :span="4">
+                <div class="title">Staked</div>
+                <div class="value">
+                  {{ farm.userInfo.depositBalance.format() }}
+                </div>
+              </Col>
+              <Col v-if="!app.isMobile" class="state" :span="4">
+                <div class="title">Apr</div>
+                <div class="value">{{ farm.farmInfo.apr }}%</div>
+              </Col>
+              <Col class="fc-container" :span="app.isMobile ? 12 : 4">
+                <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
+                  Connect Wallet
+                </Button>
+                <Button v-else ghost @click="$router.replace({ path: '/migrate' })"> Unstake & Migrate </Button>
+              </Col>
+            </Row>
+          </template>
         </div>
       </div>
     </div>
