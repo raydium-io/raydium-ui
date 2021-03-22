@@ -92,6 +92,10 @@ export default Vue.extend({
     }
   },
 
+  head: {
+    title: 'Raydium Migrate'
+  },
+
   computed: {
     ...mapState(['wallet', 'liquidity', 'farm', 'url'])
   },

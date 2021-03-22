@@ -245,6 +245,10 @@ export default Vue.extend({
     }
   },
 
+  head: {
+    title: 'Raydium Swap'
+  },
+
   computed: {
     ...mapState(['wallet', 'swap', 'liquidity', 'url', 'setting'])
   },

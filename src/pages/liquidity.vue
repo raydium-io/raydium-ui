@@ -229,6 +229,10 @@ export default Vue.extend({
     }
   },
 
+  head: {
+    title: 'Raydium Liquidity'
+  },
+
   computed: {
     ...mapState(['wallet', 'liquidity', 'transaction', 'setting', 'url'])
   },

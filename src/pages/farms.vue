@@ -243,6 +243,10 @@ export default Vue.extend({
     }
   },
 
+  head: {
+    title: 'Raydium Farm'
+  },
+
   computed: {
     ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
   },

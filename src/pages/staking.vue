@@ -80,7 +80,7 @@
 
               <CoinModal
                 v-if="stakeModalOpening"
-                title="Stake LP"
+                title="Stake RAY"
                 :coin="lp"
                 :loading="staking"
                 @onOk="stake"
@@ -88,7 +88,7 @@
               />
               <CoinModal
                 v-if="unstakeModalOpening"
-                title="Unstake LP"
+                title="Unstake RAY"
                 :coin="lp"
                 :loading="unstaking"
                 @onOk="unstake"
@@ -169,6 +169,10 @@ export default Vue.extend({
       unstakeModalOpening: false,
       unstaking: false
     }
+  },
+
+  head: {
+    title: 'Raydium Staking'
   },
 
   computed: {
