@@ -71,7 +71,16 @@
               </Row>
 
               <Row :class="app.isMobile ? 'is-mobile' : ''" :gutter="48">
-                <Col :span="app.isMobile ? 24 : 12">
+                <Col :span="app.isMobile ? 24 : 4">
+                  <p>Add liquidity:</p>
+                  <NuxtLink
+                    :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
+                  >
+                    {{ farm.farmInfo.lp.name }}
+                  </NuxtLink>
+                </Col>
+
+                <Col :span="app.isMobile ? 24 : 10">
                   <div class="harvest">
                     <div class="title">Pending Rewards</div>
                     <div class="pending fs-container">
@@ -112,7 +121,7 @@
                   @onOk="unstake"
                   @onCancel="cancelUnstake"
                 />
-                <Col :span="app.isMobile ? 24 : 12">
+                <Col :span="app.isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
                     <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
