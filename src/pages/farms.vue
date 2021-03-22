@@ -308,7 +308,7 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              this.price.prices[reward.symbol as string]
 
             const liquidityCoinValue =
               (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *

@@ -52,7 +52,7 @@
                   </div>
                 </Col>
                 <Col class="state" :span="app.isMobile ? 6 : 4">
-                  <div class="title">Apr</div>
+                  <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
                   <div class="value">
                     <div>{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
                     <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
@@ -95,7 +95,11 @@
                       <Button
                         size="large"
                         ghost
-                        :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
+                        :disabled="
+                          !wallet.connected ||
+                          harvesting ||
+                          (farm.userInfo.pendingReward.isNullOrZero() && farm.userInfo.pendingRewardB.isNullOrZero())
+                        "
                         :loading="harvesting"
                         @click="harvest(farm.farmInfo)"
                       >
@@ -265,7 +269,7 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              this.price.prices[reward.symbol as string]
             const rewardBPerBlockAmountTotalValue =
               rewardBPerBlockAmount.toEther().toNumber() *
               2 *
@@ -273,7 +277,7 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              this.price.prices[rewardB.symbol as string]
 
             const liquidityCoinValue =
               (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
@@ -289,11 +293,17 @@ export default Vue.extend({
             const liquidityUsdValue = lp.balance.toEther().toNumber() * liquidityItemValue
             const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
             const aprB = ((rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
+            const aprTotal = (
+              (rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100 +
+              (rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100
+            ).toFixed(2)
 
             // @ts-ignore
             newFarmInfo.apr = apr
             // @ts-ignore
             newFarmInfo.aprB = aprB
+            // @ts-ignore
+            newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
           }
