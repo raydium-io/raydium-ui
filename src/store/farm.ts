@@ -174,51 +174,51 @@ export const actions = {
                 stakeAccountAddress
               }
             }
-
-            // 获取 stake user info account v4
-            const stakeFiltersV4 = [
-              {
-                memcmp: {
-                  offset: 40,
-                  bytes: wallet.publicKey.toBase58()
-                }
-              },
-              {
-                dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
-              }
-            ]
-
-            getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
-              .then((stakeAccountInfos) => {
-                stakeAccountInfos.forEach((stakeAccountInfo) => {
-                  const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-                  const { data } = stakeAccountInfo.accountInfo
-
-                  const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
-
-                  const poolId = userStakeInfo.poolId.toBase58()
-                  const depositBalance = userStakeInfo.depositBalance.toNumber()
-                  const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-                  const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
-
-                  const farm = getFarmByPoolId(poolId)
-
-                  if (farm) {
-                    stakeAccounts[poolId] = {
-                      depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                      rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                      // @ts-ignore
-                      rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                      stakeAccountAddress
-                    }
-                  }
-                })
-
-                commit('setStakeAccounts', stakeAccounts)
-                logger('User StakeAccounts updated')
-              })
-              .catch()
           })
+
+          // 获取 stake user info account v4
+          const stakeFiltersV4 = [
+            {
+              memcmp: {
+                offset: 40,
+                bytes: wallet.publicKey.toBase58()
+              }
+            },
+            {
+              dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
+            }
+          ]
+
+          getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
+            .then((stakeAccountInfos) => {
+              stakeAccountInfos.forEach((stakeAccountInfo) => {
+                const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+                const { data } = stakeAccountInfo.accountInfo
+
+                const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+                const poolId = userStakeInfo.poolId.toBase58()
+                const depositBalance = userStakeInfo.depositBalance.toNumber()
+                const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+                const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+
+                const farm = getFarmByPoolId(poolId)
+
+                if (farm) {
+                  stakeAccounts[poolId] = {
+                    depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                    rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                    // @ts-ignore
+                    rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                    stakeAccountAddress
+                  }
+                }
+              })
+
+              commit('setStakeAccounts', stakeAccounts)
+              logger('User StakeAccounts updated')
+            })
+            .catch()
         })
         .catch()
     }
