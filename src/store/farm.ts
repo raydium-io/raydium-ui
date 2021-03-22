@@ -137,7 +137,7 @@ export const actions = {
     const conn = (this as any)._vm.$conn
     const wallet = (this as any)._vm.$wallet
 
-    if (wallet) {
+    if (wallet && wallet.connected) {
       // 获取 stake user info account
       const stakeFilters = [
         {

@@ -88,58 +88,60 @@ export const actions = {
     const conn: Connection = (this as any)._vm.$conn
     const wallet = (this as any)._vm.$wallet
 
-    commit('setLoading', true)
+    if (wallet && wallet.connected) {
+      commit('setLoading', true)
 
-    conn
-      .getParsedTokenAccountsByOwner(
-        wallet.publicKey,
-        {
-          programId: TOKEN_PROGRAM_ID
-        },
-        'confirmed'
-      )
-      .then(async (parsedTokenAccounts: any) => {
-        const tokenAccounts: any = {}
+      conn
+        .getParsedTokenAccountsByOwner(
+          wallet.publicKey,
+          {
+            programId: TOKEN_PROGRAM_ID
+          },
+          'confirmed'
+        )
+        .then(async (parsedTokenAccounts: any) => {
+          const tokenAccounts: any = {}
 
-        parsedTokenAccounts.value.forEach(
-          (tokenAccountInfo: { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }) => {
-            const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58()
-            const parsedInfo = tokenAccountInfo.account.data.parsed.info
-            const mintAddress = parsedInfo.mint
-            const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
+          parsedTokenAccounts.value.forEach(
+            (tokenAccountInfo: { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }) => {
+              const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58()
+              const parsedInfo = tokenAccountInfo.account.data.parsed.info
+              const mintAddress = parsedInfo.mint
+              const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
 
-            // 如果同一 mint 有多个账户
-            if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
-              // 且老账户没余额
-              if (tokenAccounts[mintAddress].balance === 0) {
+              // 如果同一 mint 有多个账户
+              if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
+                // 且老账户没余额
+                if (tokenAccounts[mintAddress].balance === 0) {
+                  tokenAccounts[mintAddress] = {
+                    tokenAccountAddress,
+                    balance
+                  }
+                }
+              } else {
                 tokenAccounts[mintAddress] = {
                   tokenAccountAddress,
                   balance
                 }
               }
-            } else {
-              tokenAccounts[mintAddress] = {
-                tokenAccountAddress,
-                balance
-              }
             }
+          )
+
+          // 获取原生 SOL 余额
+          const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
+          tokenAccounts[NATIVE_SOL.mintAddress] = {
+            tokenAccountAddress: wallet.publicKey.toBase58(),
+            balance: new TokenAmount(solBalance, NATIVE_SOL.decimals)
           }
-        )
 
-        // 获取原生 SOL 余额
-        const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
-        tokenAccounts[NATIVE_SOL.mintAddress] = {
-          tokenAccountAddress: wallet.publicKey.toBase58(),
-          balance: new TokenAmount(solBalance, NATIVE_SOL.decimals)
-        }
-
-        commit('setTokenAccounts', tokenAccounts)
-        logger('Wallet TokenAccounts updated')
-      })
-      .catch()
-      .finally(() => {
-        commit('setInitialized')
-        commit('setLoading', false)
-      })
+          commit('setTokenAccounts', tokenAccounts)
+          logger('Wallet TokenAccounts updated')
+        })
+        .catch()
+        .finally(() => {
+          commit('setInitialized')
+          commit('setLoading', false)
+        })
+    }
   }
 }
