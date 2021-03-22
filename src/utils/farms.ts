@@ -1,6 +1,6 @@
 import { LP_TOKENS, TOKENS, TokenInfo } from '@/utils/tokens'
 
-import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4 } from '@/utils/ids'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
 import { cloneDeep } from 'lodash-es'
 
 export interface FarmInfo {
@@ -269,6 +269,7 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '3UWGpEe2NLD9oWPW1zdXGZRCvJxkNSC2puUWooNEugdS' // reward vault B
   },
   {
+    // legacy
     name: 'KIN-RAY',
     lp: { ...LP_TOKENS['KIN-RAY-V4'] },
     reward: { ...TOKENS.RAY },
@@ -284,5 +285,22 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'DgCSAJiicdEggHJxM7Vs2j59yM5wMJMCGzUHALiVDhtX', // lp vault
     poolRewardTokenAccount: '3BGPPWYJMSFaWmq21x8Feqvgsii1fVmJiivRuPJSgXe1', // reward vault A
     poolRewardTokenAccountB: '5uX6ceRRxDRrcARddFkypCZV5MXz5KUQDr7Zf9ZnSSLf' // reward vault B
+  },
+  {
+    name: 'KIN-RAY',
+    lp: { ...LP_TOKENS['KIN-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.KIN },
+    isStake: false,
+
+    legacy: false,
+    version: 4,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'FgApVk6mASrkuWNxmsFvsaAYkFKqdiwMTvYZK36A2DaC',
+    poolAuthority: '7kEx8qnkZPkRXV6f4ztf27zYjCACBHY3PUMfuiYJsoML',
+    poolLpTokenAccount: '7fgDjhZn9GqRZbbCregr9tpkbWSKjibdCsJNBYbLhLir', // lp vault
+    poolRewardTokenAccount: '5XZjRyEo8Wr2CtSE5bpoKioThT9czK1dUebbK87Lqkaa', // reward vault A
+    poolRewardTokenAccountB: '8jGJ3ST1j9eemfC6N2qQevtUdwxT7TpXW1NmvWyvLLVs' // reward vault B
   }
 ]
