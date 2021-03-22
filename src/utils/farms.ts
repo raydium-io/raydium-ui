@@ -294,7 +294,7 @@ export const FARMS: FarmInfo[] = [
     isStake: false,
 
     legacy: false,
-    version: 4,
+    version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
     poolId: 'FgApVk6mASrkuWNxmsFvsaAYkFKqdiwMTvYZK36A2DaC',

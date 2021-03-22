@@ -9,7 +9,7 @@ import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/u
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
-import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4 } from '@/utils/ids'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
@@ -100,7 +100,7 @@ export const actions = {
                 case 'poolId': {
                   let parsed
 
-                  if (farmInfo.version === 4) {
+                  if ([4, 5].includes(farmInfo.version)) {
                     parsed = STAKE_INFO_LAYOUT_V4.decode(data)
                   } else {
                     parsed = STAKE_INFO_LAYOUT.decode(data)
@@ -215,8 +215,36 @@ export const actions = {
                 }
               })
 
-              commit('setStakeAccounts', stakeAccounts)
-              logger('User StakeAccounts updated')
+              getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V5), stakeFiltersV4)
+                .then((stakeAccountInfos) => {
+                  stakeAccountInfos.forEach((stakeAccountInfo) => {
+                    const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+                    const { data } = stakeAccountInfo.accountInfo
+
+                    const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+                    const poolId = userStakeInfo.poolId.toBase58()
+                    const depositBalance = userStakeInfo.depositBalance.toNumber()
+                    const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+                    const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+
+                    const farm = getFarmByPoolId(poolId)
+
+                    if (farm) {
+                      stakeAccounts[poolId] = {
+                        depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                        rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                        // @ts-ignore
+                        rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                        stakeAccountAddress
+                      }
+                    }
+                  })
+
+                  commit('setStakeAccounts', stakeAccounts)
+                  logger('User StakeAccounts updated')
+                })
+                .catch()
             })
             .catch()
         })

@@ -48,7 +48,7 @@
           <Collapse expand-icon-position="right">
             <CollapsePanel
               v-for="farm in farms"
-              v-show="farm.farmInfo.version === 4 && !farm.farmInfo.legacy"
+              v-show="[4, 5].includes(farm.farmInfo.version) && !farm.farmInfo.legacy"
               :key="farm.farmInfo.poolId"
             >
               <Row slot="header" class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
@@ -167,7 +167,7 @@
         <div class="card-body">
           <template v-for="farm in farms">
             <Row
-              v-if="farm.farmInfo.version === 4 && farm.farmInfo.legacy"
+              v-if="[4, 5].includes(farm.farmInfo.version) && farm.farmInfo.legacy"
               :key="farm.farmInfo.poolId"
               class="farm-head"
               :class="app.isMobile ? 'is-mobile' : ''"
@@ -312,7 +312,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake && farmInfo.version === 4) {
+        if (!farmInfo.isStake && [4, 5].includes(farmInfo.version)) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
           const { perShare, perBlock, perShareB, perBlockB } = farmInfo.poolInfo
@@ -377,13 +377,20 @@ export default Vue.extend({
 
             const { rewardDebt, rewardDebtB, depositBalance } = userInfo
 
+            let d = 0
+            // @ts-ignore
+            if (newFarmInfo.version === 5) {
+              d = 1e15
+            } else {
+              d = 1e9
+            }
             const pendingReward = depositBalance.wei
               .multipliedBy(perShare.toNumber())
-              .dividedBy(1e9)
+              .dividedBy(d)
               .minus(rewardDebt.wei)
             const pendingRewardB = depositBalance.wei
               .multipliedBy(perShareB.toNumber())
-              .dividedBy(1e9)
+              .dividedBy(d)
               .minus(rewardDebtB.wei)
 
             userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
