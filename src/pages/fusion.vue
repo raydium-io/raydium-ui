@@ -1,5 +1,17 @@
 <template>
   <div class="fusion container">
+    <div class="fc-container">
+      <Alert type="warning" message="IMPORTANT" show-icon closable>
+        <div slot="description">
+          NOTICE: Due to the large number of KIN in the Fusion pool, a decimal rounding issue has affected RAY rewards
+          for the KIN-RAY pool. In order to solve this, tokens need to be manually migrated from the "Legacy" pool to
+          the new KIN-RAY pool to continue receiving rewards. To migrate, simply unstake from the legacy pool and stake
+          in the new pool. You DO NOT need to remove liquidity. Current KIN rewards will be auto-harvested during
+          unstaking.
+        </div>
+      </Alert>
+    </div>
+
     <div class="page-head fs-container">
       <span class="title">Fusion Pools</span>
       <div class="buttons">
@@ -159,7 +171,7 @@
       </div>
 
       <div class="page-head fs-container">
-        <span class="title">Legacy Fusion Pools</span>
+        <span class="title">Legacy</span>
         <div class="buttons"></div>
       </div>
 
@@ -229,7 +241,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -250,7 +262,8 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    Alert
   },
 
   data() {
@@ -727,6 +740,17 @@ export default Vue.extend({
 
   .ant-collapse-content {
     border-top: 1px solid #1c274f;
+  }
+}
+
+.ant-alert-warning {
+  width: 500px;
+  margin-top: 30px;
+  background-color: transparent;
+  border: 1px solid #85858d;
+
+  .anticon-close {
+    color: #fff;
   }
 }
 </style>
