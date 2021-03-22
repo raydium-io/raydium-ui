@@ -415,7 +415,9 @@ export default Vue.extend({
             (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
             (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
           ) {
-            marketAddress = address
+            if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
+              marketAddress = address
+            }
           }
         }
 
