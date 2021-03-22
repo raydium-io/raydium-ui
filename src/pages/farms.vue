@@ -297,7 +297,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake && farmInfo.version !== 4) {
+        if (!farmInfo.isStake && ![4, 5].includes(farmInfo.version)) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
           const { rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo

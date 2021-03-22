@@ -209,7 +209,7 @@
                   ghost
                   @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
                 >
-                  Unstake
+                  Unstake & Harvest
                 </Button>
               </Col>
             </Row>
