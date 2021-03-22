@@ -316,11 +316,11 @@ export const TOKENS: Tokens = {
 }
 
 export const LP_TOKENS: Tokens = {
-  'RAY-USDT': {
-    symbol: 'RAY-USDT',
-    name: 'RAY-USDT LP',
+  'RAY-WUSDT': {
+    symbol: 'RAY-WUSDT',
+    name: 'RAY-WUSDT LP',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDT },
+    pc: { ...TOKENS.WUSDT },
 
     mintAddress: 'CzPDyvotTcxNqtPne32yUiEVQ6jk42HZi1Y3hUu7qf7f',
     decimals: 6
@@ -334,20 +334,20 @@ export const LP_TOKENS: Tokens = {
     mintAddress: '134Cct3CSdRCbYgq5SkwmHgfwjJ7EM5cG9PzqffWqECx',
     decimals: 6
   },
-  'LINK-USDT': {
-    symbol: 'LINK-USDT',
-    name: 'LINK-USDT LP',
+  'LINK-WUSDT': {
+    symbol: 'LINK-WUSDT',
+    name: 'LINK-WUSDT LP',
     coin: { ...TOKENS.LINK },
-    pc: { ...TOKENS.USDT },
+    pc: { ...TOKENS.WUSDT },
 
     mintAddress: 'EVDmwajM5U73PD34bYPugwiA4Eqqbrej4mLXXv15Z5qR',
     decimals: 6
   },
-  'ETH-USDT': {
-    symbol: 'ETH-USDT',
-    name: 'ETH-USDT LP',
+  'ETH-WUSDT': {
+    symbol: 'ETH-WUSDT',
+    name: 'ETH-WUSDT LP',
     coin: { ...TOKENS.ETH },
-    pc: { ...TOKENS.USDT },
+    pc: { ...TOKENS.WUSDT },
 
     mintAddress: 'KY4XvwHy7JPzbWYAbk23jQvEb4qWJ8aCqYWREmk1Q7K',
     decimals: 6
@@ -371,11 +371,11 @@ export const LP_TOKENS: Tokens = {
     decimals: 6
   },
   // v3
-  'RAY-USDT-V3': {
-    symbol: 'RAY-USDT',
-    name: 'RAY-USDT LP',
+  'RAY-WUSDT-V3': {
+    symbol: 'RAY-WUSDT',
+    name: 'RAY-WUSDT LP',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDT },
+    pc: { ...TOKENS.WUSDT },
 
     mintAddress: 'FdhKXYjCou2jQfgKWcNY7jb8F2DPLU1teTTTRfLBD2v1',
     decimals: 6

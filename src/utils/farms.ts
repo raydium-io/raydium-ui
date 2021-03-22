@@ -79,8 +79,8 @@ export function getAddressForWhat(address: string) {
 
 export const FARMS: FarmInfo[] = [
   {
-    name: 'RAY-USDT',
-    lp: { ...LP_TOKENS['RAY-USDT'] },
+    name: 'RAY-WUSDT',
+    lp: { ...LP_TOKENS['RAY-WUSDT'] },
     reward: { ...TOKENS.RAY },
     isStake: false,
 
@@ -122,8 +122,8 @@ export const FARMS: FarmInfo[] = [
   },
   // v3 farm
   {
-    name: 'RAY-USDT',
-    lp: { ...LP_TOKENS['RAY-USDT-V3'] },
+    name: 'RAY-WUSDT',
+    lp: { ...LP_TOKENS['RAY-WUSDT-V3'] },
     reward: { ...TOKENS.RAY },
     isStake: false,
 

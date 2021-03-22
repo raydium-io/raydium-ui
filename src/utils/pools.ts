@@ -113,10 +113,10 @@ export function getAddressForWhat(address: string) {
 
 export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   {
-    name: 'RAY-USDT',
+    name: 'RAY-WUSDT',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDT },
-    lp: { ...LP_TOKENS['RAY-USDT'] },
+    pc: { ...TOKENS.WUSDT },
+    lp: { ...LP_TOKENS['RAY-WUSDT'] },
 
     version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
@@ -161,10 +161,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumVaultSigner: 'FhTczYTxkXMyofPMDQFJGHxjcnPrjrEGQMexob4BVwXD'
   },
   {
-    name: 'LINK-USDT',
+    name: 'LINK-WUSDT',
     coin: { ...TOKENS.LINK },
-    pc: { ...TOKENS.USDT },
-    lp: { ...LP_TOKENS['LINK-USDT'] },
+    pc: { ...TOKENS.WUSDT },
+    lp: { ...LP_TOKENS['LINK-WUSDT'] },
 
     version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
@@ -185,10 +185,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumVaultSigner: '7bwfaV98FDNtWvgPMo7wY3nE7cE8tKfXkFAVzCxtkw6w'
   },
   {
-    name: 'ETH-USDT',
+    name: 'ETH-WUSDT',
     coin: { ...TOKENS.ETH },
-    pc: { ...TOKENS.USDT },
-    lp: { ...LP_TOKENS['ETH-USDT'] },
+    pc: { ...TOKENS.WUSDT },
+    lp: { ...LP_TOKENS['ETH-WUSDT'] },
 
     version: 2,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V2,
@@ -258,10 +258,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   // v3
   {
-    name: 'RAY-USDT',
+    name: 'RAY-WUSDT',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.USDT },
-    lp: { ...LP_TOKENS['RAY-USDT-V3'] },
+    pc: { ...TOKENS.WUSDT },
+    lp: { ...LP_TOKENS['RAY-WUSDT-V3'] },
 
     version: 3,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V3,
