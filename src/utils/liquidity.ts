@@ -100,10 +100,7 @@ export async function addLiquidity(
   const owner = wallet.publicKey
 
   const userAccounts = [new PublicKey(fromCoinAccount), new PublicKey(toCoinAccount)]
-  const userAmounts = [
-    new TokenAmount(fromAmount, poolInfo.coin.decimals, false).wei.toNumber(),
-    new TokenAmount(toAmount, poolInfo.pc.decimals, false).wei.toNumber()
-  ]
+  const userAmounts = [fromAmount, toAmount]
 
   // 反转
   if (poolInfo.coin.mintAddress === toCoin.mintAddress && poolInfo.pc.mintAddress === fromCoin.mintAddress) {
@@ -113,8 +110,8 @@ export async function addLiquidity(
 
   const userCoinTokenAccount = userAccounts[0]
   const userPcTokenAccount = userAccounts[1]
-  const coinAmount = userAmounts[0]
-  const pcAmount = userAmounts[1]
+  const coinAmount = new TokenAmount(userAmounts[0], poolInfo.coin.decimals, false).wei.toNumber()
+  const pcAmount = new TokenAmount(userAmounts[1], poolInfo.pc.decimals, false).wei.toNumber()
 
   // 如果是 NATIVE SOL 包裹一下
   let wrappedSolAccount
