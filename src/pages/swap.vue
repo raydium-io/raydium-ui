@@ -129,7 +129,13 @@
           "
           @onSelect="openToCoinSelect"
         />
-        <div v-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
+        <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base fc-container">
+          <span>
+            1 {{ fromCoin.symbol }} = 1
+            {{ toCoin.symbol }}
+          </span>
+        </div>
+        <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
           <span>
             1 {{ fromCoin.symbol }} ≈
             {{ outToPirceValue }}
@@ -157,7 +163,7 @@
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
-            (!marketAddress && !lpMintAddress) ||
+            (!marketAddress && !lpMintAddress && !isWrap) ||
             !initialized ||
             loading ||
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
@@ -167,7 +173,7 @@
           @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="(!marketAddress && !lpMintAddress) || !initialized">
+          <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
             Insufficient liquidity for this trade
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
@@ -175,7 +181,7 @@
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else>Swap</template>
+          <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
         </Button>
       </div>
     </div>
@@ -195,10 +201,10 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { getOutAmount, getSwapOutAmount, place, swap } from '@/utils/swap'
+import { getOutAmount, getSwapOutAmount, place, swap, wrap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
-import { getPoolByTokenMintAddresses } from '@/utils/liquidity'
+import { getPoolByTokenMintAddresses, canWrap } from '@/utils/liquidity'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -234,6 +240,8 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
+      // wrap
+      isWrap: false,
       // serum
       market: null as any,
       marketAddress: '',
@@ -389,6 +397,13 @@ export default Vue.extend({
       if (this.fromCoin && this.toCoin) {
         let marketAddress = ''
 
+        // wrap & unwrap
+        if (canWrap(this.fromCoin.mintAddress, this.toCoin.mintAddress)) {
+          this.isWrap = true
+          this.initialized = true
+          return
+        }
+
         // 如果有自有池 内部消化
         const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
         if (pool && pool.version === 4) {
@@ -425,6 +440,8 @@ export default Vue.extend({
           // 处理 老的和新的市场一样
           if (this.marketAddress !== marketAddress) {
             this.marketAddress = marketAddress
+            this.lpMintAddress = ''
+            this.isWrap = false
             // @ts-ignore
             Market.load(this.$conn, new PublicKey(marketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
               (market) => {
@@ -439,12 +456,15 @@ export default Vue.extend({
         } else {
           this.marketAddress = ''
           this.market = null
+          this.lpMintAddress = ''
+          this.isWrap = false
           // this.unsubPoolChange()
         }
       } else {
         this.marketAddress = ''
         this.market = null
         this.lpMintAddress = ''
+        this.isWrap = false
         // this.unsubPoolChange()
       }
     },
@@ -489,7 +509,9 @@ export default Vue.extend({
 
     // 更新输入价格
     updateAmounts() {
-      if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
+      if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
+        this.toCoinAmount = this.fromCoinAmount
+      } else if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
         const { amountOut } = getSwapOutAmount(
           get(this.liquidity.infos, this.lpMintAddress),
           this.fromCoin.mintAddress,
@@ -569,7 +591,48 @@ export default Vue.extend({
         duration: 0
       })
 
-      if (this.lpMintAddress) {
+      if (this.isWrap) {
+        wrap(
+          this.$axios,
+          // @ts-ignore
+          this.$conn,
+          // @ts-ignore
+          this.$wallet,
+          // @ts-ignore
+          this.fromCoin.mintAddress,
+          // @ts-ignore
+          this.toCoin.mintAddress,
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          // @ts-ignore
+          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          this.fromCoinAmount
+        )
+          .then((txid) => {
+            ;(this as any).$notify.info({
+              key,
+              message: 'Transaction has been sent',
+              description: (h: any) =>
+                h('div', [
+                  'Confirmation is in progress.  Check your transaction on ',
+                  h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                ])
+            })
+
+            const description = `Unwrap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            this.$store.dispatch('transaction/sub', { txid, description })
+          })
+          .catch((error) => {
+            ;(this as any).$notify.error({
+              key,
+              message: 'Swap failed',
+              description: error.message
+            })
+          })
+          .finally(() => {
+            this.swaping = false
+          })
+      } else if (this.lpMintAddress) {
         swap(
           // @ts-ignore
           this.$conn,

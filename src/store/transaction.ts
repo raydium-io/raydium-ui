@@ -48,10 +48,7 @@ export const mutations = {
 }
 
 export const actions = {
-  sub(
-    { commit, dispatch }: { commit: any; dispatch: any },
-    { txid, description }: { txid: string; description: string }
-  ) {
+  sub({ commit }: { commit: any }, { txid, description }: { txid: string; description: string }) {
     commit('pushTx', [txid, description])
     logger('Sub', txid)
 
@@ -82,20 +79,10 @@ export const actions = {
             description
           })
         }
-
-        dispatch('unsub', txid)
       },
       'single'
     )
 
     commit('setListenerId', [txid, listenerId + 1])
-  },
-
-  unsub({ commit, state }: { commit: any; state: any }, txid: string) {
-    const conn: Connection = (this as any)._vm.$conn
-
-    conn.removeSignatureListener(state.history[txid].i).catch()
-
-    commit('setListenerId', [txid, null])
   }
 }

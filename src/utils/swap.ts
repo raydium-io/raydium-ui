@@ -12,7 +12,7 @@ import {
 } from '@/utils/web3'
 import { TokenAmount } from '@/utils/safe-math'
 // eslint-disable-next-line
-import { TOKEN_PROGRAM_ID, SERUM_PROGRAM_ID_V3 } from './ids'
+import { TOKEN_PROGRAM_ID, MEMO_PROGRAM_ID, SERUM_PROGRAM_ID_V3 } from './ids'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 
 // 计算金额
@@ -154,6 +154,66 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     amountOut: pcOut,
     worstPrice
   }
+}
+
+export async function wrap(
+  axios: any,
+  connection: Connection,
+  wallet: any,
+  fromCoinMint: string,
+  toCoinMint: string,
+  fromTokenAccount: string,
+  toTokenAccount: string,
+  amount: string
+) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  const fromCoin = getTokenByMintAddress(fromCoinMint)
+  const amountOut = new TokenAmount(amount, fromCoin?.decimals, false)
+
+  const newFromTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    fromTokenAccount,
+    owner,
+    fromCoinMint,
+    null,
+    transaction,
+    signers
+  )
+  const newToTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    toTokenAccount,
+    owner,
+    toCoinMint,
+    null,
+    transaction,
+    signers
+  )
+
+  const solletRes = await axios.post('https://swap.sollet.io/api/swap_to', {
+    address: newToTokenAccount.toString(),
+    blockchain: 'sol',
+    coin: toCoinMint,
+    size: 1,
+    wusdtToUsdt: true
+  })
+  const { address, maxSize } = solletRes.data.result
+
+  if (!address) {
+    throw new Error('Unwrap not available now')
+  }
+
+  if (parseFloat(amount) > maxSize) {
+    throw new Error(`Max allow ${maxSize}`)
+  }
+
+  transaction.add(transfer(newFromTokenAccount, new PublicKey(address), owner, amountOut.toWei().toNumber()))
+  transaction.add(memoInstruction(newToTokenAccount.toString()))
+
+  return await sendTransaction(connection, wallet, transaction, signers)
 }
 
 export async function swap(
@@ -447,5 +507,38 @@ export function swapInstruction(
     keys,
     programId,
     data
+  })
+}
+
+export function transfer(source: PublicKey, destination: PublicKey, owner: PublicKey, amount: number) {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    { pubkey: source, isSigner: false, isWritable: true },
+    { pubkey: destination, isSigner: false, isWritable: true },
+    { pubkey: owner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 3,
+      amount
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId: TOKEN_PROGRAM_ID,
+    data
+  })
+}
+
+export function memoInstruction(memo: string) {
+  return new TransactionInstruction({
+    keys: [],
+    data: Buffer.from(memo, 'utf-8'),
+    programId: MEMO_PROGRAM_ID
   })
 }

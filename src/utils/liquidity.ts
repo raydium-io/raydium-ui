@@ -3,7 +3,8 @@ import {
   LiquidityPoolInfo,
   getLpMintByTokenMintAddresses,
   getPoolByLpMintAddress,
-  getPoolByTokenMintAddresses
+  getPoolByTokenMintAddresses,
+  canWrap
 } from '@/utils/pools'
 import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
 import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
@@ -16,7 +17,7 @@ import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 
-export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
+export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
 // 计算价格
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
