@@ -156,6 +156,17 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
   }
 }
 
+export async function createTokenAccount(connection: Connection, wallet: any, mintAddress: string) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  await createTokenAccountIfNotExist(connection, '', owner, mintAddress, null, transaction, signers)
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
 export async function wrap(
   axios: any,
   connection: Connection,

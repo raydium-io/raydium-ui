@@ -27,6 +27,19 @@
             "
           >
             <Step>
+              <div slot="title">Create USDT account</div>
+              <div slot="description" class="action">
+                <Button
+                  ghost
+                  :loading="creating"
+                  :disabled="creating || get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`)"
+                  @click="createUsdtAccount"
+                >
+                  Create USDT Account
+                </Button>
+              </div>
+            </Step>
+            <Step>
               <div slot="title">Unstake</div>
               <div slot="description" class="action">
                 Staked LP tokens will be unstaked from legacy RAY-WUSDT pools
@@ -80,9 +93,18 @@
                   <span>WUSDT Balance</span>
                   <span>USDT Balance</span>
                 </h6>
-                <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
-                  <span>{{ wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.format() || 0 }}</span>
-                  <span>{{ wallet.tokenAccounts[TOKENS.USDT.mintAddress].balance.format() || 0 }}</span>
+                <h6
+                  v-if="wallet.connected && get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`)"
+                  class="fs-container"
+                >
+                  <span v-if="!get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`)">
+                    {{ get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`).balance.format() }}
+                  </span>
+                  <span v-else>0</span>
+                  <span v-if="!get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`)"> No USDT account yet </span>
+                  <span v-else>
+                    {{ get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`).balance.format() }}
+                  </span>
                 </h6>
 
                 <Button
@@ -106,8 +128,9 @@
                   @click="
                     $router.replace({ path: `/liquidity?from=${TOKENS.RAY.mintAddress}&to=${TOKENS.USDT.mintAddress}` })
                   "
-                  >Add liquidity</Button
                 >
+                  Add liquidity
+                </Button>
               </div>
             </Step>
           </Steps>
@@ -206,7 +229,7 @@ import { Button, Steps } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { unstakeAll } from '@/utils/migrate'
-import { wrap } from '@/utils/swap'
+import { createTokenAccount, wrap } from '@/utils/swap'
 import { withdraw } from '@/utils/stake'
 import { TOKENS } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
@@ -227,6 +250,7 @@ export default Vue.extend({
       farms: [] as any,
       liquids: [] as any,
 
+      creating: false,
       unstaking: false,
       removing: false,
       unwraping: false
@@ -264,6 +288,8 @@ export default Vue.extend({
   },
 
   methods: {
+    get,
+
     updateFarms() {
       const farms: any = []
 
@@ -288,6 +314,46 @@ export default Vue.extend({
       }
 
       this.farms = farms
+    },
+
+    createUsdtAccount() {
+      this.creating = true
+
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
+      createTokenAccount(conn, wallet, TOKENS.USDT.mintAddress)
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Create USDT account`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Create USDT account failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.creating = false
+        })
     },
 
     unstakeWUSDT(farmInfo: any, amount: string) {
