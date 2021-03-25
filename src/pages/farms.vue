@@ -163,7 +163,7 @@
         <div class="card-body">
           <template v-for="farm in farms">
             <Row
-              v-if="farm.farmInfo.version === 2 && farm.farmInfo.legacy"
+              v-if="[2, 3].includes(farm.farmInfo.version) && farm.farmInfo.legacy"
               :key="farm.farmInfo.poolId"
               class="farm-head"
               :class="app.isMobile ? 'is-mobile' : ''"

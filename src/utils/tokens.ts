@@ -318,7 +318,7 @@ export const TOKENS: Tokens = {
 export const LP_TOKENS: Tokens = {
   'RAY-WUSDT': {
     symbol: 'RAY-WUSDT',
-    name: 'RAY-WUSDT LP',
+    name: 'RAY-WUSDT V2 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.WUSDT },
 
@@ -373,7 +373,7 @@ export const LP_TOKENS: Tokens = {
   // v3
   'RAY-WUSDT-V3': {
     symbol: 'RAY-WUSDT',
-    name: 'RAY-WUSDT LP',
+    name: 'RAY-WUSDT V3 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.WUSDT },
 
@@ -451,6 +451,15 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.RAY },
 
     mintAddress: 'CHT8sft3h3gpLYbCcZ9o27mT5s3Z6VifBVbUiDvprHPW',
+    decimals: 6
+  },
+  'RAY-USDT-V4': {
+    symbol: 'RAY-USDT',
+    name: 'RAY-USDT LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: 'C3sT1R3nsw4AVdepvLTLKr5Gvszr7jufyBWUCvy4TUvT',
     decimals: 6
   }
 }

@@ -54,7 +54,11 @@
               <div slot="description" class="action">
                 Remove liquidity from legacy RAY-WUSDT pools
 
-                <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
+                <h6
+                  v-for="liquid in liquids.filter((l) => l.poolInfo.version === 3)"
+                  :key="liquid.poolInfo.name"
+                  class="fs-container"
+                >
                   <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
 
                   <Button

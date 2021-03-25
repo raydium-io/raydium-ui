@@ -79,6 +79,38 @@ export function getAddressForWhat(address: string) {
 }
 
 export const FARMS: FarmInfo[] = [
+  // v3
+  {
+    name: 'RAY-WUSDT',
+    lp: { ...LP_TOKENS['RAY-WUSDT-V3'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    legacy: true,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: '6d3vDYvk6VFVacEAGA1NDyxkQPRiNxXQRkeKpTPMJwe4',
+    poolAuthority: 'EcPc2KUDFMyPNAVPE6PsMkzneBFKNqRjUhfhyM2da9go',
+    poolLpTokenAccount: 'Gx4kLpTirc3Lr3GEYojYt1zUmsCcWajjBZTFVA3tzyDg', // lp vault
+    poolRewardTokenAccount: 'J144vsbPdLa9V6JpvGFH63bQw8QhQckUNe48YjPKwcZo' // reward vault
+  },
+  {
+    name: 'RAY-USDT',
+    lp: { ...LP_TOKENS['RAY-USDT-V4'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    legacy: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: 'AvbVWpBi2e4C9HPmZgShGdPoNydG4Yw8GJvG9HUcLgce',
+    poolAuthority: '8JYVFy3pYsPSpPRsqf43KSJFnJzn83nnRLQgG88XKB8q',
+    poolLpTokenAccount: '4u4AnMBHXehdpP5tbD6qzB5Q4iZmvKKR5aUr2gavG7aw', // lp vault
+    poolRewardTokenAccount: 'HCHNuGzkqSnw9TbwpPv1gTnoqnqYepcojHw9DAToBrUj' // reward vault
+  },
+  // v2
   {
     name: 'RAY-WUSDT',
     lp: { ...LP_TOKENS['RAY-WUSDT'] },
@@ -125,21 +157,6 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccount: 'ETwFtP1dYCbvbARNPfKuJFxoGFDTTsqB6j3pRquPE7Fq' // reward vault
   },
   // v3 farm
-  {
-    name: 'RAY-WUSDT',
-    lp: { ...LP_TOKENS['RAY-WUSDT-V3'] },
-    reward: { ...TOKENS.RAY },
-    isStake: false,
-
-    legacy: false,
-    version: 3,
-    programId: STAKE_PROGRAM_ID,
-
-    poolId: '6d3vDYvk6VFVacEAGA1NDyxkQPRiNxXQRkeKpTPMJwe4',
-    poolAuthority: 'EcPc2KUDFMyPNAVPE6PsMkzneBFKNqRjUhfhyM2da9go',
-    poolLpTokenAccount: 'Gx4kLpTirc3Lr3GEYojYt1zUmsCcWajjBZTFVA3tzyDg', // lp vault
-    poolRewardTokenAccount: 'J144vsbPdLa9V6JpvGFH63bQw8QhQckUNe48YjPKwcZo' // reward vault
-  },
   {
     name: 'RAY-USDC',
     lp: { ...LP_TOKENS['RAY-USDC-V3'] },
