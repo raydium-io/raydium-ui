@@ -8,8 +8,7 @@
       <div class="card-body">
         <p>
           Native SPL USDT has launched on Solana. As a result, SPL Wrapped USDT (WUSDT) liquidity in the RAY-WUSDT pool
-          must migrate to a new RAY-USDT pool. This tool simplifies the process. For more info click
-          <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
+          must migrate to a new RAY-USDT pool. This tool simplifies the process.
         </p>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
@@ -78,8 +77,12 @@
                 Convert WUSDT to USDT
 
                 <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
-                  <span>{{ wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.format() || 0 }} WUSDT</span>
-                  <span>{{ wallet.tokenAccounts[TOKENS.USDT.mintAddress].balance.format() || 0 }} USDT</span>
+                  <span>WUSDT Balance</span>
+                  <span>USDT Balance</span>
+                </h6>
+                <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
+                  <span>{{ wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.format() || 0 }}</span>
+                  <span>{{ wallet.tokenAccounts[TOKENS.USDT.mintAddress].balance.format() || 0 }}</span>
                 </h6>
 
                 <Button

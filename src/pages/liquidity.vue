@@ -1,15 +1,5 @@
 <template>
   <div class="liquidity container">
-    <div class="fc-container">
-      <Alert type="warning" message="IMPORTANT" show-icon closable>
-        <div slot="description">
-          Raydium has upgraded to Serum DEX3. Liquidity in legacy pools is migrating to new pools and rewards for legacy
-          farms will gradually decline. To simplify the process, use the
-          <NuxtLink to="/migrate">migration tool</NuxtLink>.
-        </div>
-      </Alert>
-    </div>
-
     <div class="page-head fs-container">
       <span class="title">Add Liquidity</span>
       <div class="buttons">
@@ -176,7 +166,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress, Alert } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 import {
   PublicKey,
   // types
@@ -200,8 +190,7 @@ export default Vue.extend({
     Icon,
     Tooltip,
     Button,
-    Progress,
-    Alert
+    Progress
   },
 
   data() {
