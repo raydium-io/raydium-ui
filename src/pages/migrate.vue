@@ -74,7 +74,7 @@
             <Step>
               <div slot="title">Unwrap</div>
               <div slot="description" class="action">
-                Convert WUSDT to USDT
+                Convert WUSDT to USDT. Converting takes time to process, please give it a couple minutes.
 
                 <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
                   <span>WUSDT Balance</span>
