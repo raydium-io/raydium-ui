@@ -339,10 +339,12 @@ export default Vue.extend({
         while (true) {
           if ((this as any).$conn) {
             if (fromCoin) {
+              fromCoin.balance = get(this.wallet.tokenAccounts, `${fromCoin.mintAddress}.balance`)
               this.fromCoin = fromCoin
             }
 
             if (toCoin) {
+              toCoin.balance = get(this.wallet.tokenAccounts, `${toCoin.mintAddress}.balance`)
               this.toCoin = toCoin
             }
 
