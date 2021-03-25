@@ -79,7 +79,6 @@
 
                 <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
                   <span>{{ wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.format() || 0 }} WUSDT</span>
-                  <span>-></span>
                   <span>{{ wallet.tokenAccounts[TOKENS.USDT.mintAddress].balance.format() || 0 }} USDT</span>
                 </h6>
 
