@@ -1,7 +1,116 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
-      <span class="title">Migration</span>
+      <span class="title">WUSDT Migration</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <p>
+          Native SPL USDT has launched on Solana. As a result, SPL Wrapped USDT (WUSDT) liquidity in the RAY-WUSDT pool
+          must migrate to a new RAY-USDT pool. This tool simplifies the process. For more info click
+          <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
+        </p>
+
+        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+          Connect Wallet
+        </Button>
+        <div v-else>
+          <Steps
+            direction="vertical"
+            progress-dot
+            :current="
+              farms.filter((f) => f.farmInfo.version === 3).length === 0
+                ? liquids.filter((l) => l.poolInfo.version === 3).length === 0
+                  ? 3
+                  : 2
+                : 1
+            "
+          >
+            <Step>
+              <div slot="title">Unstake</div>
+              <div slot="description" class="action">
+                Staked LP tokens will be unstaked from legacy RAY-WUSDT pools
+
+                <template
+                  v-for="farm in farms.filter((f) => f.farmInfo.version === 3 && f.farmInfo.lp.pc.symbol === 'WUSDT')"
+                >
+                  <Button
+                    :key="farm.farmInfo.lp.name"
+                    ghost
+                    :loading="unstaking"
+                    :disabled="unstaking"
+                    @click="unstakeWUSDT(farm.farmInfo, farm.depositBalance.fixed())"
+                  >
+                    Unstake
+                    {{ farm.depositBalance.format() }}
+                    {{ farm.farmInfo.lp.name }}
+                  </Button>
+                </template>
+              </div>
+            </Step>
+            <Step>
+              <div slot="title">Remove liquidity</div>
+              <div slot="description" class="action">
+                Remove liquidity from legacy RAY-WUSDT pools
+
+                <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
+                  <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
+
+                  <Button
+                    ghost
+                    :loading="removing"
+                    :disabled="liquids.length === 0"
+                    @click="remove(liquid.poolInfo, liquid.userLpBalance)"
+                  >
+                    Remove liquidity
+                  </Button>
+                </h6>
+              </div>
+            </Step>
+            <Step>
+              <div slot="title">Unwrap</div>
+              <div slot="description" class="action">
+                Convert WUSDT to USDT
+
+                <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
+                  <span>{{ wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.format() || 0 }} WUSDT</span>
+                  <span>-></span>
+                  <span>{{ wallet.tokenAccounts[TOKENS.USDT.mintAddress].balance.format() || 0 }} USDT</span>
+                </h6>
+
+                <Button
+                  v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]"
+                  ghost
+                  :loading="unwraping"
+                  :disabled="unwraping || wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.wei.toNumber() === 0"
+                  @click="unwrapWUSDT(wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.fixed())"
+                >
+                  Unwrap all WUSDT
+                </Button>
+              </div>
+            </Step>
+            <Step>
+              <div slot="title">Add liquidity to new RAY-USDT pool</div>
+              <div slot="description" class="action">
+                Continue earning RAY by adding liquidity to new pools, then staking LP tokens
+
+                <Button
+                  ghost
+                  @click="
+                    $router.replace({ path: `/liquidity?from=${TOKENS.RAY.mintAddress}&to=${TOKENS.USDT.mintAddress}` })
+                  "
+                  >Add liquidity</Button
+                >
+              </div>
+            </Step>
+          </Steps>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-head fs-container">
+      <span class="title">DEX2 to DEX3 Migration</span>
     </div>
 
     <div class="card">
@@ -16,17 +125,36 @@
           Connect Wallet
         </Button>
         <div v-else>
-          <Steps direction="vertical" progress-dot :current="farms.length === 0 ? (liquids.length === 0 ? 3 : 2) : 1">
+          <Steps
+            direction="vertical"
+            progress-dot
+            :current="
+              farms.filter((f) => f.farmInfo.version === 2).length === 0
+                ? liquids.filter((l) => l.poolInfo.version === 2).length === 0
+                  ? 3
+                  : 2
+                : 1
+            "
+          >
             <Step>
               <div slot="title">Unstake</div>
               <div slot="description" class="action">
                 All staked LP tokens will be unstaked from legacy pools
 
-                <h6 v-for="farm in farms" :key="farm.farmInfo.poolId">
-                  {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
-                </h6>
+                <template v-for="farm in farms">
+                  <h6 v-if="farm.farmInfo.version === 2" :key="farm.farmInfo.poolId">
+                    {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
+                  </h6>
+                </template>
 
-                <Button ghost :loading="unstaking" :disabled="farms.length === 0" @click="unstake">Unstake all</Button>
+                <Button
+                  ghost
+                  :loading="unstaking"
+                  :disabled="farms.filter((f) => f.farmInfo.version === 2).length === 0"
+                  @click="unstake"
+                >
+                  Unstake all
+                </Button>
               </div>
             </Step>
             <Step>
@@ -34,18 +162,20 @@
               <div slot="description" class="action">
                 Remove liquidity for all legacy LP tokens
 
-                <h6 v-for="liquid in liquids" :key="liquid.poolInfo.name" class="fs-container">
-                  <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
+                <template v-for="liquid in liquids">
+                  <h6 v-if="liquid.poolInfo.version === 2" :key="liquid.poolInfo.name" class="fs-container">
+                    <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
 
-                  <Button
-                    ghost
-                    :loading="removing"
-                    :disabled="liquids.length === 0"
-                    @click="remove(liquid.poolInfo, liquid.userLpBalance)"
-                  >
-                    Remove liquidity
-                  </Button>
-                </h6>
+                    <Button
+                      ghost
+                      :loading="removing"
+                      :disabled="liquids.filter((l) => l.poolInfo.version === 2).length === 0"
+                      @click="remove(liquid.poolInfo, liquid.userLpBalance)"
+                    >
+                      Remove liquidity
+                    </Button>
+                  </h6>
+                </template>
               </div>
             </Step>
             <Step>
@@ -70,6 +200,9 @@ import { Button, Steps } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { unstakeAll } from '@/utils/migrate'
+import { wrap } from '@/utils/swap'
+import { withdraw } from '@/utils/stake'
+import { TOKENS } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
 import { getUnixTs } from '@/utils'
 
@@ -84,11 +217,13 @@ export default Vue.extend({
 
   data() {
     return {
+      TOKENS,
       farms: [] as any,
       liquids: [] as any,
 
       unstaking: false,
-      removing: false
+      removing: false,
+      unwraping: false
     }
   },
 
@@ -128,7 +263,7 @@ export default Vue.extend({
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
-        if (!farmInfo.isStake && farmInfo.version === 2) {
+        if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
 
           if (userInfo) {
@@ -147,6 +282,102 @@ export default Vue.extend({
       }
 
       this.farms = farms
+    },
+
+    unstakeWUSDT(farmInfo: any, amount: string) {
+      this.unstaking = true
+
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
+      const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
+      withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Unstake ${amount} ${farmInfo.lp.name}`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Stake failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.unstaking = false
+        })
+    },
+
+    unwrapWUSDT(amount: string) {
+      this.unwraping = true
+
+      const conn = (this as any).$conn
+      const wallet = (this as any).$wallet
+
+      const wusdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}.tokenAccountAddress`)
+      const usdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}.tokenAccountAddress`)
+
+      const key = getUnixTs()
+      ;(this as any).$notify.info({
+        key,
+        message: 'Making transaction...',
+        duration: 0
+      })
+
+      wrap(
+        this.$axios,
+        conn,
+        wallet,
+        TOKENS.WUSDT.mintAddress,
+        TOKENS.USDT.mintAddress,
+        wusdtAccount,
+        usdtAccount,
+        amount
+      )
+        .then((txid) => {
+          ;(this as any).$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Unwrap ${amount} WUSDT`
+          this.$store.dispatch('transaction/sub', { txid, description })
+        })
+        .catch((error) => {
+          ;(this as any).$notify.error({
+            key,
+            message: 'Unwrap failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.unwraping = false
+        })
     },
 
     unstake() {
@@ -212,7 +443,7 @@ export default Vue.extend({
       for (const [mintAddress, tokenAccount] of Object.entries(this.wallet.tokenAccounts)) {
         const poolInfo = get(this.liquidity.infos, mintAddress)
 
-        if (poolInfo && poolInfo.version === 2) {
+        if (poolInfo) {
           const userLpBalance = cloneDeep((tokenAccount as any).balance)
 
           if (!userLpBalance.isNullOrZero()) {
