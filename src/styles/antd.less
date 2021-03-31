@@ -1,0 +1,44 @@
+@import './variables.less';
+
+.ant-notification-notice {
+  background: @modal-header-bg !important;
+
+  .ant-notification-notice-message {
+    color: @text-color;
+  }
+
+  .ant-notification-notice-description {
+    color: rgba(241, 241, 242, 0.75);
+  }
+
+  .ant-notification-notice-close {
+    color: @text-color;
+  }
+}
+
+button.ant-btn-background-ghost {
+  border-color: @primary-color;
+  background: rgba(90, 196, 190, 0.1);
+}
+
+.ant-tooltip-inner {
+  padding: 16px !important;
+}
+
+button.ant-btn-background-ghost[disabled] {
+  border-color: #85858d;
+  color: #85858d;
+
+  &:active,
+  &:focus,
+  &:hover {
+    border-color: #85858d;
+    color: #85858d;
+  }
+}
+
+.ant-btn.ant-btn-loading {
+  &::before {
+    background: transparent;
+  }
+}

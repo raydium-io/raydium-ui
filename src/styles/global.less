@@ -1,0 +1,147 @@
+@import './variables.less';
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f1f1f2;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.fc-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fs-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-head {
+  margin-top: 20px;
+  margin-bottom: 40px;
+
+  .title {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .buttons {
+    display: flex;
+
+    .anticon {
+      font-size: 20px;
+    }
+
+    .ant-progress {
+      line-height: 1;
+    }
+
+    .ant-progress.disabled {
+      cursor: not-allowed;
+    }
+
+    .anticon,
+    .ant-progress {
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background: #000829;
+      }
+    }
+  }
+}
+
+.card {
+  padding: 1px;
+  background: linear-gradient(245.22deg, #c200fb 7.97%, #3772ff 49.17%, #3773fe 49.17%, @primary-color 92.1%);
+  border-radius: 4px;
+
+  .card-body {
+    display: grid;
+    grid-auto-rows: auto;
+    row-gap: 12px;
+    padding: 32px 24px;
+    background-color: #131a35;
+    opacity: 0.9;
+    border-radius: 4px;
+  }
+}
+
+.lp-icons {
+  display: flex !important;
+  align-items: center;
+
+  .icons {
+    display: flex;
+    flex-direction: row;
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.ant-tooltip-inner {
+  display: inline-block;
+
+  p {
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 20px;
+    color: @text-color;
+  }
+
+  .swap-info {
+    font-size: 12px;
+    line-height: 20px;
+    color: @text-color;
+
+    .info {
+      display: grid;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      gap: 10px;
+      grid-template-columns: minmax(auto, 1fr) auto auto;
+
+      .symbol {
+        opacity: 0.75;
+      }
+
+      .address {
+        padding: 2px 4px;
+        background: @bg-color;
+        border-radius: 4px;
+        opacity: 0.75;
+      }
+
+      .action {
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+          color: @primary-color;
+        }
+      }
+    }
+  }
+}
