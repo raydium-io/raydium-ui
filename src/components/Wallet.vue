@@ -159,7 +159,7 @@ export default Vue.extend({
         this.$store.dispatch('wallet/closeModal').then(() => {
           Vue.prototype.$wallet = wallet
 
-          this.$store.commit('wallet/connected', wallet?.publicKey.toBase58())
+          this.$accessor.wallet.setConnected(wallet?.publicKey.toBase58())
 
           this.subWallet()
           ;(this as any).$notify.success({

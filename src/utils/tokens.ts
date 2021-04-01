@@ -702,5 +702,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '9VoY3VERETuc2FoadMSYYizF26mJinY514ZpEzkHMtwG',
     decimals: TOKENS.ETH.decimals
+  },
+  'SRM-SOL-V4': {
+    symbol: 'SRM-SOL',
+    name: 'SRM-SOL LP',
+    coin: { ...TOKENS.SRM },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'AKJHspCwDhABucCxNLXUSfEzb7Ny62RqFtC9uNjJi4fq',
+    decimals: TOKENS.SRM.decimals
   }
 }
