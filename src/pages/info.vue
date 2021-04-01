@@ -1,5 +1,5 @@
 <template>
-  <div :class="app.isMobile ? 'mobile' : 'pc'">
+  <div :class="isMobile ? 'mobile' : 'pc'">
     <div class="big_div image_div" style="background: rgb(19, 26, 53)">
       <img src="../assets/background/info_background.svg" class="image" />
       <div class="node_div" style="padding-top: 70px">
@@ -25,7 +25,7 @@
             <div class="data_div_title font_color_3">24 Hour Volume</div>
             <div class="data_div_num">
               ${{
-                Math.round(hour_volume_24)
+                Math.round(volume24h)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               }}
@@ -34,7 +34,7 @@
           <div class="data_div">
             <div class="data_div_title font_color_3">RAY Price</div>
             <div class="data_div_num">
-              ${{ (Math.round(ray_price * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }}
+              ${{ (Math.round(prices.RAY * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }}
             </div>
           </div>
           <div style="clear: both"></div>
@@ -230,20 +230,26 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
-// import { FARMS } from '@/utils/farms'
 
 export default Vue.extend({
   components: {},
 
-  layout: 'no_head',
+  layout: 'single',
+
+  async asyncData({ $accessor, $api }) {
+    if (!$accessor.price.initialized) {
+      await $accessor.price.requestPrices()
+    }
+
+    const { tvl, volume24h } = await $api.getInfo()
+    return { tvl, volume24h }
+  },
 
   data() {
     return {
-      ray_price: 0,
-      hour_volume_24: 0,
-      timer: null as any,
-      tvl: 0
+      tvl: 0,
+      volume24h: 0,
+      timer: undefined as number | undefined
     }
   },
 
@@ -252,50 +258,30 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['wallet', 'price', 'app'])
-  },
+    isMobile() {
+      return this.$accessor.isMobile
+    },
 
-  watch: {
-    'price.prices': {
-      handler() {
-        this.price_prices_flush()
-      },
-      deep: true
+    prices() {
+      return this.$accessor.price.prices
     }
   },
 
-  beforeDestroy() {
-    clearInterval(this.timer)
-  },
+  watch: {},
 
   mounted() {
-    this.get_request_data()
-    this.get_tvl()
-    this.price_prices_flush()
-    this.timer = setInterval(this.get_request_data, 1000 * 30)
+    this.timer = window.setInterval(this.getInfo, 1000 * 30)
+  },
+
+  beforeDestroy() {
+    window.clearInterval(this.timer)
   },
 
   methods: {
-    price_prices_flush() {
-      this.ray_price = this.price.prices?.RAY
-    },
-    get_request_data() {
-      this.$axios
-        .get('https://api.raydium.io/ray/24_hour_volume', {
-          params: {}
-        })
-        .then((data: any) => {
-          this.hour_volume_24 = parseFloat(data)
-        })
-    },
-    get_tvl() {
-      this.$axios
-        .get('https://api.raydium.io/tvl', {
-          params: {}
-        })
-        .then((data: any) => {
-          this.tvl = parseFloat(data)
-        })
+    async getInfo() {
+      const { tvl, volume24h } = await this.$api.getInfo()
+      this.tvl = tvl
+      this.volume24h = volume24h
     }
   }
 })
@@ -308,120 +294,149 @@ export default Vue.extend({
     padding-bottom: 50px;
     background: #1a2843;
   }
+
   .div6 {
     padding-top: 50px;
     padding-bottom: 50px;
     background: #131e39;
   }
+
   .div5 {
     padding-top: 50px;
     padding-bottom: 50px;
     background: #1a2843;
   }
+
   .div4 {
     padding-top: 50px;
     padding-bottom: 50px;
     background: #131e39;
   }
+
   .div3 {
     padding-top: 30px;
     padding-bottom: 50px;
     background: #131a35;
   }
+
   .big_logo {
     width: 180px;
   }
+
   .big_div {
     width: 100%;
   }
+
   .node_div {
     width: 80%;
     margin: 0 auto;
   }
+
   .font_color_1 {
     color: rgba(241, 241, 242, 1);
   }
+
   .font_color_2 {
     color: #bbbebc;
   }
+
   .font_color_3 {
     color: #84879c;
   }
+
   .font_center {
     text-align: center;
   }
+
   .title {
     font-size: 45px;
     padding-top: 50px;
   }
+
   .title_node {
     font-size: 22px;
     width: 90%;
   }
+
   .title_node_2 {
     font-size: 18px;
     width: 90%;
     padding-top: 25px;
   }
+
   .data_div {
     width: 90%;
     display: inline-block;
     border: 1px #05bec5 solid;
     margin-bottom: 30px;
+
     .data_div_num {
       font-size: 30px;
       padding-top: 15px;
       padding-bottom: 20px;
       font-weight: 100;
     }
+
     .data_div_title {
       font-size: 22px;
       padding-top: 23px;
     }
   }
+
   .tokenomics_div {
     width: 100%;
+
     .title {
       font-size: 25px;
       padding-bottom: 20px;
     }
+
     .node {
       font-size: 18px;
       line-height: 1.4;
     }
   }
+
   .circulating_div {
     .title {
       font-size: 25px;
       font-weight: 100;
     }
+
     .node {
       font-size: 18px;
       padding-top: 10px;
     }
+
     .node_2 {
       font-size: 18px;
       padding: 10px 0;
     }
   }
+
   .Allocation {
     font-size: 25px;
     text-align: center;
     padding-bottom: 20px;
   }
+
   .Allocation_table {
     font-size: 16px;
+
     .num {
       text-align: left;
     }
+
     .value {
       text-align: right;
     }
   }
+
   .team_title {
     font-size: 30px;
     padding-bottom: 20px;
   }
+
   .button_link {
     font-size: 16px;
     background: rgba(90, 196, 190, 0.1);
@@ -431,14 +446,17 @@ export default Vue.extend({
     border-radius: 4px;
     width: 90%;
     text-align: left;
+
     .button_link_coin {
       font-size: 5px;
       display: inline-block;
       padding-left: 20px;
     }
   }
+
   .image_div {
     position: relative;
+
     .image {
       position: absolute;
       width: 932px;
@@ -447,79 +465,96 @@ export default Vue.extend({
       top: 0;
       z-index: 1;
     }
+
     .image2 {
       position: absolute;
       width: 70%;
       top: -70px;
     }
   }
+
   .funding_and_stakeholders_table_line {
     border-bottom: 1px solid rgba(119, 227, 239, 1);
     padding: 10px 0;
     font-size: 15px;
+
     .value {
       display: inline-block;
       width: 49%;
     }
   }
+
   .allocation_breakdown_table_line {
     border-bottom: 1px solid rgba(119, 227, 239, 1);
     padding: 16px 0;
+
     .item_other {
       display: inline-block;
       width: 49%;
     }
+
     .item_title {
       width: 100%;
     }
   }
+
   .team_table_line {
     border-bottom: rgba(128, 128, 255, 1) 1px solid;
     margin: 10px 0;
     padding-bottom: 34px;
     font-size: 20px;
+
     .name {
       font-size: 25px;
       margin-bottom: 10px;
     }
+
     .value {
       font-size: 16px;
     }
   }
 }
+
 .pc {
   .div7 {
     padding-top: 110px;
     padding-bottom: 100px;
     background: #1a2843;
   }
+
   .div6 {
     padding-top: 110px;
     padding-bottom: 120px;
     background: #131e39;
   }
+
   .div5 {
     padding-top: 110px;
     padding-bottom: 120px;
     background: #1a2843;
   }
+
   .div4 {
     padding-top: 110px;
     padding-bottom: 100px;
     background: #131e39;
   }
+
   .div3 {
     padding-top: 100px;
     padding-bottom: 120px;
     background: #131a35;
   }
+
   .big_logo {
     width: 260px;
     height: 80px;
   }
+
   .big_div {
     width: 100%;
   }
+
   .node_div {
     width: 80%;
     margin: 0 auto;
@@ -529,91 +564,113 @@ export default Vue.extend({
       padding-top: 100px;
     }
   }
+
   .font_color_1 {
     color: rgba(241, 241, 242, 1);
   }
+
   .font_color_2 {
     color: #bbbebc;
   }
+
   .font_color_3 {
     color: #84879c;
   }
+
   .font_center {
     text-align: center;
   }
+
   .title_node {
     font-size: 32px;
     width: 60%;
   }
+
   .title_node_2 {
     font-size: 20px;
     width: 50%;
     padding-top: 25px;
   }
+
   .data_div {
     width: 30%;
     min-height: 189px;
     display: inline-block;
     border: 1px #05bec5 solid;
     margin: 1%;
+
     .data_div_num {
       font-size: 40px;
       padding-top: 15px;
       padding-bottom: 40px;
       font-weight: 100;
     }
+
     .data_div_title {
       font-size: 32px;
       padding-top: 43px;
     }
   }
+
   .tokenomics_div {
     width: 50%;
     float: left;
+
     .title {
       font-size: 40px;
       padding-bottom: 40px;
     }
+
     .node {
       font-size: 20px;
       width: 90%;
       line-height: 1.5;
     }
   }
+
   .circulating_div {
     float: right;
     width: 50%;
+
     .title {
       font-size: 40px;
       font-weight: 100;
     }
+
     .node {
       font-size: 20px;
       padding-top: 20px;
     }
+
     .node_2 {
       font-size: 20px;
       padding: 30px 0;
     }
   }
+
   .Allocation {
     font-size: 40px;
     text-align: center;
     padding-bottom: 60px;
   }
+
   .Allocation_table {
     font-size: 20px;
+
     .num {
       text-align: center;
     }
+
     .value {
       text-align: right;
     }
   }
+
   .team_title {
     font-size: 40px;
     padding-bottom: 60px;
   }
+
   .button_link {
     font-size: 16px;
     background: rgba(90, 196, 190, 0.1);
@@ -622,14 +679,17 @@ export default Vue.extend({
     margin-top: 50px;
     border-radius: 4px;
     margin-right: 30px;
+
     .button_link_coin {
       font-size: 5px;
       display: inline-block;
       padding-left: 20px;
     }
   }
+
   .image_div {
     position: relative;
+
     .image {
       position: absolute;
       width: 932px;
@@ -638,6 +698,7 @@ export default Vue.extend({
       top: 0;
       z-index: 1;
     }
+
     .image2 {
       position: absolute;
       width: 932px;
@@ -645,33 +706,40 @@ export default Vue.extend({
       top: -70px;
     }
   }
+
   .funding_and_stakeholders_table_line {
     border-bottom: 1px solid rgba(119, 227, 239, 1);
     padding: 16px 0;
     font-size: 20px;
+
     .value {
       display: inline-block;
       width: 49%;
     }
   }
+
   .allocation_breakdown_table_line {
     border-bottom: 1px solid rgba(119, 227, 239, 1);
     padding: 16px 0;
+
     .item {
       display: inline-block;
       width: 32%;
     }
   }
+
   .team_table_line {
     border-bottom: rgba(128, 128, 255, 1) 1px solid;
     margin: 34px 0;
     padding-bottom: 34px;
     font-size: 20px;
+
     .name {
       float: left;
       width: 40%;
       font-size: 34px;
     }
+
     .value {
       float: left;
       width: 60%;

@@ -36,7 +36,8 @@
     "enquire.js": "^2.1.6",
     "lodash-es": "^4.17.21",
     "nuxt": "^2.15.2",
-    "nuxt-clipboard": "^0.0.2"
+    "nuxt-clipboard": "^0.0.2",
+    "nuxt-typed-vuex": "^0.1.22"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.4",
@@ -45,6 +46,7 @@
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/stylelint-module": "^4.0.0",
+    "@types/enquire.js": "^2.1.2",
     "@types/ledgerhq__hw-transport": "^4.21.3",
     "@types/ledgerhq__hw-transport-webusb": "^4.70.1",
     "@types/lodash-es": "^4.17.4",

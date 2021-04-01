@@ -1,8 +1,8 @@
 <template>
   <Menu
     v-model="currentRoute"
-    :mode="app.isMobile ? 'inline' : 'horizontal'"
-    :theme="app.isMobile ? 'dark' : 'light'"
+    :mode="isMobile ? 'inline' : 'horizontal'"
+    :theme="isMobile ? 'dark' : 'light'"
     @click="changeRoute"
   >
     <MenuItem v-for="(extra, name) in navs" :key="name">
@@ -16,7 +16,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
 import { Menu } from 'ant-design-vue'
 
 const MenuItem = Menu.Item
@@ -44,13 +43,21 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app', 'url']),
-    currentRoute: {
-      get() {
-        return [this.$store.state.route.name]
-      },
-      set() {}
+    isMobile() {
+      return this.$accessor.isMobile
+    },
+    url() {
+      return this.$accessor.url
+    },
+    currentRoute() {
+      return [this.$accessor.route.name]
     }
+    // currentRoute: {
+    //   get() {
+    //     return [this.$accessor.route.name]
+    //   },
+    //   set() {}
+    // }
   },
 
   methods: {

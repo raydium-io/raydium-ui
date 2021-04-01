@@ -1,13 +1,13 @@
 <template>
-  <Footer :class="app.isMobile ? 'mobile' : 'pc'">
-    <div class="logo" v-if="!app.isMobile">
+  <Footer :class="isMobile ? 'mobile' : 'pc'">
+    <div v-if="!isMobile" class="logo">
       <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
     </div>
     <div class="link_menu">
       <a :href="link_url.home"><span>Home</span></a>
-      <img class="logo" src="@/assets/icons/round.svg" v-if="!app.isMobile" />
+      <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
       <a :href="link_url.app"><span>App</span></a>
-      <img class="logo" src="@/assets/icons/round.svg" v-if="!app.isMobile" />
+      <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
       <a :href="link_url.info"><span>Info</span></a>
     </div>
     <div class="icon_list">
@@ -24,7 +24,7 @@
         ><img src="@/assets/icons/medium.svg" width="20" height="20"
       /></a>
     </div>
-    <div class="logo" v-if="app.isMobile">
+    <div v-if="isMobile" class="logo">
       <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
     </div>
   </Footer>
@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
 
 import { Layout } from 'ant-design-vue'
 
@@ -59,11 +58,13 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app'])
+    isMobile() {
+      return this.$accessor.isMobile
+    }
   },
 
-  mounted() {
-    this.$store.dispatch('app/queryIsMobile')
+  beforeMount() {
+    this.$accessor.queryIsMobile()
   }
 })
 </script>
@@ -80,18 +81,22 @@ export default Vue.extend({
       padding-top: 16px;
     }
   }
+
   .icon_list {
     text-align: center;
     margin: 48px 0;
   }
+
   .logo {
     text-align: center;
     margin-bottom: 50px;
   }
 }
+
 .pc {
   display: flex;
   justify-content: space-between;
+
   .link_menu {
     a {
       display: inline-block;

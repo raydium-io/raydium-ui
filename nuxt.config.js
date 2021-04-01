@@ -45,7 +45,7 @@ export default {
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/web3.ts', '@/plugins/axios.ts', '@/plugins/notify.ts'],
+  plugins: ['@/plugins/web3.ts', '@/plugins/axios.ts', '@/plugins/api.ts', '@/plugins/notify.ts'],
 
   router: {
     // 在每页渲染前运行 middleware/route.js 中间件的逻辑
@@ -62,7 +62,9 @@ export default {
     // https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/stylelint
-    '@nuxtjs/stylelint-module'
+    '@nuxtjs/stylelint-module',
+    // https://typed-vuex.roe.dev
+    'nuxt-typed-vuex'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules

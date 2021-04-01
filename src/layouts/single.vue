@@ -1,12 +1,12 @@
 <template>
-  <div class="all_background">
-    <Wallet v-show="false" /><Nuxt />
+  <div class="all-background">
+    <Nuxt />
     <div
       style="
         height: 1px;
         background: linear-gradient(90deg, rgba(90, 196, 190, 0) 0%, #3772ff 50%, rgba(194, 0, 251, 0) 100%);
       "
-    ></div>
+    />
     <Foot />
   </div>
 </template>
@@ -18,7 +18,7 @@ export default Vue.extend({})
 </script>
 
 <style lang="less">
-.all_background {
+.all-background {
   background: linear-gradient(180deg, rgba(19, 26, 53, 0) 0%, rgba(10, 14, 28, 0.5) 100%),
     linear-gradient(
       120.31deg,
