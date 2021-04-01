@@ -11,7 +11,7 @@
           must migrate to a new RAY-USDT pool. This tool simplifies the process.
         </p>
 
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <div v-else>
@@ -142,7 +142,7 @@
           <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
         </p>
 
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <div v-else>
@@ -303,16 +303,17 @@ export default Vue.extend({
       const conn = this.$web3
       const wallet = (this as any).$wallet
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       createTokenAccount(conn, wallet, TOKENS.USDT.mintAddress)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -323,10 +324,10 @@ export default Vue.extend({
           })
 
           const description = `Create USDT account`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Create USDT account failed',
             description: error.message
@@ -347,16 +348,17 @@ export default Vue.extend({
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -367,10 +369,10 @@ export default Vue.extend({
           })
 
           const description = `Unstake ${amount} ${farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Stake failed',
             description: error.message
@@ -390,10 +392,11 @@ export default Vue.extend({
       const wusdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}.tokenAccountAddress`)
       const usdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}.tokenAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
@@ -408,7 +411,7 @@ export default Vue.extend({
         amount
       )
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -419,10 +422,10 @@ export default Vue.extend({
           })
 
           const description = `Unwrap ${amount} WUSDT`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Unwrap failed',
             description: error.message
@@ -456,16 +459,17 @@ export default Vue.extend({
         })
       })
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       unstakeAll(conn, wallet, farms)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -476,10 +480,10 @@ export default Vue.extend({
           })
 
           const description = `Unstake all LP tokens`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Unstake all LP tokens failed',
             description: error.message
@@ -521,16 +525,17 @@ export default Vue.extend({
       const fromCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.coin.mintAddress}.tokenAccountAddress`)
       const toCoinAccount = get(this.wallet.tokenAccounts, `${poolInfo.pc.mintAddress}.tokenAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       removeLiquidity(conn, wallet, poolInfo, lpAccount, fromCoinAccount, toCoinAccount, lpBalance.fixed())
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -541,10 +546,10 @@ export default Vue.extend({
           })
 
           const description = `Remove liquidity for ${lpBalance.format()} ${poolInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Remove liquidity failed',
             description: error.message

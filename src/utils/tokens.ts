@@ -639,5 +639,77 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'nPrB78ETY8661fUgohpuVusNCZnedYCgghzRJzxWnVb',
     decimals: TOKENS.ETH.decimals
+  },
+  'YFI-SRM-V4': {
+    symbol: 'YFI-SRM',
+    name: 'YFI-SRM LP',
+    coin: { ...TOKENS.YFI },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'EGJht91R7dKpCj8wzALkjmNdUUUcQgodqWCYweyKcRcV',
+    decimals: TOKENS.YFI.decimals
+  },
+  'FTT-SRM-V4': {
+    symbol: 'FTT-SRM',
+    name: 'FTT-SRM LP',
+    coin: { ...TOKENS.FTT },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'AsDuPg9MgPtt3jfoyctUCUgsvwqAN6RZPftqoeiPDefM',
+    decimals: TOKENS.FTT.decimals
+  },
+  'BTC-SRM-V4': {
+    symbol: 'BTC-SRM',
+    name: 'BTC-SRM LP',
+    coin: { ...TOKENS.BTC },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'AGHQxXb3GSzeiLTcLtXMS2D5GGDZxsB2fZYZxSB5weqB',
+    decimals: TOKENS.BTC.decimals
+  },
+  'SUSHI-SRM-V4': {
+    symbol: 'SUSHI-SRM',
+    name: 'SUSHI-SRM LP',
+    coin: { ...TOKENS.SUSHI },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: '3HYhUnUdV67j1vn8fu7ExuVGy5dJozHEyWvqEstDbWwE',
+    decimals: TOKENS.SUSHI.decimals
+  },
+  'TOMO-SRM-V4': {
+    symbol: 'TOMO-SRM',
+    name: 'TOMO-SRM LP',
+    coin: { ...TOKENS.TOMO },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'GgH9RnKrQpaMQeqmdbMvs5oo1A24hERQ9wuY2pSkeG7x',
+    decimals: TOKENS.TOMO.decimals
+  },
+  'LINK-SRM-V4': {
+    symbol: 'LINK-SRM',
+    name: 'LINK-SRM LP',
+    coin: { ...TOKENS.LINK },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: 'GXN6yJv12o18skTmJXaeFXZVY1iqR18CHsmCT8VVCmDD',
+    decimals: TOKENS.LINK.decimals
+  },
+  'ETH-SRM-V4': {
+    symbol: 'ETH-SRM',
+    name: 'ETH-SRM LP',
+    coin: { ...TOKENS.ETH },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: '9VoY3VERETuc2FoadMSYYizF26mJinY514ZpEzkHMtwG',
+    decimals: TOKENS.ETH.decimals
+  },
+  'SRM-SOL-V4': {
+    symbol: 'SRM-SOL',
+    name: 'SRM-SOL LP',
+    coin: { ...TOKENS.SRM },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'AKJHspCwDhABucCxNLXUSfEzb7Ny62RqFtC9uNjJi4fq',
+    decimals: TOKENS.SRM.decimals
   }
 }

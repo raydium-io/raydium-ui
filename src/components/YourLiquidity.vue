@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <div v-if="!wallet.connected" class="fc-container">
-        <Button size="large" ghost @click="$store.dispatch('wallet/openModal')"> Connect Wallet </Button>
+        <Button size="large" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
       </div>
       <div v-else-if="!wallet.initialized" class="fc-container">
         <Spin :spinning="true">
@@ -212,16 +212,17 @@ export default Vue.extend({
       const fromCoinAccount = get(this.wallet.tokenAccounts, `${coin.mintAddress}.tokenAccountAddress`)
       const toCoinAccount = get(this.wallet.tokenAccounts, `${pc.mintAddress}.tokenAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       removeLiquidity(conn, wallet, this.poolInfo, lpAccount, fromCoinAccount, toCoinAccount, value)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -233,10 +234,10 @@ export default Vue.extend({
 
           const description = `Remove liquidity for ${value} ${lp.name}`
 
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Remove liquidity failed',
             description: error.message

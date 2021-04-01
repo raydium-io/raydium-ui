@@ -1,13 +1,15 @@
-import { MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 export const state = () => ({
   name: ''
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   changeName(state, name: string) {
     state.name = name
   }
-}
+})
+
+export const actions = actionTree({ state, getters, mutations }, {})

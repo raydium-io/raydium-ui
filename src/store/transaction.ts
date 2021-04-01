@@ -1,19 +1,18 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+
 import { Context, SignatureResult } from '@solana/web3.js'
 
 import LocalStorage from '@/utils/local-storage'
 import { getUnixTs } from '@/utils'
 import logger from '@/utils/logger'
 
-// import { commitment } from '@/utils/web3'
-
 export const state = () => ({
   history: {}
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   pushTx(state: any, [txid, description]: [txid: string, description: string]) {
     const history = { ...state.history }
 
@@ -48,44 +47,47 @@ export const mutations: MutationTree<RootState> = {
     state.history = { ...history }
     LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
   }
-}
+})
 
-export const actions: ActionTree<RootState, RootState> = {
-  sub({ commit }, { txid, description }: { txid: string; description: string }) {
-    commit('pushTx', [txid, description])
-    logger('Sub', txid)
+export const actions = actionTree(
+  { state, getters, mutations },
+  {
+    sub({ commit }, { txid, description }: { txid: string; description: string }) {
+      commit('pushTx', [txid, description])
+      logger('Sub', txid)
 
-    const conn = this.$web3
-    const notify = (this as any)._vm.$notify
+      const conn = this.$web3
+      const notify = this.$notify
 
-    const listenerId = conn.onSignature(
-      txid,
-      function (signatureResult: SignatureResult, context: Context) {
-        const { slot } = context
+      const listenerId = conn.onSignature(
+        txid,
+        function (signatureResult: SignatureResult, context: Context) {
+          const { slot } = context
 
-        if (!signatureResult.err) {
-          // success
-          commit('setTxStatus', [txid, 's', slot])
+          if (!signatureResult.err) {
+            // success
+            commit('setTxStatus', [txid, 's', slot])
 
-          notify.success({
-            key: txid,
-            message: 'Transaction has been confirmed',
-            description
-          })
-        } else {
-          // fail
-          commit('setTxStatus', [txid, 'f', slot])
+            notify.success({
+              key: txid,
+              message: 'Transaction has been confirmed',
+              description
+            })
+          } else {
+            // fail
+            commit('setTxStatus', [txid, 'f', slot])
 
-          notify.error({
-            key: txid,
-            message: 'Transaction has been failed',
-            description
-          })
-        }
-      },
-      'single'
-    )
+            notify.error({
+              key: txid,
+              message: 'Transaction has been failed',
+              description
+            })
+          }
+        },
+        'single'
+      )
 
-    commit('setListenerId', [txid, listenerId + 1])
+      commit('setListenerId', [txid, listenerId + 1])
+    }
   }
-}
+)

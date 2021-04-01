@@ -1,4 +1,6 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+
+import { PricesData } from '@/types/api'
 
 import { TOKENS } from '@/utils/tokens'
 import { cloneDeep } from 'lodash-es'
@@ -9,15 +11,16 @@ const AUTO_REFRESH_TIME = 60
 export const state = () => ({
   initialized: false,
   loading: false,
-  prices: {},
 
   autoRefreshTime: AUTO_REFRESH_TIME,
-  countdown: 0
+  countdown: 0,
+
+  prices: {} as PricesData
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   setInitialized(state) {
     state.initialized = true
   },
@@ -34,39 +37,34 @@ export const mutations: MutationTree<RootState> = {
     }
   },
 
-  setPrices(state, prices: object) {
+  setPrices(state, prices: PricesData) {
     state.prices = cloneDeep(prices)
   },
 
   setCountdown(state, countdown: number) {
     state.countdown = countdown
   }
-}
+})
 
-export const actions: ActionTree<RootState, RootState> = {
-  requestPrices({ commit }) {
-    commit('setLoading', true)
+export const actions = actionTree(
+  { state, getters, mutations },
+  {
+    async requestPrices({ commit }) {
+      commit('setLoading', true)
 
-    const tokens = ['SOL']
+      const tokens = ['SOL']
 
-    for (const symbol of Object.keys({ ...TOKENS })) {
-      tokens.push(symbol)
+      for (const symbol of Object.keys({ ...TOKENS })) {
+        tokens.push(symbol)
+      }
+
+      const prices: PricesData = await this.$api.getPrices(tokens.join(','))
+
+      commit('setPrices', prices)
+      logger('Price updated')
+
+      commit('setInitialized')
+      commit('setLoading', false)
     }
-
-    ;(this as any).$axios
-      .get('https://api.raydium.io/coin/price', {
-        params: {
-          coins: tokens.join(',')
-        }
-      })
-      .then((data: any) => {
-        commit('setPrices', data)
-        logger('Price updated')
-      })
-      .catch()
-      .finally(() => {
-        commit('setInitialized')
-        commit('setLoading', false)
-      })
   }
-}
+)

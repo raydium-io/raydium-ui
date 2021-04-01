@@ -1,15 +1,15 @@
 <template>
-  <Header class="header fs-container" :class="app.isMobile ? 'mobile' : ''">
+  <Header class="header fs-container" :class="isMobile ? 'mobile' : ''">
     <a href="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></a>
 
-    <div v-if="app.isMobile ? (navOpened ? true : false) : true" :class="app.isMobile ? 'mobile-nav' : ''">
+    <div v-if="isMobile ? (navOpened ? true : false) : true" :class="isMobile ? 'mobile-nav' : ''">
       <Nav @onSelect="() => (navOpened = false)" />
     </div>
 
     <div class="fs-container">
       <Wallet />
       <div
-        v-if="app.isMobile"
+        v-if="isMobile"
         class="nav-button"
         :class="navOpened ? 'opened' : ''"
         @click="() => (navOpened = !navOpened)"
@@ -25,7 +25,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
 
 import { Layout } from 'ant-design-vue'
 
@@ -43,11 +42,9 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app'])
-  },
-
-  mounted() {
-    this.$store.dispatch('app/queryIsMobile')
+    isMobile() {
+      return this.$accessor.isMobile
+    }
   }
 })
 </script>

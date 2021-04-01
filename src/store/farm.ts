@@ -1,4 +1,4 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
 import {
@@ -21,17 +21,18 @@ const AUTO_REFRESH_TIME = 60
 export const state = () => ({
   initialized: false,
   loading: false,
-  infos: {},
-  stakeAccounts: {},
 
   autoRefreshTime: AUTO_REFRESH_TIME,
   countdown: 0,
-  lastSubBlock: 0
+  lastSubBlock: 0,
+
+  infos: {},
+  stakeAccounts: {}
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   setInitialized(state) {
     state.initialized = true
   },
@@ -63,196 +64,199 @@ export const mutations: MutationTree<RootState> = {
   setLastSubBlock(state, lastSubBlock: number) {
     state.lastSubBlock = lastSubBlock
   }
-}
+})
 
-export const actions: ActionTree<RootState, RootState> = {
-  requestInfos({ commit, dispatch }) {
-    commit('setLoading', true)
-    dispatch('getStakeAccounts')
+export const actions = actionTree(
+  { state, getters, mutations },
+  {
+    requestInfos({ commit, dispatch }) {
+      commit('setLoading', true)
+      dispatch('getStakeAccounts')
 
-    const conn = this.$web3
+      const conn = this.$web3
 
-    const farms = {} as any
-    const publicKeys = [] as any
+      const farms = {} as any
+      const publicKeys = [] as any
 
-    FARMS.forEach((farm) => {
-      const { lp, poolId, poolLpTokenAccount } = farm
+      FARMS.forEach((farm) => {
+        const { lp, poolId, poolLpTokenAccount } = farm
 
-      publicKeys.push(new PublicKey(poolId), new PublicKey(poolLpTokenAccount))
+        publicKeys.push(new PublicKey(poolId), new PublicKey(poolLpTokenAccount))
 
-      const farmInfo = cloneDeep(farm)
+        const farmInfo = cloneDeep(farm)
 
-      farmInfo.lp.balance = new TokenAmount(0, lp.decimals)
+        farmInfo.lp.balance = new TokenAmount(0, lp.decimals)
 
-      farms[poolId] = farmInfo
-    })
+        farms[poolId] = farmInfo
+      })
 
-    getMultipleAccounts(conn, publicKeys, commitment)
-      .then((multipleInfo) => {
-        multipleInfo.forEach((info) => {
-          if (info) {
-            const address = info.publicKey.toBase58()
-            const data = Buffer.from(info.account.data)
+      getMultipleAccounts(conn, publicKeys, commitment)
+        .then((multipleInfo) => {
+          multipleInfo.forEach((info) => {
+            if (info) {
+              const address = info.publicKey.toBase58()
+              const data = Buffer.from(info.account.data)
 
-            const { key, poolId } = getAddressForWhat(address)
+              const { key, poolId } = getAddressForWhat(address)
 
-            if (key && poolId) {
-              const farmInfo = farms[poolId]
+              if (key && poolId) {
+                const farmInfo = farms[poolId]
 
-              switch (key) {
-                // pool info
-                case 'poolId': {
-                  let parsed
+                switch (key) {
+                  // pool info
+                  case 'poolId': {
+                    let parsed
 
-                  if ([4, 5].includes(farmInfo.version)) {
-                    parsed = STAKE_INFO_LAYOUT_V4.decode(data)
-                  } else {
-                    parsed = STAKE_INFO_LAYOUT.decode(data)
+                    if ([4, 5].includes(farmInfo.version)) {
+                      parsed = STAKE_INFO_LAYOUT_V4.decode(data)
+                    } else {
+                      parsed = STAKE_INFO_LAYOUT.decode(data)
+                    }
+
+                    farmInfo.poolInfo = parsed
+
+                    break
                   }
+                  // staked balance
+                  case 'poolLpTokenAccount': {
+                    const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                  farmInfo.poolInfo = parsed
+                    farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
 
-                  break
+                    break
+                  }
                 }
-                // staked balance
-                case 'poolLpTokenAccount': {
-                  const parsed = ACCOUNT_LAYOUT.decode(data)
-
-                  farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
-
-                  break
-                }
-              }
-            }
-          }
-        })
-
-        commit('setInfos', farms)
-        logger('Farm&Stake pool infomations updated')
-      })
-      .catch()
-      .finally(() => {
-        commit('setInitialized')
-        commit('setLoading', false)
-      })
-  },
-
-  getStakeAccounts({ commit }) {
-    const conn = this.$web3
-    const wallet = (this as any)._vm.$wallet
-
-    if (wallet && wallet.connected) {
-      // stake user info account
-      const stakeFilters = [
-        {
-          memcmp: {
-            offset: 40,
-            bytes: wallet.publicKey.toBase58()
-          }
-        },
-        {
-          dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span
-        }
-      ]
-
-      const stakeAccounts: any = {}
-
-      getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
-        .then((stakeAccountInfos) => {
-          stakeAccountInfos.forEach((stakeAccountInfo) => {
-            const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-            const { data } = stakeAccountInfo.accountInfo
-
-            const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
-
-            const poolId = userStakeInfo.poolId.toBase58()
-            const depositBalance = userStakeInfo.depositBalance.toNumber()
-            const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-
-            const farm = getFarmByPoolId(poolId)
-
-            if (farm) {
-              stakeAccounts[poolId] = {
-                depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                stakeAccountAddress
               }
             }
           })
 
-          // stake user info account v4
-          const stakeFiltersV4 = [
-            {
-              memcmp: {
-                offset: 40,
-                bytes: wallet.publicKey.toBase58()
-              }
-            },
-            {
-              dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
-            }
-          ]
-
-          getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
-            .then((stakeAccountInfos) => {
-              stakeAccountInfos.forEach((stakeAccountInfo) => {
-                const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-                const { data } = stakeAccountInfo.accountInfo
-
-                const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
-
-                const poolId = userStakeInfo.poolId.toBase58()
-                const depositBalance = userStakeInfo.depositBalance.toNumber()
-                const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-                const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
-
-                const farm = getFarmByPoolId(poolId)
-
-                if (farm) {
-                  stakeAccounts[poolId] = {
-                    depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                    rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                    // @ts-ignore
-                    rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                    stakeAccountAddress
-                  }
-                }
-              })
-
-              getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V5), stakeFiltersV4)
-                .then((stakeAccountInfos) => {
-                  stakeAccountInfos.forEach((stakeAccountInfo) => {
-                    const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-                    const { data } = stakeAccountInfo.accountInfo
-
-                    const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
-
-                    const poolId = userStakeInfo.poolId.toBase58()
-                    const depositBalance = userStakeInfo.depositBalance.toNumber()
-                    const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-                    const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
-
-                    const farm = getFarmByPoolId(poolId)
-
-                    if (farm) {
-                      stakeAccounts[poolId] = {
-                        depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                        rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                        // @ts-ignore
-                        rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                        stakeAccountAddress
-                      }
-                    }
-                  })
-
-                  commit('setStakeAccounts', stakeAccounts)
-                  logger('User StakeAccounts updated')
-                })
-                .catch()
-            })
-            .catch()
+          commit('setInfos', farms)
+          logger('Farm&Stake pool infomations updated')
         })
         .catch()
+        .finally(() => {
+          commit('setInitialized')
+          commit('setLoading', false)
+        })
+    },
+
+    getStakeAccounts({ commit }) {
+      const conn = this.$web3
+      const wallet = (this as any)._vm.$wallet
+
+      if (wallet && wallet.connected) {
+        // stake user info account
+        const stakeFilters = [
+          {
+            memcmp: {
+              offset: 40,
+              bytes: wallet.publicKey.toBase58()
+            }
+          },
+          {
+            dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span
+          }
+        ]
+
+        const stakeAccounts: any = {}
+
+        getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
+          .then((stakeAccountInfos) => {
+            stakeAccountInfos.forEach((stakeAccountInfo) => {
+              const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+              const { data } = stakeAccountInfo.accountInfo
+
+              const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+
+              const poolId = userStakeInfo.poolId.toBase58()
+              const depositBalance = userStakeInfo.depositBalance.toNumber()
+              const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+
+              const farm = getFarmByPoolId(poolId)
+
+              if (farm) {
+                stakeAccounts[poolId] = {
+                  depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                  rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                  stakeAccountAddress
+                }
+              }
+            })
+
+            // stake user info account v4
+            const stakeFiltersV4 = [
+              {
+                memcmp: {
+                  offset: 40,
+                  bytes: wallet.publicKey.toBase58()
+                }
+              },
+              {
+                dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
+              }
+            ]
+
+            getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
+              .then((stakeAccountInfos) => {
+                stakeAccountInfos.forEach((stakeAccountInfo) => {
+                  const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+                  const { data } = stakeAccountInfo.accountInfo
+
+                  const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+                  const poolId = userStakeInfo.poolId.toBase58()
+                  const depositBalance = userStakeInfo.depositBalance.toNumber()
+                  const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+                  const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+
+                  const farm = getFarmByPoolId(poolId)
+
+                  if (farm) {
+                    stakeAccounts[poolId] = {
+                      depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                      rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                      // @ts-ignore
+                      rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                      stakeAccountAddress
+                    }
+                  }
+                })
+
+                getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V5), stakeFiltersV4)
+                  .then((stakeAccountInfos) => {
+                    stakeAccountInfos.forEach((stakeAccountInfo) => {
+                      const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+                      const { data } = stakeAccountInfo.accountInfo
+
+                      const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+                      const poolId = userStakeInfo.poolId.toBase58()
+                      const depositBalance = userStakeInfo.depositBalance.toNumber()
+                      const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+                      const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+
+                      const farm = getFarmByPoolId(poolId)
+
+                      if (farm) {
+                        stakeAccounts[poolId] = {
+                          depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
+                          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                          // @ts-ignore
+                          rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                          stakeAccountAddress
+                        }
+                      }
+                    })
+
+                    commit('setStakeAccounts', stakeAccounts)
+                    logger('User StakeAccounts updated')
+                  })
+                  .catch()
+              })
+              .catch()
+          })
+          .catch()
+      }
     }
   }
-}
+)

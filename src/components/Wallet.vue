@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
+    <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal">
       <Icon type="wallet" />
       Connect
     </Button>
-    <Button v-else ghost @click="$store.dispatch('wallet/openModal')">
+    <Button v-else ghost @click="$accessor.wallet.openModal">
       <Icon type="wallet" />
       {{ wallet.address.substr(0, 4) }}
       ...
@@ -16,7 +16,7 @@
       :visible="wallet.modalShow"
       :footer="null"
       centered
-      @cancel="$store.dispatch('wallet/closeModal')"
+      @cancel="$accessor.wallet.closeModal"
     >
       <div v-if="!wallet.connected" class="select-wallet">
         <Button v-for="(providerUrl, name) in wallets" :key="name" ghost @click="connect(name)">
@@ -54,8 +54,7 @@ import { WalletAdapter, SolongWalletAdapter, MathWalletAdapter, LedgerWalletAdap
 Vue.use(Modal)
 
 interface Wallets {
-  [key: string]: any
-  [index: number]: any
+  [key: string]: string
 }
 
 export default Vue.extend({
@@ -97,10 +96,10 @@ export default Vue.extend({
   watch: {},
 
   mounted() {
-    this.$store.dispatch('price/requestPrices')
-    this.$store.dispatch('swap/getMarkets')
-    this.$store.dispatch('liquidity/requestInfos')
-    this.$store.dispatch('farm/requestInfos')
+    this.$accessor.price.requestPrices()
+    this.$accessor.swap.getMarkets()
+    this.$accessor.liquidity.requestInfos()
+    this.$accessor.farm.requestInfos()
 
     this.setWalletTimer()
     this.setPriceTimer()
@@ -128,7 +127,7 @@ export default Vue.extend({
         }
         case 'Solong': {
           if ((window as any).solong === undefined) {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               message: 'Connect wallet failed',
               description: 'Please install and initialize Solong wallet first'
             })
@@ -140,7 +139,7 @@ export default Vue.extend({
         }
         case 'MathWallet': {
           if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               message: 'Connect wallet failed',
               description: 'Please install and initialize Math wallet first'
             })
@@ -157,13 +156,13 @@ export default Vue.extend({
       }
 
       wallet?.on('connect', () => {
-        this.$store.dispatch('wallet/closeModal').then(() => {
+        this.$accessor.wallet.closeModal().then(() => {
           Vue.prototype.$wallet = wallet
 
-          this.$store.commit('wallet/connected', wallet?.publicKey.toBase58())
+          this.$accessor.wallet.setConnected(wallet?.publicKey.toBase58())
 
           this.subWallet()
-          ;(this as any).$notify.success({
+          this.$notify.success({
             message: 'Wallet connected',
             description: ''
           })
@@ -175,7 +174,7 @@ export default Vue.extend({
       try {
         wallet?.connect()
       } catch (error) {
-        ;(this as any).$notify.error({
+        this.$notify.error({
           message: 'Connect wallet failed',
           description: error.message
         })
@@ -188,9 +187,10 @@ export default Vue.extend({
 
       this.unsubWallet()
 
-      this.$store.commit('wallet/disconnected')
-      ;(this as any).$notify.warning({
-        message: 'Wallet disconnected'
+      this.$accessor.wallet.setDisconnected()
+      this.$notify.warning({
+        message: 'Wallet disconnected',
+        description: ''
       })
     },
 
@@ -200,9 +200,9 @@ export default Vue.extend({
       const { slot } = context
 
       if (slot !== this.wallet.lastSubBlock) {
-        this.$store.commit('wallet/setLastSubBlock', slot)
-        this.$store.dispatch('wallet/getTokenAccounts')
-        this.$store.dispatch('farm/getStakeAccounts')
+        this.$accessor.wallet.setLastSubBlock(slot)
+        this.$accessor.wallet.getTokenAccounts()
+        this.$accessor.farm.getStakeAccounts()
       }
     },
 
@@ -211,8 +211,8 @@ export default Vue.extend({
 
       this.walletListenerId = this.$web3.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
 
-      this.$store.dispatch('wallet/getTokenAccounts')
-      this.$store.dispatch('farm/getStakeAccounts')
+      this.$accessor.wallet.getTokenAccounts()
+      this.$accessor.farm.getStakeAccounts()
     },
 
     unsubWallet() {
@@ -225,10 +225,10 @@ export default Vue.extend({
       this.walletTimer = setInterval(() => {
         if (this.wallet.connected && !this.wallet.loading) {
           if (this.wallet.countdown < this.wallet.autoRefreshTime) {
-            this.$store.commit('wallet/setCountdown', this.wallet.countdown + 1)
+            this.$accessor.wallet.setCountdown(this.$accessor.wallet.countdown + 1)
 
             if (this.wallet.countdown === this.wallet.autoRefreshTime) {
-              this.$store.dispatch('wallet/getTokenAccounts')
+              this.$accessor.wallet.getTokenAccounts()
             }
           }
         }
@@ -239,10 +239,10 @@ export default Vue.extend({
       this.priceTimer = setInterval(() => {
         if (!this.price.loading) {
           if (this.price.countdown < this.price.autoRefreshTime) {
-            this.$store.commit('price/setCountdown', this.price.countdown + 1)
+            this.$accessor.price.setCountdown(this.$accessor.price.countdown + 1)
 
             if (this.price.countdown === this.price.autoRefreshTime) {
-              this.$store.dispatch('price/requestPrices')
+              this.$accessor.price.requestPrices()
             }
           }
         }
@@ -253,10 +253,10 @@ export default Vue.extend({
       this.liquidityTimer = setInterval(() => {
         if (!this.liquidity.loading) {
           if (this.liquidity.countdown < this.liquidity.autoRefreshTime) {
-            this.$store.commit('liquidity/setCountdown', this.liquidity.countdown + 1)
+            this.$accessor.liquidity.setCountdown(this.$accessor.liquidity.countdown + 1)
 
             if (this.liquidity.countdown === this.liquidity.autoRefreshTime) {
-              this.$store.dispatch('liquidity/requestInfos')
+              this.$accessor.liquidity.requestInfos()
             }
           }
         }
@@ -267,10 +267,10 @@ export default Vue.extend({
       this.farmTimer = setInterval(() => {
         if (!this.farm.loading) {
           if (this.farm.countdown < this.farm.autoRefreshTime) {
-            this.$store.commit('farm/setCountdown', this.farm.countdown + 1)
+            this.$accessor.farm.setCountdown(this.$accessor.farm.countdown + 1)
 
             if (this.farm.countdown === this.farm.autoRefreshTime) {
-              this.$store.dispatch('farm/requestInfos')
+              this.$accessor.farm.requestInfos()
             }
           }
         }

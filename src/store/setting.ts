@@ -1,17 +1,16 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import LocalStorage from '@/utils/local-storage'
 
 export const state = () => ({
   show: false,
-
   // percent
   slippage: LocalStorage.get('RAYDIUM_SLIPPAGE') || 1
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   setModal(state, show: boolean) {
     state.show = show
   },
@@ -20,14 +19,17 @@ export const mutations: MutationTree<RootState> = {
     state.slippage = slippage
     LocalStorage.set('RAY_SLIPPAGE', slippage)
   }
-}
+})
 
-export const actions: ActionTree<RootState, RootState> = {
-  open({ commit }) {
-    commit('setModal', true)
-  },
+export const actions = actionTree(
+  { state, getters, mutations },
+  {
+    open({ commit }) {
+      commit('setModal', true)
+    },
 
-  close({ commit }) {
-    commit('setModal', false)
+    close({ commit }) {
+      commit('setModal', false)
+    }
   }
-}
+)

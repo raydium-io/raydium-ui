@@ -19,7 +19,7 @@
             :percent="(100 / farm.autoRefreshTime) * farm.countdown"
             :show-info="false"
             :class="farm.loading ? 'disabled' : ''"
-            @click="$store.dispatch('farm/requestInfos')"
+            @click="$accessor.farm.requestInfos"
           />
         </Tooltip>
       </div>
@@ -133,7 +133,7 @@
                 <Col :span="app.isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
-                    <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+                    <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
                       Connect Wallet
                     </Button>
                     <div v-else class="fs-container">
@@ -201,9 +201,7 @@
                 </div>
               </Col>
               <Col class="fc-container" :span="app.isMobile ? 12 : 4">
-                <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
-                  Connect Wallet
-                </Button>
+                <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
                 <Button
                   v-else
                   ghost
@@ -448,16 +446,17 @@ export default Vue.extend({
       const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -468,10 +467,10 @@ export default Vue.extend({
           })
 
           const description = `Stake ${amount} ${this.farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Stake failed',
             description: error.message
@@ -508,16 +507,17 @@ export default Vue.extend({
       const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -528,10 +528,10 @@ export default Vue.extend({
           })
 
           const description = `Unstake ${amount} ${this.farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Stake failed',
             description: error.message
@@ -560,16 +560,17 @@ export default Vue.extend({
       const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
       depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
         .then((txid) => {
-          ;(this as any).$notify.info({
+          this.$notify.info({
             key,
             message: 'Transaction has been sent',
             description: (h: any) =>
@@ -580,10 +581,10 @@ export default Vue.extend({
           })
           // @ts-ignore
           const description = `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
-          ;(this as any).$notify.error({
+          this.$notify.error({
             key,
             message: 'Harvest failed',
             description: error.message

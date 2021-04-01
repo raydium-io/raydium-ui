@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Settings" :visible="setting.show" :footer="null" centered @cancel="$store.dispatch('setting/close')">
+  <Modal title="Settings" :visible="show" :footer="null" centered @cancel="$accessor.setting.close">
     <div class="slippage">
       <h3>Slippage tolerance</h3>
       <Row class="slippage-setting" :gutter="30">
@@ -22,8 +22,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapState } from 'vuex'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Modal, Row, Col, Input } from 'ant-design-vue'
 
 import { inputRegex, escapeRegExp } from '@/utils/regex'
@@ -31,52 +30,48 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
 
-export default Vue.extend({
+@Component({
+  asyncData({ $accessor }) {
+    return { slippage: $accessor.setting.slippage.toString() }
+  },
+
   components: {
     Modal,
     Row,
     Col,
     Input
-  },
-
-  data() {
-    return {
-      slippage: '1',
-      errorMsg: ''
-    }
-  },
-
-  computed: {
-    ...mapState(['setting'])
-  },
-
-  watch: {
-    slippage(newSlippage: string, oldSlippage: string) {
-      this.$nextTick(() => {
-        if (!inputRegex.test(escapeRegExp(newSlippage))) {
-          this.slippage = oldSlippage
-        } else {
-          const slippage = parseFloat(newSlippage)
-          if (slippage > 100 || slippage <= 0 || isNaN(slippage)) {
-            this.errorMsg = 'Enter a valid slippage percentage'
-          } else {
-            if (slippage < 1) {
-              this.errorMsg = 'Your transaction may fail'
-            } else {
-              this.errorMsg = ''
-            }
-
-            this.$store.commit('setting/setSlippage', parseFloat(newSlippage))
-          }
-        }
-      })
-    }
-  },
-
-  mounted() {
-    this.slippage = this.setting.slippage.toString()
   }
 })
+export default class Setting extends Vue {
+  slippage = '1'
+  errorMsg = ''
+
+  get show() {
+    return this.$accessor.setting.show
+  }
+
+  @Watch('slippage')
+  onSlippageChanged(val: string, oldVal: string) {
+    this.$nextTick(() => {
+      if (!inputRegex.test(escapeRegExp(val))) {
+        this.slippage = oldVal
+      } else {
+        const slippage = parseFloat(val)
+        if (slippage > 100 || slippage <= 0 || isNaN(slippage)) {
+          this.errorMsg = 'Enter a valid slippage percentage'
+        } else {
+          if (slippage < 1) {
+            this.errorMsg = 'Your transaction may fail'
+          } else {
+            this.errorMsg = ''
+          }
+
+          this.$accessor.setting.setSlippage(parseFloat(val))
+        }
+      }
+    })
+  }
+}
 </script>
 
 <style lang="less" scoped>

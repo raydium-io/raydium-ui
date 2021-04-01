@@ -1,4 +1,4 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
@@ -11,38 +11,41 @@ export const state = () => ({
   markets: {}
 })
 
-type RootState = ReturnType<typeof state>
+export const getters = getterTree(state, {})
 
-export const mutations: MutationTree<RootState> = {
+export const mutations = mutationTree(state, {
   setMarkets(state, markets: any) {
     state.markets = cloneDeep(markets)
   }
-}
+})
 
-export const actions: ActionTree<RootState, RootState> = {
-  getMarkets({ commit }) {
-    const conn = this.$web3
+export const actions = actionTree(
+  { state, getters, mutations },
+  {
+    getMarkets({ commit }) {
+      const conn = this.$web3
 
-    const filters = [
-      {
-        dataSize: _MARKET_STATE_LAYOUT_V2.span
-      }
-    ]
+      const filters = [
+        {
+          dataSize: _MARKET_STATE_LAYOUT_V2.span
+        }
+      ]
 
-    getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), filters)
-      .then((marketInfos) => {
-        const markets: any = {}
+      getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), filters)
+        .then((marketInfos) => {
+          const markets: any = {}
 
-        marketInfos.forEach((marketInfo) => {
-          const address = marketInfo.publicKey.toBase58()
-          const { data } = marketInfo.accountInfo
+          marketInfos.forEach((marketInfo) => {
+            const address = marketInfo.publicKey.toBase58()
+            const { data } = marketInfo.accountInfo
 
-          markets[address] = _MARKET_STATE_LAYOUT_V2.decode(data)
+            markets[address] = _MARKET_STATE_LAYOUT_V2.decode(data)
+          })
+
+          commit('setMarkets', markets)
+          logger('Markets updated')
         })
-
-        commit('setMarkets', markets)
-        logger('Markets updated')
-      })
-      .catch()
+        .catch()
+    }
   }
-}
+)

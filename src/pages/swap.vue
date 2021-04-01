@@ -34,7 +34,7 @@
                   {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(fromCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="toCoin" class="info">
@@ -45,7 +45,7 @@
                   {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(toCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="lpMintAddress" class="info">
@@ -56,7 +56,7 @@
                   {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(lpMintAddress)" />
                 </div>
               </div>
               <div v-else-if="marketAddress" class="info">
@@ -67,14 +67,14 @@
                   {{ marketAddress.substr(marketAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', marketAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(marketAddress)" />
                 </div>
               </div>
             </div>
           </template>
           <Icon type="info-circle" />
         </Tooltip>
-        <Icon type="setting" @click="$store.dispatch('setting/open')" />
+        <Icon type="setting" @click="$accessor.setting.open" />
       </div>
     </div>
 
@@ -152,7 +152,7 @@
             {{ toCoin.symbol }}
           </span>
         </div>
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <Button
@@ -567,10 +567,11 @@ export default Vue.extend({
     placeOrder() {
       this.swaping = true
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
@@ -591,7 +592,7 @@ export default Vue.extend({
           this.fromCoinAmount
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -602,10 +603,10 @@ export default Vue.extend({
             })
 
             const description = `Unwrap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$store.dispatch('transaction/sub', { txid, description })
+            this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
@@ -632,7 +633,7 @@ export default Vue.extend({
           this.setting.slippage
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -643,10 +644,10 @@ export default Vue.extend({
             })
 
             const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$store.dispatch('transaction/sub', { txid, description })
+            this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
@@ -675,7 +676,7 @@ export default Vue.extend({
           this.setting.slippage
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -686,10 +687,10 @@ export default Vue.extend({
             })
 
             const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$store.dispatch('transaction/sub', { txid, description })
+            this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
