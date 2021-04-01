@@ -3,26 +3,26 @@
     <div v-if="!isMobile" class="logo">
       <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
     </div>
-    <div class="link_menu">
-      <a :href="link_url.home"><span>Home</span></a>
+    <div class="link-menu">
+      <a :href="linkUrl.home"><span>Home</span></a>
       <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
-      <a :href="link_url.app"><span>App</span></a>
+      <a :href="linkUrl.app"><span>App</span></a>
       <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
-      <a :href="link_url.info"><span>Info</span></a>
+      <a :href="linkUrl.info"><span>Info</span></a>
     </div>
     <div class="icon_list">
-      <a :href="link_url.twitter" target="_blank" style="margin-left: 10px"
-        ><img src="@/assets/icons/twitter.svg" width="20" height="20"
-      /></a>
-      <a :href="link_url.discord" target="_blank" style="margin-left: 10px"
-        ><img src="@/assets/icons/discord.png" width="20" height="20"
-      /></a>
-      <a :href="link_url.telegram" target="_blank" style="margin-left: 10px"
-        ><img src="@/assets/icons/telegram.svg" width="20" height="20"
-      /></a>
-      <a :href="link_url.medium" target="_blank" style="margin-left: 10px"
-        ><img src="@/assets/icons/medium.svg" width="20" height="20"
-      /></a>
+      <a :href="linkUrl.twitter" target="_blank" style="margin-left: 10px">
+        <img src="@/assets/icons/twitter.svg" width="20" height="20" />
+      </a>
+      <a :href="linkUrl.discord" target="_blank" style="margin-left: 10px">
+        <img src="@/assets/icons/discord.png" width="20" height="20" />
+      </a>
+      <a :href="linkUrl.telegram" target="_blank" style="margin-left: 10px">
+        <img src="@/assets/icons/telegram.svg" width="20" height="20" />
+      </a>
+      <a :href="linkUrl.medium" target="_blank" style="margin-left: 10px">
+        <img src="@/assets/icons/medium.svg" width="20" height="20" />
+      </a>
     </div>
     <div v-if="isMobile" class="logo">
       <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
@@ -31,47 +31,42 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { Vue, Component } from 'nuxt-property-decorator'
 
 import { Layout } from 'ant-design-vue'
 
 const { Footer } = Layout
 
-export default Vue.extend({
+@Component({
   components: {
     Footer
-  },
+  }
+})
+export default class Foot extends Vue {
+  navOpened = false
+  linkUrl = {
+    home: '/',
+    app: '/swap',
+    info: '/info',
+    twitter: 'https://twitter.com/RaydiumProtocol',
+    discord: 'https://discord.com/invite/6EvFwvCfpx',
+    telegram: 'https://t.me/raydiumprotocol',
+    medium: 'https://raydium.medium.com/'
+  }
 
-  data() {
-    return {
-      navOpened: false,
-      link_url: {
-        home: '/',
-        app: '/swap',
-        info: '/info',
-        twitter: 'https://twitter.com/RaydiumProtocol',
-        discord: 'https://discord.com/invite/6EvFwvCfpx',
-        telegram: 'https://t.me/raydiumprotocol',
-        medium: 'https://raydium.medium.com/'
-      }
-    }
-  },
-
-  computed: {
-    isMobile() {
-      return this.$accessor.isMobile
-    }
-  },
+  get isMobile() {
+    return this.$accessor.isMobile
+  }
 
   beforeMount() {
     this.$accessor.queryIsMobile()
   }
-})
+}
 </script>
 
 <style lang="less" scoped>
 .mobile {
-  .link_menu {
+  .link-menu {
     span {
       display: inline-block;
       width: 100%;
@@ -97,7 +92,7 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
 
-  .link_menu {
+  .link-menu {
     a {
       display: inline-block;
       width: 100px;

@@ -15,61 +15,54 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { Vue, Component } from 'nuxt-property-decorator'
+
 import { Menu } from 'ant-design-vue'
 
 const MenuItem = Menu.Item
 
-export default Vue.extend({
+@Component({
   components: {
     Menu,
     MenuItem
-  },
-
-  data() {
-    return {
-      navs: {
-        trading: true,
-        swap: false,
-        liquidity: false,
-        pools: false,
-        farms: false,
-        fusion: false,
-        staking: false,
-        migrate: false
-        // info: false
-      }
-    }
-  },
-
-  computed: {
-    isMobile() {
-      return this.$accessor.isMobile
-    },
-    url() {
-      return this.$accessor.url
-    },
-    currentRoute() {
-      return [this.$accessor.route.name]
-    }
-    // currentRoute: {
-    //   get() {
-    //     return [this.$accessor.route.name]
-    //   },
-    //   set() {}
-    // }
-  },
-
-  methods: {
-    changeRoute({ key }: { key: string }): void {
-      if (!(this as any).navs[key]) {
-        this.$router.push(`/${key}/`)
-      }
-
-      this.$emit('onSelect')
-    }
   }
 })
+export default class Nav extends Vue {
+  navs = {
+    trading: true,
+    swap: false,
+    liquidity: false,
+    pools: false,
+    farms: false,
+    fusion: false,
+    staking: false,
+    migrate: false
+    // info: false
+  }
+
+  get isMobile() {
+    return this.$accessor.isMobile
+  }
+
+  get url() {
+    return this.$accessor.url
+  }
+
+  get currentRoute() {
+    return [this.$accessor.route.name]
+  }
+
+  set currentRoute(route) {}
+
+  changeRoute({ key }: { key: string }): void {
+    if (!(this as any).navs[key]) {
+      this.$router.push(`/${key}/`)
+    }
+
+    // to close menu on mobile mode
+    this.$emit('onSelect')
+  }
+}
 </script>
 
 <style lang="less">
