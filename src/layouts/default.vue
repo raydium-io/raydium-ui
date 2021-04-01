@@ -17,20 +17,21 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { Vue, Component } from 'nuxt-property-decorator'
 
 import { Layout } from 'ant-design-vue'
 import Setting from '@/components/Setting.vue'
 
 const { Content } = Layout
 
-export default Vue.extend({
+@Component({
   components: {
     Layout,
     Content,
     Setting
   }
 })
+export default class Default extends Vue {}
 </script>
 
 <style lang="less">
