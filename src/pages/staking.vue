@@ -53,28 +53,28 @@
                 </div>
                 {{ farm.farmInfo.lp.symbol }}
               </Col>
-              <Col class="state" :span="app.isMobile ? 8 : 4">
-                <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
+              <Col class="state" :span="isMobile ? 8 : 4">
+                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                 <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
               </Col>
-              <Col v-if="!app.isMobile" class="state" :span="4">
+              <Col v-if="!isMobile" class="state" :span="4">
                 <div class="title">Staked</div>
                 <div class="value">
                   {{ farm.userInfo.depositBalance.format() }}
                 </div>
               </Col>
-              <Col class="state" :span="app.isMobile ? 8 : 4">
+              <Col class="state" :span="isMobile ? 8 : 4">
                 <div class="title">Apr</div>
                 <div class="value">{{ farm.farmInfo.apr }}%</div>
               </Col>
-              <Col v-if="!app.isMobile" class="state" :span="4">
+              <Col v-if="!isMobile" class="state" :span="4">
                 <div class="title">Liquidity</div>
                 <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
               </Col>
             </Row>
 
-            <Row :class="app.isMobile ? 'is-mobile' : ''" :gutter="16">
-              <Col :span="app.isMobile ? 24 : 12">
+            <Row :class="isMobile ? 'is-mobile' : ''" :gutter="16">
+              <Col :span="isMobile ? 24 : 12">
                 <div class="harvest">
                   <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                   <div class="pending fs-container">
@@ -95,7 +95,7 @@
                 </div>
               </Col>
 
-              <Col :span="app.isMobile ? 24 : 12">
+              <Col :span="isMobile ? 24 : 12">
                 <div class="start">
                   <div class="title">Start staking</div>
                   <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -160,6 +160,8 @@ export default Vue.extend({
 
   data() {
     return {
+      isMobile: false,
+
       farms: [] as any,
 
       lp: null,
