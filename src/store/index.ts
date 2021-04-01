@@ -43,7 +43,7 @@ export const actions = actionTree(
     },
 
     copy(_vuexContext, text: string) {
-      const copy = (this as any)._vm.$copyText
+      const copy = this.$copyText
       const notify = this.$notify
 
       copy(text)

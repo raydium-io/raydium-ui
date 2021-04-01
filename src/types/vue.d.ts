@@ -1,6 +1,7 @@
 import { NuxtWeb3Instance } from './web3'
 import { NuxtApiInstance } from './api'
 import { NuxtNotifyInstance } from './notify'
+import { CopyTextInterface } from './copy'
 
 import { accessorType } from '@/store'
 
@@ -35,5 +36,6 @@ declare module 'vuex/types/index' {
     $api: NuxtApiInstance
     $notify: NuxtNotifyInstance
     $accessor: typeof accessorType
+    $copyText(text: string, container?: object | HTMLElement): Promise<CopyTextInterface>
   }
 }
