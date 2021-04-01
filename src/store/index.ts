@@ -3,6 +3,10 @@ import * as route from './route'
 import * as price from './price'
 import * as setting from './setting'
 import * as wallet from './wallet'
+import * as swap from './swap'
+import * as liquidity from './liquidity'
+import * as farm from './farm'
+import * as transaction from './transaction'
 
 import { getAccessorType, mutationTree, actionTree } from 'typed-vuex'
 
@@ -43,18 +47,16 @@ export const actions = actionTree(
     },
 
     copy(_vuexContext, text: string) {
-      const copy = this.$copyText
-      const notify = this.$notify
-
-      copy(text)
+      ;(this as any)._vm
+        .$copyText(text)
         .then(() => {
-          notify.success({
+          this.$notify.success({
             message: 'Copy success',
             description: ''
           })
         })
         .catch(() => {
-          notify.error({
+          this.$notify.error({
             message: 'Copy failed',
             description: ''
           })
@@ -73,6 +75,10 @@ export const accessorType = getAccessorType({
     route,
     price,
     setting,
-    wallet
+    wallet,
+    swap,
+    liquidity,
+    farm,
+    transaction
   }
 })

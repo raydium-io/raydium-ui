@@ -19,7 +19,7 @@
             :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
             :show-info="false"
             :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
-            @click="$store.dispatch('liquidity/requestInfos')"
+            @click="$accessor.liquidity.requestInfos"
           />
         </Tooltip>
         <Tooltip placement="bottomRight">
@@ -34,7 +34,7 @@
                   {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', fromCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(fromCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="toCoin" class="info">
@@ -45,7 +45,7 @@
                   {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', toCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(toCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="lpMintAddress" class="info">
@@ -56,14 +56,14 @@
                   {{ lpMintAddress.substr(lpMintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$store.dispatch('app/copy', lpMintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(lpMintAddress)" />
                 </div>
               </div>
             </div>
           </template>
           <Icon type="info-circle" />
         </Tooltip>
-        <Icon type="setting" @click="$store.dispatch('setting/open')" />
+        <Icon type="setting" @click="$accessor.setting.open" />
       </div>
     </div>
 
@@ -119,7 +119,7 @@
 
         <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
 
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <Button
@@ -437,8 +437,8 @@ export default Vue.extend({
       const { slot } = context
 
       if (slot !== this.liquidity.lastSubBlock) {
-        this.$store.commit('liquidity/setLastSubBlock', slot)
-        this.$store.dispatch('liquidity/requestInfos')
+        this.$accessor.liquidity.setLastSubBlock(slot)
+        this.$accessor.liquidity.requestInfos()
       }
     },
 
@@ -511,7 +511,7 @@ export default Vue.extend({
           })
 
           const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({

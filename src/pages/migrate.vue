@@ -11,7 +11,7 @@
           must migrate to a new RAY-USDT pool. This tool simplifies the process.
         </p>
 
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <div v-else>
@@ -142,7 +142,7 @@
           <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
         </p>
 
-        <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <div v-else>
@@ -324,7 +324,7 @@ export default Vue.extend({
           })
 
           const description = `Create USDT account`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -369,7 +369,7 @@ export default Vue.extend({
           })
 
           const description = `Unstake ${amount} ${farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -422,7 +422,7 @@ export default Vue.extend({
           })
 
           const description = `Unwrap ${amount} WUSDT`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -480,7 +480,7 @@ export default Vue.extend({
           })
 
           const description = `Unstake all LP tokens`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -546,7 +546,7 @@ export default Vue.extend({
           })
 
           const description = `Remove liquidity for ${lpBalance.format()} ${poolInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({

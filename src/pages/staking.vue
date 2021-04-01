@@ -19,7 +19,7 @@
             :percent="(100 / farm.autoRefreshTime) * farm.countdown"
             :show-info="false"
             :class="farm.loading ? 'disabled' : ''"
-            @click="$store.dispatch('farm/requestInfos')"
+            @click="$accessor.farm.requestInfos"
           />
         </Tooltip>
       </div>
@@ -98,7 +98,7 @@
               <Col :span="app.isMobile ? 24 : 12">
                 <div class="start">
                   <div class="title">Start staking</div>
-                  <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
                     Connect Wallet
                   </Button>
                   <div v-else class="fs-container">
@@ -320,7 +320,7 @@ export default Vue.extend({
           })
 
           const description = `Stake ${amount} ${this.farmInfo.lp.symbol}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -381,7 +381,7 @@ export default Vue.extend({
           })
 
           const description = `Unstake ${amount} ${this.farmInfo.lp.symbol}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -433,7 +433,7 @@ export default Vue.extend({
           })
 
           const description = `Harvest ${farmInfo.reward.symbol}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({

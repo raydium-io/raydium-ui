@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Settings" :visible="show" :footer="null" centered @cancel="$store.dispatch('setting/close')">
+  <Modal title="Settings" :visible="show" :footer="null" centered @cancel="$accessor.setting.close">
     <div class="slippage">
       <h3>Slippage tolerance</h3>
       <Row class="slippage-setting" :gutter="30">

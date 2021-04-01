@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <div v-if="!wallet.connected" class="fc-container">
-        <Button size="large" ghost @click="$store.dispatch('wallet/openModal')"> Connect Wallet </Button>
+        <Button size="large" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
       </div>
       <div v-else-if="!wallet.initialized" class="fc-container">
         <Spin :spinning="true">
@@ -234,7 +234,7 @@ export default Vue.extend({
 
           const description = `Remove liquidity for ${value} ${lp.name}`
 
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({

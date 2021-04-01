@@ -19,7 +19,7 @@
             :percent="(100 / farm.autoRefreshTime) * farm.countdown"
             :show-info="false"
             :class="farm.loading ? 'disabled' : ''"
-            @click="$store.dispatch('farm/requestInfos')"
+            @click="$accessor.farm.requestInfos"
           />
         </Tooltip>
       </div>
@@ -133,7 +133,7 @@
                 <Col :span="app.isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
-                    <Button v-if="!wallet.connected" size="large" ghost @click="$store.dispatch('wallet/openModal')">
+                    <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
                       Connect Wallet
                     </Button>
                     <div v-else class="fs-container">
@@ -201,9 +201,7 @@
                 </div>
               </Col>
               <Col class="fc-container" :span="app.isMobile ? 12 : 4">
-                <Button v-if="!wallet.connected" ghost @click="$store.dispatch('wallet/openModal')">
-                  Connect Wallet
-                </Button>
+                <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
                 <Button
                   v-else
                   ghost
@@ -469,7 +467,7 @@ export default Vue.extend({
           })
 
           const description = `Stake ${amount} ${this.farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -530,7 +528,7 @@ export default Vue.extend({
           })
 
           const description = `Unstake ${amount} ${this.farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
@@ -583,7 +581,7 @@ export default Vue.extend({
           })
           // @ts-ignore
           const description = `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
-          this.$store.dispatch('transaction/sub', { txid, description })
+          this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
