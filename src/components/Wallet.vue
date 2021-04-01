@@ -54,8 +54,7 @@ import { WalletAdapter, SolongWalletAdapter, MathWalletAdapter, LedgerWalletAdap
 Vue.use(Modal)
 
 interface Wallets {
-  [key: string]: any
-  [index: number]: any
+  [key: string]: string
 }
 
 export default Vue.extend({

@@ -229,12 +229,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { Vue, Component } from 'nuxt-property-decorator'
 
-export default Vue.extend({
-  components: {},
-
+@Component({
   layout: 'single',
+
+  head: {
+    title: 'Raydium Info'
+  },
 
   async asyncData({ $accessor, $api }) {
     if (!$accessor.price.initialized) {
@@ -243,48 +245,35 @@ export default Vue.extend({
 
     const { tvl, volume24h } = await $api.getInfo()
     return { tvl, volume24h }
-  },
+  }
+})
+export default class Info extends Vue {
+  tvl = 0
+  volume24h = 0
+  timer: number | undefined = undefined
 
-  data() {
-    return {
-      tvl: 0,
-      volume24h: 0,
-      timer: undefined as number | undefined
-    }
-  },
+  get isMobile() {
+    return this.$accessor.isMobile
+  }
 
-  head: {
-    title: 'Raydium Info'
-  },
-
-  computed: {
-    isMobile() {
-      return this.$accessor.isMobile
-    },
-
-    prices() {
-      return this.$accessor.price.prices
-    }
-  },
-
-  watch: {},
+  get prices() {
+    return this.$accessor.price.prices
+  }
 
   mounted() {
     this.timer = window.setInterval(this.getInfo, 1000 * 30)
-  },
+  }
 
   beforeDestroy() {
     window.clearInterval(this.timer)
-  },
-
-  methods: {
-    async getInfo() {
-      const { tvl, volume24h } = await this.$api.getInfo()
-      this.tvl = tvl
-      this.volume24h = volume24h
-    }
   }
-})
+
+  async getInfo() {
+    const { tvl, volume24h } = await this.$api.getInfo()
+    this.tvl = tvl
+    this.volume24h = volume24h
+  }
+}
 </script>
 
 <style lang="less" scoped>

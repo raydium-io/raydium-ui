@@ -11,18 +11,18 @@ import logger from '@/utils/logger'
 const AUTO_REFRESH_TIME = 60
 
 export const state = () => ({
+  initialized: false,
+  loading: false,
   modalShow: false,
+
+  autoRefreshTime: AUTO_REFRESH_TIME,
+  countdown: 0,
+  lastSubBlock: 0,
 
   connected: false,
   address: '',
 
-  initialized: false,
-  loading: false,
-  tokenAccounts: {},
-
-  autoRefreshTime: AUTO_REFRESH_TIME,
-  countdown: 0,
-  lastSubBlock: 0
+  tokenAccounts: {}
 })
 
 export const getters = getterTree(state, {})

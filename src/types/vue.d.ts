@@ -29,5 +29,6 @@ declare module 'vuex/types/index' {
   interface Store<S> {
     $web3: NuxtWeb3Instance
     $api: NuxtApiInstance
+    $accessor: typeof accessorType
   }
 }

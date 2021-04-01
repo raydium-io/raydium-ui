@@ -48,7 +48,6 @@ export default {
   plugins: ['@/plugins/web3.ts', '@/plugins/axios.ts', '@/plugins/api.ts', '@/plugins/notify.ts'],
 
   router: {
-    // 在每页渲染前运行 middleware/route.js 中间件的逻辑
     middleware: ['route']
   },
 

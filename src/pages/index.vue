@@ -90,7 +90,7 @@ export default Vue.extend({
     Button
   },
 
-  layout: 'no_head'
+  layout: 'single'
 })
 </script>
 
