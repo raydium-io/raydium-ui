@@ -57,7 +57,7 @@ export const actions = actionTree(
       logger('Sub', txid)
 
       const conn = this.$web3
-      const notify = (this as any)._vm.$notify
+      const notify = this.$notify
 
       const listenerId = conn.onSignature(
         txid,

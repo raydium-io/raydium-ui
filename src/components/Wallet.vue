@@ -127,7 +127,7 @@ export default Vue.extend({
         }
         case 'Solong': {
           if ((window as any).solong === undefined) {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               message: 'Connect wallet failed',
               description: 'Please install and initialize Solong wallet first'
             })
@@ -139,7 +139,7 @@ export default Vue.extend({
         }
         case 'MathWallet': {
           if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               message: 'Connect wallet failed',
               description: 'Please install and initialize Math wallet first'
             })
@@ -162,7 +162,7 @@ export default Vue.extend({
           this.$accessor.wallet.setConnected(wallet?.publicKey.toBase58())
 
           this.subWallet()
-          ;(this as any).$notify.success({
+          this.$notify.success({
             message: 'Wallet connected',
             description: ''
           })
@@ -174,7 +174,7 @@ export default Vue.extend({
       try {
         wallet?.connect()
       } catch (error) {
-        ;(this as any).$notify.error({
+        this.$notify.error({
           message: 'Connect wallet failed',
           description: error.message
         })
@@ -188,8 +188,9 @@ export default Vue.extend({
       this.unsubWallet()
 
       this.$store.commit('wallet/disconnected')
-      ;(this as any).$notify.warning({
-        message: 'Wallet disconnected'
+      this.$notify.warning({
+        message: 'Wallet disconnected',
+        description: ''
       })
     },
 

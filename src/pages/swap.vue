@@ -567,10 +567,11 @@ export default Vue.extend({
     placeOrder() {
       this.swaping = true
 
-      const key = getUnixTs()
-      ;(this as any).$notify.info({
+      const key = getUnixTs().toString()
+      this.$notify.info({
         key,
         message: 'Making transaction...',
+        description: '',
         duration: 0
       })
 
@@ -591,7 +592,7 @@ export default Vue.extend({
           this.fromCoinAmount
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -605,7 +606,7 @@ export default Vue.extend({
             this.$store.dispatch('transaction/sub', { txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
@@ -632,7 +633,7 @@ export default Vue.extend({
           this.setting.slippage
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -646,7 +647,7 @@ export default Vue.extend({
             this.$store.dispatch('transaction/sub', { txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
@@ -675,7 +676,7 @@ export default Vue.extend({
           this.setting.slippage
         )
           .then((txid) => {
-            ;(this as any).$notify.info({
+            this.$notify.info({
               key,
               message: 'Transaction has been sent',
               description: (h: any) =>
@@ -689,7 +690,7 @@ export default Vue.extend({
             this.$store.dispatch('transaction/sub', { txid, description })
           })
           .catch((error) => {
-            ;(this as any).$notify.error({
+            this.$notify.error({
               key,
               message: 'Swap failed',
               description: error.message
