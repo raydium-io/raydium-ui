@@ -61,29 +61,29 @@
               v-show="farm.farmInfo.version === 3 && !farm.farmInfo.legacy"
               :key="farm.farmInfo.poolId"
             >
-              <Row slot="header" class="farm-head" :class="app.isMobile ? 'is-mobile' : ''" :gutter="0">
-                <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
+              <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
+                <Col class="lp-icons" :span="isMobile ? 12 : 8">
                   <div class="icons">
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
                     <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                   </div>
-                  {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
+                  {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                 </Col>
-                <Col class="state" :span="app.isMobile ? 6 : 4">
-                  <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
+                <Col class="state" :span="isMobile ? 6 : 4">
+                  <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
                 </Col>
-                <Col v-if="!app.isMobile" class="state" :span="4">
+                <Col v-if="!isMobile" class="state" :span="4">
                   <div class="title">Staked</div>
                   <div class="value">
                     {{ farm.userInfo.depositBalance.format() }}
                   </div>
                 </Col>
-                <Col class="state" :span="app.isMobile ? 6 : 4">
+                <Col class="state" :span="isMobile ? 6 : 4">
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col v-if="!app.isMobile" class="state" :span="4">
+                <Col v-if="!isMobile" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">
                     ${{
@@ -95,8 +95,8 @@
                 </Col>
               </Row>
 
-              <Row :class="app.isMobile ? 'is-mobile' : ''" :gutter="48">
-                <Col :span="app.isMobile ? 24 : 4">
+              <Row :class="isMobile ? 'is-mobile' : ''" :gutter="48">
+                <Col :span="isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
                   <NuxtLink
                     :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
@@ -105,7 +105,7 @@
                   </NuxtLink>
                 </Col>
 
-                <Col :span="app.isMobile ? 24 : 10">
+                <Col :span="isMobile ? 24 : 10">
                   <div class="harvest">
                     <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                     <div class="pending fs-container">
@@ -126,7 +126,7 @@
                   </div>
                 </Col>
 
-                <Col :span="app.isMobile ? 24 : 10">
+                <Col :span="isMobile ? 24 : 10">
                   <div class="start">
                     <div class="title">Start farming</div>
                     <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -166,31 +166,31 @@
               v-if="[2, 3].includes(farm.farmInfo.version) && farm.farmInfo.legacy"
               :key="farm.farmInfo.poolId"
               class="farm-head"
-              :class="app.isMobile ? 'is-mobile' : ''"
+              :class="isMobile ? 'is-mobile' : ''"
               :gutter="0"
             >
-              <Col class="lp-icons" :span="app.isMobile ? 12 : 8">
+              <Col class="lp-icons" :span="isMobile ? 12 : 8">
                 <div class="icons">
                   <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
                   <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
                 </div>
-                {{ app.isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
+                {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
               </Col>
-              <Col v-if="!app.isMobile" class="state" :span="4">
-                <div class="title">{{ app.isMobile ? 'Reward' : 'Pending Reward' }}</div>
+              <Col v-if="!isMobile" class="state" :span="4">
+                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                 <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
               </Col>
-              <Col v-if="!app.isMobile" class="state" :span="4">
+              <Col v-if="!isMobile" class="state" :span="4">
                 <div class="title">Staked</div>
                 <div class="value">
                   {{ farm.userInfo.depositBalance.format() }}
                 </div>
               </Col>
-              <Col v-if="!app.isMobile" class="state" :span="4">
+              <Col v-if="!isMobile" class="state" :span="4">
                 <div class="title">Apr</div>
                 <div class="value">{{ farm.farmInfo.apr }}%</div>
               </Col>
-              <Col class="fc-container" :span="app.isMobile ? 12 : 4">
+              <Col class="fc-container" :span="isMobile ? 12 : 4">
                 <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
                 <Button v-else ghost @click="$router.replace({ path: '/migrate/' })"> Unstake & Migrate </Button>
               </Col>
@@ -238,6 +238,8 @@ export default Vue.extend({
 
   data() {
     return {
+      isMobile: false,
+
       farms: [] as any,
 
       lp: null,
