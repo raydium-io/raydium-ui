@@ -69,7 +69,7 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    requestInfos({ commit, dispatch }) {
+    async requestInfos({ commit, dispatch }) {
       commit('setLoading', true)
       dispatch('getStakeAccounts')
 
@@ -90,54 +90,49 @@ export const actions = actionTree(
         farms[poolId] = farmInfo
       })
 
-      getMultipleAccounts(conn, publicKeys, commitment)
-        .then((multipleInfo) => {
-          multipleInfo.forEach((info) => {
-            if (info) {
-              const address = info.publicKey.toBase58()
-              const data = Buffer.from(info.account.data)
+      const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
+      multipleInfo.forEach((info) => {
+        if (info) {
+          const address = info.publicKey.toBase58()
+          const data = Buffer.from(info.account.data)
 
-              const { key, poolId } = getAddressForWhat(address)
+          const { key, poolId } = getAddressForWhat(address)
 
-              if (key && poolId) {
-                const farmInfo = farms[poolId]
+          if (key && poolId) {
+            const farmInfo = farms[poolId]
 
-                switch (key) {
-                  // pool info
-                  case 'poolId': {
-                    let parsed
+            switch (key) {
+              // pool info
+              case 'poolId': {
+                let parsed
 
-                    if ([4, 5].includes(farmInfo.version)) {
-                      parsed = STAKE_INFO_LAYOUT_V4.decode(data)
-                    } else {
-                      parsed = STAKE_INFO_LAYOUT.decode(data)
-                    }
-
-                    farmInfo.poolInfo = parsed
-
-                    break
-                  }
-                  // staked balance
-                  case 'poolLpTokenAccount': {
-                    const parsed = ACCOUNT_LAYOUT.decode(data)
-
-                    farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
-
-                    break
-                  }
+                if ([4, 5].includes(farmInfo.version)) {
+                  parsed = STAKE_INFO_LAYOUT_V4.decode(data)
+                } else {
+                  parsed = STAKE_INFO_LAYOUT.decode(data)
                 }
+
+                farmInfo.poolInfo = parsed
+
+                break
+              }
+              // staked balance
+              case 'poolLpTokenAccount': {
+                const parsed = ACCOUNT_LAYOUT.decode(data)
+
+                farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
+
+                break
               }
             }
-          })
+          }
+        }
+      })
 
-          commit('setInfos', farms)
-          logger('Farm&Stake pool infomations updated')
-        })
-        .catch()
-        .finally(() => {
-          commit('setInitialized')
-          commit('setLoading', false)
-        })
+      commit('setInfos', farms)
+      logger('Farm&Stake pool infomations updated')
+      commit('setInitialized')
+      commit('setLoading', false)
     },
 
     getStakeAccounts({ commit }) {

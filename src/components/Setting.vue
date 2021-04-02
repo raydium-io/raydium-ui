@@ -51,10 +51,10 @@ export default class Setting extends Vue {
   }
 
   @Watch('slippage')
-  onSlippageChanged(val: string, oldVal: string) {
+  onSlippageChanged(val: string, old: string) {
     this.$nextTick(() => {
       if (!inputRegex.test(escapeRegExp(val))) {
-        this.slippage = oldVal
+        this.slippage = old
       } else {
         const slippage = parseFloat(val)
         if (slippage > 100 || slippage <= 0 || isNaN(slippage)) {

@@ -1,5 +1,5 @@
 import { getPublicKey, signTransaction } from './ledger-core'
-import { DEFAULT_PUBLIC_KEY, WalletAdapter } from './types'
+import { WalletAdapter } from './types'
 
 import type Transport from '@ledgerhq/hw-transport'
 import type { Transaction } from '@solana/web3.js'
@@ -21,7 +21,7 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   get publicKey() {
-    return this._publicKey || DEFAULT_PUBLIC_KEY
+    return this._publicKey
   }
 
   get connected() {

@@ -1,4 +1,4 @@
-import { WalletAdapter, DEFAULT_PUBLIC_KEY } from './types'
+import { WalletAdapter } from './types'
 
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
@@ -39,7 +39,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   get publicKey() {
-    return this._publicKey || DEFAULT_PUBLIC_KEY
+    return this._publicKey
   }
 
   signTransaction(transaction: Transaction) {

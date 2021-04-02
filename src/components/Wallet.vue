@@ -34,14 +34,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapState } from 'vuex'
+import { Vue, Component } from 'nuxt-property-decorator'
 import { Button, Modal, Icon } from 'ant-design-vue'
-import {
-  // types
-  AccountInfo,
-  Context
-} from '@solana/web3.js'
+import { AccountInfo, Context } from '@solana/web3.js'
 // @ts-ignore
 import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
@@ -57,227 +52,243 @@ interface Wallets {
   [key: string]: string
 }
 
-export default Vue.extend({
+@Component({
   components: {
     Button,
     Modal,
     Icon
-  },
+  }
+})
+export default class Wallet extends Vue {
+  /* ========== DATA ========== */
+  wallets = {
+    Ledger: '',
+    Solong: '',
+    // TrustWallet: '',
+    MathWallet: '',
+    Sollet: 'https://www.sollet.io',
+    // Solflare: 'https://solflare.com/access-wallet',
+    Bonfida: 'https://bonfida.com/wallet'
+    // https://docs.coin98.app/coin98-extension/developer-guide
+    // Coin98: ''
+    // ezDeFi: '',
+  } as Wallets
 
-  data() {
-    return {
-      wallets: {
-        Ledger: '',
-        Solong: '',
-        // TrustWallet: '',
-        MathWallet: '',
-        Sollet: 'https://www.sollet.io',
-        // Solflare: 'https://solflare.com/access-wallet',
-        Bonfida: 'https://bonfida.com/wallet'
-        // https://docs.coin98.app/coin98-extension/developer-guide
-        // Coin98: ''
-        // ezDeFi: '',
-      } as Wallets,
+  // auto refresh
+  walletTimer: number | undefined = undefined
+  priceTimer: number | undefined = undefined
+  liquidityTimer: number | undefined = undefined
+  farmTimer: number | undefined = undefined
+  // web3 listener
+  walletListenerId = null as number | null
 
-      // auto refresh
-      walletTimer: null as any,
-      priceTimer: null as any,
-      liquidityTimer: null as any,
-      farmTimer: null as any,
-      // listener
-      walletListenerId: null as number | undefined | null
-    }
-  },
+  /* ========== COMPUTED ========== */
+  get wallet() {
+    return this.$accessor.wallet
+  }
 
-  computed: {
-    ...mapState(['wallet', 'price', 'swap', 'liquidity', 'farm'])
-  },
+  get price() {
+    return this.$accessor.price
+  }
 
-  watch: {},
+  get liquidity() {
+    return this.$accessor.liquidity
+  }
 
-  mounted() {
-    this.$accessor.price.requestPrices()
-    this.$accessor.swap.getMarkets()
-    this.$accessor.liquidity.requestInfos()
-    this.$accessor.farm.requestInfos()
+  get farm() {
+    return this.$accessor.farm
+  }
+
+  /* ========== LIFECYCLE ========== */
+  async beforeMount() {
+    await this.$accessor.price.requestPrices()
+    await this.$accessor.swap.getMarkets()
+    await this.$accessor.liquidity.requestInfos()
+    await this.$accessor.farm.requestInfos()
 
     this.setWalletTimer()
     this.setPriceTimer()
     this.setLiquidityTimer()
     this.setFarmTimer()
-  },
+  }
 
-  destroyed() {
-    clearInterval(this.walletTimer)
-    clearInterval(this.priceTimer)
-    clearInterval(this.liquidityTimer)
-    clearInterval(this.farmTimer)
-  },
+  beforeDestroy() {
+    window.clearInterval(this.walletTimer)
+    window.clearInterval(this.priceTimer)
+    window.clearInterval(this.liquidityTimer)
+    window.clearInterval(this.farmTimer)
+  }
 
-  methods: {
-    importIcon,
+  /* ========== WATCH ========== */
 
-    connect(walletName: string) {
-      let wallet: WalletAdapter | null = null
+  /* ========== METHODS ========== */
+  importIcon = importIcon
 
-      switch (walletName) {
-        case 'Ledger': {
-          wallet = new LedgerWalletAdapter()
-          break
-        }
-        case 'Solong': {
-          if ((window as any).solong === undefined) {
-            this.$notify.error({
-              message: 'Connect wallet failed',
-              description: 'Please install and initialize Solong wallet first'
-            })
-            return
-          }
+  connect(walletName: string) {
+    let wallet: WalletAdapter
 
-          wallet = new SolongWalletAdapter()
-          break
-        }
-        case 'MathWallet': {
-          if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
-            this.$notify.error({
-              message: 'Connect wallet failed',
-              description: 'Please install and initialize Math wallet first'
-            })
-            return
-          }
-
-          wallet = new MathWalletAdapter()
-          break
-        }
-        default: {
-          wallet = new SolanaWalletAdapter(this.wallets[walletName], endpoint)
-          break
-        }
+    switch (walletName) {
+      case 'Ledger': {
+        wallet = new LedgerWalletAdapter()
+        break
       }
+      case 'Solong': {
+        if ((window as any).solong === undefined) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and initialize Solong wallet first'
+          })
+          return
+        }
 
-      wallet?.on('connect', () => {
-        this.$accessor.wallet.closeModal().then(() => {
+        wallet = new SolongWalletAdapter()
+        break
+      }
+      case 'MathWallet': {
+        if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and initialize Math wallet first'
+          })
+          return
+        }
+
+        wallet = new MathWalletAdapter()
+        break
+      }
+      default: {
+        wallet = new SolanaWalletAdapter(this.wallets[walletName], endpoint)
+        break
+      }
+    }
+
+    wallet.on('connect', () => {
+      this.$accessor.wallet.closeModal().then(() => {
+        if (wallet.publicKey) {
           Vue.prototype.$wallet = wallet
-
-          this.$accessor.wallet.setConnected(wallet?.publicKey.toBase58())
+          this.$accessor.wallet.setConnected(wallet.publicKey.toBase58())
 
           this.subWallet()
           this.$notify.success({
             message: 'Wallet connected',
             description: ''
           })
-        })
+        }
       })
+    })
 
-      wallet?.on('disconnect', () => {})
+    wallet.on('disconnect', () => {
+      this.disconnect()
+    })
 
-      try {
-        wallet?.connect()
-      } catch (error) {
-        this.$notify.error({
-          message: 'Connect wallet failed',
-          description: error.message
-        })
-      }
-    },
-
-    disconnect() {
-      Vue.prototype.$wallet.disconnect()
-      Vue.prototype.$wallet = null
-
-      this.unsubWallet()
-
-      this.$accessor.wallet.setDisconnected()
-      this.$notify.warning({
-        message: 'Wallet disconnected',
-        description: ''
+    try {
+      wallet.connect()
+    } catch (error) {
+      this.$notify.error({
+        message: 'Connect wallet failed',
+        description: error.message
       })
-    },
-
-    onWalletChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
-      logger('onAccountChange')
-
-      const { slot } = context
-
-      if (slot !== this.wallet.lastSubBlock) {
-        this.$accessor.wallet.setLastSubBlock(slot)
-        this.$accessor.wallet.getTokenAccounts()
-        this.$accessor.farm.getStakeAccounts()
-      }
-    },
-
-    subWallet() {
-      const wallet = (this as any).$wallet
-
-      this.walletListenerId = this.$web3.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
-
-      this.$accessor.wallet.getTokenAccounts()
-      this.$accessor.farm.getStakeAccounts()
-    },
-
-    unsubWallet() {
-      if (this.walletListenerId) {
-        this.$web3.removeAccountChangeListener(this.walletListenerId)
-      }
-    },
-
-    setWalletTimer() {
-      this.walletTimer = setInterval(() => {
-        if (this.wallet.connected && !this.wallet.loading) {
-          if (this.wallet.countdown < this.wallet.autoRefreshTime) {
-            this.$accessor.wallet.setCountdown(this.$accessor.wallet.countdown + 1)
-
-            if (this.wallet.countdown === this.wallet.autoRefreshTime) {
-              this.$accessor.wallet.getTokenAccounts()
-            }
-          }
-        }
-      }, 1000)
-    },
-
-    setPriceTimer() {
-      this.priceTimer = setInterval(() => {
-        if (!this.price.loading) {
-          if (this.price.countdown < this.price.autoRefreshTime) {
-            this.$accessor.price.setCountdown(this.$accessor.price.countdown + 1)
-
-            if (this.price.countdown === this.price.autoRefreshTime) {
-              this.$accessor.price.requestPrices()
-            }
-          }
-        }
-      }, 1000)
-    },
-
-    setLiquidityTimer() {
-      this.liquidityTimer = setInterval(() => {
-        if (!this.liquidity.loading) {
-          if (this.liquidity.countdown < this.liquidity.autoRefreshTime) {
-            this.$accessor.liquidity.setCountdown(this.$accessor.liquidity.countdown + 1)
-
-            if (this.liquidity.countdown === this.liquidity.autoRefreshTime) {
-              this.$accessor.liquidity.requestInfos()
-            }
-          }
-        }
-      }, 1000)
-    },
-
-    setFarmTimer() {
-      this.farmTimer = setInterval(() => {
-        if (!this.farm.loading) {
-          if (this.farm.countdown < this.farm.autoRefreshTime) {
-            this.$accessor.farm.setCountdown(this.$accessor.farm.countdown + 1)
-
-            if (this.farm.countdown === this.farm.autoRefreshTime) {
-              this.$accessor.farm.requestInfos()
-            }
-          }
-        }
-      }, 1000)
     }
   }
-})
+
+  disconnect() {
+    Vue.prototype.$wallet.disconnect()
+    Vue.prototype.$wallet = null
+
+    this.unsubWallet()
+
+    this.$accessor.wallet.setDisconnected()
+    this.$notify.warning({
+      message: 'Wallet disconnected',
+      description: ''
+    })
+  }
+
+  onWalletChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
+    logger('onAccountChange')
+
+    const { slot } = context
+
+    if (slot !== this.wallet.lastSubBlock) {
+      this.$accessor.wallet.setLastSubBlock(slot)
+      this.$accessor.wallet.getTokenAccounts()
+      this.$accessor.farm.getStakeAccounts()
+    }
+  }
+
+  async subWallet() {
+    const wallet = this.$wallet
+    if (wallet && wallet.publicKey) {
+      this.walletListenerId = this.$web3.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
+
+      await this.$accessor.wallet.getTokenAccounts()
+      await this.$accessor.farm.getStakeAccounts()
+    }
+  }
+
+  unsubWallet() {
+    if (this.walletListenerId) {
+      this.$web3.removeAccountChangeListener(this.walletListenerId)
+    }
+  }
+
+  setWalletTimer() {
+    this.walletTimer = window.setInterval(async () => {
+      if (this.wallet.connected && !this.wallet.loading) {
+        // vuex is connected but $wallet not, meaning window closed
+        if (this.$wallet && this.$wallet.connected) {
+          if (this.wallet.countdown < this.wallet.autoRefreshTime) {
+            this.$accessor.wallet.setCountdown(this.$accessor.wallet.countdown + 1)
+            if (this.wallet.countdown === this.wallet.autoRefreshTime) {
+              await this.$accessor.wallet.getTokenAccounts()
+            }
+          }
+        } else {
+          this.disconnect()
+        }
+      }
+    }, 1000)
+  }
+
+  setPriceTimer() {
+    this.priceTimer = window.setInterval(async () => {
+      if (!this.price.loading) {
+        if (this.price.countdown < this.price.autoRefreshTime) {
+          this.$accessor.price.setCountdown(this.$accessor.price.countdown + 1)
+          if (this.price.countdown === this.price.autoRefreshTime) {
+            await this.$accessor.price.requestPrices()
+          }
+        }
+      }
+    }, 1000)
+  }
+
+  setLiquidityTimer() {
+    this.liquidityTimer = window.setInterval(async () => {
+      if (!this.liquidity.loading) {
+        if (this.liquidity.countdown < this.liquidity.autoRefreshTime) {
+          this.$accessor.liquidity.setCountdown(this.$accessor.liquidity.countdown + 1)
+          if (this.liquidity.countdown === this.liquidity.autoRefreshTime) {
+            await this.$accessor.liquidity.requestInfos()
+          }
+        }
+      }
+    }, 1000)
+  }
+
+  setFarmTimer() {
+    this.farmTimer = window.setInterval(async () => {
+      if (!this.farm.loading) {
+        if (this.farm.countdown < this.farm.autoRefreshTime) {
+          this.$accessor.farm.setCountdown(this.$accessor.farm.countdown + 1)
+          if (this.farm.countdown === this.farm.autoRefreshTime) {
+            await this.$accessor.farm.requestInfos()
+          }
+        }
+      }
+    }, 1000)
+  }
+}
 </script>
 
 <style lang="less">

@@ -1,6 +1,7 @@
 import { NuxtWeb3Instance } from './web3'
 import { NuxtApiInstance } from './api'
 import { NuxtNotifyInstance } from './notify'
+import { WalletAdapter } from '@/wallets/types'
 
 import { accessorType } from '@/store'
 
@@ -24,6 +25,7 @@ declare module 'vue/types/vue' {
     $api: NuxtApiInstance
     $notify: NuxtNotifyInstance
     $accessor: typeof accessorType
+    $wallet: WalletAdapter | null
   }
 }
 

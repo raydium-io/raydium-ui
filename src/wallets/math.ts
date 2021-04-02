@@ -1,10 +1,10 @@
-import { DEFAULT_PUBLIC_KEY, WalletAdapter } from './types'
+import { WalletAdapter } from './types'
 
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
 export class MathWalletAdapter extends EventEmitter implements WalletAdapter {
-  _publicKey?: PublicKey
+  _publicKey?: PublicKey | null
   _onProcess: boolean
   _connected: boolean
   constructor() {
@@ -39,7 +39,7 @@ export class MathWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   get publicKey() {
-    return this._publicKey || DEFAULT_PUBLIC_KEY
+    return this._publicKey
   }
 
   signTransaction(transaction: Transaction) {

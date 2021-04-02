@@ -32,7 +32,7 @@ export const mutations = mutationTree(state, {
     state.modalShow = show
   },
 
-  setConnected(state, address: any) {
+  setConnected(state, address: string) {
     state.connected = true
     state.address = address
   },
