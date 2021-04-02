@@ -54,17 +54,7 @@ export function getSwapOutAmount(
   const { coin, pc, fees } = poolInfo
   const { swapFeeNumerator, swapFeeDenominator } = fees
 
-  let fromMint = fromCoinMint
-  let toMint = toCoinMint
-
-  if (fromMint === NATIVE_SOL.mintAddress) {
-    fromMint = TOKENS.WSOL.mintAddress
-  }
-  if (toMint === NATIVE_SOL.mintAddress) {
-    toMint = TOKENS.WSOL.mintAddress
-  }
-
-  if (fromMint === coin.mintAddress && toMint === pc.mintAddress) {
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // coin2pc
     const fromAmount = new TokenAmount(amount, coin.decimals, false)
     const denominator = coin.balance.wei.plus(fromAmount.wei)
