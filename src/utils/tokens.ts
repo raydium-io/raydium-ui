@@ -458,7 +458,7 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.RAY },
 
     mintAddress: 'CHT8sft3h3gpLYbCcZ9o27mT5s3Z6VifBVbUiDvprHPW',
-    decimals: TOKENS.KIN.decimals
+    decimals: 6
   },
   'RAY-USDT-V4': {
     symbol: 'RAY-USDT',
