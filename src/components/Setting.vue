@@ -43,7 +43,7 @@ Vue.use(Modal)
   }
 })
 export default class Setting extends Vue {
-  slippage = '1'
+  slippage = this.$accessor.setting.slippage.toString()
   errorMsg = ''
 
   get show() {

@@ -7,7 +7,10 @@ export interface InfoData {
   volume24h: number
 }
 
+export interface PairData {}
+
 export interface NuxtApiInstance {
   getPrices: (coins: string) => Promise<PricesData>
   getInfo: () => Promise<InfoData>
+  getPairs: () => Promise<PairData[]>
 }

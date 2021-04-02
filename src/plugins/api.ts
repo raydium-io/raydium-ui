@@ -9,7 +9,8 @@ const apiPlugin: Plugin = (ctx, inject) => {
           coins
         }
       }),
-    getInfo: () => ctx.$axios.get('https://api.raydium.io/info')
+    getInfo: () => ctx.$axios.get('https://api.raydium.io/info'),
+    getPairs: () => ctx.$axios.get('https://api.raydium.io/pairs')
   }
 
   ctx.$api = api

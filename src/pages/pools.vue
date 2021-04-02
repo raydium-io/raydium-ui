@@ -29,101 +29,77 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapState } from 'vuex'
+import { Vue, Component } from 'nuxt-property-decorator'
 import { Table } from 'ant-design-vue'
 
-import { parseError } from '@/utils'
 import importIcon from '@/utils/import-icon'
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'lp_mint',
-    key: 'lp_mint',
-    scopedSlots: { customRender: 'name' }
-  },
-  {
-    title: 'Liquidity',
-    dataIndex: 'liquidity',
-    key: 'liquidity',
-    scopedSlots: { customRender: 'liquidity' },
-    defaultSortOrder: 'descend',
-    sorter: (a: any, b: any) => a.liquidity - b.liquidity
-  },
-  {
-    title: 'Volume (24hrs)',
-    dataIndex: 'volume_24h',
-    key: 'volume_24h',
-    scopedSlots: { customRender: 'volume_24h' },
-    sorter: (a: any, b: any) => a.volume_24h - b.volume_24h
-  },
-  {
-    title: 'Volume (7d)',
-    dataIndex: 'volume_7d',
-    key: 'volume_7d',
-    scopedSlots: { customRender: 'volume_7d' },
-    sorter: (a: any, b: any) => a.volume_7d - b.volume_7d
-  },
-  {
-    title: 'Fees (24hr)',
-    dataIndex: 'fee_24h',
-    key: 'fee_24h',
-    scopedSlots: { customRender: 'fee_24h' },
-    sorter: (a: any, b: any) => a.fee_24h - b.fee_24h
-  },
-  {
-    title: '1y Fees / Liquidity',
-    dataIndex: 'apy',
-    key: 'apy',
-    scopedSlots: { customRender: 'apy' },
-    sorter: (a: any, b: any) => a.apy - b.apy
-  }
-]
-
-export default Vue.extend({
-  components: {
-    Table
-  },
-
-  asyncData({ $axios, error }) {
-    return $axios
-      .get('https://api.raydium.io/pairs')
-      .then((pools) => {
-        return { pools }
-      })
-      .catch((err) => {
-        const data = parseError(err)
-        error({ statusCode: data.status, message: data.message })
-      })
-  },
-
-  data() {
-    return {
-      columns
-    }
-  },
-
+@Component({
   head: {
     title: 'Raydium Pools'
   },
 
-  computed: {
-    ...mapState(['liquidity'])
+  components: {
+    Table
   },
 
-  watch: {},
-
-  mounted() {},
-
-  methods: {
-    getPoolByLpMintAddress,
-    importIcon,
-    TokenAmount
+  async asyncData({ $api }) {
+    const pools = await $api.getPairs()
+    return { pools }
   }
 })
+export default class Pools extends Vue {
+  columns = [
+    {
+      title: 'Name',
+      dataIndex: 'lp_mint',
+      key: 'lp_mint',
+      scopedSlots: { customRender: 'name' }
+    },
+    {
+      title: 'Liquidity',
+      dataIndex: 'liquidity',
+      key: 'liquidity',
+      scopedSlots: { customRender: 'liquidity' },
+      defaultSortOrder: 'descend',
+      sorter: (a: any, b: any) => a.liquidity - b.liquidity
+    },
+    {
+      title: 'Volume (24hrs)',
+      dataIndex: 'volume_24h',
+      key: 'volume_24h',
+      scopedSlots: { customRender: 'volume_24h' },
+      sorter: (a: any, b: any) => a.volume_24h - b.volume_24h
+    },
+    {
+      title: 'Volume (7d)',
+      dataIndex: 'volume_7d',
+      key: 'volume_7d',
+      scopedSlots: { customRender: 'volume_7d' },
+      sorter: (a: any, b: any) => a.volume_7d - b.volume_7d
+    },
+    {
+      title: 'Fees (24hr)',
+      dataIndex: 'fee_24h',
+      key: 'fee_24h',
+      scopedSlots: { customRender: 'fee_24h' },
+      sorter: (a: any, b: any) => a.fee_24h - b.fee_24h
+    },
+    {
+      title: '1y Fees / Liquidity',
+      dataIndex: 'apy',
+      key: 'apy',
+      scopedSlots: { customRender: 'apy' },
+      sorter: (a: any, b: any) => a.apy - b.apy
+    }
+  ]
+
+  getPoolByLpMintAddress = getPoolByLpMintAddress
+  importIcon = importIcon
+  TokenAmount = TokenAmount
+}
 </script>
 
 <style lang="less" scoped>

@@ -82,16 +82,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { Vue, Component } from 'nuxt-property-decorator'
+
 import { Button } from 'ant-design-vue'
 
-export default Vue.extend({
+@Component({
+  layout: 'single',
+
   components: {
     Button
-  },
-
-  layout: 'single'
+  }
 })
+export default class Index extends Vue {}
 </script>
 
 <style lang="less" scoped>
