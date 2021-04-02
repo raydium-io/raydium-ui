@@ -11,15 +11,15 @@
         <div class="title">An avenue for</div>
         <div class="title">the evolution of <span class="defiText">DeFi</span></div>
         <div class="subtitle">Next-level liquidity. Friction-less yield. Light-speed swaps.</div>
-        <div style="padding-top: 36px">
-          <Button size="large" ghost class="button_div">
+        <div style="padding-top: 36px; position: relative">
+          <Button size="large" ghost class="button_div" style="position: absolute; z-index: 999">
             <a href="swap" style="display: inline-block; width: 100%; height: 100%">
               <div class="card-body" style="padding: 0; height: 100%">
                 <div class="button_font">Launch app</div>
               </div></a
             >
           </Button>
-          <div class="button_div_line button_div" style="display: inline-block">
+          <div class="button_div_line button_div" style="display: inline-block; position: absolute; z-index: 999">
             <a
               href="https://raydium.gitbook.io/raydium/"
               target="_blank"
@@ -192,6 +192,7 @@ export default class Index extends Vue {}
     border: 1px solid #fff;
     border-radius: 5px;
     margin-left: 40px;
+    left: 220px;
   }
   .title_line {
     font-size: 40px;
@@ -324,6 +325,7 @@ export default class Index extends Vue {}
     border: 1px solid #fff;
     border-radius: 5px;
     margin-left: 40px;
+    left: 40%;
   }
   .title_line {
     font-size: 40px;
