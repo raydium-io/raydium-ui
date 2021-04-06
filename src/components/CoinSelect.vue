@@ -195,6 +195,7 @@ export default Vue.extend({
       opacity: 1;
 
       img {
+        border-radius: 50%;
         height: 24px;
         width: 24px;
       }

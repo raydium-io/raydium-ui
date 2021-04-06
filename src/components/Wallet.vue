@@ -21,7 +21,7 @@
       <div v-if="!wallet.connected" class="select-wallet">
         <Button v-for="(providerUrl, name) in wallets" :key="name" ghost @click="connect(name)">
           <span>{{ name }}</span>
-          <img :src="importIcon(`/wallets/${name.toLowerCase()}.png`)" />
+          <img :src="importIcon(`/wallets/${name.replace(' ', '-').toLowerCase()}.png`)" />
         </Button>
       </div>
       <div v-else class="wallet-info">
@@ -63,6 +63,7 @@ export default class Wallet extends Vue {
   /* ========== DATA ========== */
   wallets = {
     Ledger: '',
+    'Sollet Extension': '',
     Solong: '',
     // TrustWallet: '',
     MathWallet: '',
@@ -132,11 +133,23 @@ export default class Wallet extends Vue {
         wallet = new LedgerWalletAdapter()
         break
       }
+      case 'Sollet Extension': {
+        if ((window as any).sollet === undefined) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and initialize Sollet wallet extension first'
+          })
+          return
+        }
+
+        wallet = new SolanaWalletAdapter((window as any).sollet, endpoint)
+        break
+      }
       case 'Solong': {
         if ((window as any).solong === undefined) {
           this.$notify.error({
             message: 'Connect wallet failed',
-            description: 'Please install and initialize Solong wallet first'
+            description: 'Please install and initialize Solong wallet extension first'
           })
           return
         }
@@ -148,7 +161,7 @@ export default class Wallet extends Vue {
         if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
           this.$notify.error({
             message: 'Connect wallet failed',
-            description: 'Please install and initialize Math wallet first'
+            description: 'Please install and initialize Math wallet extension first'
           })
           return
         }
