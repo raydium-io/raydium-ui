@@ -22,6 +22,15 @@ export const endpoint = 'https://solana-api.projectserum.com'
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
 
+export async function createAmmAuthority(programId: PublicKey) {
+  const [ammAuthority, nonce] = await PublicKey.findProgramAddress(
+    [new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))],
+    programId
+  )
+
+  return { ammAuthority, nonce }
+}
+
 export async function createTokenAccountIfNotExist(
   connection: Connection,
   account: string | undefined | null,
