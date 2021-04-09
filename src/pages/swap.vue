@@ -129,28 +129,41 @@
           "
           @onSelect="openToCoinSelect"
         />
-        <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base fc-container">
-          <span>
-            1 {{ fromCoin.symbol }} = 1
-            {{ toCoin.symbol }}
-          </span>
-        </div>
-        <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
-          <span>
-            1 {{ fromCoin.symbol }} ≈
-            {{ outToPirceValue }}
-            {{ toCoin.symbol }}
-          </span>
-        </div>
-        <div
-          v-else-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
-          class="price-base fc-container"
-        >
-          <span>
-            1 {{ fromCoin.symbol }} ≈
-            {{ outToPirceValue }}
-            {{ toCoin.symbol }}
-          </span>
+        <div style="padding: 0 12px">
+          <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="fs-container">
+            <span> Price </span>
+            <span>
+              1 {{ fromCoin.symbol }} = 1
+              {{ toCoin.symbol }}
+            </span>
+          </div>
+          <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="fs-container">
+            <span> Price </span>
+            <span>
+              1 {{ fromCoin.symbol }} ≈
+              {{ outToPirceValue }}
+              {{ toCoin.symbol }}
+            </span>
+          </div>
+          <div
+            v-else-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
+            class="fs-container"
+          >
+            <span> Price </span>
+            <span>
+              1 {{ fromCoin.symbol }} ≈
+              {{ outToPirceValue }}
+              {{ toCoin.symbol }}
+            </span>
+          </div>
+          <div class="fs-container">
+            <span> Slippage Tolerance </span>
+            <span> {{ $accessor.setting.slippage }}% </span>
+          </div>
+          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinAmount" class="fs-container">
+            <span> Minimum received </span>
+            <span> {{ toCoinAmount }} {{ toCoin.symbol }} </span>
+          </div>
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet

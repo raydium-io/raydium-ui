@@ -371,3 +371,41 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '7niS4ngxgZ3oynHwH82PnwJXicTnY3fo9Vubi1PnjzJq' // reward vault B
   }
 ]
+
+// for solana.tokenlist.json
+// for (const [key, value] of Object.entries(LP_TOKENS)) {
+//   const kk = key.split('-')
+//   let version = 'V2 '
+//   if (kk.length > 2) {
+//     version = kk[2] + ' '
+//   }
+
+//   const { symbol, mintAddress, decimals } = value
+
+//   let islegacy = false
+//   let isfusion = false
+//   for (const farm of FARMS) {
+//     const { lp, legacy, fusion } = farm
+//     if (lp.mintAddress === mintAddress && legacy === true) {
+//       islegacy = true
+//     } else if (lp.mintAddress === mintAddress && fusion === true) {
+//       isfusion = true
+//     }
+//   }
+
+//   console.log(
+//     JSON.stringify({
+//       chainId: 101,
+//       address: mintAddress,
+//       symbol,
+//       name: `Raydium ${islegacy ? 'Legacy ' : ''}${isfusion ? 'Fusion ' : ''}LP Token ${version}(${symbol})`,
+//       decimals,
+//       logoURI:
+//         'https://cdn.jsdelivr.net/gh/solana-labs/token-list/assets/mainnet/RVKd61ztZW9GUwhRbbLoYVRE5Xf1B2tVscKqwZqXgEr/logo.png',
+//       tags: ['lp-token'],
+//       extensions: {
+//         website: 'https://raydium.io/'
+//       }
+//     })
+//   )
+// }
