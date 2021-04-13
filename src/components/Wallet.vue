@@ -43,7 +43,13 @@ import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { endpoint, commitment } from '@/utils/web3'
-import { WalletAdapter, SolongWalletAdapter, MathWalletAdapter, LedgerWalletAdapter } from '@/wallets'
+import {
+  WalletAdapter,
+  SolongWalletAdapter,
+  MathWalletAdapter,
+  PhantomWalletAdapter,
+  LedgerWalletAdapter
+} from '@/wallets'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -67,6 +73,7 @@ export default class Wallet extends Vue {
     Solong: '',
     // TrustWallet: '',
     MathWallet: '',
+    Phantom: '',
     Sollet: 'https://www.sollet.io',
     // Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
@@ -167,6 +174,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new MathWalletAdapter()
+        break
+      }
+      case 'Phantom': {
+        if ((window as any).solana === undefined || !(window as any).solana.isPhantom) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and initialize Phantom wallet extension first'
+          })
+          return
+        }
+
+        wallet = new PhantomWalletAdapter()
         break
       }
       default: {
