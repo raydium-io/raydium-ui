@@ -243,6 +243,32 @@ export async function swap(
     toMint = TOKENS.WSOL.mintAddress
   }
 
+  let wrappedSolAccount: PublicKey | null = null
+  let wrappedSolAccount2: PublicKey | null = null
+
+  if (fromCoinMint === NATIVE_SOL.mintAddress) {
+    wrappedSolAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      amountIn.wei.toNumber() + 1e7,
+      transaction,
+      signers
+    )
+  }
+  if (toCoinMint === NATIVE_SOL.mintAddress) {
+    wrappedSolAccount2 = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount2,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      transaction,
+      signers
+    )
+  }
+
   const newFromTokenAccount = await createTokenAccountIfNotExist(
     connection,
     fromTokenAccount,
@@ -279,13 +305,32 @@ export async function swap(
       new PublicKey(poolInfo.serumCoinVaultAccount),
       new PublicKey(poolInfo.serumPcVaultAccount),
       new PublicKey(poolInfo.serumVaultSigner),
-      newFromTokenAccount,
-      newToTokenAccount,
+      wrappedSolAccount ?? newFromTokenAccount,
+      wrappedSolAccount2 ?? newToTokenAccount,
       owner,
       Math.floor(amountIn.toWei().toNumber()),
       Math.floor(amountOut.toWei().toNumber())
     )
   )
+
+  if (wrappedSolAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+  if (wrappedSolAccount2) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount2,
+        destination: owner,
+        owner
+      })
+    )
+  }
 
   return await sendTransaction(connection, wallet, transaction, signers)
 }
