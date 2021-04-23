@@ -96,7 +96,7 @@
           @onMax="
             () => {
               fixedFromCoin = true
-              fromCoinAmount = fromCoin.balance.fixed()
+              fromCoinAmount = fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0'
             }
           "
           @onSelect="openFromCoinSelect"
@@ -179,7 +179,7 @@
             (!marketAddress && !lpMintAddress && !isWrap) ||
             !initialized ||
             loading ||
-            gt(fromCoinAmount, fromCoin.balance.fixed()) ||
+            gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
             swaping ||
             (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
@@ -193,7 +193,7 @@
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
+          <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)">
