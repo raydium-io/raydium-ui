@@ -43,6 +43,17 @@
     />
 
     <div v-if="farm.initialized">
+      <div style="padding-bottom: 20px">
+        <Button
+          size="large"
+          ghost
+
+          @click="harvestAll"
+        >
+          Harvest all
+        </Button>
+      </div>
+
       <div class="card">
         <div class="card-body">
           <Collapse expand-icon-position="right">
@@ -231,7 +242,7 @@ import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-d
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
-import { TokenAmount } from '@/utils/safe-math'
+import { gt, TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { depositV4, withdrawV4 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
@@ -570,7 +581,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+      return depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
         .then((txid) => {
           this.$notify.info({
             key,
@@ -595,6 +606,15 @@ export default Vue.extend({
         .finally(() => {
           this.harvesting = false
         })
+    },
+
+    async harvestAll() {
+      for (const farm of this.farms) {
+        const currentReward = farm.userInfo.pendingReward.format()
+
+        if (gt(currentReward, '0'))
+          await this.harvest(farm.farmInfo)
+      }
     }
   }
 })
