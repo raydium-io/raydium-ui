@@ -725,7 +725,7 @@ export const LP_TOKENS: Tokens = {
     coin: { ...TOKENS.STEP },
     pc: { ...TOKENS.USDC },
 
-    mintAddress: 'AKJHspCwDhABucCxNLXUSfEzb7Ny62RqFtC9uNjJi4fq',
+    mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
     decimals: TOKENS.STEP.decimals
   }
 }
