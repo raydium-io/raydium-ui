@@ -132,16 +132,6 @@ export default class Setting extends Vue {
 <style lang="less">
 @import '../styles/variables';
 
-.ant-input-affix-wrapper {
-  input {
-    background-color: @bg-color;
-    text-align: center !important;
-    font-size: 12px;
-    line-height: 20px;
-    font-weight: 600;
-  }
-}
-
 .has-error {
   input {
     border-color: #f5222d;
@@ -150,6 +140,18 @@ export default class Setting extends Vue {
     &:focus,
     &:hover {
       border-color: #f5222d !important;
+    }
+  }
+}
+
+.slippage {
+  .ant-input-affix-wrapper {
+    input {
+      background-color: @bg-color;
+      text-align: center !important;
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 600;
     }
   }
 }
