@@ -311,6 +311,7 @@ export default class Index extends Vue {}
   }
   .button_div {
     width: 40%;
+    min-width: 130px;
     height: 50px;
     .button_font {
       text-transform: uppercase;
