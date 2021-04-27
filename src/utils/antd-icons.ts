@@ -31,5 +31,7 @@ export {
   CalculatorOutline,
   // arrow
   CaretDownFill,
-  CaretUpFill
+  CaretUpFill,
+  // search
+  SearchOutline
 } from '@ant-design/icons'

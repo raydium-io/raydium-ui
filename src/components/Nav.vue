@@ -7,9 +7,9 @@
   >
     <MenuItem v-for="(extra, name) in navs" :key="name">
       <a v-if="extra" :href="url[name]" target="_blank" rel="noopener noreferrer">
-        {{ name }}
+        {{ name.replace('-', ' ') }}
       </a>
-      <span v-else> {{ name }} </span>
+      <span v-else> {{ name.replace('-', ' ') }} </span>
     </MenuItem>
   </Menu>
 </template>
@@ -36,6 +36,7 @@ export default class Nav extends Vue {
     farms: false,
     fusion: false,
     staking: false,
+    acceleraytor: false,
     migrate: false
     // info: false
   }

@@ -24,6 +24,7 @@
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^5.41.0",
     "@nuxtjs/axios": "^5.12.5",
+    "@nuxtjs/dayjs": "^1.4.0",
     "@nuxtjs/google-gtag": "^1.0.4",
     "@nuxtjs/sentry": "^5.0.2",
     "@project-serum/borsh": "^0.1.0",
