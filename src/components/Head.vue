@@ -62,6 +62,7 @@ export default Vue.extend({
   .mobile-nav {
     position: absolute;
     width: 100vw;
+    max-width: 100%;
     top: 64px;
     left: 0;
     text-align: center;
