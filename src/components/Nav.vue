@@ -5,7 +5,7 @@
     :theme="isMobile ? 'dark' : 'light'"
     @click="changeRoute"
   >
-    <MenuItem v-for="(extra, name) in navs" :key="name">
+    <MenuItem v-for="(extra, name) in navs" :key="name.toLowerCase()">
       <a v-if="extra" :href="url[name]" target="_blank" rel="noopener noreferrer">
         {{ name.replace('-', ' ') }}
       </a>
@@ -36,7 +36,7 @@ export default class Nav extends Vue {
     farms: false,
     fusion: false,
     staking: false,
-    acceleraytor: false,
+    acceleRaytor: false,
     migrate: false
     // info: false
   }

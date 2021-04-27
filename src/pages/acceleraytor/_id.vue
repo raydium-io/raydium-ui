@@ -57,11 +57,6 @@
           </div>
         </div>
       </Col>
-      <Col :span="8" class="purchase">
-        <div class="fs-container">
-          <span class="title">Join Pool</span>
-        </div>
-      </Col>
     </Row>
   </div>
 </template>
@@ -203,6 +198,19 @@ hr {
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
+  }
+
+  .coin-input {
+    padding: 16px;
+    border: 1px solid rgba(241, 241, 242, 0.75);
+    border-radius: 4px;
+
+    .label {
+      font-size: 12px;
+      line-height: 20px;
+      color: #f1f1f2;
+      opacity: 0.5;
+    }
   }
 }
 </style>

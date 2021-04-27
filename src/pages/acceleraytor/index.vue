@@ -75,11 +75,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
+
 import { Input, Icon, Radio, Table } from 'ant-design-vue'
+import { filter } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
 import importIcon from '@/utils/import-icon'
+import { IdoPool } from '@/utils/ido'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
@@ -106,9 +109,27 @@ const RadioButton = Radio.Button
 export default class AcceleRaytor extends Vue {
   filter = {
     access: 'all',
-    allocation: 'all',
     status: 'all',
     mine: 'all'
+  }
+
+  pools: IdoPool[] = []
+
+  @Watch('filter', { immediate: true, deep: true })
+  onPersonChanged({ access }: { access: string; status: string; mine: string }) {
+    const rules = {
+      info: {}
+    } as any
+
+    if (access !== 'all') {
+      if (access === 'ray') {
+        rules.info.isRayPool = true
+      } else {
+        rules.info.isRayPool = false
+      }
+    }
+
+    this.pools = filter(this.$accessor.ido.pools, rules)
   }
 
   columns = [
@@ -154,10 +175,6 @@ export default class AcceleRaytor extends Vue {
       align: 'center'
     }
   ]
-
-  get pools() {
-    return this.$accessor.ido.pools
-  }
 
   getUnixTs = getUnixTs
   importIcon = importIcon
