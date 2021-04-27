@@ -88,14 +88,14 @@ import importIcon from '@/utils/import-icon'
   async asyncData({ $accessor, params, error }) {
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
-      const { id } = params
-      const pool = $accessor.ido.pools.find((pool) => pool.idoId === id)
+    }
+    const { id } = params
+    const pool = $accessor.ido.pools.find((pool) => pool.idoId === id)
 
-      if (pool) {
-        return { pool }
-      } else {
-        error({ statusCode: 404, message: 'Project not found' })
-      }
+    if (pool) {
+      return { pool }
+    } else {
+      error({ statusCode: 404, message: 'Project not found' })
     }
   }
 })
