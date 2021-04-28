@@ -19,6 +19,7 @@ export interface IdoPoolInfo {
   stakePoolId: PublicKey
 
   minStakeLimit: TokenAmount
+  quoteTokenDeposited: TokenAmount
 }
 
 export interface IdoPool {
@@ -45,7 +46,7 @@ export const IDO_POOLS: IdoPool[] = [
     quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(10, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(500000, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(50000, TOKENS.MEDIA.decimals, false),
 
     version: 1,
     programId: IDO_PROGRAM_ID,
@@ -60,7 +61,7 @@ export const IDO_POOLS: IdoPool[] = [
     quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(10, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(500000, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(50000, TOKENS.MEDIA.decimals, false),
 
     version: 1,
     programId: IDO_PROGRAM_ID,
@@ -109,7 +110,7 @@ export const IDO_USER_INFO_LAYOUT = struct([
   u64('state'),
   publicKey('idoPoolId'),
   publicKey('owner'),
-  publicKey('quoteTokenDeposited')
+  u64('quoteTokenDeposited')
 ])
 
 export async function findAssociatedIdoInfoAddress(idoId: PublicKey, walletAddress: PublicKey, programId: PublicKey) {

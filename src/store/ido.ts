@@ -4,7 +4,14 @@ import { cloneDeep } from 'lodash-es'
 import { TOKENS } from '@/utils/tokens'
 import { TokenAmount } from '@/utils/safe-math'
 import { commitment, getMultipleAccounts } from '@/utils/web3'
-import { IDO_POOLS, IdoPool, getIdoPoolById, IDO_POOL_INFO_LAYOUT } from '@/utils/ido'
+import {
+  IDO_POOLS,
+  IdoPool,
+  getIdoPoolById,
+  IDO_POOL_INFO_LAYOUT,
+  IDO_USER_INFO_LAYOUT,
+  findAssociatedIdoInfoAddress
+} from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
 
@@ -18,7 +25,8 @@ export const state = () => ({
   countdown: 0,
   lastSubBlock: 0,
 
-  pools: [] as Array<IdoPool>
+  pools: [] as Array<IdoPool>,
+  userInfos: {} as any
 })
 
 export const getters = getterTree(state, {})
@@ -44,6 +52,10 @@ export const mutations = mutationTree(state, {
     state.pools = cloneDeep(pools)
   },
 
+  setUserInfos(state, userInfos: any) {
+    state.userInfos = cloneDeep(userInfos)
+  },
+
   setCountdown(state, countdown: number) {
     state.countdown = countdown
   },
@@ -56,8 +68,9 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    async requestInfos({ commit }) {
+    async requestInfos({ commit, dispatch }) {
       commit('setLoading', true)
+      dispatch('getIdoAccounts')
 
       const conn = this.$web3
 
@@ -65,9 +78,9 @@ export const actions = actionTree(
       const publicKeys: Array<PublicKey> = []
 
       IDO_POOLS.forEach((pool) => {
-        const { idoId } = pool
+        const { idoId, quoteVault } = pool
 
-        publicKeys.push(new PublicKey(idoId))
+        publicKeys.push(new PublicKey(idoId), new PublicKey(quoteVault))
       })
 
       const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
@@ -87,7 +100,8 @@ export const actions = actionTree(
               minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
               maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
               stakePoolId: decoded.stakePoolId,
-              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals)
+              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
+              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
             }
 
             idoPools.push(pool)
@@ -99,6 +113,44 @@ export const actions = actionTree(
       logger('Ido pool infomations updated')
       commit('setInitialized')
       commit('setLoading', false)
+    },
+
+    async getIdoAccounts({ commit }) {
+      const conn = this.$web3
+      const wallet = (this as any)._vm.$wallet
+
+      if (wallet && wallet.connected) {
+        const userInfos = {} as any
+        const publicKeys: Array<PublicKey> = []
+
+        for (const pool of IDO_POOLS) {
+          const { idoId, programId } = pool
+
+          const userIdoAccount = await findAssociatedIdoInfoAddress(
+            new PublicKey(idoId),
+            wallet.publicKey,
+            new PublicKey(programId)
+          )
+          publicKeys.push(userIdoAccount)
+        }
+
+        const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
+        multipleInfo.forEach((info) => {
+          if (info) {
+            // const address = info.publicKey.toBase58()
+            const data = Buffer.from(info.account.data)
+
+            const decoded = IDO_USER_INFO_LAYOUT.decode(data)
+            const idoId = decoded.idoPoolId.toBase58()
+            const pool = getIdoPoolById(idoId)
+            if (pool) {
+              userInfos[idoId] = new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+            }
+          }
+        })
+        commit('setUserInfos', userInfos)
+        logger('Ido user infomations updated')
+      }
     }
   }
 )

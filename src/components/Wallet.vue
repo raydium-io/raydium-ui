@@ -245,16 +245,18 @@ export default class Wallet extends Vue {
       this.$accessor.wallet.setLastSubBlock(slot)
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
+      this.$accessor.ido.getIdoAccounts()
     }
   }
 
-  async subWallet() {
+  subWallet() {
     const wallet = this.$wallet
     if (wallet && wallet.publicKey) {
       this.walletListenerId = this.$web3.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
 
-      await this.$accessor.wallet.getTokenAccounts()
-      await this.$accessor.farm.getStakeAccounts()
+      this.$accessor.wallet.getTokenAccounts()
+      this.$accessor.farm.getStakeAccounts()
+      this.$accessor.ido.getIdoAccounts()
     }
   }
 

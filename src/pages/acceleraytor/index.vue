@@ -62,7 +62,7 @@
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
-        <span slot="raise" slot-scope="raise, record"> {{ raise.format() }} {{ record.quote.symbol }} </span>
+        <span slot="raise" slot-scope="raise, record"> {{ raise.format() }} {{ record.base.symbol }} </span>
         <span slot="progress"> 0.00% </span>
         <span slot="status" slot-scope="info" class="status">
           <span v-if="info.endTime < getUnixTs() / 1000" class="closed"> Closed </span>

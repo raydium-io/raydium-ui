@@ -24,7 +24,7 @@
         <hr />
         <div class="fs-container">
           <div class="state">
-            <span class="value"> {{ pool.raise.format() }} {{ pool.quote.symbol }} </span>
+            <span class="value"> {{ pool.raise.format() }} {{ pool.base.symbol }} </span>
             <span class="desc"> Total raise </span>
           </div>
           <div class="state">
@@ -40,15 +40,25 @@
             <span class="desc"> Max. purchase limit </span>
           </div>
         </div>
-        <Progress :percent="0" />
+        <Progress
+          :percent="
+            pool.info.quoteTokenDeposited
+              .toEther()
+              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+              .toNumber()
+          "
+        />
         <hr />
         <div class="fs-container">
+          {{ void (idoInfo = safeGet(ido.userInfos, pool.idoId)) }}
           <div class="state">
-            <span class="value"> 0 {{ pool.quote.symbol }} </span>
+            <span class="value"> {{ idoInfo ? idoInfo.format() : 0 }} {{ pool.quote.symbol }} </span>
             <span class="desc"> Your deposited </span>
           </div>
           <div class="state">
-            <span class="value"> 0 % </span>
+            <span class="value">
+              {{ idoInfo ? idoInfo.wei.dividedBy(pool.info.quoteTokenDeposited.wei).multipliedBy(100).toFixed(2) : 0 }}%
+            </span>
             <span class="desc"> Your share </span>
           </div>
           <div class="state">
@@ -267,6 +277,10 @@ export default class AcceleRaytor extends Vue {
 
   get farm() {
     return this.$accessor.farm
+  }
+
+  get ido() {
+    return this.$accessor.ido
   }
 
   get url() {
@@ -563,7 +577,15 @@ hr {
   margin-top: 20px;
 }
 
+.ant-progress-outer {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
 .ant-progress-text {
+  margin: 0;
+  width: 100%;
+  text-align: right;
   color: #f1f1f2;
 }
 
