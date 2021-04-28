@@ -88,4 +88,10 @@ export default class Nav extends Vue {
 .ant-menu-horizontal > .ant-menu-submenu-selected {
   border-bottom: 2px solid @menu-dark-item-active-bg;
 }
+
+@media (max-width: 1020px) {
+  .ant-menu-item {
+    padding: 0 12px;
+  }
+}
 </style>
