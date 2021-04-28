@@ -55,14 +55,14 @@
           <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="info, record"> {{ info.price }} {{ record.quote.symbol }} </span>
-        <span slot="access" slot-scope="info" class="access">
-          <span v-if="info.isRayPool" class="ray">
+        <span slot="price" slot-scope="price, record"> {{ price.format() }} {{ record.quote.symbol }} </span>
+        <span slot="access" slot-scope="isRayPool" class="access">
+          <span v-if="isRayPool" class="ray">
             <span>RAY Pool</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
-        <span slot="raise" slot-scope="info, record"> {{ 50000 * info.price }} {{ record.quote.symbol }} </span>
+        <span slot="raise" slot-scope="raise, record"> {{ raise.format() }} {{ record.quote.symbol }} </span>
         <span slot="progress"> 0.00% </span>
         <span slot="status" slot-scope="info" class="status">
           <span v-if="info.endTime < getUnixTs() / 1000" class="closed"> Closed </span>
@@ -116,7 +116,7 @@ export default class AcceleRaytor extends Vue {
   pools: IdoPool[] = []
 
   @Watch('filter', { immediate: true, deep: true })
-  onPersonChanged({ access }: { access: string; status: string; mine: string }) {
+  onFilterChanged({ access }: { access: string; status: string; mine: string }) {
     const rules = {
       info: {}
     } as any
@@ -141,21 +141,21 @@ export default class AcceleRaytor extends Vue {
     },
     {
       title: 'Price per token',
-      dataIndex: 'info',
+      dataIndex: 'price',
       key: 'price',
       scopedSlots: { customRender: 'price' },
       align: 'center'
     },
     {
       title: 'Access',
-      dataIndex: 'info',
+      dataIndex: 'isRayPool',
       key: 'access',
       scopedSlots: { customRender: 'access' },
       align: 'center'
     },
     {
       title: 'Total raise',
-      dataIndex: 'info',
+      dataIndex: 'raise',
       key: 'raise',
       scopedSlots: { customRender: 'raise' },
       align: 'center'

@@ -32,6 +32,12 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
 
+  loadingIndicator: {
+    name: 'circle',
+    color: '#5ac4be',
+    background: '#131a35'
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     {
@@ -71,6 +77,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     'nuxt-clipboard',
+    '@nuxtjs/dayjs',
     '@nuxtjs/google-gtag'
     // '@nuxtjs/sentry'
   ],
@@ -80,6 +87,12 @@ export default {
 
   clipboard: {
     autoSetContainer: true
+  },
+
+  dayjs: {
+    locales: ['en'],
+    defaultLocale: 'en',
+    plugins: []
   },
 
   'google-gtag': {

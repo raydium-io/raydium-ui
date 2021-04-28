@@ -11,6 +11,10 @@ export interface TokenInfo {
 
   referrer?: string
 
+  details?: string
+  docs?: object
+  socials?: object
+
   tokenAccountAddress?: string
   balance?: TokenAmount
 }
@@ -332,7 +336,19 @@ export const TOKENS: Tokens = {
     name: 'MEDIA',
     mintAddress: 'ETAtLmCmsoiEEKfNrHKJ2kYy3MoABhU6NQvpSfij5tDs',
     decimals: 6,
-    referrer: 'DiLuXdZ5TbQ1jUNEF6tNstHNqXJ3mTCrsVrM6DeX18Mh'
+    referrer: 'DiLuXdZ5TbQ1jUNEF6tNstHNqXJ3mTCrsVrM6DeX18Mh',
+
+    details:
+      'Media Network is a new protocol that bypasses traditional CDN providers’ centralized approach for a self-governed and open source solution where everyone can participate. Media Network creates a distributed bandwidth market that enables service providers such as media platforms to hire resources from the network and dynamically come and go as the demand for last-mile data delivery shifts. It allows anyone to organically serve content without introducing any trust assumptions or pre-authentication requirements. Participants earn MEDIA rewards for their bandwidth contributions, a fixed supply SPL token minted on Solana’s Blockchain.',
+    docs: {
+      website: 'https://media.network/',
+      whitepaper: 'https://media.network/whitepaper.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/Media_FDN',
+      Telegram: 'https://t.me/Media_FDN',
+      Medium: 'https://mediafoundation.medium.com/'
+    }
   }
 }
 

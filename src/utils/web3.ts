@@ -10,7 +10,7 @@ import {
 } from '@solana/web3.js'
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
-import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@/utils/ids'
 // eslint-disable-next-line
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
@@ -22,13 +22,24 @@ export const endpoint = 'https://solana-api.projectserum.com'
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
 
+export async function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
+  const [publicKey, nonce] = await PublicKey.findProgramAddress(seeds, programId)
+  return { publicKey, nonce }
+}
+
 export async function createAmmAuthority(programId: PublicKey) {
-  const [ammAuthority, nonce] = await PublicKey.findProgramAddress(
+  return await findProgramAddress(
     [new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))],
     programId
   )
+}
 
-  return { ammAuthority, nonce }
+export async function findAssociatedTokenAddress(walletAddress: PublicKey, tokenMintAddress: PublicKey) {
+  const { publicKey } = await findProgramAddress(
+    [walletAddress.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), tokenMintAddress.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  )
+  return publicKey
 }
 
 export async function createTokenAccountIfNotExist(

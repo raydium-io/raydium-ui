@@ -6,7 +6,7 @@
     @click="changeRoute"
   >
     <MenuItem v-for="(extra, name) in navs" :key="name.toLowerCase()">
-      <a v-if="extra" :href="url[name]" target="_blank" rel="noopener noreferrer">
+      <a v-if="extra" :href="url[name]" target="_blank">
         {{ name.replace('-', ' ') }}
       </a>
       <span v-else> {{ name.replace('-', ' ') }} </span>

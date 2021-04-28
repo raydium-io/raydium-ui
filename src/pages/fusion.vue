@@ -464,7 +464,7 @@ export default Vue.extend({
             description: (h: any) =>
               h('div', [
                 'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
               ])
           })
 
@@ -525,7 +525,7 @@ export default Vue.extend({
             description: (h: any) =>
               h('div', [
                 'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
               ])
           })
 
@@ -578,7 +578,7 @@ export default Vue.extend({
             description: (h: any) =>
               h('div', [
                 'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}${txid}`, target: '_blank' } }, 'here')
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
               ])
           })
           // @ts-ignore

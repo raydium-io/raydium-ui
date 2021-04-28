@@ -1,10 +1,11 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+import { cloneDeep } from 'lodash-es'
 
+import { TOKENS } from '@/utils/tokens'
+import { TokenAmount } from '@/utils/safe-math'
 import { commitment, getMultipleAccounts } from '@/utils/web3'
-
 import { IDO_POOLS, IdoPool, getIdoPoolById, IDO_POOL_INFO_LAYOUT } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
-import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
 const AUTO_REFRESH_TIME = 60
@@ -78,16 +79,15 @@ export const actions = actionTree(
           const pool = getIdoPoolById(address)
           if (pool) {
             const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
+
             pool.info = {
-              startTime: decoded.startTime.toNumber() as number,
-              endTime: decoded.endTime.toNumber() as number,
-              price:
-                (decoded.numerator.toNumber() * 10 ** pool.base.decimals) /
-                (decoded.denominator.toNumber() * 10 ** pool.quote.decimals),
-              minDepositLimit: decoded.minDepositLimit.toNumber(),
-              maxDepositLimit: decoded.maxDepositLimit.toNumber(),
+              startTime: decoded.startTime.toNumber(),
+              endTime: decoded.endTime.toNumber(),
+
+              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
+              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
               stakePoolId: decoded.stakePoolId,
-              isRayPool: decoded.stakePoolId.toBase58() === '11111111111111111111111111111111'
+              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals)
             }
 
             idoPools.push(pool)

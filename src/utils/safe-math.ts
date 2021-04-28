@@ -28,7 +28,8 @@ export class TokenAmount {
   }
 
   format() {
-    return this.wei.dividedBy(this._decimals).toFormat(this.decimals)
+    const vaule = this.wei.dividedBy(this._decimals)
+    return vaule.toFormat(vaule.isInteger() ? 0 : this.decimals)
   }
 
   fixed() {
