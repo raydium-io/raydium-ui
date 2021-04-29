@@ -102,14 +102,14 @@ export const actions = actionTree(
               case 'poolCoinTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount)
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(Number(parsed.amount))
 
                 break
               }
               case 'poolPcTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(parsed.amount)
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(Number(parsed.amount))
 
                 break
               }
@@ -118,8 +118,8 @@ export const actions = actionTree(
                 const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
                 const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal)
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal)
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(Number(baseTokenTotal))
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(Number(quoteTokenTotal))
 
                 break
               }
@@ -134,14 +134,14 @@ export const actions = actionTree(
 
                   const { swapFeeNumerator, swapFeeDenominator } = parsed
                   poolInfo.fees = {
-                    swapFeeNumerator: swapFeeNumerator.toNumber(),
-                    swapFeeDenominator: swapFeeDenominator.toNumber()
+                    swapFeeNumerator: Number(swapFeeNumerator),
+                    swapFeeDenominator: Number(swapFeeDenominator)
                   }
                 }
 
                 const { needTakePnlCoin, needTakePnlPc } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(needTakePnlCoin.toNumber())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(needTakePnlPc.toNumber())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(Number(needTakePnlCoin))
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(Number(needTakePnlPc))
 
                 break
               }
@@ -149,7 +149,7 @@ export const actions = actionTree(
               case 'lpMintAddress': {
                 const parsed = MINT_LAYOUT.decode(data)
 
-                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toNumber(), poolInfo.lp.decimals)
+                poolInfo.lp.totalSupply = new TokenAmount(Number(parsed.supply), poolInfo.lp.decimals)
 
                 break
               }
