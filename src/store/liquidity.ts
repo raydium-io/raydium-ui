@@ -101,8 +101,8 @@ export const actions = actionTree(
             switch (key) {
               case 'poolCoinTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
-
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount.toNumber())
+                // quick fix: Number can only safely store up to 53 bits
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount.toString())
 
                 break
               }
