@@ -53,14 +53,15 @@
         <div class="fs-container">
           <div class="state">
             <span class="value">
-              {{ pool.userInfo ? pool.userInfo.deposited.format() : 0 }} {{ pool.quote.symbol }}
+              {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }}
+              {{ pool.quote.symbol }}
             </span>
             <span class="desc"> Your deposit </span>
           </div>
           <div class="state">
             <span class="value">
               {{
-                pool.userInfo
+                pool.userInfo && pool.userInfo.deposited
                   ? pool.userInfo.deposited.wei
                       .dividedBy(pool.info.quoteTokenDeposited.wei)
                       .multipliedBy(100)
@@ -131,6 +132,9 @@
           @click="withdraw"
         >
           Claim
+        </Button>
+        <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
+          Wallet not eligible for this pool
         </Button>
         <Button
           v-else-if="pool.info.startTime < getUnixTs() / 1000"
