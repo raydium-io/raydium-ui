@@ -48,7 +48,18 @@
               .multipliedBy(100)
               .toNumber()
           "
-        />
+          status="active"
+        >
+          <span slot="format">
+            {{
+              pool.info.quoteTokenDeposited
+                .toEther()
+                .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                .multipliedBy(100)
+                .toNumber()
+            }}%
+          </span>
+        </Progress>
         <hr />
         <div class="fs-container">
           <div class="state">
