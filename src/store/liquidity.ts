@@ -102,14 +102,14 @@ export const actions = actionTree(
               case 'poolCoinTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount.toNumber())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount)
 
                 break
               }
               case 'poolPcTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(parsed.amount.toNumber())
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(parsed.amount)
 
                 break
               }
@@ -118,8 +118,8 @@ export const actions = actionTree(
                 const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
                 const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toNumber())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toNumber())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal)
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal)
 
                 break
               }
