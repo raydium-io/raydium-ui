@@ -4,7 +4,7 @@ import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 
 import { NATIVE_SOL } from '@/utils/tokens'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { TokenAmount } from '@/utils/safe-math'
+import { TokenAmount, lt } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
@@ -113,7 +113,7 @@ export const actions = actionTree(
                 const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
 
                 if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
-                  if (tokenAccounts[mintAddress].balance === 0) {
+                  if (lt(tokenAccounts[mintAddress].balance.wei.toNumber(), balance.wei.toNumber())) {
                     tokenAccounts[mintAddress] = {
                       tokenAccountAddress,
                       balance

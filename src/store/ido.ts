@@ -7,10 +7,11 @@ import { commitment, getMultipleAccounts } from '@/utils/web3'
 import {
   IDO_POOLS,
   IdoPool,
-  getIdoPoolById,
+  IdoUserInfo,
   IDO_POOL_INFO_LAYOUT,
   IDO_USER_INFO_LAYOUT,
-  findAssociatedIdoInfoAddress
+  findAssociatedIdoInfoAddress,
+  findAssociatedIdoCheckAddress
 } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
@@ -25,8 +26,7 @@ export const state = () => ({
   countdown: 0,
   lastSubBlock: 0,
 
-  pools: [] as Array<IdoPool>,
-  userInfos: {} as any
+  pools: [] as Array<IdoPool>
 })
 
 export const getters = getterTree(state, {})
@@ -52,10 +52,6 @@ export const mutations = mutationTree(state, {
     state.pools = cloneDeep(pools)
   },
 
-  setUserInfos(state, userInfos: any) {
-    state.userInfos = cloneDeep(userInfos)
-  },
-
   setCountdown(state, countdown: number) {
     state.countdown = countdown
   },
@@ -74,37 +70,41 @@ export const actions = actionTree(
 
       const conn = this.$web3
 
-      const idoPools: Array<IdoPool> = []
+      const idoPools: Array<IdoPool> = cloneDeep(IDO_POOLS)
       const publicKeys: Array<PublicKey> = []
 
-      IDO_POOLS.forEach((pool) => {
-        const { idoId, quoteVault } = pool
+      const keys = ['idoId']
+      const keyLength = keys.length
 
-        publicKeys.push(new PublicKey(idoId), new PublicKey(quoteVault))
+      idoPools.forEach((pool) => {
+        const { idoId } = pool
+
+        publicKeys.push(new PublicKey(idoId))
       })
 
       const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
-      multipleInfo.forEach((info) => {
+      multipleInfo.forEach((info, index) => {
         if (info) {
-          const address = info.publicKey.toBase58()
+          const poolIndex = parseInt((index / keyLength).toString())
+          // const keyIndex = index % keyLength
+          // const key = keys[keyIndex]
+
           const data = Buffer.from(info.account.data)
 
-          const pool = getIdoPoolById(address)
-          if (pool) {
-            const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
+          const pool = idoPools[poolIndex]
 
-            pool.info = {
-              startTime: decoded.startTime.toNumber(),
-              endTime: decoded.endTime.toNumber(),
+          const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
 
-              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
-              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
-              stakePoolId: decoded.stakePoolId,
-              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
-              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
-            }
+          pool.info = {
+            startTime: decoded.startTime.toNumber(),
+            endTime: decoded.endTime.toNumber(),
+            startWithdrawTime: decoded.startWithdrawTime.toNumber(),
 
-            idoPools.push(pool)
+            minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
+            maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
+            stakePoolId: decoded.stakePoolId,
+            minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
+            quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
           }
         }
       })
@@ -115,40 +115,67 @@ export const actions = actionTree(
       commit('setLoading', false)
     },
 
-    async getIdoAccounts({ commit }) {
+    async getIdoAccounts({ state, commit }) {
       const conn = this.$web3
       const wallet = (this as any)._vm.$wallet
 
       if (wallet && wallet.connected) {
-        const userInfos = {} as any
+        const idoPools: Array<IdoPool> = cloneDeep(state.pools)
         const publicKeys: Array<PublicKey> = []
 
-        for (const pool of IDO_POOLS) {
-          const { idoId, programId } = pool
+        const keys = ['idoAccount', 'idoCheck']
+        const keyLength = keys.length
+
+        for (const pool of idoPools) {
+          const { idoId, programId, snapshotProgramId } = pool
 
           const userIdoAccount = await findAssociatedIdoInfoAddress(
             new PublicKey(idoId),
             wallet.publicKey,
             new PublicKey(programId)
           )
-          publicKeys.push(userIdoAccount)
+          const userIdoCheck = await findAssociatedIdoCheckAddress(
+            new PublicKey(idoId),
+            wallet.publicKey,
+            new PublicKey(snapshotProgramId)
+          )
+
+          publicKeys.push(userIdoAccount, userIdoCheck)
         }
 
         const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
-        multipleInfo.forEach((info) => {
+        multipleInfo.forEach((info, index) => {
+          const poolIndex = parseInt((index / keyLength).toString())
+          const keyIndex = index % keyLength
+          const key = keys[keyIndex]
+
           if (info) {
             // const address = info.publicKey.toBase58()
             const data = Buffer.from(info.account.data)
 
-            const decoded = IDO_USER_INFO_LAYOUT.decode(data)
-            const idoId = decoded.idoPoolId.toBase58()
-            const pool = getIdoPoolById(idoId)
-            if (pool) {
-              userInfos[idoId] = new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+            const pool = idoPools[poolIndex]
+
+            switch (key) {
+              case 'idoAccount': {
+                const decoded = IDO_USER_INFO_LAYOUT.decode(data)
+                if (!pool.userInfo) {
+                  pool.userInfo = {} as IdoUserInfo
+                }
+                pool.userInfo.deposited = new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+                break
+              }
+              case 'idoCheck': {
+                if (!pool.userInfo) {
+                  pool.userInfo = {} as IdoUserInfo
+                }
+                pool.userInfo.snapshoted = true
+                break
+              }
             }
           }
         })
-        commit('setUserInfos', userInfos)
+
+        commit('setPools', idoPools)
         logger('Ido user infomations updated')
       }
     }

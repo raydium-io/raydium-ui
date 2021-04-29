@@ -1,7 +1,7 @@
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, CLOCK_PROGRAM_ID, IDO_PROGRAM_ID } from './ids'
 import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
-import { findProgramAddress, sendTransaction } from './web3'
+import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
 
 // @ts-ignore
 import { u8, nu64, struct } from 'buffer-layout'
@@ -12,6 +12,7 @@ import { Account, Connection, PublicKey, Transaction, TransactionInstruction } f
 export interface IdoPoolInfo {
   startTime: number
   endTime: number
+  startWithdrawTime: number
 
   minDepositLimit: TokenAmount
   maxDepositLimit: TokenAmount
@@ -20,6 +21,11 @@ export interface IdoPoolInfo {
 
   minStakeLimit: TokenAmount
   quoteTokenDeposited: TokenAmount
+}
+
+export interface IdoUserInfo {
+  deposited: TokenAmount
+  snapshoted: boolean
 }
 
 export interface IdoPool {
@@ -32,9 +38,11 @@ export interface IdoPool {
 
   isRayPool: boolean
   idoId: string
+  baseVault: string
   quoteVault: string
 
   info?: IdoPoolInfo
+  userInfo?: IdoUserInfo
 
   price: TokenAmount
   raise: TokenAmount
@@ -53,8 +61,9 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: 'E3FHPjesXTcoQ2A4pPPLd2YjnL5aXb5j3obdNoT5nbcJ',
-    quoteVault: 'AKU9iYZERtoDNjhRXU6JnDZQqj2eYXMLupnFeA1yhquj'
+    idoId: 'EFnvwDxehFLycdUp6DiwcyBTz88qcZFP3KUDfmPU4Fdc',
+    baseVault: '2WCoJRu1w6awJR7PvCc1mWKR9XpPNZDFyBDBX713k8ng',
+    quoteVault: '21XBxBZn3tX8aaJKm1KKm6sWsLUxsMedV3a1CvNBW2m9'
   },
   {
     base: { ...TOKENS.MEDIA },
@@ -68,8 +77,9 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '11111111111111111111111111111111',
 
     isRayPool: false,
-    idoId: 'DPQn9sXy1f6zYZ6SCDSF2hqtUGo7QwNWJYjzn6mxkzox',
-    quoteVault: '8MuRRe62zvtieqohcicVEzEQsKQXZwqHT3xbR1dSZwEp'
+    idoId: '3phgXrkHbMmVLUbUvXPXsnot9WxkdyvVEyiA8odyWY8s',
+    baseVault: '2Gxcw4Vo7zGGNg9JxksrWYazcpQTWNi8JdQkF3bF5yaN',
+    quoteVault: '6TyVHwiEaDRQCf398QjvC6JLqPzK9REvMiS6DsCWG5o4'
   }
 ]
 
@@ -121,6 +131,18 @@ export async function findAssociatedIdoInfoAddress(idoId: PublicKey, walletAddre
   return publicKey
 }
 
+export async function findAssociatedIdoCheckAddress(
+  idoId: PublicKey,
+  walletAddress: PublicKey,
+  snapshotProgramId: PublicKey
+) {
+  const { publicKey } = await findProgramAddress(
+    [idoId.toBuffer(), walletAddress.toBuffer(), snapshotProgramId.toBuffer()],
+    snapshotProgramId
+  )
+  return publicKey
+}
+
 export async function purchase(
   connection: Connection,
   wallet: any,
@@ -148,8 +170,9 @@ export async function purchase(
     owner,
     new PublicKey(poolInfo.programId)
   )
-  const { publicKey: userIdoCheck } = await findProgramAddress(
-    [new PublicKey(poolInfo.idoId).toBuffer(), owner.toBuffer(), new PublicKey(poolInfo.snapshotProgramId).toBuffer()],
+  const userIdoCheck = await findAssociatedIdoCheckAddress(
+    new PublicKey(poolInfo.idoId),
+    owner,
     new PublicKey(poolInfo.snapshotProgramId)
   )
 
@@ -165,6 +188,55 @@ export async function purchase(
       new PublicKey(stakeInfoAccount),
       userIdoCheck,
       new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+    )
+  )
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+export async function claim(
+  connection: Connection,
+  wallet: any,
+  poolInfo: IdoPool,
+  userBaseTokenAccount: string,
+  userQuoteTokenAccount: string
+) {
+  if (!connection || !wallet) throw new Error('Miss connection')
+  if (!poolInfo) throw new Error('Miss pool infomations')
+
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  const newUserBaseTokenAccount = userBaseTokenAccount
+    ? new PublicKey(userBaseTokenAccount)
+    : await createAssociatedTokenAccount(new PublicKey(poolInfo.base.mintAddress), owner, transaction)
+  const newUserQuoteTokenAccount = userQuoteTokenAccount
+    ? new PublicKey(userQuoteTokenAccount)
+    : await createAssociatedTokenAccount(new PublicKey(poolInfo.quote.mintAddress), owner, transaction)
+
+  const { publicKey: idoAuthority } = await findProgramAddress(
+    [new PublicKey(poolInfo.idoId).toBuffer()],
+    new PublicKey(poolInfo.programId)
+  )
+  const userIdoInfo = await findAssociatedIdoInfoAddress(
+    new PublicKey(poolInfo.idoId),
+    owner,
+    new PublicKey(poolInfo.programId)
+  )
+
+  transaction.add(
+    claimInstruction(
+      new PublicKey(poolInfo.programId),
+      new PublicKey(poolInfo.idoId),
+      idoAuthority,
+      new PublicKey(poolInfo.quoteVault),
+      new PublicKey(poolInfo.baseVault),
+      newUserQuoteTokenAccount,
+      newUserBaseTokenAccount,
+      userIdoInfo,
+      owner
     )
   )
 
@@ -209,6 +281,49 @@ export function purchaseInstruction(
     {
       instruction: 1,
       amount
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function claimInstruction(
+  programId: PublicKey,
+  idoId: PublicKey,
+  authority: PublicKey,
+  poolQuoteTokenAccount: PublicKey,
+  poolBaseTokenAccount: PublicKey,
+  userQuoteTokenAccount: PublicKey,
+  userBaseTokenAccount: PublicKey,
+  userIdoInfo: PublicKey,
+  userOwner: PublicKey
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    // ido
+    { pubkey: idoId, isSigner: false, isWritable: true },
+    { pubkey: authority, isSigner: false, isWritable: true },
+    { pubkey: poolQuoteTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolBaseTokenAccount, isSigner: false, isWritable: true },
+    // user
+    { pubkey: userQuoteTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userBaseTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userIdoInfo, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 2
     },
     data
   )

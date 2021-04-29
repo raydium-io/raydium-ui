@@ -15,7 +15,7 @@
               <span v-else class="community"><span>Community Pool</span></span>
             </span>
             <span class="status">
-              <span v-if="pool.info.endTime < getUnixTs() / 1000" class="closed"> Closed </span>
+              <span v-if="pool.info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
               <span v-else-if="pool.info.startTime < getUnixTs() / 1000" class="open"> Open </span>
               <span v-else class="upcoming"> Upcoming </span>
             </span>
@@ -33,11 +33,11 @@
           </div>
           <div class="state">
             <span class="value"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            <span class="desc"> Min. purchase limit </span>
+            <span class="desc"> Min. allocation </span>
           </div>
           <div class="state">
             <span class="value"> {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            <span class="desc"> Max. purchase limit </span>
+            <span class="desc"> Max. allocation </span>
           </div>
         </div>
         <Progress
@@ -45,19 +45,28 @@
             pool.info.quoteTokenDeposited
               .toEther()
               .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+              .multipliedBy(100)
               .toNumber()
           "
         />
         <hr />
         <div class="fs-container">
-          {{ void (idoInfo = safeGet(ido.userInfos, pool.idoId)) }}
           <div class="state">
-            <span class="value"> {{ idoInfo ? idoInfo.format() : 0 }} {{ pool.quote.symbol }} </span>
-            <span class="desc"> Your deposited </span>
+            <span class="value">
+              {{ pool.userInfo ? pool.userInfo.deposited.format() : 0 }} {{ pool.quote.symbol }}
+            </span>
+            <span class="desc"> Your deposit </span>
           </div>
           <div class="state">
             <span class="value">
-              {{ idoInfo ? idoInfo.wei.dividedBy(pool.info.quoteTokenDeposited.wei).multipliedBy(100).toFixed(2) : 0 }}%
+              {{
+                pool.userInfo
+                  ? pool.userInfo.deposited.wei
+                      .dividedBy(pool.info.quoteTokenDeposited.wei)
+                      .multipliedBy(100)
+                      .toFixed(2)
+                  : 0
+              }}%
             </span>
             <span class="desc"> Your share </span>
           </div>
@@ -105,7 +114,27 @@
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
-        <Button v-else-if="pool.info.endTime < getUnixTs() / 1000" size="large" ghost> Claim </Button>
+        <Button
+          v-else-if="pool.info.endTime < getUnixTs() / 1000 && pool.info.startWithdrawTime > getUnixTs() / 1000"
+          size="large"
+          ghost
+          disabled
+        >
+          Wait
+        </Button>
+        <Button
+          v-else-if="pool.info.endTime < getUnixTs() / 1000"
+          size="large"
+          ghost
+          :loading="purchasing"
+          :disabled="purchasing"
+          @click="withdraw"
+        >
+          Claim
+        </Button>
+        <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
+          Wallet not eligible for this pool
+        </Button>
         <Button
           v-else-if="pool.info.startTime < getUnixTs() / 1000"
           size="large"
@@ -122,20 +151,22 @@
         >
           <template v-if="!value"> Enter an amount </template>
           <template v-else-if="lt(value, pool.info.minDepositLimit.toEther())">
-            Min. purchase is {{ pool.info.minDepositLimit.toEther() }} {{ pool.quote.symbol }}
+            Min. allocation is {{ pool.info.minDepositLimit.toEther() }} {{ pool.quote.symbol }}
           </template>
           <template v-else-if="gt(value, pool.info.maxDepositLimit.toEther())">
-            Max. purchase is {{ pool.info.maxDepositLimit.toEther() }} {{ pool.quote.symbol }}
+            Max. allocation is {{ pool.info.maxDepositLimit.toEther() }} {{ pool.quote.symbol }}
           </template>
           <template v-else-if="gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0')">
             Insufficient {{ pool.quote.symbol }} balance
           </template>
-          <template v-else>Purchase</template>
+          <template v-else>Join pool</template>
         </Button>
         <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
         <hr />
         <Alert
-          :description="`${pool.quote.symbol} can’t be withdrawn after deposit. Once the pool has concluded you’ll be able to withdraw your token allocation.`"
+          :description="`${pool.quote.symbol} can't be withdrawn after join. Tokens can be claimed after ${$dayjs(
+            pool.info.startWithdrawTime * 1000
+          ).toString()}`"
           type="warning"
           show-icon
           banner
@@ -221,7 +252,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { Row, Col, Progress, Button, Alert, Tabs } from 'ant-design-vue'
 import { get as safeGet } from 'lodash-es'
@@ -229,7 +260,7 @@ import { get as safeGet } from 'lodash-es'
 import { getUnixTs } from '@/utils'
 import importIcon from '@/utils/import-icon'
 import { gt, lt } from '@/utils/safe-math'
-import { IdoPool, purchase } from '@/utils/ido'
+import { IdoPool, purchase, claim } from '@/utils/ido'
 
 const { TabPane } = Tabs
 
@@ -266,6 +297,15 @@ export default class AcceleRaytor extends Vue {
   value = ''
   pool = {} as IdoPool
   purchasing = false
+
+  @Watch('$accessor.ido.pools', { immediate: true, deep: true })
+  onIdoPoolsChanged(pools: any) {
+    const { idoId } = this.pool
+    const pool = pools.find((pool: any) => pool.idoId === idoId)
+    if (pool) {
+      this.pool = pool
+    }
+  }
 
   get isMobile() {
     return this.$accessor.isMobile
@@ -328,13 +368,60 @@ export default class AcceleRaytor extends Vue {
             ])
         })
 
-        const description = `Purchase ${this.pool.base.symbol}`
+        const description = `Join ${this.pool.base.symbol} pool`
         this.$accessor.transaction.sub({ txid, description })
       })
       .catch((error) => {
         this.$notify.error({
           key,
-          message: 'Purchase failed',
+          message: 'Join pool failed',
+          description: error.message
+        })
+      })
+      .finally(() => {
+        this.purchasing = false
+      })
+  }
+
+  withdraw() {
+    this.purchasing = true
+
+    const conn = this.$web3
+    const wallet = (this as any).$wallet
+
+    const userQuoteTokenAccount = safeGet(
+      this.wallet.tokenAccounts,
+      `${this.pool.quote.mintAddress}.tokenAccountAddress`
+    )
+    const userBaseTokenAccount = safeGet(this.wallet.tokenAccounts, `${this.pool.base.mintAddress}.tokenAccountAddress`)
+
+    const key = getUnixTs().toString()
+    this.$notify.info({
+      key,
+      message: 'Making transaction...',
+      description: '',
+      duration: 0
+    })
+
+    claim(conn, wallet, this.pool, userBaseTokenAccount, userQuoteTokenAccount)
+      .then((txid) => {
+        this.$notify.info({
+          key,
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Claim`
+        this.$accessor.transaction.sub({ txid, description })
+      })
+      .catch((error) => {
+        this.$notify.error({
+          key,
+          message: 'Claim failed',
           description: error.message
         })
       })
@@ -376,11 +463,26 @@ hr {
   .status {
     margin-left: 16px;
 
-    .upcoming {
+    .upcoming,
+    .open,
+    .ended {
       padding: 4px 14px;
       border-radius: 16px;
+    }
+
+    .upcoming {
       background: rgba(90, 196, 190, 0.2);
       border: 1px solid #5ac4be;
+    }
+
+    .open {
+      background: rgba(90, 196, 190, 0.2);
+      border: 1px solid #5ac4be;
+    }
+
+    .ended {
+      background: rgba(194, 0, 251, 0.2);
+      border: 1px solid #c200fb;
     }
   }
 

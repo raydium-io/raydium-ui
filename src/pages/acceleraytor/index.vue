@@ -23,7 +23,7 @@
             <RadioButton value="all">All</RadioButton>
             <RadioButton value="open">Open</RadioButton>
             <RadioButton value="upcoming">Upcoming</RadioButton>
-            <RadioButton value="closed">Closed</RadioButton>
+            <RadioButton value="ended">Ended</RadioButton>
           </RadioGroup>
         </div>
         <div>
@@ -55,17 +55,25 @@
           <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="price, record"> {{ price.format() }} {{ record.quote.symbol }} </span>
+        <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
         <span slot="access" slot-scope="isRayPool" class="access">
           <span v-if="isRayPool" class="ray">
             <span>RAY Pool</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
-        <span slot="raise" slot-scope="raise, record"> {{ raise.format() }} {{ record.base.symbol }} </span>
-        <span slot="progress"> 0.00% </span>
+        <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
+        <span slot="progress" slot-scope="info, pool">
+          {{
+            info.quoteTokenDeposited
+              .toEther()
+              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+              .multipliedBy(100)
+              .toNumber()
+          }}%
+        </span>
         <span slot="status" slot-scope="info" class="status">
-          <span v-if="info.endTime < getUnixTs() / 1000" class="closed"> Closed </span>
+          <span v-if="info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
           <span v-else-if="info.startTime < getUnixTs() / 1000" class="open"> Open </span>
           <span v-else class="upcoming"> Upcoming </span>
         </span>
@@ -123,9 +131,9 @@ export default class AcceleRaytor extends Vue {
 
     if (access !== 'all') {
       if (access === 'ray') {
-        rules.info.isRayPool = true
+        rules.isRayPool = true
       } else {
-        rules.info.isRayPool = false
+        rules.isRayPool = false
       }
     }
 
@@ -242,11 +250,26 @@ export default class AcceleRaytor extends Vue {
   }
 
   .status {
-    .upcoming {
+    .upcoming,
+    .open,
+    .ended {
       padding: 4px 14px;
       border-radius: 16px;
+    }
+
+    .upcoming {
       background: rgba(90, 196, 190, 0.2);
       border: 1px solid #5ac4be;
+    }
+
+    .open {
+      background: rgba(90, 196, 190, 0.2);
+      border: 1px solid #5ac4be;
+    }
+
+    .ended {
+      background: rgba(194, 0, 251, 0.2);
+      border: 1px solid #c200fb;
     }
   }
 }

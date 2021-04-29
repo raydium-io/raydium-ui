@@ -17,7 +17,7 @@ export const mutations = mutationTree(state, {
 
   setSlippage(state, slippage: number) {
     state.slippage = slippage
-    LocalStorage.set('RAY_SLIPPAGE', slippage)
+    LocalStorage.set('RAYDIUM_SLIPPAGE', slippage)
   }
 })
 

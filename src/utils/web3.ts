@@ -6,18 +6,19 @@ import {
   PublicKey,
   SystemProgram,
   Transaction,
-  TransactionSignature
+  TransactionSignature,
+  TransactionInstruction
 } from '@solana/web3.js'
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
 // eslint-disable-next-line
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
-// export const endpoint = 'https://api.mainnet-beta.solana.com'
-export const endpoint = 'https://solana-api.projectserum.com'
+export const endpoint = 'https://api.mainnet-beta.solana.com'
+// export const endpoint = 'https://solana-api.projectserum.com'
 
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
@@ -113,6 +114,62 @@ export async function createProgramAccountIfNotExist(
   }
 
   return publicKey
+}
+
+export async function createAssociatedTokenAccount(
+  tokenMintAddress: PublicKey,
+  owner: PublicKey,
+  transaction: Transaction
+) {
+  const associatedTokenAddress = await findAssociatedTokenAddress(owner, tokenMintAddress)
+
+  const keys = [
+    {
+      pubkey: owner,
+      isSigner: true,
+      isWritable: true
+    },
+    {
+      pubkey: associatedTokenAddress,
+      isSigner: false,
+      isWritable: true
+    },
+    {
+      pubkey: owner,
+      isSigner: false,
+      isWritable: false
+    },
+    {
+      pubkey: tokenMintAddress,
+      isSigner: false,
+      isWritable: false
+    },
+    {
+      pubkey: SYSTEM_PROGRAM_ID,
+      isSigner: false,
+      isWritable: false
+    },
+    {
+      pubkey: TOKEN_PROGRAM_ID,
+      isSigner: false,
+      isWritable: false
+    },
+    {
+      pubkey: RENT_PROGRAM_ID,
+      isSigner: false,
+      isWritable: false
+    }
+  ]
+
+  transaction.add(
+    new TransactionInstruction({
+      keys,
+      programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+      data: Buffer.from([])
+    })
+  )
+
+  return associatedTokenAddress
 }
 
 export async function getFilteredProgramAccounts(

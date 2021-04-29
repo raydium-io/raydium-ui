@@ -87,6 +87,7 @@ export default class Wallet extends Vue {
   priceTimer: number | undefined = undefined
   liquidityTimer: number | undefined = undefined
   farmTimer: number | undefined = undefined
+  idoTimer: number | undefined = undefined
   // web3 listener
   walletListenerId = null as number | null
 
@@ -107,6 +108,10 @@ export default class Wallet extends Vue {
     return this.$accessor.farm
   }
 
+  get ido() {
+    return this.$accessor.ido
+  }
+
   /* ========== LIFECYCLE ========== */
   async beforeMount() {
     await this.$accessor.price.requestPrices()
@@ -118,6 +123,7 @@ export default class Wallet extends Vue {
     this.setPriceTimer()
     this.setLiquidityTimer()
     this.setFarmTimer()
+    this.setIdoTimer()
   }
 
   beforeDestroy() {
@@ -125,6 +131,7 @@ export default class Wallet extends Vue {
     window.clearInterval(this.priceTimer)
     window.clearInterval(this.liquidityTimer)
     window.clearInterval(this.farmTimer)
+    window.clearInterval(this.idoTimer)
   }
 
   /* ========== WATCH ========== */
@@ -317,6 +324,19 @@ export default class Wallet extends Vue {
           this.$accessor.farm.setCountdown(this.$accessor.farm.countdown + 1)
           if (this.farm.countdown === this.farm.autoRefreshTime) {
             await this.$accessor.farm.requestInfos()
+          }
+        }
+      }
+    }, 1000)
+  }
+
+  setIdoTimer() {
+    this.idoTimer = window.setInterval(async () => {
+      if (!this.ido.loading) {
+        if (this.ido.countdown < this.ido.autoRefreshTime) {
+          this.$accessor.ido.setCountdown(this.$accessor.ido.countdown + 1)
+          if (this.ido.countdown === this.ido.autoRefreshTime) {
+            await this.$accessor.ido.requestInfos()
           }
         }
       }
