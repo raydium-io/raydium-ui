@@ -83,7 +83,21 @@
             <span class="desc"> Your share </span>
           </div>
           <div class="state">
-            <span class="value"> 0 {{ pool.base.symbol }} </span>
+            <span class="value">
+              {{
+                pool.userInfo && pool.userInfo.deposited
+                  ? gt(pool.info.quoteTokenDeposited.wei, pool.raise.wei.multipliedBy(pool.price.toEther()))
+                    ? new TokenAmount(
+                        pool.userInfo.deposited.wei
+                          .dividedBy(pool.info.quoteTokenDeposited.wei)
+                          .multipliedBy(pool.raise.wei),
+                        pool.base.decimals
+                      ).format()
+                    : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
+                  : 0
+              }}
+              {{ pool.base.symbol }}
+            </span>
             <span class="desc"> Your allocation </span>
           </div>
         </div>
@@ -271,7 +285,7 @@ import { get as safeGet } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
 import importIcon from '@/utils/import-icon'
-import { gt, lt } from '@/utils/safe-math'
+import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { IdoPool, purchase, claim } from '@/utils/ido'
 
 const { TabPane } = Tabs
@@ -342,6 +356,7 @@ export default class AcceleRaytor extends Vue {
   safeGet = safeGet
   getUnixTs = getUnixTs
   importIcon = importIcon
+  TokenAmount = TokenAmount
   gt = gt
   lt = lt
 
