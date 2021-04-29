@@ -90,14 +90,12 @@
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
-              convertEnabledTo = false
+              convertDestination = 'to'
               fixedFromCoin = true
             }
           "
-          @onBlur="convertEnabledTo = true"
           @onMax="
             () => {
-              convertEnabledTo = false
               fixedFromCoin = true
               fromCoinAmount = fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0'
             }
@@ -121,14 +119,12 @@
           @onInput="(amount) => (toCoinAmount = amount)"
           @onFocus="
             () => {
-              convertEnabledFrom = false
+              convertDestination = 'from'
               fixedFromCoin = false
             }
           "
-          @onBlur="convertEnabledFrom = true"
           @onMax="
             () => {
-              convertEnabledFrom = true
               fixedFromCoin = false
               toCoinAmount = toCoin.balance.fixed()
             }
@@ -266,8 +262,7 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      convertEnabledFrom: true,
-      convertEnabledTo: true,
+      convertDestination: 'from', // which direction we are converting to
 
       // wrap
       isWrap: false,
@@ -298,8 +293,8 @@ export default Vue.extend({
           return
         }
 
-        if (!this.convertEnabledFrom) {
-          // The user has focus on the "to" coin, so they are updating the value they wish to receive
+        if (this.convertDestination === 'from') {
+          // The user has focus on the "to" coin and wants to convert to "from".
           // To prevent the coins from swapping back and forth and having a vue-watcher loop, disable.
           return
         }
@@ -316,8 +311,8 @@ export default Vue.extend({
           return
         }
 
-        if (!this.convertEnabledTo) {
-          // The user has focus on the "from" coin, so they are updating the value they wish to receive
+        if (this.convertDestination === 'to') {
+          // The user has focus on the "to" coin and wants to convert to "from".
           // To prevent the coins from swapping back and forth and having a vue-watcher loop, disable.
           return
         }

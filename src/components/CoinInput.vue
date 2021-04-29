@@ -19,7 +19,6 @@
         :disabled="disabled"
         @input="$emit('onInput', $event.target.value)"
         @focus="$emit('onFocus')"
-        @blur="$emit('onBlur')"
       />
       <button
         v-if="showMax && balance && (!value || lt(value, balance.toEther()))"
