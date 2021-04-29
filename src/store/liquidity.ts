@@ -101,9 +101,7 @@ export const actions = actionTree(
             switch (key) {
               case 'poolCoinTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
-
                 poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(Number(parsed.amount))
-
                 break
               }
               case 'poolPcTokenAccount': {
