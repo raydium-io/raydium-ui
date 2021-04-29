@@ -17,8 +17,8 @@ import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
-export const endpoint = 'https://api.mainnet-beta.solana.com'
-// export const endpoint = 'https://solana-api.projectserum.com'
+// export const endpoint = 'https://api.mainnet-beta.solana.com'
+export const endpoint = 'https://solana-api.projectserum.com'
 
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
