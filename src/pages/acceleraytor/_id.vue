@@ -132,9 +132,6 @@
         >
           Claim
         </Button>
-        <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
-          Wallet not eligible for this pool
-        </Button>
         <Button
           v-else-if="pool.info.startTime < getUnixTs() / 1000"
           size="large"
