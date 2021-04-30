@@ -19,9 +19,9 @@ import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
 export const endpoints = [
-  { url: 'https://raydium.rpcpool.com', weight: 80 },
+  { url: 'https://raydium.rpcpool.com', weight: 90 },
   { url: 'https://api.mainnet-beta.solana.com', weight: 5 },
-  { url: 'https://solana-api.projectserum.com', weight: 15 }
+  { url: 'https://solana-api.projectserum.com', weight: 5 }
 ]
 
 export function getRandomEndpoint() {
