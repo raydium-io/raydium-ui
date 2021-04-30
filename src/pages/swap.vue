@@ -90,7 +90,6 @@
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
-              convertDestination = 'to'
               fixedFromCoin = true
             }
           "
@@ -115,11 +114,10 @@
           :coin-name="toCoin ? toCoin.symbol : ''"
           :balance="toCoin ? toCoin.balance : null"
           :show-max="false"
-          :disabled="!toCoin || !fromCoin"
+          :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
           @onFocus="
             () => {
-              convertDestination = 'from'
               fixedFromCoin = false
             }
           "
@@ -262,8 +260,6 @@ export default Vue.extend({
       fromCoinAmount: '',
       toCoinAmount: '',
 
-      convertDestination: 'from', // which direction we are converting to
-
       // wrap
       isWrap: false,
       // serum
@@ -288,36 +284,10 @@ export default Vue.extend({
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
-          // The user input was invalid (not a number), reset it to the previous valid amount
           this.fromCoinAmount = oldAmount
-          return
-        }
-
-        if (this.convertDestination === 'from') {
-          // The user has focus on the "to" coin and wants to convert to "from".
-          // To prevent the coins from swapping back and forth and having a vue-watcher loop, disable.
-          return
-        }
-
-        this.updateAmounts()
-      })
-    },
-
-    toCoinAmount(newAmount: string) {
-      this.$nextTick(() => {
-        if (!inputRegex.test(escapeRegExp(newAmount))) {
-          // The user input was invalid (not a number), recalculate the "to" price from the "from"
+        } else {
           this.updateAmounts()
-          return
         }
-
-        if (this.convertDestination === 'to') {
-          // The user has focus on the "to" coin and wants to convert to "from".
-          // To prevent the coins from swapping back and forth and having a vue-watcher loop, disable.
-          return
-        }
-
-        this.updateToVSFrom()
       })
     },
 
@@ -591,62 +561,6 @@ export default Vue.extend({
       } else {
         this.toCoinAmount = ''
       }
-    },
-    updateToVSFrom() {
-      if (this.toCoin && this.fromCoin && this.isWrap && this.toCoinAmount) {
-        this.fromCoinAmount = this.toCoinAmount
-        return // we are wrapping a coin, should be the same amount
-      }
-
-      if (this.toCoin && this.fromCoin && this.lpMintAddress && this.toCoinAmount) {
-        const { amountOut } = getSwapOutAmount(
-          get(this.liquidity.infos, this.lpMintAddress),
-          this.toCoin.mintAddress,
-          this.fromCoin.mintAddress,
-          this.toCoinAmount,
-          this.setting.slippage
-        )
-
-        if (amountOut.isNullOrZero()) {
-          this.fromCoinAmount = ''
-          return // no result received
-        }
-
-        this.fromCoinAmount = amountOut.fixed()
-        return
-      }
-
-      if (
-        this.toCoin &&
-        this.fromCoin &&
-        this.marketAddress &&
-        this.market &&
-        this.asks &&
-        this.bids &&
-        this.toCoinAmount
-      ) {
-        const { amountOut } = getOutAmount(
-          this.market,
-          this.asks,
-          this.bids,
-          this.toCoin.mintAddress,
-          this.fromCoin.mintAddress,
-          this.toCoinAmount,
-          this.setting.slippage
-        )
-
-        const out = new TokenAmount(amountOut, this.fromCoin.decimals, false)
-
-        if (out.isNullOrZero()) {
-          this.toCoinAmount = ''
-          return // no result received
-        }
-
-        this.fromCoinAmount = out.fixed()
-        return
-      }
-
-      this.fromCoinAmount = ''
     },
 
     setMarketTimer() {
