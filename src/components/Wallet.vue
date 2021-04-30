@@ -42,7 +42,7 @@ import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
-import { endpoint, commitment } from '@/utils/web3'
+import { getRandomEndpoint, commitment } from '@/utils/web3'
 import {
   WalletAdapter,
   SolongWalletAdapter,
@@ -141,6 +141,7 @@ export default class Wallet extends Vue {
 
   connect(walletName: string) {
     let wallet: WalletAdapter
+    const endpoint = getRandomEndpoint()
 
     switch (walletName) {
       case 'Ledger': {

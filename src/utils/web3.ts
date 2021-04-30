@@ -12,13 +12,22 @@ import {
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
+import logger from '@/utils/logger'
 // eslint-disable-next-line
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
+export const endpoints = ['https://api.mainnet-beta.solana.com', 'https://solana-api.projectserum.com']
+
+export function getRandomEndpoint() {
+  const endpoint = Math.random() > 0.5 ? endpoints[0] : endpoints[1]
+  logger(`using ${endpoint}`)
+  return endpoint
+}
+
 // export const endpoint = 'https://api.mainnet-beta.solana.com'
-export const endpoint = 'https://solana-api.projectserum.com'
+// export const endpoint = 'https://solana-api.projectserum.com'
 
 export const commitment: Commitment = 'confirmed'
 // export const commitment = 'finalized'
