@@ -27,18 +27,21 @@ export const endpoints = [
 export function getRandomEndpoint() {
   let pointer = 0
   const random = Math.random() * 100
+  let api = ''
 
   for (const endpoint of endpoints) {
     if (random > pointer + endpoint.weight) {
       pointer += pointer + endpoint.weight
     } else if (random >= pointer && random < pointer + endpoint.weight) {
-      logger(`${random} using ${endpoint.url}`)
-      return endpoint.url
+      api = endpoint.url
     } else {
       logger(`${random} using ${endpoint.url}`)
-      return endpoint.url
+      api = endpoint.url
     }
   }
+
+  logger(`using ${api}`)
+  return api
 }
 
 // export const commitment: Commitment = 'processed'
