@@ -18,10 +18,14 @@ import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
-export const endpoints = ['https://api.mainnet-beta.solana.com', 'https://solana-api.projectserum.com']
+export const endpoints = [
+  'https://raydium.rpcpool.com',
+  'https://api.mainnet-beta.solana.com',
+  'https://solana-api.projectserum.com'
+]
 
 export function getRandomEndpoint() {
-  const endpoint = Math.random() > 0.5 ? endpoints[0] : endpoints[1]
+  const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)]
   logger(`using ${endpoint}`)
   return endpoint
 }
