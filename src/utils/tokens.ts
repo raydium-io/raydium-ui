@@ -750,5 +750,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
     decimals: TOKENS.STEP.decimals
+  },
+  'MEDIA-USDC-V4': {
+    symbol: 'MEDIA-USDC',
+    name: 'MEDIA-USDC LP',
+    coin: { ...TOKENS.MEDIA },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'A5zanvgtioZGiJMdEyaKN4XQmJsp1p7uVxaq2696REvQ',
+    decimals: TOKENS.MEDIA.decimals
   }
 }
