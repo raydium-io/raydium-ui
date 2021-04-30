@@ -110,7 +110,7 @@
             <div @click="value = pool.info.maxDepositLimit.fixed()">MAX</div>
           </div>
         </div>
-        <div class="deposit">
+        <div v-if="pool.info.endTime > getUnixTs() / 1000" class="deposit">
           <div class="label fs-container">
             <span>Deposit</span>
             <span>
@@ -643,7 +643,7 @@ hr {
   }
 
   .deposit {
-    margin: 24px 0;
+    margin-top: 24px;
     padding: 16px;
     border: 1px solid rgba(241, 241, 242, 0.75);
     border-radius: 4px;
@@ -697,6 +697,7 @@ hr {
   }
 
   button {
+    margin-top: 24px;
     width: 100%;
   }
 }

@@ -19,22 +19,36 @@ import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
 export const endpoints = [
-  'https://raydium.rpcpool.com',
-  'https://api.mainnet-beta.solana.com',
-  'https://solana-api.projectserum.com'
+  { url: 'https://raydium.rpcpool.com', weight: 60 },
+  { url: 'https://api.mainnet-beta.solana.com', weight: 20 },
+  { url: 'https://solana-api.projectserum.com', weight: 20 }
 ]
 
 export function getRandomEndpoint() {
-  const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)]
-  logger(`using ${endpoint}`)
-  return endpoint
+  let pointer = 0
+  const random = Math.random() * 100
+  let api = endpoints[0].url
+
+  for (const endpoint of endpoints) {
+    if (random > pointer + endpoint.weight) {
+      pointer += pointer + endpoint.weight
+    } else if (random >= pointer && random < pointer + endpoint.weight) {
+      api = endpoint.url
+      break
+    } else {
+      logger(`${random} using ${endpoint.url}`)
+      api = endpoint.url
+      break
+    }
+  }
+
+  logger(`using ${api}`)
+  return api
 }
 
-// export const endpoint = 'https://api.mainnet-beta.solana.com'
-// export const endpoint = 'https://solana-api.projectserum.com'
-
+// export const commitment: Commitment = 'processed'
 export const commitment: Commitment = 'confirmed'
-// export const commitment = 'finalized'
+// export const commitment: Commitment = 'finalized'
 
 export async function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
   const [publicKey, nonce] = await PublicKey.findProgramAddress(seeds, programId)
