@@ -145,8 +145,9 @@
           size="large"
           ghost
           disabled
+          style="font-size: 13px"
         >
-          Wait
+          Claim after {{ $dayjs(pool.info.startWithdrawTime * 1000) }}
         </Button>
         <Button
           v-else-if="pool.info.endTime < getUnixTs() / 1000"
