@@ -43,7 +43,7 @@ export function getRandomEndpoint() {
   }
 
   logger(`using ${api}`)
-  return 'https://raydium.rpcpool.com'
+  return api
 }
 
 // export const commitment: Commitment = 'processed'
