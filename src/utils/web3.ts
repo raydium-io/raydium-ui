@@ -20,8 +20,8 @@ import { struct } from 'superstruct'
 
 export const endpoints = [
   { url: 'https://raydium.rpcpool.com', weight: 50 },
-  { url: 'https://api.mainnet-beta.solana.com', weight: 10 },
-  { url: 'https://solana-api.projectserum.com', weight: 40 }
+  { url: 'https://api.mainnet-beta.solana.com', weight: 25 },
+  { url: 'https://solana-api.projectserum.com', weight: 25 }
 ]
 
 export function getRandomEndpoint() {
