@@ -225,7 +225,7 @@
             </div>
             <div class="infos flex">
               <span class="key">Total raise</span>
-              <span class="text">{{ pool.raise.format() }} {{ pool.quote.symbol }} </span>
+              <span class="text">{{ pool.raise.format() }} {{ pool.base.symbol }} </span>
             </div>
             <div class="infos flex">
               <span class="key">Price</span>
