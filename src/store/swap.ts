@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market.js'
 import { cloneDeep } from 'lodash-es'
+import { MARKETS } from '@/utils/serum'
 import { getFilteredProgramAccounts } from '@/utils/web3'
 import logger from '@/utils/logger'
 
@@ -37,9 +38,12 @@ export const actions = actionTree(
 
           marketInfos.forEach((marketInfo) => {
             const address = marketInfo.publicKey.toBase58()
-            const { data } = marketInfo.accountInfo
 
-            markets[address] = _MARKET_STATE_LAYOUT_V2.decode(data)
+            if (MARKETS.includes(address)) {
+              const { data } = marketInfo.accountInfo
+
+              markets[address] = _MARKET_STATE_LAYOUT_V2.decode(data)
+            }
           })
 
           commit('setMarkets', markets)
