@@ -373,8 +373,12 @@ export default Vue.extend({
       this.toCoinAmount = ''
       this.fromCoinAmount = ''
 
+      if (!this.fromCoin || !this.toCoin) {
+        return false
+      }
+
       this.fixedCoin = this.fromCoin.mintAddress
-      this.fromCoinAmount = this.fromCoin.balance.fixed()
+      this.fromCoinAmount = this.fromCoin.balance ? this.fromCoin.balance.fixed() : '0'
 
       while (!this.toCoinAmount) {
         // we need to wait till toCoinAmount gets filled via watcher
@@ -383,7 +387,7 @@ export default Vue.extend({
       // logger('fromCoinAmount', this.fromCoinAmount, 'this.fromCoin.balance', this.fromCoin.balance.fixed())
       // logger('toCoinAmount', this.toCoinAmount, 'this.toCoin.balance', this.toCoin.balance.fixed())
 
-      if (gt(this.toCoinAmount, this.toCoin.balance.fixed())) {
+      if (this.toCoin.balance && gt(this.toCoinAmount, this.toCoin.balance.fixed())) {
         // logger(`Insufficient ${this.toCoin.symbol} balance`)
         this.fixedCoin = this.toCoin.mintAddress
         this.fromCoinAmount = '' // reset
@@ -395,10 +399,10 @@ export default Vue.extend({
         }
       }
 
-      if (gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
+      if (!this.fromCoin.balance || gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
         // logger(`Insufficient ${this.fromCoin.symbol} balance`)
         this.$notify.error({
-          key: getUnixTs(),
+          key: getUnixTs().toString(),
           message: 'Add liquidity failed',
           description: 'Cannot set max, due to insufficient balance on to & from coin'
         })

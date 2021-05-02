@@ -17,6 +17,21 @@ export interface TokenInfo {
 
   tokenAccountAddress?: string
   balance?: TokenAmount
+
+  coin?: {
+    symbol: string
+    name: string
+    mintAddress: string
+    decimals: number
+    referrer: string
+  }
+  pc?: {
+    symbol: string
+    name: string
+    mintAddress: string
+    decimals: number
+    referrer: string
+  }
 }
 
 /**

@@ -243,9 +243,9 @@ export default Vue.extend({
     return {
       isMobile: false,
 
-      farms: [] as { farmInfo: FarmInfo; userInfo: any },
+      farms: [] as { farmInfo: FarmInfo; userInfo: any }[],
 
-      lp: null,
+      lp: null as any,
       farmInfo: null as any,
       harvesting: false,
       stakeModalOpening: false,
@@ -253,8 +253,8 @@ export default Vue.extend({
       unstakeModalOpening: false,
       unstaking: false,
 
-      triggerLowerBalanceCoinToMax: {},
-      triggerSupplyLP: {}
+      triggerLowerBalanceCoinToMax: {} as any,
+      triggerSupplyLP: {} as any
     }
   },
 
@@ -420,20 +420,24 @@ export default Vue.extend({
     },
 
     changeTriggerLowerBalanceCoinToMax(farmInfo: FarmInfo) {
-      if (!this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]) {
-        this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = true
+      const lpCoinMintAddress = farmInfo.lp.coin && farmInfo.lp.coin.mintAddress
+      const lpPcMintAddress = farmInfo.lp.pc && farmInfo.lp.pc.mintAddress
+      if (!this.triggerLowerBalanceCoinToMax[`${lpCoinMintAddress}_${lpPcMintAddress}`]) {
+        this.triggerLowerBalanceCoinToMax[`${lpCoinMintAddress}_${lpPcMintAddress}`] = true
       } else {
-        this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = !this
-          .triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]
+        this.triggerLowerBalanceCoinToMax[`${lpCoinMintAddress}_${lpPcMintAddress}`] = !this
+          .triggerLowerBalanceCoinToMax[`${lpCoinMintAddress}_${lpPcMintAddress}`]
       }
     },
 
     changeTriggerSupplyLP(farmInfo: FarmInfo) {
-      if (!this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]) {
-        this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = true
+      const lpCoinMintAddress = farmInfo.lp.coin && farmInfo.lp.coin.mintAddress
+      const lpPcMintAddress = farmInfo.lp.pc && farmInfo.lp.pc.mintAddress
+      if (!this.triggerSupplyLP[`${lpCoinMintAddress}_${lpPcMintAddress}`]) {
+        this.triggerSupplyLP[`${lpCoinMintAddress}_${lpPcMintAddress}`] = true
       } else {
-        this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = !this.triggerSupplyLP[
-          `${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`
+        this.triggerSupplyLP[`${lpCoinMintAddress}_${lpPcMintAddress}`] = !this.triggerSupplyLP[
+          `${lpCoinMintAddress}_${lpPcMintAddress}`
         ]
       }
     },
@@ -516,6 +520,10 @@ export default Vue.extend({
       await this.$accessor.wallet.getTokenAccounts()
       await this.$accessor.farm.requestInfos()
       await sleep(1000)
+      // update liquidity max
+      this.farms.forEach((farm: { farmInfo: FarmInfo }) => {
+        this.changeTriggerLowerBalanceCoinToMax(farm.farmInfo)
+      })
     },
 
     cancelStake() {
@@ -525,7 +533,7 @@ export default Vue.extend({
     },
 
     harvest(farmInfo: FarmInfo) {
-      // logger('harvest farmInfo', JSON.stringify(farmInfo))
+      logger('harvest farmInfo', JSON.stringify(farmInfo, null, 2))
 
       this.farmInfo = cloneDeep(farmInfo)
 
@@ -565,10 +573,9 @@ export default Vue.extend({
           await this.$accessor.transaction.sub({ txid, description })
           // wait till confirmed ^
 
-          // trigger supply LP
-          logger('trigger supply LP')
-
           await sleep(1000)
+
+          // trigger supply LP
           this.changeTriggerSupplyLP(farmInfo)
         })
         .catch((error) => {
@@ -588,9 +595,9 @@ export default Vue.extend({
     onLiquidityProvidingError(error: Error) {
       logger('onLiquidityProvidingError', error)
       this.$notify.error({
-        key: getUnixTs(),
+        key: getUnixTs().toString(),
         message: 'Auto Farm failed',
-        description: error.message || error,
+        description: error.message || error.toString(),
         duration: 0
       })
       this.harvesting = false
@@ -614,15 +621,25 @@ export default Vue.extend({
       // the farmInfo provided by LiqudityProvider has no rewards* in it, so we look it up here
       const farmInfo = this.findFarmInfoByMintAddress(tx.farmInfo.lp.mintAddress)
 
+      if (!farmInfo) {
+        this.$notify.error({
+          key: getUnixTs().toString(),
+          message: 'Stake not possible',
+          description: 'Farm not found: ' + tx.farmInfo.lp.name,
+          duration: 0
+        })
+        return
+      }
+
       logger('found farm info', JSON.stringify(farmInfo))
 
       this.openStakeModal(farmInfo, farmInfo.lp)
 
       await sleep(1000)
 
-      if (isNullOrZero(this.lp.balance.fixed())) {
+      if (!this.lp || isNullOrZero(this.lp.balance.fixed())) {
         this.$notify.error({
-          key: getUnixTs(),
+          key: getUnixTs().toString(),
           message: 'Stake not possible',
           description: 'No LP tokens in your account',
           duration: 0
@@ -633,8 +650,9 @@ export default Vue.extend({
       this.stake(this.lp.balance.fixed())
     },
 
-    findFarmInfoByMintAddress(mintAddress: string): FarmInfo {
-      return this.farms.find((farm: { farmInfo: FarmInfo }) => farm.farmInfo.lp.mintAddress === mintAddress).farmInfo
+    findFarmInfoByMintAddress(mintAddress: string): FarmInfo | undefined {
+      const farm = this.farms.find((farm: { farmInfo: FarmInfo }) => farm.farmInfo.lp.mintAddress === mintAddress)
+      return farm && farm.farmInfo
     }
   }
 })
