@@ -1,7 +1,7 @@
 <template>
-  <div class="liquidity container">
+  <div class="liquidity-provider container">
     <div class="page-head fs-container">
-      <span class="title">Add Liquidity</span>
+      <span class="title">Add liquidity</span>
       <div class="buttons">
         <Tooltip v-if="lpMintAddress" placement="bottomRight">
           <template slot="title">
@@ -71,6 +71,11 @@
 
     <div class="card">
       <div class="card-body">
+        <button class="max-button" :disabled="coinToMaxRunning" @click="onTriggerLowerBalanceCoinToMax">
+          <span v-if="!coinToMaxRunning">Set possible MAX</span>
+          <span v-else>⏳</span>
+        </button>
+
         <CoinInput
           v-model="fromCoinAmount"
           label="Input"
@@ -162,12 +167,6 @@
         </Button>
       </div>
     </div>
-
-    <div class="page-head your-liquidity fs-container">
-      <span class="title">Your Liquidity</span>
-    </div>
-
-    <YourLiquidity @onAdd="setCoinFromMint" />
   </div>
 </template>
 
@@ -189,7 +188,7 @@ import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
-import { getUnixTs } from '@/utils'
+import { getUnixTs, sleep } from '@/utils'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -199,6 +198,14 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress
+  },
+
+  props: {
+    fromCoinMintAddress: { type: String, default: '' },
+    toCoinMintAddress: { type: String, default: '' },
+    shouldSetMaxOnInit: { type: Boolean, default: false },
+    triggerLowerBalanceCoinToMax: { type: Boolean, default: false },
+    triggerSupplyLP: { type: Boolean, default: false }
   },
 
   data() {
@@ -219,12 +226,10 @@ export default Vue.extend({
       lpMintAddress: '',
 
       poolListenerId: null as number | null,
-      lastSubBlock: 0
-    }
-  },
+      lastSubBlock: 0,
 
-  head: {
-    title: 'Raydium Liquidity'
+      coinToMaxRunning: false
+    }
   },
 
   computed: {
@@ -276,15 +281,30 @@ export default Vue.extend({
         this.updateAmounts()
       },
       deep: true
+    },
+
+    triggerLowerBalanceCoinToMax() {
+      this.onTriggerLowerBalanceCoinToMax()
+    },
+
+    triggerSupplyLP() {
+      this.onTriggerSupplyLP()
     }
   },
 
-  mounted() {
+  async mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
     const { from, to } = this.$route.query
     // @ts-ignore
     this.setCoinFromMint(from, to, true)
+
+    if (this.$props.fromCoinMintAddress || this.$props.toCoinMintAddress) {
+      this.setCoinFromMint(this.$props.fromCoinMintAddress, this.$props.toCoinMintAddress, false)
+      if (this.$props.shouldSetMaxOnInit) {
+        await this.setLowerBalanceCoinToMax()
+      }
+    }
   },
 
   methods: {
@@ -346,6 +366,76 @@ export default Vue.extend({
           this.$router.replace({ path: '/liquidity/' })
         }
       }
+    },
+
+    async setLowerBalanceCoinToMax(): Promise<boolean> {
+      // reset both, otherwise a second cann would not wait till its filled in while loop
+      this.toCoinAmount = ''
+      this.fromCoinAmount = ''
+
+      if (!this.fromCoin || !this.toCoin) {
+        return false
+      }
+
+      this.fixedCoin = this.fromCoin.mintAddress
+      this.fromCoinAmount = this.fromCoin.balance ? this.fromCoin.balance.fixed() : '0'
+
+      while (!this.toCoinAmount) {
+        // we need to wait till toCoinAmount gets filled via watcher
+        await sleep(100)
+      }
+      // logger('fromCoinAmount', this.fromCoinAmount, 'this.fromCoin.balance', this.fromCoin.balance.fixed())
+      // logger('toCoinAmount', this.toCoinAmount, 'this.toCoin.balance', this.toCoin.balance.fixed())
+
+      if (this.toCoin.balance && gt(this.toCoinAmount, this.toCoin.balance.fixed())) {
+        // logger(`Insufficient ${this.toCoin.symbol} balance`)
+        this.fixedCoin = this.toCoin.mintAddress
+        this.fromCoinAmount = '' // reset
+        this.toCoinAmount = this.toCoin.balance.fixed()
+
+        while (!this.fromCoinAmount) {
+          // we need to wait till fromCoinAmount gets filled via watcher
+          await sleep(100)
+        }
+      }
+
+      if (!this.fromCoin.balance || gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
+        // logger(`Insufficient ${this.fromCoin.symbol} balance`)
+        this.$notify.error({
+          key: getUnixTs().toString(),
+          message: 'Add liquidity failed',
+          description: 'Cannot set max, due to insufficient balance on to & from coin'
+        })
+        this.$emit('onError', new Error('Cannot set max, due to insufficient balance on to & from coin'))
+        this.coinToMaxRunning = false
+        return false
+      }
+
+      // logger('✅ set amount to max for', getTokenByMintAddress(this.fixedCoin)?.symbol)
+      this.coinToMaxRunning = false
+      return true
+    },
+
+    async onTriggerLowerBalanceCoinToMax(): Promise<boolean> {
+      this.coinToMaxRunning = true
+      // update wallet
+      await this.$accessor.wallet.getTokenAccounts()
+
+      // update pools first
+      await this.$accessor.liquidity.requestInfos()
+      await sleep(500)
+      return await this.setLowerBalanceCoinToMax()
+    },
+
+    async onTriggerSupplyLP() {
+      const success = await this.onTriggerLowerBalanceCoinToMax()
+      if (!success) {
+        // end, error gets already $emit + $notify inside the function
+        return
+      }
+      // supply LP
+      logger('supply LP...')
+      this.supply()
     },
 
     changeCoinAmountPosition() {
@@ -432,7 +522,7 @@ export default Vue.extend({
     },
 
     onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
-      logger('onPoolChange')
+      // logger('onPoolChange')
 
       const { slot } = context
 
@@ -450,7 +540,7 @@ export default Vue.extend({
 
         this.poolListenerId = conn.onAccountChange(new PublicKey(poolInfo.ammQuantities), this.onPoolChange, commitment)
 
-        logger('subPoolChange', poolInfo.lp.symbol)
+        // logger('subPoolChange', poolInfo.lp.symbol)
       }
     },
 
@@ -460,7 +550,7 @@ export default Vue.extend({
 
         conn.removeAccountChangeListener(this.poolListenerId)
 
-        logger('unsubPoolChange')
+        // logger('unsubPoolChange')
       }
     },
 
@@ -481,112 +571,10 @@ export default Vue.extend({
       const key = getUnixTs().toString()
       this.$notify.info({
         key,
-        message: 'Making transaction...',
+        message: 'Making supply transaction...',
         description: '',
         duration: 0
       })
-
-      logger(
-        'add liquidity',
-        JSON.stringify({
-          poolInfo,
-          fromCoinAccount,
-          toCoinAccount,
-          lpAccount,
-          fromCoin: this.fromCoin,
-          toCoin: this.toCoin,
-          fromCoinAmount: this.fromCoinAmount,
-          toCoinAmount: this.toCoinAmount,
-          fixedCoin: this.fixedCoin
-        })
-      )
-
-      // const stepFarm = {
-      //   poolInfo: {
-      //     name: 'STEP-USDC',
-      //     coin: {
-      //       symbol: 'STEP',
-      //       name: 'STEP',
-      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //       decimals: 9,
-      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
-      //       balance: { decimals: 9, _decimals: '1000000000', wei: '13406266428736201' }
-      //     },
-      //     pc: {
-      //       symbol: 'USDC',
-      //       name: 'USDC',
-      //       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //       decimals: 6,
-      //       referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
-      //       balance: { decimals: 6, _decimals: '1000000', wei: '90970145059098' }
-      //     },
-      //     lp: {
-      //       symbol: 'STEP-USDC',
-      //       name: 'STEP-USDC LP',
-      //       coin: {
-      //         symbol: 'STEP',
-      //         name: 'STEP',
-      //         mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //         decimals: 9,
-      //         referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //       },
-      //       pc: {
-      //         symbol: 'USDC',
-      //         name: 'USDC',
-      //         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //         decimals: 6,
-      //         referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
-      //       },
-      //       mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
-      //       decimals: 9,
-      //       totalSupply: { decimals: 9, _decimals: '1000000000', wei: '2845973147894810' }
-      //     },
-      //     version: 4,
-      //     programId: '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
-      //     ammId: '4Sx1NLrQiK4b9FdLKe2DhQ9FHvRzJhzKN3LoD6BrEPnf',
-      //     ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
-      //     ammOpenOrders: 'EXgME2sUuzBxEc2wuyoSZ8FZNZMC3ChhZgFZRAW3nCQG',
-      //     ammTargetOrders: '78bwAGKJjaiPQqmwKmbj4fhrRTLAdzwqNwpFdpTzrhk1',
-      //     ammQuantities: '11111111111111111111111111111111',
-      //     poolCoinTokenAccount: '8Gf8Cc6yrxtfUZqM2vf2kg5uR9bGPfCHfzdYRVBAJSJj',
-      //     poolPcTokenAccount: 'ApLc86fHjVbGbU9QFzNPNuWM5VYckZM92q6sgJN1SGYn',
-      //     poolWithdrawQueue: '5bzBcB7cnJYGYvGPFxKcZETn6sGAyBbXgFhUbefbagYh',
-      //     poolTempLpTokenAccount: 'CpfWKDYNYfvgk42tqR8HEHUWohGSJjASXfRBm3yaKJre',
-      //     serumProgramId: '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin',
-      //     serumMarket: '97qCB4cAVSTthvJu3eNoEx6AY6DLuRDtCoPm5Tdyg77S',
-      //     serumBids: '5Xdpf7CMGFDkJj1smcVQAAZG6GY9gqAns18QLKbPZKsw',
-      //     serumAsks: '6Tqwg8nrKJrcqsr4zR9wJuPv3iXsHAMN65FxwJ3RMH8S',
-      //     serumEventQueue: '5frw4m8pEZHorTKVzmMzvf8xLUrj65vN7wA57KzaZFK3',
-      //     serumCoinVaultAccount: 'CVNye3Xr9Jv26c8TVqZZHq4F43BhoWWfmrzyp1M9YA67',
-      //     serumPcVaultAccount: 'AnGbReAhCDFkR83nB8mXTDX5dQJFB8Pwicu6pGMfCLjt',
-      //     serumVaultSigner: 'FbwU5U1Doj2PSKRJi7pnCny4dFPPJURwALkFhHwdHaMW',
-      //     fees: { swapFeeNumerator: 3, swapFeeDenominator: 1000 }
-      //   },
-      //   fromCoinAccount: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
-      //   toCoinAccount: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
-      //   lpAccount: 'HtJhjCUjXVUVFwuL3sKmGnhLEoKy6qSyNfdzQMwUYxo5',
-      //   fromCoin: {
-      //     symbol: 'STEP',
-      //     name: 'STEP',
-      //     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //     decimals: 9,
-      //     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
-      //     tokenAccountAddress: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
-      //     balance: { decimals: 9, _decimals: '1000000000', wei: '21614559111' }
-      //   },
-      //   toCoin: {
-      //     symbol: 'USDC',
-      //     name: 'USDC',
-      //     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //     decimals: 6,
-      //     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
-      //     tokenAccountAddress: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
-      //     balance: { decimals: 6, _decimals: '1000000', wei: '65387551' }
-      //   },
-      //   fromCoinAmount: '9.732522',
-      //   toCoinAmount: '65.387551',
-      //   fixedCoin: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-      // }
 
       addLiquidity(
         conn,
@@ -601,7 +589,7 @@ export default Vue.extend({
         this.toCoinAmount,
         this.fixedCoin
       )
-        .then((txid) => {
+        .then(async (txid) => {
           this.$notify.info({
             key,
             message: 'Transaction has been sent',
@@ -613,7 +601,18 @@ export default Vue.extend({
           })
 
           const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
-          this.$accessor.transaction.sub({ txid, description })
+          await this.$accessor.transaction.sub({ txid, description })
+
+          // notify parent
+          this.$emit('onLiquidityAdded', {
+            txid,
+            description,
+            fromCoinAmount: this.fromCoinAmount,
+            fromCoinSymbol: this.fromCoin?.symbol,
+            toCoinAmount: this.toCoinAmount,
+            toCoinSymbol: this.toCoin?.symbol,
+            farmInfo: poolInfo
+          })
         })
         .catch((error) => {
           this.$notify.error({
@@ -621,6 +620,9 @@ export default Vue.extend({
             message: 'Add liquidity failed',
             description: error.message
           })
+
+          // notify parent
+          this.$emit('onError', error)
         })
         .finally(() => {
           this.suppling = false
@@ -631,33 +633,58 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.liquidity.container {
-  max-width: 450px;
+.liquidity-provider.container {
+  padding: 0;
 
-  .your-liquidity {
-    margin-top: 40px !important;
-  }
+  .page-head {
+    margin: 10px 0;
 
-  .add-icon {
-    div {
-      height: 32px;
-      width: 32px;
-      border-radius: 50%;
-      background: #000829;
+    .title {
+      font-size: 16px;
     }
   }
-}
-</style>
 
-<style lang="less">
-.ant-alert-warning {
-  width: 500px;
-  margin-top: 30px;
-  background-color: transparent;
-  border: 1px solid #85858d;
+  .card {
+    .card-body {
+      padding-top: 14px;
 
-  .anticon-close {
-    color: #fff;
+      .max-button {
+        border: none;
+        background-color: transparent;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+        border-radius: 4px;
+        white-space: nowrap;
+        cursor: pointer;
+        height: 32px;
+        padding: 0 16px;
+        color: @primary-color;
+
+        &:active,
+        &:focus,
+        &:hover {
+          outline: 0;
+        }
+
+        &:hover {
+          background-color: @modal-header-bg;
+        }
+
+        &:disabled {
+          cursor: progress;
+        }
+      }
+
+      .add-icon {
+        div {
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          background: #000829;
+        }
+      }
+    }
   }
 }
 </style>

@@ -1,6 +1,6 @@
 {
   "name": "raydium-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -10,7 +10,10 @@
     "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{less,vue}\" --ignore-path .gitignore",
     "lint": "yarn lint:js && yarn lint:style",
-    "test": "jest"
+    "test": "jest",
+    "version:patch": "npm version patch && git push && git push --tags",
+    "version:minor": "npm version minor && git push && git push --tags",
+    "version:major": "npm version major && git push && git push --tags"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint",

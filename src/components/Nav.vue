@@ -37,7 +37,8 @@ export default class Nav extends Vue {
     fusion: false,
     staking: false,
     acceleRaytor: false,
-    migrate: false
+    migrate: false,
+    autoFarm: false
     // info: false
   }
 
