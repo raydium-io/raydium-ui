@@ -193,7 +193,9 @@
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
-          <template v-else-if="gt(fromCoinAmount, swap.fromCoin && swap.fromCoin.balance ? swap.fromCoin.balance.fixed() : '0')">
+          <template
+            v-else-if="gt(fromCoinAmount, swap.fromCoin && swap.fromCoin.balance ? swap.fromCoin.balance.fixed() : '0')"
+          >
             Insufficient {{ swap.fromCoin.symbol }} balance
           </template>
           <template v-else-if="swap.fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)">
@@ -343,6 +345,7 @@ export default Vue.extend({
       }
 
       this.coinSelectShow = false
+      this.findMarket()
     },
 
     changeCoinPosition() {
@@ -352,6 +355,7 @@ export default Vue.extend({
       this.setToCoin(tempFromCoin)
 
       this.changeCoinAmountPosition()
+      this.findMarket()
     },
 
     changeCoinAmountPosition() {
@@ -378,6 +382,8 @@ export default Vue.extend({
           this.setToCoin({ ...this.swap.toCoin, ...toCoin })
         }
       }
+
+      this.findMarket()
     },
     findMarket() {
       if (this.swap.fromCoin && this.swap.toCoin) {
