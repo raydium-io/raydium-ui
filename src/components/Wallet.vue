@@ -126,14 +126,6 @@ export default class Wallet extends Vue {
     this.setIdoTimer()
   }
 
-  beforeDestroy() {
-    window.clearInterval(this.walletTimer)
-    window.clearInterval(this.priceTimer)
-    window.clearInterval(this.liquidityTimer)
-    window.clearInterval(this.farmTimer)
-    window.clearInterval(this.idoTimer)
-  }
-
   mounted() {
     // automatically connect wallet after page refresh if user already connected
     if (this.wallet.walletName) {
@@ -144,6 +136,14 @@ export default class Wallet extends Vue {
         this.$accessor.wallet.setDisconnected()
       }
     }
+  }
+
+  beforeDestroy() {
+    window.clearInterval(this.walletTimer)
+    window.clearInterval(this.priceTimer)
+    window.clearInterval(this.liquidityTimer)
+    window.clearInterval(this.farmTimer)
+    window.clearInterval(this.idoTimer)
   }
 
   /* ========== WATCH ========== */
