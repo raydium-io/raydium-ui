@@ -300,13 +300,8 @@ export default Vue.extend({
     this.setCoinFromMint(from, to, true)
 
     if (this.$props.fromCoinMintAddress || this.$props.toCoinMintAddress) {
-      logger('LiquidityProvider mounted with from and to coin mint addresses', {
-        fromCoinMintAddress: this.$props.fromCoinMintAddress,
-        toCoinMintAddress: this.$props.toCoinMintAddress
-      })
       this.setCoinFromMint(this.$props.fromCoinMintAddress, this.$props.toCoinMintAddress, false)
       if (this.$props.shouldSetMaxOnInit) {
-        logger('LiquidityProvider mount shouldSetMaxOnInit')
         await this.setLowerBalanceCoinToMax()
       }
     }
@@ -389,7 +384,7 @@ export default Vue.extend({
       // logger('toCoinAmount', this.toCoinAmount, 'this.toCoin.balance', this.toCoin.balance.fixed())
 
       if (gt(this.toCoinAmount, this.toCoin.balance.fixed())) {
-        logger(`Insufficient ${this.toCoin.symbol} balance`)
+        // logger(`Insufficient ${this.toCoin.symbol} balance`)
         this.fixedCoin = this.toCoin.mintAddress
         this.fromCoinAmount = '' // reset
         this.toCoinAmount = this.toCoin.balance.fixed()
@@ -401,7 +396,7 @@ export default Vue.extend({
       }
 
       if (gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
-        logger(`Insufficient ${this.fromCoin.symbol} balance`)
+        // logger(`Insufficient ${this.fromCoin.symbol} balance`)
         this.$notify.error({
           key: getUnixTs(),
           message: 'Add liquidity failed',
@@ -412,13 +407,12 @@ export default Vue.extend({
         return false
       }
 
-      logger('✅ set amount to max for', getTokenByMintAddress(this.fixedCoin)?.symbol)
+      // logger('✅ set amount to max for', getTokenByMintAddress(this.fixedCoin)?.symbol)
       this.coinToMaxRunning = false
       return true
     },
 
     async onTriggerLowerBalanceCoinToMax(): Promise<boolean> {
-      logger('onTriggerLowerBalanceCoinToMax')
       this.coinToMaxRunning = true
       // update wallet
       await this.$accessor.wallet.getTokenAccounts()
@@ -430,9 +424,6 @@ export default Vue.extend({
     },
 
     async onTriggerSupplyLP() {
-      logger('onTriggerSupply')
-      logger('LiquidityProvider mount shouldSetMaxOnInit')
-
       const success = await this.onTriggerLowerBalanceCoinToMax()
       if (!success) {
         // end, error gets already $emit + $notify inside the function
@@ -452,8 +443,6 @@ export default Vue.extend({
     },
 
     updateCoinInfo(tokenAccounts: any) {
-      logger('updateCoinInfo', tokenAccounts)
-
       if (this.fromCoin) {
         const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
 
@@ -529,7 +518,7 @@ export default Vue.extend({
     },
 
     onPoolChange(_accountInfo: AccountInfo<Buffer>, context: Context): void {
-      logger('onPoolChange')
+      // logger('onPoolChange')
 
       const { slot } = context
 
@@ -547,7 +536,7 @@ export default Vue.extend({
 
         this.poolListenerId = conn.onAccountChange(new PublicKey(poolInfo.ammQuantities), this.onPoolChange, commitment)
 
-        logger('subPoolChange', poolInfo.lp.symbol)
+        // logger('subPoolChange', poolInfo.lp.symbol)
       }
     },
 
@@ -557,7 +546,7 @@ export default Vue.extend({
 
         conn.removeAccountChangeListener(this.poolListenerId)
 
-        logger('unsubPoolChange')
+        // logger('unsubPoolChange')
       }
     },
 
@@ -582,108 +571,6 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
-
-      logger(
-        'add liquidity',
-        JSON.stringify({
-          poolInfo,
-          fromCoinAccount,
-          toCoinAccount,
-          lpAccount,
-          fromCoin: this.fromCoin,
-          toCoin: this.toCoin,
-          fromCoinAmount: this.fromCoinAmount,
-          toCoinAmount: this.toCoinAmount,
-          fixedCoin: this.fixedCoin
-        })
-      )
-
-      // const stepFarm = {
-      //   poolInfo: {
-      //     name: 'STEP-USDC',
-      //     coin: {
-      //       symbol: 'STEP',
-      //       name: 'STEP',
-      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //       decimals: 9,
-      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
-      //       balance: { decimals: 9, _decimals: '1000000000', wei: '13406266428736201' }
-      //     },
-      //     pc: {
-      //       symbol: 'USDC',
-      //       name: 'USDC',
-      //       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //       decimals: 6,
-      //       referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
-      //       balance: { decimals: 6, _decimals: '1000000', wei: '90970145059098' }
-      //     },
-      //     lp: {
-      //       symbol: 'STEP-USDC',
-      //       name: 'STEP-USDC LP',
-      //       coin: {
-      //         symbol: 'STEP',
-      //         name: 'STEP',
-      //         mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //         decimals: 9,
-      //         referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //       },
-      //       pc: {
-      //         symbol: 'USDC',
-      //         name: 'USDC',
-      //         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //         decimals: 6,
-      //         referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
-      //       },
-      //       mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
-      //       decimals: 9,
-      //       totalSupply: { decimals: 9, _decimals: '1000000000', wei: '2845973147894810' }
-      //     },
-      //     version: 4,
-      //     programId: '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
-      //     ammId: '4Sx1NLrQiK4b9FdLKe2DhQ9FHvRzJhzKN3LoD6BrEPnf',
-      //     ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
-      //     ammOpenOrders: 'EXgME2sUuzBxEc2wuyoSZ8FZNZMC3ChhZgFZRAW3nCQG',
-      //     ammTargetOrders: '78bwAGKJjaiPQqmwKmbj4fhrRTLAdzwqNwpFdpTzrhk1',
-      //     ammQuantities: '11111111111111111111111111111111',
-      //     poolCoinTokenAccount: '8Gf8Cc6yrxtfUZqM2vf2kg5uR9bGPfCHfzdYRVBAJSJj',
-      //     poolPcTokenAccount: 'ApLc86fHjVbGbU9QFzNPNuWM5VYckZM92q6sgJN1SGYn',
-      //     poolWithdrawQueue: '5bzBcB7cnJYGYvGPFxKcZETn6sGAyBbXgFhUbefbagYh',
-      //     poolTempLpTokenAccount: 'CpfWKDYNYfvgk42tqR8HEHUWohGSJjASXfRBm3yaKJre',
-      //     serumProgramId: '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin',
-      //     serumMarket: '97qCB4cAVSTthvJu3eNoEx6AY6DLuRDtCoPm5Tdyg77S',
-      //     serumBids: '5Xdpf7CMGFDkJj1smcVQAAZG6GY9gqAns18QLKbPZKsw',
-      //     serumAsks: '6Tqwg8nrKJrcqsr4zR9wJuPv3iXsHAMN65FxwJ3RMH8S',
-      //     serumEventQueue: '5frw4m8pEZHorTKVzmMzvf8xLUrj65vN7wA57KzaZFK3',
-      //     serumCoinVaultAccount: 'CVNye3Xr9Jv26c8TVqZZHq4F43BhoWWfmrzyp1M9YA67',
-      //     serumPcVaultAccount: 'AnGbReAhCDFkR83nB8mXTDX5dQJFB8Pwicu6pGMfCLjt',
-      //     serumVaultSigner: 'FbwU5U1Doj2PSKRJi7pnCny4dFPPJURwALkFhHwdHaMW',
-      //     fees: { swapFeeNumerator: 3, swapFeeDenominator: 1000 }
-      //   },
-      //   fromCoinAccount: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
-      //   toCoinAccount: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
-      //   lpAccount: 'HtJhjCUjXVUVFwuL3sKmGnhLEoKy6qSyNfdzQMwUYxo5',
-      //   fromCoin: {
-      //     symbol: 'STEP',
-      //     name: 'STEP',
-      //     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //     decimals: 9,
-      //     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
-      //     tokenAccountAddress: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
-      //     balance: { decimals: 9, _decimals: '1000000000', wei: '21614559111' }
-      //   },
-      //   toCoin: {
-      //     symbol: 'USDC',
-      //     name: 'USDC',
-      //     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //     decimals: 6,
-      //     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
-      //     tokenAccountAddress: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
-      //     balance: { decimals: 6, _decimals: '1000000', wei: '65387551' }
-      //   },
-      //   fromCoinAmount: '9.732522',
-      //   toCoinAmount: '65.387551',
-      //   fixedCoin: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-      // }
 
       addLiquidity(
         conn,

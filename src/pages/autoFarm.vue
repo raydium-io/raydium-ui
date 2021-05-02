@@ -218,7 +218,7 @@ import LiquidityProvider from '@/components/LiquidityProvider.vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
-import { isNullOrZero, lte, TokenAmount } from '@/utils/safe-math'
+import { isNullOrZero, TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { depositV4 } from '@/utils/stake'
 import { getUnixTs, sleep } from '@/utils'
@@ -449,100 +449,6 @@ export default Vue.extend({
       this.farmInfo = cloneDeep(farmInfo)
 
       this.stakeModalOpening = true
-
-      logger('open stake', JSON.stringify({ lp: this.lp, farmInfo: this.farmInfo }))
-      // const stakeStep = {
-      //   lp: {
-      //     symbol: 'STEP-USDC',
-      //     name: 'STEP-USDC LP',
-      //     coin: {
-      //       symbol: 'STEP',
-      //       name: 'STEP',
-      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //       decimals: 9,
-      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //     },
-      //     pc: {
-      //       symbol: 'USDC',
-      //       name: 'USDC',
-      //       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //       decimals: 6,
-      //       referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
-      //     },
-      //     mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
-      //     decimals: 9,
-      //     balance: { decimals: 9, _decimals: '1000000000', wei: '2045701204' }
-      //   },
-      //   farmInfo: {
-      //     name: 'STEP-USDC',
-      //     lp: {
-      //       symbol: 'STEP-USDC',
-      //       name: 'STEP-USDC LP',
-      //       coin: {
-      //         symbol: 'STEP',
-      //         name: 'STEP',
-      //         mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //         decimals: 9,
-      //         referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //       },
-      //       pc: {
-      //         symbol: 'USDC',
-      //         name: 'USDC',
-      //         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //         decimals: 6,
-      //         referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
-      //       },
-      //       mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
-      //       decimals: 9,
-      //       balance: { decimals: 9, _decimals: '1000000000', wei: '2842818943106092' }
-      //     },
-      //     reward: {
-      //       symbol: 'RAY',
-      //       name: 'Raydium',
-      //       mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-      //       decimals: 6,
-      //       referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
-      //     },
-      //     rewardB: {
-      //       symbol: 'STEP',
-      //       name: 'STEP',
-      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //       decimals: 9,
-      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //     },
-      //     isStake: false,
-      //     fusion: true,
-      //     legacy: false,
-      //     dual: false,
-      //     version: 5,
-      //     programId: '9KEPoZmtHUrBbhWN1v1KWLMkkvwY6WLtAVUCPRtRjP4z',
-      //     poolId: '8xhjCzfzVcP79jE7jXR2xtNaSL6aJYoDRLVT9FMjpRTC',
-      //     poolAuthority: '6wRMPrHKFzj3qB4j5yj4y9mDF89fZ6w7gD1cEzCJwT9B',
-      //     poolLpTokenAccount: 'CP3wdgdSygYGLJMjKfbJMiANnYuAxXHPiLTtB124tzVX',
-      //     poolRewardTokenAccount: '3zSiR4XrrRPhsom2hh9iigYZZ7uCpMucfJnZRgREgH8j',
-      //     poolRewardTokenAccountB: '4n3vRUk3wdtbGWgMFSaxUcnGLKwa2wiWVhqw7kv9JDVS',
-      //     poolInfo: {
-      //       state: '01',
-      //       nonce: 'fd',
-      //       poolLpTokenAccount: { _bn: 'a916a9134c3de34fe71cef076bec7fed14e5cbdbdbf1ff045790a549126b1a42' },
-      //       poolRewardTokenAccount: { _bn: '2c6e8e1069021df378559c3788f05c4f7377780225a71e283d8163a84e4326a8' },
-      //       totalReward: '00',
-      //       perShare: '00',
-      //       perBlock: '00',
-      //       option: 1,
-      //       poolRewardTokenAccountB: { _bn: '381d80035eb387038431725737f4355544ee866bc700d66c5e12a959d11e7529' },
-      //       totalRewardB: '1decacc0565e93',
-      //       perShareB: '1351aa41daf9fc',
-      //       perBlockB: '01b1536580',
-      //       lastBlock: '048ede15',
-      //       owner: { _bn: 'df025f0c43896dfbd2cb18fa779e41a16b10b1f34d8222911d8bf5aba66ebd23' }
-      //     },
-      //     apr: '0.00',
-      //     aprB: '1709.55',
-      //     aprTotal: '1709.55',
-      //     liquidityUsdValue: 181474253.29443642
-      //   }
-      // }
     },
 
     stake(amount: string) {
@@ -612,147 +518,7 @@ export default Vue.extend({
     },
 
     harvest(farmInfo: FarmInfo) {
-      logger('harvest farmInfo', JSON.stringify(farmInfo))
-
-      // const kinRayHarvest = {
-      //   name: 'KIN-RAY',
-      //   lp: {
-      //     symbol: 'KIN-RAY',
-      //     name: 'KIN-RAY LP',
-      //     coin: {
-      //       symbol: 'KIN',
-      //       name: 'KIN',
-      //       mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
-      //       decimals: 5,
-      //       referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9'
-      //     },
-      //     pc: {
-      //       symbol: 'RAY',
-      //       name: 'Raydium',
-      //       mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-      //       decimals: 6,
-      //       referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
-      //     },
-      //     mintAddress: 'CHT8sft3h3gpLYbCcZ9o27mT5s3Z6VifBVbUiDvprHPW',
-      //     decimals: 6,
-      //     balance: { decimals: 6, _decimals: '1000000', wei: '3302479924487778' }
-      //   },
-      //   reward: {
-      //     symbol: 'RAY',
-      //     name: 'Raydium',
-      //     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-      //     decimals: 6,
-      //     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
-      //   },
-      //   rewardB: {
-      //     symbol: 'KIN',
-      //     name: 'KIN',
-      //     mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
-      //     decimals: 5,
-      //     referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9'
-      //   },
-      //   isStake: false,
-      //   fusion: true,
-      //   legacy: false,
-      //   dual: true,
-      //   version: 5,
-      //   programId: '9KEPoZmtHUrBbhWN1v1KWLMkkvwY6WLtAVUCPRtRjP4z',
-      //   poolId: 'FgApVk6mASrkuWNxmsFvsaAYkFKqdiwMTvYZK36A2DaC',
-      //   poolAuthority: '7kEx8qnkZPkRXV6f4ztf27zYjCACBHY3PUMfuiYJsoML',
-      //   poolLpTokenAccount: '7fgDjhZn9GqRZbbCregr9tpkbWSKjibdCsJNBYbLhLir',
-      //   poolRewardTokenAccount: '5XZjRyEo8Wr2CtSE5bpoKioThT9czK1dUebbK87Lqkaa',
-      //   poolRewardTokenAccountB: '8jGJ3ST1j9eemfC6N2qQevtUdwxT7TpXW1NmvWyvLLVs',
-      //   poolInfo: {
-      //     state: '01',
-      //     nonce: 'fd',
-      //     poolLpTokenAccount: { _bn: '630e89bc9da17a1d101cb246e4138e7683bbe55e6796bbe3c5af68bea35a2a97' },
-      //     poolRewardTokenAccount: { _bn: '43432e81fff19629b3475875fb1fbb8a68d0895eea640ace84c86d89b69608d7' },
-      //     totalReward: '0b6d9779ca',
-      //     perShare: '06ac29f42d',
-      //     perBlock: '1f40',
-      //     option: 1,
-      //     poolRewardTokenAccountB: { _bn: '72d57ec8dead90b580d6a31fe6840105faadded377dc0f7815f212fe5a15b83e' },
-      //     totalRewardB: '01be7b99fb7870',
-      //     perShareB: 'a01845f4368e',
-      //     perBlockB: '04c4b400',
-      //     lastBlock: '048ed1bb',
-      //     owner: { _bn: 'df025f0c43896dfbd2cb18fa779e41a16b10b1f34d8222911d8bf5aba66ebd23' }
-      //   },
-      //   apr: '71.23',
-      //   aprB: '128.02',
-      //   aprTotal: '199.25',
-      //   liquidityUsdValue: 10129148.577409675
-      // }
-
-      // const stepHarvest = {
-      //   name: 'STEP-USDC',
-      //   lp: {
-      //     symbol: 'STEP-USDC',
-      //     name: 'STEP-USDC LP',
-      //     coin: {
-      //       symbol: 'STEP',
-      //       name: 'STEP',
-      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //       decimals: 9,
-      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //     },
-      //     pc: {
-      //       symbol: 'USDC',
-      //       name: 'USDC',
-      //       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      //       decimals: 6,
-      //       referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
-      //     },
-      //     mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
-      //     decimals: 9,
-      //     balance: { decimals: 9, _decimals: '1000000000', wei: '2840028876147307' }
-      //   },
-      //   reward: {
-      //     symbol: 'RAY',
-      //     name: 'Raydium',
-      //     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-      //     decimals: 6,
-      //     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
-      //   },
-      //   rewardB: {
-      //     symbol: 'STEP',
-      //     name: 'STEP',
-      //     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
-      //     decimals: 9,
-      //     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
-      //   },
-      //   isStake: false,
-      //   fusion: true,
-      //   legacy: false,
-      //   dual: false,
-      //   version: 5,
-      //   programId: '9KEPoZmtHUrBbhWN1v1KWLMkkvwY6WLtAVUCPRtRjP4z',
-      //   poolId: '8xhjCzfzVcP79jE7jXR2xtNaSL6aJYoDRLVT9FMjpRTC',
-      //   poolAuthority: '6wRMPrHKFzj3qB4j5yj4y9mDF89fZ6w7gD1cEzCJwT9B',
-      //   poolLpTokenAccount: 'CP3wdgdSygYGLJMjKfbJMiANnYuAxXHPiLTtB124tzVX',
-      //   poolRewardTokenAccount: '3zSiR4XrrRPhsom2hh9iigYZZ7uCpMucfJnZRgREgH8j',
-      //   poolRewardTokenAccountB: '4n3vRUk3wdtbGWgMFSaxUcnGLKwa2wiWVhqw7kv9JDVS',
-      //   poolInfo: {
-      //     state: '01',
-      //     nonce: 'fd',
-      //     poolLpTokenAccount: { _bn: 'a916a9134c3de34fe71cef076bec7fed14e5cbdbdbf1ff045790a549126b1a42' },
-      //     poolRewardTokenAccount: { _bn: '2c6e8e1069021df378559c3788f05c4f7377780225a71e283d8163a84e4326a8' },
-      //     totalReward: '00',
-      //     perShare: '00',
-      //     perBlock: '00',
-      //     option: 1,
-      //     poolRewardTokenAccountB: { _bn: '381d80035eb387038431725737f4355544ee866bc700d66c5e12a959d11e7529' },
-      //     totalRewardB: '1de31ed49a7313',
-      //     perShareB: '134e4da988bdb3',
-      //     perBlockB: '01b1536580',
-      //     lastBlock: '048ed870',
-      //     owner: { _bn: 'df025f0c43896dfbd2cb18fa779e41a16b10b1f34d8222911d8bf5aba66ebd23' }
-      //   },
-      //   apr: '0.00',
-      //   aprB: '1716.21',
-      //   aprTotal: '1716.21',
-      //   liquidityUsdValue: 181823791.58565214
-      // }
+      // logger('harvest farmInfo', JSON.stringify(farmInfo))
 
       this.farmInfo = cloneDeep(farmInfo)
 
@@ -844,12 +610,6 @@ export default Vue.extend({
       logger('found farm info', JSON.stringify(farmInfo))
 
       this.openStakeModal(farmInfo, farmInfo.lp)
-
-      logger('onLiquidityAdded; LP balance:', this.lp.balance)
-      logger('onLiquidityAdded; LP balance:', this.lp.balance.wei)
-      logger('onLiquidityAdded; LP isNullOrZero:', isNullOrZero(this.lp.balance))
-      logger('onLiquidityAdded; LP lte:', !lte(this.lp.balance, this.lp.balance.toEther()))
-      logger('onLiquidityAdded; this.lp.balance.toString():', this.lp.balance.fixed())
 
       await sleep(1000)
 
