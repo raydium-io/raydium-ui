@@ -651,7 +651,10 @@ export default Vue.extend({
     },
 
     findFarmInfoByMintAddress(mintAddress: string): FarmInfo | undefined {
-      const farm = this.farms.find((farm: { farmInfo: FarmInfo }) => farm.farmInfo.lp.mintAddress === mintAddress)
+      // important: exclude legacy farms
+      const farm = this.farms.find(
+        (farm: { farmInfo: FarmInfo }) => !farm.farmInfo.legacy && farm.farmInfo.lp.mintAddress === mintAddress
+      )
       return farm && farm.farmInfo
     }
   }
