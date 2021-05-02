@@ -618,7 +618,7 @@ export default Vue.extend({
           get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount
         )
-          .then((txid) => {
+          .then(async (txid) => {
             this.$notify.info({
               key,
               message: 'Transaction has been sent',
@@ -630,7 +630,10 @@ export default Vue.extend({
             })
 
             const description = `Unwrap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$accessor.transaction.sub({ txid, description })
+            await this.$accessor.transaction.sub({ txid, description })
+            // reset after success
+            this.fromCoinAmount = ''
+            this.toCoinAmount = ''
           })
           .catch((error) => {
             this.$notify.error({
@@ -639,8 +642,10 @@ export default Vue.extend({
               description: error.message
             })
           })
-          .finally(() => {
+          .finally(async () => {
             this.swaping = false
+            // update wallet
+            await this.$accessor.wallet.getTokenAccounts()
           })
       } else if (this.lpMintAddress) {
         swap(
@@ -659,7 +664,7 @@ export default Vue.extend({
           this.fromCoinAmount,
           this.setting.slippage
         )
-          .then((txid) => {
+          .then(async (txid) => {
             this.$notify.info({
               key,
               message: 'Transaction has been sent',
@@ -671,7 +676,10 @@ export default Vue.extend({
             })
 
             const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$accessor.transaction.sub({ txid, description })
+            await this.$accessor.transaction.sub({ txid, description })
+            // reset after success
+            this.fromCoinAmount = ''
+            this.toCoinAmount = ''
           })
           .catch((error) => {
             this.$notify.error({
@@ -680,8 +688,10 @@ export default Vue.extend({
               description: error.message
             })
           })
-          .finally(() => {
+          .finally(async () => {
             this.swaping = false
+            // update wallet
+            await this.$accessor.wallet.getTokenAccounts()
           })
       } else {
         place(
@@ -702,7 +712,7 @@ export default Vue.extend({
           this.fromCoinAmount,
           this.setting.slippage
         )
-          .then((txid) => {
+          .then(async (txid) => {
             this.$notify.info({
               key,
               message: 'Transaction has been sent',
@@ -714,7 +724,10 @@ export default Vue.extend({
             })
 
             const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$accessor.transaction.sub({ txid, description })
+            await this.$accessor.transaction.sub({ txid, description })
+            // reset after success
+            this.fromCoinAmount = ''
+            this.toCoinAmount = ''
           })
           .catch((error) => {
             this.$notify.error({
@@ -723,8 +736,10 @@ export default Vue.extend({
               description: error.message
             })
           })
-          .finally(() => {
+          .finally(async () => {
             this.swaping = false
+            // update wallet
+            await this.$accessor.wallet.getTokenAccounts()
           })
       }
     }

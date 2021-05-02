@@ -178,7 +178,7 @@ export default Vue.extend({
 
     .max-button {
       height: 32px;
-      padding: 0 16px;
+      padding: 0 8px;
       color: @primary-color;
     }
 

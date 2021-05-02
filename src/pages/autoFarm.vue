@@ -19,7 +19,7 @@
             :percent="(100 / farm.autoRefreshTime) * farm.countdown"
             :show-info="false"
             :class="farm.loading ? 'disabled' : ''"
-            @click="$accessor.farm.requestInfos"
+            @click="updateAll"
           />
         </Tooltip>
       </div>
@@ -123,6 +123,7 @@
                       <Button
                         size="large"
                         ghost
+                        block
                         :disabled="
                           !wallet.connected ||
                           harvesting ||
