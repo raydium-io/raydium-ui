@@ -579,7 +579,7 @@ export default Vue.extend({
           this.changeTriggerSupplyLP(farmInfo)
         })
         .catch((error) => {
-          console.error('harvest', error)
+          logger('harvest error', error)
           this.$notify.error({
             key,
             message: 'Harvest failed',
