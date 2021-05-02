@@ -7,8 +7,21 @@ import { cloneDeep } from 'lodash-es'
 import { MARKETS } from '@/utils/serum'
 import { getFilteredProgramAccounts } from '@/utils/web3'
 import logger from '@/utils/logger'
+// import {  TokenInfo } from '@/utils/tokens'
+import { getTokenBySymbol, TokenInfo } from '@/utils/tokens'
+import LocalStorage from '@/utils/local-storage'
 
-export const state = () => ({
+interface State {
+  fromCoin: TokenInfo | null
+  toCoin: TokenInfo | null
+  markets: any
+}
+
+export const state = (): State => ({
+  fromCoin: getTokenBySymbol(LocalStorage.get('RAYDIUM_SWAP_FROM_COIN') || 'RAY'),
+  toCoin: getTokenBySymbol(LocalStorage.get('RAYDIUM_SWAP_TO_COIN') || ''),
+  // fromCoin: null,
+  // toCoin: null,
   markets: {}
 })
 
@@ -17,6 +30,14 @@ export const getters = getterTree(state, {})
 export const mutations = mutationTree(state, {
   setMarkets(state, markets: any) {
     state.markets = cloneDeep(markets)
+  },
+  setFromCoin(state, tokenInfo: TokenInfo | null) {
+    LocalStorage.set('RAYDIUM_SWAP_FROM_COIN', tokenInfo?.symbol)
+    state.fromCoin = tokenInfo
+  },
+  setToCoin(state, tokenInfo: TokenInfo | null) {
+    LocalStorage.set('RAYDIUM_SWAP_TO_COIN', tokenInfo?.symbol)
+    state.toCoin = tokenInfo
   }
 })
 
