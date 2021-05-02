@@ -26,7 +26,7 @@
     </div>
     <div class="description">
       <div>
-        <span>This experimental feature does auto harvest and stakes and all the steps in between.</span>
+        <span>This experimental feature does auto harvesting & staking and all the steps in between.</span>
         <br />
         <h3>Steps:</h3>
         <ol>
