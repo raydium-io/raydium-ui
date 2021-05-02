@@ -139,6 +139,7 @@ export default class Wallet extends Vue {
           // clears local storage when unsuccessfully connected
           // this happens when a user connects with a wallet, then disables the wallet extension
           this.$accessor.wallet.setDisconnected()
+          this.autoConnectWallet = false
         }
       })
     }
@@ -160,8 +161,6 @@ export default class Wallet extends Vue {
   connect(walletName: string): boolean {
     let wallet: WalletAdapter
     const endpoint = getRandomEndpoint()
-
-    logger('connect walletName', walletName)
 
     switch (walletName) {
       case 'Ledger': {
