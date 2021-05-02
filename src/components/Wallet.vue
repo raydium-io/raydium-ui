@@ -50,6 +50,7 @@ import {
   PhantomWalletAdapter,
   LedgerWalletAdapter
 } from '@/wallets'
+import { sleep } from '@/utils'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -129,20 +130,7 @@ export default class Wallet extends Vue {
   }
 
   mounted() {
-    // automatically connect wallet after page refresh if user already connected
-    if (this.wallet.walletName) {
-      this.autoConnectWallet = true // will be reset later in connect/disconnect/fail handler
-      // wait till page loaded == extensions injected
-      window.addEventListener('load', () => {
-        const success = this.connect(this.wallet.walletName)
-        if (!success) {
-          // clears local storage when unsuccessfully connected
-          // this happens when a user connects with a wallet, then disables the wallet extension
-          this.$accessor.wallet.setDisconnected()
-          this.autoConnectWallet = false
-        }
-      })
-    }
+    this.autoConnect()
   }
 
   beforeDestroy() {
@@ -157,6 +145,35 @@ export default class Wallet extends Vue {
 
   /* ========== METHODS ========== */
   importIcon = importIcon
+
+  autoConnect() {
+    // automatically connect wallet after page refresh if user already connected
+    if (this.wallet.walletName) {
+      this.autoConnectWallet = true // will be reset later in connect/disconnect/fail handler
+      // wait till page loaded == extensions injected
+      window.addEventListener('load', async () => {
+        let success = this.connect(this.wallet.walletName)
+        if (!success) {
+          // the load listener does not always know when the extensions are ready
+          // try again after x sec
+          await sleep(2000)
+          success = this.connect(this.wallet.walletName)
+        }
+        if (!success) {
+          // the load listener does not always know when the extensions are ready
+          // try again after x sec
+          await sleep(2000)
+          success = this.connect(this.wallet.walletName)
+        }
+        if (!success) {
+          // clears local storage when unsuccessfully connected
+          // this happens when a user connects with a wallet, then disables the wallet extension
+          this.$accessor.wallet.setDisconnected()
+          this.autoConnectWallet = false
+        }
+      })
+    }
+  }
 
   connect(walletName: string): boolean {
     let wallet: WalletAdapter
