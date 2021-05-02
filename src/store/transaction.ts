@@ -69,42 +69,46 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    sub({ commit }, { txid, description }: { txid: string; description: string }) {
-      commit('pushTx', [txid, description])
-      logger('Sub', txid)
+    sub({ commit }, { txid, description }: { txid: string; description: string }): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        commit('pushTx', [txid, description])
+        logger('Sub', txid)
 
-      const conn = this.$web3
-      const notify = this.$notify
+        const conn = this.$web3
+        const notify = this.$notify
 
-      const listenerId = conn.onSignature(
-        txid,
-        function (signatureResult: SignatureResult, context: Context) {
-          const { slot } = context
+        const listenerId = conn.onSignature(
+          txid,
+          function (signatureResult: SignatureResult, context: Context) {
+            const { slot } = context
 
-          if (!signatureResult.err) {
-            // success
-            commit('setTxStatus', [txid, 's', slot])
+            if (!signatureResult.err) {
+              // success
+              commit('setTxStatus', [txid, 's', slot])
 
-            notify.success({
-              key: txid,
-              message: 'Transaction has been confirmed',
-              description
-            })
-          } else {
-            // fail
-            commit('setTxStatus', [txid, 'f', slot])
+              notify.success({
+                key: txid,
+                message: 'Transaction has been confirmed',
+                description
+              })
+              resolve(true)
+            } else {
+              // fail
+              commit('setTxStatus', [txid, 'f', slot])
 
-            notify.error({
-              key: txid,
-              message: 'Transaction has been failed',
-              description
-            })
-          }
-        },
-        'single'
-      )
+              notify.error({
+                key: txid,
+                message: 'Transaction has been failed',
+                description
+              })
+              reject(signatureResult.err)
+            }
+          },
+          'single'
+        )
 
-      commit('setListenerId', [txid, listenerId + 1])
+        commit('setListenerId', [txid, listenerId + 1])
+      })
     }
   }
 )

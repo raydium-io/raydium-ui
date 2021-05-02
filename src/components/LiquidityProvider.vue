@@ -1,7 +1,7 @@
 <template>
-  <div class="liquidity container">
+  <div class="liquidity-provider container">
     <div class="page-head fs-container">
-      <span class="title">Add Liquidity</span>
+      <span class="title">Add liquidity</span>
       <div class="buttons">
         <Tooltip v-if="lpMintAddress" placement="bottomRight">
           <template slot="title">
@@ -71,6 +71,11 @@
 
     <div class="card">
       <div class="card-body">
+        <button class="max-button" :disabled="coinToMaxRunning" @click="onTriggerLowerBalanceCoinToMax">
+          <span v-if="!coinToMaxRunning">Set possible MAX</span>
+          <span v-else>⏳</span>
+        </button>
+
         <CoinInput
           v-model="fromCoinAmount"
           label="Input"
@@ -162,12 +167,6 @@
         </Button>
       </div>
     </div>
-
-    <div class="page-head your-liquidity fs-container">
-      <span class="title">Your Liquidity</span>
-    </div>
-
-    <YourLiquidity @onAdd="setCoinFromMint" />
   </div>
 </template>
 
@@ -189,7 +188,7 @@ import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
-import { getUnixTs } from '@/utils'
+import { getUnixTs, sleep } from '@/utils'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -199,6 +198,14 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress
+  },
+
+  props: {
+    fromCoinMintAddress: { type: String, default: '' },
+    toCoinMintAddress: { type: String, default: '' },
+    shouldSetMaxOnInit: { type: Boolean, default: false },
+    triggerLowerBalanceCoinToMax: { type: Boolean, default: false },
+    triggerSupplyLP: { type: Boolean, default: false }
   },
 
   data() {
@@ -219,12 +226,10 @@ export default Vue.extend({
       lpMintAddress: '',
 
       poolListenerId: null as number | null,
-      lastSubBlock: 0
-    }
-  },
+      lastSubBlock: 0,
 
-  head: {
-    title: 'Raydium Liquidity'
+      coinToMaxRunning: false
+    }
   },
 
   computed: {
@@ -276,15 +281,35 @@ export default Vue.extend({
         this.updateAmounts()
       },
       deep: true
+    },
+
+    triggerLowerBalanceCoinToMax() {
+      this.onTriggerLowerBalanceCoinToMax()
+    },
+
+    triggerSupplyLP() {
+      this.onTriggerSupplyLP()
     }
   },
 
-  mounted() {
+  async mounted() {
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
     const { from, to } = this.$route.query
     // @ts-ignore
     this.setCoinFromMint(from, to, true)
+
+    if (this.$props.fromCoinMintAddress || this.$props.toCoinMintAddress) {
+      logger('LiquidityProvider mounted with from and to coin mint addresses', {
+        fromCoinMintAddress: this.$props.fromCoinMintAddress,
+        toCoinMintAddress: this.$props.toCoinMintAddress
+      })
+      this.setCoinFromMint(this.$props.fromCoinMintAddress, this.$props.toCoinMintAddress, false)
+      if (this.$props.shouldSetMaxOnInit) {
+        logger('LiquidityProvider mount shouldSetMaxOnInit')
+        await this.setLowerBalanceCoinToMax()
+      }
+    }
   },
 
   methods: {
@@ -348,6 +373,76 @@ export default Vue.extend({
       }
     },
 
+    async setLowerBalanceCoinToMax(): Promise<boolean> {
+      // reset both, otherwise a second cann would not wait till its filled in while loop
+      this.toCoinAmount = ''
+      this.fromCoinAmount = ''
+
+      this.fixedCoin = this.fromCoin.mintAddress
+      this.fromCoinAmount = this.fromCoin.balance.fixed()
+
+      while (!this.toCoinAmount) {
+        // we need to wait till toCoinAmount gets filled via watcher
+        await sleep(100)
+      }
+      // logger('fromCoinAmount', this.fromCoinAmount, 'this.fromCoin.balance', this.fromCoin.balance.fixed())
+      // logger('toCoinAmount', this.toCoinAmount, 'this.toCoin.balance', this.toCoin.balance.fixed())
+
+      if (gt(this.toCoinAmount, this.toCoin.balance.fixed())) {
+        logger(`Insufficient ${this.toCoin.symbol} balance`)
+        this.fixedCoin = this.toCoin.mintAddress
+        this.fromCoinAmount = '' // reset
+        this.toCoinAmount = this.toCoin.balance.fixed()
+
+        while (!this.fromCoinAmount) {
+          // we need to wait till fromCoinAmount gets filled via watcher
+          await sleep(100)
+        }
+      }
+
+      if (gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
+        logger(`Insufficient ${this.fromCoin.symbol} balance`)
+        this.$notify.error({
+          key: getUnixTs(),
+          message: 'Add liquidity failed',
+          description: 'Cannot set max, due to insufficient balance on to & from coin'
+        })
+        this.$emit('onError', new Error('Cannot set max, due to insufficient balance on to & from coin'))
+        this.coinToMaxRunning = false
+        return false
+      }
+
+      logger('✅ set amount to max for', getTokenByMintAddress(this.fixedCoin)?.symbol)
+      this.coinToMaxRunning = false
+      return true
+    },
+
+    async onTriggerLowerBalanceCoinToMax(): Promise<boolean> {
+      logger('onTriggerLowerBalanceCoinToMax')
+      this.coinToMaxRunning = true
+      // update wallet
+      await this.$accessor.wallet.getTokenAccounts()
+
+      // update pools first
+      await this.$accessor.liquidity.requestInfos()
+      await sleep(500)
+      return await this.setLowerBalanceCoinToMax()
+    },
+
+    async onTriggerSupplyLP() {
+      logger('onTriggerSupply')
+      logger('LiquidityProvider mount shouldSetMaxOnInit')
+
+      const success = await this.onTriggerLowerBalanceCoinToMax()
+      if (!success) {
+        // end, error gets already $emit + $notify inside the function
+        return
+      }
+      // supply LP
+      logger('supply LP...')
+      this.supply()
+    },
+
     changeCoinAmountPosition() {
       const tempFromCoinAmount = this.fromCoinAmount
       const tempToCoinAmount = this.toCoinAmount
@@ -357,6 +452,8 @@ export default Vue.extend({
     },
 
     updateCoinInfo(tokenAccounts: any) {
+      logger('updateCoinInfo', tokenAccounts)
+
       if (this.fromCoin) {
         const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
 
@@ -481,7 +578,7 @@ export default Vue.extend({
       const key = getUnixTs().toString()
       this.$notify.info({
         key,
-        message: 'Making transaction...',
+        message: 'Making supply transaction...',
         description: '',
         duration: 0
       })
@@ -601,7 +698,7 @@ export default Vue.extend({
         this.toCoinAmount,
         this.fixedCoin
       )
-        .then((txid) => {
+        .then(async (txid) => {
           this.$notify.info({
             key,
             message: 'Transaction has been sent',
@@ -613,7 +710,18 @@ export default Vue.extend({
           })
 
           const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
-          this.$accessor.transaction.sub({ txid, description })
+          await this.$accessor.transaction.sub({ txid, description })
+
+          // notify parent
+          this.$emit('onLiquidityAdded', {
+            txid,
+            description,
+            fromCoinAmount: this.fromCoinAmount,
+            fromCoinSymbol: this.fromCoin?.symbol,
+            toCoinAmount: this.toCoinAmount,
+            toCoinSymbol: this.toCoin?.symbol,
+            farmInfo: poolInfo
+          })
         })
         .catch((error) => {
           this.$notify.error({
@@ -621,6 +729,9 @@ export default Vue.extend({
             message: 'Add liquidity failed',
             description: error.message
           })
+
+          // notify parent
+          this.$emit('onError', error)
         })
         .finally(() => {
           this.suppling = false
@@ -631,33 +742,58 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
-.liquidity.container {
-  max-width: 450px;
+.liquidity-provider.container {
+  padding: 0;
 
-  .your-liquidity {
-    margin-top: 40px !important;
-  }
+  .page-head {
+    margin: 10px 0;
 
-  .add-icon {
-    div {
-      height: 32px;
-      width: 32px;
-      border-radius: 50%;
-      background: #000829;
+    .title {
+      font-size: 16px;
     }
   }
-}
-</style>
 
-<style lang="less">
-.ant-alert-warning {
-  width: 500px;
-  margin-top: 30px;
-  background-color: transparent;
-  border: 1px solid #85858d;
+  .card {
+    .card-body {
+      padding-top: 14px;
 
-  .anticon-close {
-    color: #fff;
+      .max-button {
+        border: none;
+        background-color: transparent;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+        border-radius: 4px;
+        white-space: nowrap;
+        cursor: pointer;
+        height: 32px;
+        padding: 0 16px;
+        color: @primary-color;
+
+        &:active,
+        &:focus,
+        &:hover {
+          outline: 0;
+        }
+
+        &:hover {
+          background-color: @modal-header-bg;
+        }
+
+        &:disabled {
+          cursor: progress;
+        }
+      }
+
+      .add-icon {
+        div {
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          background: #000829;
+        }
+      }
+    }
   }
 }
 </style>

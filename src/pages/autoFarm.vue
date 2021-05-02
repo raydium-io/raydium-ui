@@ -1,7 +1,7 @@
 <template>
   <div class="auto-farm container">
     <div class="page-head fs-container">
-      <span class="title">Auto Farm</span>
+      <span class="title">Auto Farm (beta)</span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
@@ -42,16 +42,9 @@
       title="Stake LP"
       :coin="lp"
       :loading="staking"
+      :set-max-on-init="true"
       @onOk="stake"
       @onCancel="cancelStake"
-    />
-    <CoinModal
-      v-if="unstakeModalOpening"
-      title="Unstake LP"
-      :coin="lp"
-      :loading="unstaking"
-      @onOk="unstake"
-      @onCancel="cancelUnstake"
     />
 
     <div v-if="farm.initialized">
@@ -107,19 +100,10 @@
               </Row>
 
               <Row :class="isMobile ? 'is-mobile' : ''" :gutter="48">
-                <Col :span="isMobile ? 24 : 4">
-                  <p>Add liquidity:</p>
-                  <NuxtLink
-                    :to="`/liquidity/?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
-                  >
-                    {{ farm.farmInfo.lp.name }}
-                  </NuxtLink>
-                </Col>
-
-                <Col :span="isMobile ? 24 : 10">
+                <Col :span="isMobile ? 24 : 6">
                   <div class="harvest">
                     <div class="title">Pending Rewards</div>
-                    <div class="pending fs-container">
+                    <div class="pending">
                       <div class="reward">
                         <div v-if="farm.farmInfo.dual" class="token">
                           {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
@@ -128,6 +112,7 @@
                           {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
                         </div>
                       </div>
+                      <br />
                       <Button
                         size="large"
                         ghost
@@ -139,28 +124,54 @@
                         :loading="harvesting"
                         @click="harvest(farm.farmInfo)"
                       >
-                        Harvest
+                        Auto Harvest & Stake
                       </Button>
                     </div>
                   </div>
                 </Col>
 
-                <Col :span="isMobile ? 24 : 10">
+                <Col :span="isMobile ? 24 : 9">
+                  <p>Swap:</p>
+                  <div style="word-break: break-all">
+                    from: {{ farm.farmInfo.lp.coin.symbol }} {{ farm.farmInfo.lp.coin.mintAddress }}
+                  </div>
+                  <div style="word-break: break-all">
+                    to: {{ farm.farmInfo.lp.pc.symbol }} {{ farm.farmInfo.lp.pc.mintAddress }}
+                  </div>
+                </Col>
+
+                <Col :span="isMobile ? 24 : 9">
+                  <!--                  <p>Add liquidity:</p>-->
+                  <!--                  <NuxtLink-->
+                  <!--                    :to="`/liquidity/?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"-->
+                  <!--                  >-->
+                  <!--                    {{ farm.farmInfo.lp.name }}-->
+                  <!--                  </NuxtLink>-->
+
+                  <LiquidityProvider
+                    :from-coin-mint-address="farm.farmInfo.lp.coin.mintAddress"
+                    :to-coin-mint-address="farm.farmInfo.lp.pc.mintAddress"
+                    should-set-max-on-init
+                    :trigger-lower-balance-coin-to-max="
+                      triggerLowerBalanceCoinToMax[
+                        `${farm.farmInfo.lp.coin.mintAddress}_${farm.farmInfo.lp.pc.mintAddress}`
+                      ]
+                    "
+                    :trigger-supply-l-p="
+                      triggerSupplyLP[`${farm.farmInfo.lp.coin.mintAddress}_${farm.farmInfo.lp.pc.mintAddress}`]
+                    "
+                    @onError="onLiquidityProvidingError"
+                    @onLiquidityAdded="onLiquidityAdded"
+                  />
+
+                  <br />
+
                   <div class="start">
                     <div class="title">Start farming</div>
                     <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
                       Connect Wallet
                     </Button>
                     <div v-else class="fs-container">
-                      <Button
-                        v-if="!farm.userInfo.depositBalance.isNullOrZero()"
-                        class="unstake"
-                        size="large"
-                        ghost
-                        @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                      >
-                        <Icon type="minus" />
-                      </Button>
                       <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
                         Stake LP
                       </Button>
@@ -201,15 +212,17 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState, mapGetters } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { mapGetters, mapState } from 'vuex'
+import { Button, Col, Collapse, Icon, Progress, Row, Spin, Tooltip } from 'ant-design-vue'
+import LiquidityProvider from '@/components/LiquidityProvider.vue'
 
-import { get, cloneDeep } from 'lodash-es'
+import { cloneDeep, get } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
-import { TokenAmount } from '@/utils/safe-math'
+import { isNullOrZero, lte, TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { depositV4, withdrawV4 } from '@/utils/stake'
-import { getUnixTs } from '@/utils'
+import { depositV4 } from '@/utils/stake'
+import { getUnixTs, sleep } from '@/utils'
+import logger from '@/utils/logger'
 
 const CollapsePanel = Collapse.Panel
 
@@ -223,14 +236,15 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    LiquidityProvider
   },
 
   data() {
     return {
       isMobile: false,
 
-      farms: [] as any,
+      farms: [] as { farmInfo: FarmInfo; userInfo: any },
 
       lp: null,
       farmInfo: null as any,
@@ -238,7 +252,10 @@ export default Vue.extend({
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
-      unstaking: false
+      unstaking: false,
+
+      triggerLowerBalanceCoinToMax: {},
+      triggerSupplyLP: {}
     }
   },
 
@@ -403,17 +420,37 @@ export default Vue.extend({
       }
     },
 
-    openStakeModal(poolInfo: FarmInfo, lp: any) {
+    changeTriggerLowerBalanceCoinToMax(farmInfo: FarmInfo) {
+      if (!this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]) {
+        this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = true
+      } else {
+        this.triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = !this
+          .triggerLowerBalanceCoinToMax[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]
+      }
+    },
+
+    changeTriggerSupplyLP(farmInfo: FarmInfo) {
+      if (!this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`]) {
+        this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = true
+      } else {
+        this.triggerSupplyLP[`${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`] = !this.triggerSupplyLP[
+          `${farmInfo.lp.coin.mintAddress}_${farmInfo.lp.pc.mintAddress}`
+        ]
+      }
+    },
+
+    openStakeModal(farmInfo: FarmInfo, lp: any) {
       const coin = cloneDeep(lp)
       const lpBalance = get(this.wallet.tokenAccounts, `${lp.mintAddress}.balance`)
+      console.log('lpBalance', lpBalance)
       coin.balance = lpBalance
 
       this.lp = coin
-      this.farmInfo = cloneDeep(poolInfo)
+      this.farmInfo = cloneDeep(farmInfo)
 
       this.stakeModalOpening = true
 
-      console.log('open stake', JSON.stringify({ lp: this.lp, farmInfo: this.farmInfo }))
+      logger('open stake', JSON.stringify({ lp: this.lp, farmInfo: this.farmInfo }))
       // const stakeStep = {
       //   lp: {
       //     symbol: 'STEP-USDC',
@@ -511,6 +548,8 @@ export default Vue.extend({
     stake(amount: string) {
       this.staking = true
 
+      logger('stake', amount, JSON.stringify(this.farmInfo))
+
       const conn = this.$web3
       const wallet = (this as any).$wallet
 
@@ -522,13 +561,18 @@ export default Vue.extend({
       const key = getUnixTs().toString()
       this.$notify.info({
         key,
-        message: 'Making transaction...',
+        message: 'Making stake transaction...',
         description: '',
         duration: 0
       })
 
+      logger(
+        'stake',
+        JSON.stringify({ farmInfo: this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount })
+      )
+
       depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
-        .then((txid) => {
+        .then(async (txid) => {
           this.$notify.info({
             key,
             message: 'Transaction has been sent',
@@ -540,17 +584,24 @@ export default Vue.extend({
           })
 
           const description = `Stake ${amount} ${this.farmInfo.lp.name}`
-          this.$accessor.transaction.sub({ txid, description })
+          await this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
           this.$notify.error({
             key,
             message: 'Stake failed',
-            description: error.message
+            description: error.message,
+            duration: 0
           })
         })
-        .finally(() => {
+        .finally(async () => {
           this.staking = false
+          this.harvesting = false
+          this.cancelStake()
+
+          // update wallet
+          await this.$accessor.wallet.getTokenAccounts()
+          await this.$accessor.farm.requestInfos()
         })
     },
 
@@ -560,69 +611,8 @@ export default Vue.extend({
       this.stakeModalOpening = false
     },
 
-    openUnstakeModal(poolInfo: FarmInfo, lp: any, lpBalance: any) {
-      const coin = cloneDeep(lp)
-      coin.balance = lpBalance
-
-      this.lp = coin
-      this.farmInfo = cloneDeep(poolInfo)
-      this.unstakeModalOpening = true
-    },
-
-    unstake(amount: string) {
-      this.unstaking = true
-
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
-
-      const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
-      const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
-      const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
-
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
-
-      withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
-
-          const description = `Unstake ${amount} ${this.farmInfo.lp.name}`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Stake failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.unstaking = false
-        })
-    },
-
-    cancelUnstake() {
-      this.lp = null
-      this.farmInfo = null
-      this.unstakeModalOpening = false
-    },
-
     harvest(farmInfo: FarmInfo) {
-      console.log('farmInfo', JSON.stringify(farmInfo))
+      logger('harvest farmInfo', JSON.stringify(farmInfo))
 
       // const kinRayHarvest = {
       //   name: 'KIN-RAY',
@@ -764,6 +754,8 @@ export default Vue.extend({
       //   liquidityUsdValue: 181823791.58565214
       // }
 
+      this.farmInfo = cloneDeep(farmInfo)
+
       this.harvesting = true
 
       const conn = this.$web3
@@ -778,13 +770,13 @@ export default Vue.extend({
       const key = getUnixTs().toString()
       this.$notify.info({
         key,
-        message: 'Making transaction...',
+        message: 'Making harvest transaction...',
         description: '',
         duration: 0
       })
 
       depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
-        .then((txid) => {
+        .then(async (txid) => {
           this.$notify.info({
             key,
             message: 'Transaction has been sent',
@@ -797,21 +789,85 @@ export default Vue.extend({
           })
           // @ts-ignore
           const description = `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
-          this.$accessor.transaction.sub({ txid, description })
-          // TODO wait till confirmed ^
+          await this.$accessor.transaction.sub({ txid, description })
+          // wait till confirmed ^
 
-          // TODO provide liquidity
+          // trigger supply LP
+          logger('trigger supply LP')
+
+          await sleep(1000)
+          this.changeTriggerSupplyLP(farmInfo)
         })
         .catch((error) => {
+          console.error('harvest', error)
           this.$notify.error({
             key,
             message: 'Harvest failed',
-            description: error.message
+            description: error.message,
+            duration: 0
           })
         })
         .finally(() => {
           this.harvesting = false
         })
+    },
+
+    onLiquidityProvidingError(error: Error) {
+      logger('onLiquidityProvidingError', error)
+      this.$notify.error({
+        key: getUnixTs(),
+        message: 'Auto Farm failed',
+        description: error.message || error,
+        duration: 0
+      })
+      this.harvesting = false
+    },
+
+    async onLiquidityAdded(tx: {
+      txid: string
+      description: string
+      fromCoinAmount: string
+      fromCoinSymbol: string
+      toCoinAmount: string
+      toCoinSymbol: string
+      farmInfo: FarmInfo
+    }) {
+      logger('onLiquidityAdded', JSON.stringify(tx, null, 2))
+      // update wallet
+      await this.$accessor.wallet.getTokenAccounts()
+
+      await sleep(1000)
+
+      // the farmInfo provided by LiqudityProvider has no rewards* in it, so we look it up here
+      const farmInfo = this.findFarmInfoByMintAddress(tx.farmInfo.lp.mintAddress)
+
+      logger('found farm info', JSON.stringify(farmInfo))
+
+      this.openStakeModal(farmInfo, farmInfo.lp)
+
+      logger('onLiquidityAdded; LP balance:', this.lp.balance)
+      logger('onLiquidityAdded; LP balance:', this.lp.balance.wei)
+      logger('onLiquidityAdded; LP isNullOrZero:', isNullOrZero(this.lp.balance))
+      logger('onLiquidityAdded; LP lte:', !lte(this.lp.balance, this.lp.balance.toEther()))
+      logger('onLiquidityAdded; this.lp.balance.toString():', this.lp.balance.fixed())
+
+      await sleep(1000)
+
+      if (isNullOrZero(this.lp.balance.fixed())) {
+        this.$notify.error({
+          key: getUnixTs(),
+          message: 'Stake not possible',
+          description: 'No LP tokens in your account',
+          duration: 0
+        })
+        return
+      }
+
+      this.stake(this.lp.balance.fixed())
+    },
+
+    findFarmInfoByMintAddress(mintAddress: string): FarmInfo {
+      return this.farms.find((farm: { farmInfo: FarmInfo }) => farm.farmInfo.lp.mintAddress === mintAddress).farmInfo
     }
   }
 })
@@ -850,8 +906,8 @@ export default Vue.extend({
   .harvest {
     .reward {
       .token {
-        font-weight: 600;
-        font-size: 20px;
+        //font-weight: 600;
+        //font-size: 20px;
       }
 
       .value {
@@ -909,6 +965,7 @@ export default Vue.extend({
       .icons {
         margin-right: 8px;
       }
+
       .tag {
         margin-left: 8px;
         padding: 0 7px;
