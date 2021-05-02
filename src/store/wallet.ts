@@ -19,8 +19,6 @@ const wallet: { address: string; walletName: string } = storedWallet
       walletName: ''
     }
 
-logger('wallet', wallet)
-
 export const state = () => ({
   initialized: false,
   loading: false,
