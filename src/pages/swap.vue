@@ -26,26 +26,26 @@
           <template slot="title">
             <p>Addresses</p>
             <div class="swap-info">
-              <div v-if="fromCoin" class="info">
-                <div class="symbol">{{ fromCoin.symbol }}</div>
+              <div v-if="swap.fromCoin" class="info">
+                <div class="symbol">{{ swap.fromCoin.symbol }}</div>
                 <div class="address">
-                  {{ fromCoin.mintAddress.substr(0, 14) }}
+                  {{ swap.fromCoin.mintAddress.substr(0, 14) }}
                   ...
-                  {{ fromCoin.mintAddress.substr(fromCoin.mintAddress.length - 14, 14) }}
+                  {{ swap.fromCoin.mintAddress.substr(swap.fromCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$accessor.copy(fromCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(swap.fromCoin.mintAddress)" />
                 </div>
               </div>
-              <div v-if="toCoin" class="info">
-                <div class="symbol">{{ toCoin.symbol }}</div>
+              <div v-if="swap.toCoin" class="info">
+                <div class="symbol">{{ swap.toCoin.symbol }}</div>
                 <div class="address">
-                  {{ toCoin.mintAddress.substr(0, 14) }}
+                  {{ swap.toCoin.mintAddress.substr(0, 14) }}
                   ...
-                  {{ toCoin.mintAddress.substr(toCoin.mintAddress.length - 14, 14) }}
+                  {{ swap.toCoin.mintAddress.substr(swap.toCoin.mintAddress.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$accessor.copy(toCoin.mintAddress)" />
+                  <Icon type="copy" @click="$accessor.copy(swap.toCoin.mintAddress)" />
                 </div>
               </div>
               <div v-if="lpMintAddress" class="info">
@@ -85,8 +85,8 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
-          :coin-name="fromCoin ? fromCoin.symbol : ''"
-          :balance="fromCoin ? fromCoin.balance : null"
+          :coin-name="swap.fromCoin ? swap.fromCoin.symbol : ''"
+          :balance="swap.fromCoin ? swap.fromCoin.balance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
@@ -96,7 +96,7 @@
           @onMax="
             () => {
               fixedFromCoin = true
-              fromCoinAmount = fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0'
+              fromCoinAmount = swap.fromCoin && swap.fromCoin.balance ? swap.fromCoin.balance.fixed() : '0'
             }
           "
           @onSelect="openFromCoinSelect"
@@ -111,8 +111,8 @@
         <CoinInput
           v-model="toCoinAmount"
           label="To (Estimate)"
-          :coin-name="toCoin ? toCoin.symbol : ''"
-          :balance="toCoin ? toCoin.balance : null"
+          :coin-name="swap.toCoin ? swap.toCoin.symbol : ''"
+          :balance="swap.toCoin ? swap.toCoin.balance : null"
           :show-max="false"
           :disabled="true"
           @onInput="(amount) => (toCoinAmount = amount)"
@@ -124,45 +124,45 @@
           @onMax="
             () => {
               fixedFromCoin = false
-              toCoinAmount = toCoin.balance.fixed()
+              toCoinAmount = swap.toCoin.balance.fixed()
             }
           "
           @onSelect="openToCoinSelect"
         />
         <div style="padding: 0 12px">
-          <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="fs-container">
+          <div v-if="swap.fromCoin && swap.toCoin && isWrap && fromCoinAmount" class="fs-container">
             <span> Price </span>
             <span>
-              1 {{ fromCoin.symbol }} = 1
-              {{ toCoin.symbol }}
+              1 {{ swap.fromCoin.symbol }} = 1
+              {{ swap.toCoin.symbol }}
             </span>
           </div>
-          <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="fs-container">
+          <div v-else-if="swap.fromCoin && swap.toCoin && lpMintAddress && fromCoinAmount" class="fs-container">
             <span> Price </span>
             <span>
-              1 {{ fromCoin.symbol }} ≈
+              1 {{ swap.fromCoin.symbol }} ≈
               {{ outToPirceValue }}
-              {{ toCoin.symbol }}
+              {{ swap.toCoin.symbol }}
             </span>
           </div>
           <div
-            v-else-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
+            v-else-if="swap.fromCoin && swap.toCoin && marketAddress && market && asks && bids && fromCoinAmount"
             class="fs-container"
           >
             <span> Price </span>
             <span>
-              1 {{ fromCoin.symbol }} ≈
+              1 {{ swap.fromCoin.symbol }} ≈
               {{ outToPirceValue }}
-              {{ toCoin.symbol }}
+              {{ swap.toCoin.symbol }}
             </span>
           </div>
           <div class="fs-container">
             <span> Slippage Tolerance </span>
             <span> {{ $accessor.setting.slippage }}% </span>
           </div>
-          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinAmount" class="fs-container">
+          <div v-if="swap.fromCoin && swap.toCoin && fromCoinAmount && toCoinAmount" class="fs-container">
             <span> Minimum received </span>
-            <span> {{ toCoinAmount }} {{ toCoin.symbol }} </span>
+            <span> {{ toCoinAmount }} {{ swap.toCoin.symbol }} </span>
           </div>
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -173,33 +173,35 @@
           size="large"
           ghost
           :disabled="
-            !fromCoin ||
+            !swap.fromCoin ||
             !fromCoinAmount ||
-            !toCoin ||
+            !swap.toCoin ||
             (!marketAddress && !lpMintAddress && !isWrap) ||
             !initialized ||
             loading ||
-            gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(fromCoinAmount, swap.fromCoin && swap.fromCoin.balance ? swap.fromCoin.balance.fixed() : '0') ||
             swaping ||
-            (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
-            (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
+            (swap.fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
+            (swap.toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
           "
           :loading="swaping"
           @click="placeOrder"
         >
-          <template v-if="!fromCoin || !toCoin"> Select a token </template>
+          <template v-if="!swap.fromCoin || !swap.toCoin"> Select a token </template>
           <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
             Insufficient liquidity for this trade
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
-            Insufficient {{ fromCoin.symbol }} balance
+          <template
+            v-else-if="gt(fromCoinAmount, swap.fromCoin && swap.fromCoin.balance ? swap.fromCoin.balance.fixed() : '0')"
+          >
+            Insufficient {{ swap.fromCoin.symbol }} balance
           </template>
-          <template v-else-if="fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)">
+          <template v-else-if="swap.fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)">
             COPE amount must greater than 5
           </template>
-          <template v-else-if="toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount)">
+          <template v-else-if="swap.toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount)">
             COPE amount must greater than 5
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
@@ -211,13 +213,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
-import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
+import { TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
@@ -226,8 +228,6 @@ import { getOutAmount, getSwapOutAmount, place, swap, wrap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getPoolByTokenMintAddresses, canWrap } from '@/utils/liquidity'
-
-const RAY = getTokenBySymbol('RAY')
 
 export default Vue.extend({
   components: {
@@ -255,8 +255,6 @@ export default Vue.extend({
       selectFromCoin: true,
       fixedFromCoin: true,
 
-      fromCoin: RAY as TokenInfo | null,
-      toCoin: null as TokenInfo | null,
       fromCoinAmount: '',
       toCoinAmount: '',
 
@@ -297,15 +295,6 @@ export default Vue.extend({
       },
       deep: true
     },
-
-    fromCoin() {
-      this.findMarket()
-    },
-
-    toCoin() {
-      this.findMarket()
-    },
-
     marketAddress() {
       this.updateAmounts()
     },
@@ -326,8 +315,8 @@ export default Vue.extend({
   },
 
   methods: {
+    ...mapMutations({ setFromCoin: 'swap/setFromCoin', setToCoin: 'swap/setToCoin' }),
     gt,
-
     openFromCoinSelect() {
       this.selectFromCoin = true
       this.coinSelectShow = true
@@ -340,32 +329,33 @@ export default Vue.extend({
 
     onCoinSelect(tokenInfo: TokenInfo) {
       if (this.selectFromCoin) {
-        this.fromCoin = cloneDeep(tokenInfo)
+        this.setFromCoin(cloneDeep(tokenInfo))
 
-        if (this.toCoin?.mintAddress === tokenInfo.mintAddress) {
-          this.toCoin = null
+        if (this.swap.toCoin?.mintAddress === tokenInfo.mintAddress) {
+          this.setToCoin(null)
           this.changeCoinAmountPosition()
         }
       } else {
-        this.toCoin = cloneDeep(tokenInfo)
+        this.setToCoin(cloneDeep(tokenInfo))
 
-        if (this.fromCoin?.mintAddress === tokenInfo.mintAddress) {
-          this.fromCoin = null
+        if (this.swap.fromCoin?.mintAddress === tokenInfo.mintAddress) {
+          this.setFromCoin(null)
           this.changeCoinAmountPosition()
         }
       }
 
       this.coinSelectShow = false
+      this.findMarket()
     },
 
     changeCoinPosition() {
-      const tempFromCoin = this.fromCoin
-      const tempToCoin = this.toCoin
-
-      this.fromCoin = tempToCoin
-      this.toCoin = tempFromCoin
+      const tempFromCoin = this.swap.fromCoin
+      const tempToCoin = this.swap.toCoin
+      this.setFromCoin(tempToCoin)
+      this.setToCoin(tempFromCoin)
 
       this.changeCoinAmountPosition()
+      this.findMarket()
     },
 
     changeCoinAmountPosition() {
@@ -377,35 +367,36 @@ export default Vue.extend({
     },
 
     updateCoinInfo(tokenAccounts: any) {
-      if (this.fromCoin) {
-        const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
+      if (this.swap.fromCoin) {
+        const fromCoin = tokenAccounts[this.swap.fromCoin.mintAddress]
 
         if (fromCoin) {
-          this.fromCoin = { ...this.fromCoin, ...fromCoin }
+          this.setFromCoin({ ...this.swap.fromCoin, ...fromCoin })
         }
       }
 
-      if (this.toCoin) {
-        const toCoin = tokenAccounts[this.toCoin.mintAddress]
+      if (this.swap.toCoin) {
+        const toCoin = tokenAccounts[this.swap.toCoin.mintAddress]
 
         if (toCoin) {
-          this.toCoin = { ...this.toCoin, ...toCoin }
+          this.setToCoin({ ...this.swap.toCoin, ...toCoin })
         }
       }
-    },
 
+      this.findMarket()
+    },
     findMarket() {
-      if (this.fromCoin && this.toCoin) {
+      if (this.swap.fromCoin && this.swap.toCoin) {
         let marketAddress = ''
 
         // wrap & unwrap
-        if (canWrap(this.fromCoin.mintAddress, this.toCoin.mintAddress)) {
+        if (canWrap(this.swap.fromCoin.mintAddress, this.swap.toCoin.mintAddress)) {
           this.isWrap = true
           this.initialized = true
           return
         }
 
-        const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
+        const pool = getPoolByTokenMintAddresses(this.swap.fromCoin.mintAddress, this.swap.toCoin.mintAddress)
         if (pool && pool.version === 4) {
           this.lpMintAddress = pool.lp.mintAddress
           this.initialized = true
@@ -416,8 +407,8 @@ export default Vue.extend({
         for (const address of Object.keys(this.swap.markets)) {
           const info = cloneDeep(this.swap.markets[address])
 
-          let fromMint = this.fromCoin.mintAddress
-          let toMint = this.toCoin.mintAddress
+          let fromMint = this.swap.fromCoin.mintAddress
+          let toMint = this.swap.toCoin.mintAddress
 
           if (fromMint === NATIVE_SOL.mintAddress) {
             fromMint = TOKENS.WSOL.mintAddress
@@ -505,13 +496,13 @@ export default Vue.extend({
     },
 
     updateAmounts() {
-      if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
+      if (this.swap.fromCoin && this.swap.toCoin && this.isWrap && this.fromCoinAmount) {
         this.toCoinAmount = this.fromCoinAmount
-      } else if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
+      } else if (this.swap.fromCoin && this.swap.toCoin && this.lpMintAddress && this.fromCoinAmount) {
         const { amountOut } = getSwapOutAmount(
           get(this.liquidity.infos, this.lpMintAddress),
-          this.fromCoin.mintAddress,
-          this.toCoin.mintAddress,
+          this.swap.fromCoin.mintAddress,
+          this.swap.toCoin.mintAddress,
           this.fromCoinAmount,
           this.setting.slippage
         )
@@ -523,13 +514,13 @@ export default Vue.extend({
           this.toCoinAmount = toCoinAmount
           this.outToPirceValue = new TokenAmount(
             parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
-            this.toCoin.decimals,
+            this.swap.toCoin.decimals,
             false
           ).format()
         }
       } else if (
-        this.fromCoin &&
-        this.toCoin &&
+        this.swap.fromCoin &&
+        this.swap.toCoin &&
         this.marketAddress &&
         this.market &&
         this.asks &&
@@ -540,13 +531,13 @@ export default Vue.extend({
           this.market,
           this.asks,
           this.bids,
-          this.fromCoin.mintAddress,
-          this.toCoin.mintAddress,
+          this.swap.fromCoin.mintAddress,
+          this.swap.toCoin.mintAddress,
           this.fromCoinAmount,
           this.setting.slippage
         )
 
-        const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
+        const out = new TokenAmount(amountOut, this.swap.toCoin.decimals, false)
 
         if (out.isNullOrZero()) {
           this.toCoinAmount = ''
@@ -554,7 +545,7 @@ export default Vue.extend({
           this.toCoinAmount = out.fixed()
           this.outToPirceValue = new TokenAmount(
             amountOut / parseFloat(this.fromCoinAmount),
-            this.toCoin.decimals,
+            this.swap.toCoin.decimals,
             false
           ).format()
         }
@@ -595,13 +586,13 @@ export default Vue.extend({
           // @ts-ignore
           this.$wallet,
           // @ts-ignore
-          this.fromCoin.mintAddress,
+          this.swap.fromCoin.mintAddress,
           // @ts-ignore
-          this.toCoin.mintAddress,
+          this.swap.toCoin.mintAddress,
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.fromCoin.mintAddress}.tokenAccountAddress`),
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount
         )
           .then((txid) => {
@@ -615,7 +606,7 @@ export default Vue.extend({
                 ])
             })
 
-            const description = `Unwrap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            const description = `Unwrap ${this.fromCoinAmount} ${this.swap.fromCoin?.symbol} to ${this.toCoinAmount} ${this.swap.toCoin?.symbol}`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
@@ -635,13 +626,13 @@ export default Vue.extend({
           this.$wallet,
           get(this.liquidity.infos, this.lpMintAddress),
           // @ts-ignore
-          this.fromCoin.mintAddress,
+          this.swap.fromCoin.mintAddress,
           // @ts-ignore
-          this.toCoin.mintAddress,
+          this.swap.toCoin.mintAddress,
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.fromCoin.mintAddress}.tokenAccountAddress`),
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount,
           this.setting.slippage
         )
@@ -656,7 +647,7 @@ export default Vue.extend({
                 ])
             })
 
-            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            const description = `Swap ${this.fromCoinAmount} ${this.swap.fromCoin?.symbol} to ${this.toCoinAmount} ${this.swap.toCoin?.symbol}`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
@@ -678,13 +669,13 @@ export default Vue.extend({
           this.asks,
           this.bids,
           // @ts-ignore
-          this.fromCoin.mintAddress,
+          this.swap.fromCoin.mintAddress,
           // @ts-ignore
-          this.toCoin.mintAddress,
+          this.swap.toCoin.mintAddress,
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.fromCoin.mintAddress}.tokenAccountAddress`),
           // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          get(this.wallet.tokenAccounts, `${this.swap.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount,
           this.setting.slippage
         )
@@ -699,7 +690,7 @@ export default Vue.extend({
                 ])
             })
 
-            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+            const description = `Swap ${this.fromCoinAmount} ${this.swap.fromCoin?.symbol} to ${this.toCoinAmount} ${this.swap.toCoin?.symbol}`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
