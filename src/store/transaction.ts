@@ -6,11 +6,28 @@ import LocalStorage from '@/utils/local-storage'
 import { getUnixTs } from '@/utils'
 import logger from '@/utils/logger'
 
+const history = LocalStorage.get('RAY_TX_HISTORY')
+
 export const state = () => ({
-  history: {}
+  history: history ? JSON.parse(history) : {}
 })
 
-export const getters = getterTree(state, {})
+export const getters = getterTree(state, {
+  reverseHistory: (state) => {
+    const reversedHistory: { [key: string]: any } = {}
+    const keys = []
+
+    for (const key in state.history) {
+      keys.push(key)
+    }
+
+    for (let i = keys.length - 1; i >= 0; i--) {
+      const value = state.history[keys[i]]
+      reversedHistory[keys[i]] = value
+    }
+    return reversedHistory
+  }
+})
 
 export const mutations = mutationTree(state, {
   pushTx(state: any, [txid, description]: [txid: string, description: string]) {

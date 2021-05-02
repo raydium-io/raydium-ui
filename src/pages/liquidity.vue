@@ -486,6 +486,108 @@ export default Vue.extend({
         duration: 0
       })
 
+      console.log(
+        'add liquidity',
+        JSON.stringify({
+          poolInfo,
+          fromCoinAccount,
+          toCoinAccount,
+          lpAccount,
+          fromCoin: this.fromCoin,
+          toCoin: this.toCoin,
+          fromCoinAmount: this.fromCoinAmount,
+          toCoinAmount: this.toCoinAmount,
+          fixedCoin: this.fixedCoin
+        })
+      )
+
+      // const stepFarm = {
+      //   poolInfo: {
+      //     name: 'STEP-USDC',
+      //     coin: {
+      //       symbol: 'STEP',
+      //       name: 'STEP',
+      //       mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
+      //       decimals: 9,
+      //       referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
+      //       balance: { decimals: 9, _decimals: '1000000000', wei: '13406266428736201' }
+      //     },
+      //     pc: {
+      //       symbol: 'USDC',
+      //       name: 'USDC',
+      //       mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      //       decimals: 6,
+      //       referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
+      //       balance: { decimals: 6, _decimals: '1000000', wei: '90970145059098' }
+      //     },
+      //     lp: {
+      //       symbol: 'STEP-USDC',
+      //       name: 'STEP-USDC LP',
+      //       coin: {
+      //         symbol: 'STEP',
+      //         name: 'STEP',
+      //         mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
+      //         decimals: 9,
+      //         referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
+      //       },
+      //       pc: {
+      //         symbol: 'USDC',
+      //         name: 'USDC',
+      //         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      //         decimals: 6,
+      //         referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
+      //       },
+      //       mintAddress: '3k8BDobgihmk72jVmXYLE168bxxQUhqqyESW4dQVktqC',
+      //       decimals: 9,
+      //       totalSupply: { decimals: 9, _decimals: '1000000000', wei: '2845973147894810' }
+      //     },
+      //     version: 4,
+      //     programId: '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
+      //     ammId: '4Sx1NLrQiK4b9FdLKe2DhQ9FHvRzJhzKN3LoD6BrEPnf',
+      //     ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+      //     ammOpenOrders: 'EXgME2sUuzBxEc2wuyoSZ8FZNZMC3ChhZgFZRAW3nCQG',
+      //     ammTargetOrders: '78bwAGKJjaiPQqmwKmbj4fhrRTLAdzwqNwpFdpTzrhk1',
+      //     ammQuantities: '11111111111111111111111111111111',
+      //     poolCoinTokenAccount: '8Gf8Cc6yrxtfUZqM2vf2kg5uR9bGPfCHfzdYRVBAJSJj',
+      //     poolPcTokenAccount: 'ApLc86fHjVbGbU9QFzNPNuWM5VYckZM92q6sgJN1SGYn',
+      //     poolWithdrawQueue: '5bzBcB7cnJYGYvGPFxKcZETn6sGAyBbXgFhUbefbagYh',
+      //     poolTempLpTokenAccount: 'CpfWKDYNYfvgk42tqR8HEHUWohGSJjASXfRBm3yaKJre',
+      //     serumProgramId: '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin',
+      //     serumMarket: '97qCB4cAVSTthvJu3eNoEx6AY6DLuRDtCoPm5Tdyg77S',
+      //     serumBids: '5Xdpf7CMGFDkJj1smcVQAAZG6GY9gqAns18QLKbPZKsw',
+      //     serumAsks: '6Tqwg8nrKJrcqsr4zR9wJuPv3iXsHAMN65FxwJ3RMH8S',
+      //     serumEventQueue: '5frw4m8pEZHorTKVzmMzvf8xLUrj65vN7wA57KzaZFK3',
+      //     serumCoinVaultAccount: 'CVNye3Xr9Jv26c8TVqZZHq4F43BhoWWfmrzyp1M9YA67',
+      //     serumPcVaultAccount: 'AnGbReAhCDFkR83nB8mXTDX5dQJFB8Pwicu6pGMfCLjt',
+      //     serumVaultSigner: 'FbwU5U1Doj2PSKRJi7pnCny4dFPPJURwALkFhHwdHaMW',
+      //     fees: { swapFeeNumerator: 3, swapFeeDenominator: 1000 }
+      //   },
+      //   fromCoinAccount: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
+      //   toCoinAccount: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
+      //   lpAccount: 'HtJhjCUjXVUVFwuL3sKmGnhLEoKy6qSyNfdzQMwUYxo5',
+      //   fromCoin: {
+      //     symbol: 'STEP',
+      //     name: 'STEP',
+      //     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
+      //     decimals: 9,
+      //     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
+      //     tokenAccountAddress: 'AC54bgMigTPJ8WxxQP2HKesJuwvi5ErBMdaZDres4TtA',
+      //     balance: { decimals: 9, _decimals: '1000000000', wei: '21614559111' }
+      //   },
+      //   toCoin: {
+      //     symbol: 'USDC',
+      //     name: 'USDC',
+      //     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      //     decimals: 6,
+      //     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
+      //     tokenAccountAddress: '7zThNBKM4Hj963tvTzZpzZJ8xzAqUthKcfhyuZZ9ct65',
+      //     balance: { decimals: 6, _decimals: '1000000', wei: '65387551' }
+      //   },
+      //   fromCoinAmount: '9.732522',
+      //   toCoinAmount: '65.387551',
+      //   fixedCoin: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      // }
+
       addLiquidity(
         conn,
         wallet,
