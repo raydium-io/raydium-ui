@@ -12,7 +12,7 @@ import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/u
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
 import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
-import { TokenAmount } from '@/utils/safe-math'
+import { TokenAmount, lt } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
@@ -164,16 +164,28 @@ export const actions = actionTree(
               const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
 
               const poolId = userStakeInfo.poolId.toBase58()
-              const depositBalance = userStakeInfo.depositBalance.toNumber()
+
               const rewardDebt = userStakeInfo.rewardDebt.toNumber()
 
               const farm = getFarmByPoolId(poolId)
 
               if (farm) {
-                stakeAccounts[poolId] = {
-                  depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                  rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                  stakeAccountAddress
+                const depositBalance = new TokenAmount(userStakeInfo.depositBalance.toNumber(), farm.lp.decimals)
+
+                if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
+                  if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                    stakeAccounts[poolId] = {
+                      depositBalance,
+                      rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                      stakeAccountAddress
+                    }
+                  }
+                } else {
+                  stakeAccounts[poolId] = {
+                    depositBalance,
+                    rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                    stakeAccountAddress
+                  }
                 }
               }
             })
@@ -200,19 +212,33 @@ export const actions = actionTree(
                   const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
 
                   const poolId = userStakeInfo.poolId.toBase58()
-                  const depositBalance = userStakeInfo.depositBalance.toNumber()
+
                   const rewardDebt = userStakeInfo.rewardDebt.toNumber()
                   const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
 
                   const farm = getFarmByPoolId(poolId)
 
                   if (farm) {
-                    stakeAccounts[poolId] = {
-                      depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                      rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                      // @ts-ignore
-                      rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                      stakeAccountAddress
+                    const depositBalance = new TokenAmount(userStakeInfo.depositBalance.toNumber(), farm.lp.decimals)
+
+                    if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
+                      if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                        stakeAccounts[poolId] = {
+                          depositBalance,
+                          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                          // @ts-ignore
+                          rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                          stakeAccountAddress
+                        }
+                      }
+                    } else {
+                      stakeAccounts[poolId] = {
+                        depositBalance,
+                        rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                        // @ts-ignore
+                        rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                        stakeAccountAddress
+                      }
                     }
                   }
                 })
@@ -226,19 +252,36 @@ export const actions = actionTree(
                       const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
 
                       const poolId = userStakeInfo.poolId.toBase58()
-                      const depositBalance = userStakeInfo.depositBalance.toNumber()
+
                       const rewardDebt = userStakeInfo.rewardDebt.toNumber()
                       const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
 
                       const farm = getFarmByPoolId(poolId)
 
                       if (farm) {
-                        stakeAccounts[poolId] = {
-                          depositBalance: new TokenAmount(depositBalance, farm.lp.decimals),
-                          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                          // @ts-ignore
-                          rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                          stakeAccountAddress
+                        const depositBalance = new TokenAmount(
+                          userStakeInfo.depositBalance.toNumber(),
+                          farm.lp.decimals
+                        )
+
+                        if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
+                          if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                            stakeAccounts[poolId] = {
+                              depositBalance,
+                              rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                              // @ts-ignore
+                              rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                              stakeAccountAddress
+                            }
+                          }
+                        } else {
+                          stakeAccounts[poolId] = {
+                            depositBalance,
+                            rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+                            // @ts-ignore
+                            rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+                            stakeAccountAddress
+                          }
                         }
                       }
                     })
