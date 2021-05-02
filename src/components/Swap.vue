@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
-      <span class="title">Swap</span>
+      <span class="title">Swap (manual)</span>
       <div class="buttons">
         <Tooltip v-if="marketAddress" placement="bottomRight">
           <template slot="title">
