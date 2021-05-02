@@ -134,14 +134,28 @@ export default class Wallet extends Vue {
     window.clearInterval(this.idoTimer)
   }
 
+  mounted() {
+    // automatically connect wallet after page refresh if user already connected
+    if (this.wallet.walletName) {
+      const success = this.connect(this.wallet.walletName)
+      if (!success) {
+        // clears local storage when unsuccessfully connected
+        // this happens when a user connects with a wallet, then disables the wallet extension
+        this.$accessor.wallet.setDisconnected()
+      }
+    }
+  }
+
   /* ========== WATCH ========== */
 
   /* ========== METHODS ========== */
   importIcon = importIcon
 
-  connect(walletName: string) {
+  connect(walletName: string): boolean {
     let wallet: WalletAdapter
     const endpoint = getRandomEndpoint()
+
+    logger('connect walletName', walletName)
 
     switch (walletName) {
       case 'Ledger': {
@@ -154,7 +168,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Sollet wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new SolanaWalletAdapter((window as any).sollet, endpoint)
@@ -166,7 +180,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Solong wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new SolongWalletAdapter()
@@ -178,7 +192,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Math wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new MathWalletAdapter()
@@ -190,7 +204,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Phantom wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new PhantomWalletAdapter()
@@ -206,7 +220,7 @@ export default class Wallet extends Vue {
       this.$accessor.wallet.closeModal().then(() => {
         if (wallet.publicKey) {
           Vue.prototype.$wallet = wallet
-          this.$accessor.wallet.setConnected(wallet.publicKey.toBase58())
+          this.$accessor.wallet.setConnected({ address: wallet.publicKey.toBase58(), walletName })
 
           this.subWallet()
           this.$notify.success({
@@ -223,11 +237,13 @@ export default class Wallet extends Vue {
 
     try {
       wallet.connect()
+      return true
     } catch (error) {
       this.$notify.error({
         message: 'Connect wallet failed',
         description: error.message
       })
+      return false
     }
   }
 

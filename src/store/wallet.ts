@@ -7,8 +7,19 @@ import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount, lt } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
+import LocalStorage from '@/utils/local-storage'
 
 const AUTO_REFRESH_TIME = 60
+
+const storedWallet = LocalStorage.get('RAY_WALLET')
+const wallet: { address: string; walletName: string } = storedWallet
+  ? JSON.parse(storedWallet)
+  : {
+      address: '',
+      walletName: ''
+    }
+
+logger('wallet', wallet)
 
 export const state = () => ({
   initialized: false,
@@ -20,7 +31,8 @@ export const state = () => ({
   lastSubBlock: 0,
 
   connected: false,
-  address: '',
+  address: wallet.address,
+  walletName: wallet.walletName,
 
   tokenAccounts: {}
 })
@@ -32,14 +44,18 @@ export const mutations = mutationTree(state, {
     state.modalShow = show
   },
 
-  setConnected(state, address: string) {
+  setConnected(state, { address, walletName }: { address: string; walletName: string }) {
     state.connected = true
     state.address = address
+    state.walletName = walletName
+    LocalStorage.set('RAY_WALLET', JSON.stringify({ address, walletName }))
   },
 
   setDisconnected(state) {
     state.connected = false
     state.address = ''
+    state.walletName = ''
+    LocalStorage.remove('RAY_WALLET')
   },
 
   setInitialized(state) {

@@ -6,4 +6,8 @@ export default class LocalStorage {
   static set(name: string, val: any) {
     return localStorage.setItem(name, val)
   }
+
+  static remove(name: string) {
+    return localStorage.removeItem(name)
+  }
 }
