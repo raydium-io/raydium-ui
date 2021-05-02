@@ -735,10 +735,11 @@ export default Vue.extend({
   }
 
   .history {
-    margin-top: 20px;
+    margin-top: 40px;
 
     .title {
       font-size: 20px;
+      margin-bottom: 10px;
     }
   }
 
