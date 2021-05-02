@@ -460,7 +460,7 @@ export default Vue.extend({
     stake(amount: string) {
       this.staking = true
 
-      logger('stake', amount, JSON.stringify(this.farmInfo))
+      // logger('stake', amount, JSON.stringify(this.farmInfo))
 
       const conn = this.$web3
       const wallet = (this as any).$wallet
@@ -533,7 +533,7 @@ export default Vue.extend({
     },
 
     harvest(farmInfo: FarmInfo) {
-      logger('harvest farmInfo', JSON.stringify(farmInfo, null, 2))
+      // logger('harvest farmInfo', JSON.stringify(farmInfo, null, 2))
 
       this.farmInfo = cloneDeep(farmInfo)
 
@@ -612,7 +612,7 @@ export default Vue.extend({
       toCoinSymbol: string
       farmInfo: FarmInfo
     }) {
-      logger('onLiquidityAdded', JSON.stringify(tx, null, 2))
+      // logger('onLiquidityAdded', JSON.stringify(tx, null, 2))
       await sleep(1500)
 
       // update wallet
@@ -631,7 +631,7 @@ export default Vue.extend({
         return
       }
 
-      logger('found farm info', JSON.stringify(farmInfo))
+      // logger('found farm info', JSON.stringify(farmInfo))
 
       this.openStakeModal(farmInfo, farmInfo.lp)
 
