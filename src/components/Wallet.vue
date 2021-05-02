@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal">
-      <Icon type="wallet" />
+    <Button v-if="!wallet.connected" ghost :loading="autoConnectWallet" @click="$accessor.wallet.openModal">
+      <Icon v-if="!autoConnectWallet" type="wallet" />
       Connect
     </Button>
     <Button v-else ghost @click="$accessor.wallet.openModal">
@@ -91,6 +91,8 @@ export default class Wallet extends Vue {
   // web3 listener
   walletListenerId = null as number | null
 
+  autoConnectWallet: boolean = false
+
   /* ========== COMPUTED ========== */
   get wallet() {
     return this.$accessor.wallet
@@ -129,12 +131,16 @@ export default class Wallet extends Vue {
   mounted() {
     // automatically connect wallet after page refresh if user already connected
     if (this.wallet.walletName) {
-      const success = this.connect(this.wallet.walletName)
-      if (!success) {
-        // clears local storage when unsuccessfully connected
-        // this happens when a user connects with a wallet, then disables the wallet extension
-        this.$accessor.wallet.setDisconnected()
-      }
+      this.autoConnectWallet = true // will be reset later in connect/disconnect/fail handler
+      // wait till page loaded == extensions injected
+      window.addEventListener('load', () => {
+        const success = this.connect(this.wallet.walletName)
+        if (!success) {
+          // clears local storage when unsuccessfully connected
+          // this happens when a user connects with a wallet, then disables the wallet extension
+          this.$accessor.wallet.setDisconnected()
+        }
+      })
     }
   }
 
@@ -218,6 +224,7 @@ export default class Wallet extends Vue {
 
     wallet.on('connect', () => {
       this.$accessor.wallet.closeModal().then(() => {
+        this.autoConnectWallet = false
         if (wallet.publicKey) {
           Vue.prototype.$wallet = wallet
           this.$accessor.wallet.setConnected({ address: wallet.publicKey.toBase58(), walletName })
@@ -239,6 +246,7 @@ export default class Wallet extends Vue {
       wallet.connect()
       return true
     } catch (error) {
+      this.autoConnectWallet = false
       this.$notify.error({
         message: 'Connect wallet failed',
         description: error.message
@@ -248,6 +256,7 @@ export default class Wallet extends Vue {
   }
 
   disconnect() {
+    this.autoConnectWallet = false
     Vue.prototype.$wallet.disconnect()
     Vue.prototype.$wallet = null
 
