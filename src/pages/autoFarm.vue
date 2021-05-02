@@ -31,9 +31,16 @@
         <h3>Steps:</h3>
         <ol>
           <li>Harvest Pool</li>
-          <li>Provide Liquidity (if not possible, it swaps half of harvested coins to USDC)</li>
+          <li>Provide Liquidity</li>
           <li>Stake LP</li>
         </ol>
+        <p>
+          Just hit the "Auto Farm" button to execute everything for you. You just need to confirm the TXs in your wallet
+          as usual.
+        </p>
+        <p>
+          <i>This page will not swap anything automatically, you need to swap manually, to avoid any unwanted swaps.</i>
+        </p>
       </div>
     </div>
 
@@ -124,30 +131,20 @@
                         :loading="harvesting"
                         @click="harvest(farm.farmInfo)"
                       >
-                        Auto Harvest & Stake
+                        Auto Farm
                       </Button>
                     </div>
                   </div>
                 </Col>
 
                 <Col :span="isMobile ? 24 : 9">
-                  <p>Swap:</p>
-                  <div style="word-break: break-all">
-                    from: {{ farm.farmInfo.lp.coin.symbol }} {{ farm.farmInfo.lp.coin.mintAddress }}
-                  </div>
-                  <div style="word-break: break-all">
-                    to: {{ farm.farmInfo.lp.pc.symbol }} {{ farm.farmInfo.lp.pc.mintAddress }}
-                  </div>
+                  <Swap
+                    :from-coin-mint-address="farm.farmInfo.lp.coin.mintAddress"
+                    :to-coin-mint-address="farm.farmInfo.lp.pc.mintAddress"
+                  />
                 </Col>
 
                 <Col :span="isMobile ? 24 : 9">
-                  <!--                  <p>Add liquidity:</p>-->
-                  <!--                  <NuxtLink-->
-                  <!--                    :to="`/liquidity/?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"-->
-                  <!--                  >-->
-                  <!--                    {{ farm.farmInfo.lp.name }}-->
-                  <!--                  </NuxtLink>-->
-
                   <LiquidityProvider
                     :from-coin-mint-address="farm.farmInfo.lp.coin.mintAddress"
                     :to-coin-mint-address="farm.farmInfo.lp.pc.mintAddress"
@@ -168,10 +165,9 @@
 
                   <div class="start">
                     <div class="title">Start farming</div>
-                    <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-                      Connect Wallet
-                    </Button>
-                    <div v-else class="fs-container">
+                    <div>LP: {{ getUserBalanceByFarmInfo(farm.farmInfo).fixed() }}</div>
+                    <br />
+                    <div class="fs-container">
                       <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
                         Stake LP
                       </Button>
@@ -215,6 +211,7 @@ import Vue from 'vue'
 import { mapGetters, mapState } from 'vuex'
 import { Button, Col, Collapse, Icon, Progress, Row, Spin, Tooltip } from 'ant-design-vue'
 import LiquidityProvider from '@/components/LiquidityProvider.vue'
+import Swap from '@/components/Swap.vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -237,7 +234,8 @@ export default Vue.extend({
     Row,
     Col,
     Button,
-    LiquidityProvider
+    LiquidityProvider,
+    Swap
   },
 
   data() {
@@ -439,10 +437,13 @@ export default Vue.extend({
       }
     },
 
+    getUserBalanceByFarmInfo(farmInfo: FarmInfo): TokenAmount {
+      return get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.balance`) || new TokenAmount(0)
+    },
+
     openStakeModal(farmInfo: FarmInfo, lp: any) {
       const coin = cloneDeep(lp)
-      const lpBalance = get(this.wallet.tokenAccounts, `${lp.mintAddress}.balance`)
-      console.log('lpBalance', lpBalance)
+      const lpBalance = this.getUserBalanceByFarmInfo(farmInfo)
       coin.balance = lpBalance
 
       this.lp = coin
@@ -505,10 +506,15 @@ export default Vue.extend({
           this.harvesting = false
           this.cancelStake()
 
-          // update wallet
-          await this.$accessor.wallet.getTokenAccounts()
-          await this.$accessor.farm.requestInfos()
+          await this.updateAll()
         })
+    },
+
+    async updateAll(): Promise<void> {
+      // update wallet
+      await this.$accessor.wallet.getTokenAccounts()
+      await this.$accessor.farm.requestInfos()
+      await sleep(1000)
     },
 
     cancelStake() {
@@ -599,10 +605,10 @@ export default Vue.extend({
       farmInfo: FarmInfo
     }) {
       logger('onLiquidityAdded', JSON.stringify(tx, null, 2))
-      // update wallet
-      await this.$accessor.wallet.getTokenAccounts()
+      await sleep(1500)
 
-      await sleep(1000)
+      // update wallet
+      await this.updateAll()
 
       // the farmInfo provided by LiqudityProvider has no rewards* in it, so we look it up here
       const farmInfo = this.findFarmInfoByMintAddress(tx.farmInfo.lp.mintAddress)

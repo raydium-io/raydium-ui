@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
-      <span class="title">Swap (manual)</span>
+      <span class="title">Swap</span>
       <div class="buttons">
         <Tooltip v-if="marketAddress" placement="bottomRight">
           <template slot="title">
@@ -231,7 +231,7 @@ import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
-import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
+import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS, getTokenByMintAddress } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
@@ -240,6 +240,7 @@ import { getOutAmount, getSwapOutAmount, place, swap, wrap } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getPoolByTokenMintAddresses, canWrap } from '@/utils/liquidity'
+import logger from '@/utils/logger'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -249,6 +250,11 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress
+  },
+
+  props: {
+    fromCoinMintAddress: { type: String, default: '' },
+    toCoinMintAddress: { type: String, default: '' }
   },
 
   data() {
@@ -284,10 +290,6 @@ export default Vue.extend({
       coinBasePrice: true,
       outToPirceValue: null as any
     }
-  },
-
-  head: {
-    title: 'Raydium Swap'
   },
 
   computed: {
@@ -334,6 +336,14 @@ export default Vue.extend({
   },
 
   mounted() {
+    // preset coins
+    if (this.$props.fromCoinMintAddress) {
+      this.fromCoin = cloneDeep(getTokenByMintAddress(this.$props.fromCoinMintAddress))
+    }
+    if (this.$props.toCoinMintAddress) {
+      this.toCoin = cloneDeep(getTokenByMintAddress(this.$props.toCoinMintAddress))
+    }
+
     this.updateCoinInfo(this.wallet.tokenAccounts)
 
     this.setMarketTimer()
@@ -341,6 +351,7 @@ export default Vue.extend({
 
   methods: {
     gt,
+    logger,
 
     openFromCoinSelect() {
       this.selectFromCoin = true
@@ -734,15 +745,29 @@ export default Vue.extend({
 
 <style lang="less" scoped>
 .container {
-  max-width: 450px;
+  padding: 0;
 
-  .change-side {
-    div {
-      height: 32px;
-      width: 32px;
-      border-radius: 50%;
-      background: #000829;
-      cursor: pointer;
+  .page-head {
+    margin: 10px 0;
+
+    .title {
+      font-size: 16px;
+    }
+  }
+
+  .card {
+    .card-body {
+      //padding-top: 14px;
+
+      .change-side {
+        div {
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          background: #000829;
+          cursor: pointer;
+        }
+      }
     }
   }
 }

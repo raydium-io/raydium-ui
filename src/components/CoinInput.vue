@@ -27,6 +27,20 @@
       >
         MAX
       </button>
+      <button
+        v-if="
+          showHalf &&
+          balance &&
+          (!value || lt(value, balance.toEther().dividedBy(2)) || gt(value, balance.toEther().dividedBy(2)))
+        "
+        class="max-button"
+        @click="$emit('onHalf')"
+      >
+        50%
+      </button>
+      <button v-if="showClear && balance && value && Number(value)" class="max-button" @click="$emit('onClear')">
+        X
+      </button>
       <button class="select-button fc-container" @click="$emit('onSelect')">
         <div v-if="coinName" class="fc-container">
           <img :src="importIcon(`/coins/${coinName.toLowerCase()}.png`)" />
@@ -44,7 +58,7 @@ import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
 
 import importIcon from '@/utils/import-icon'
-import { lt } from '@/utils/safe-math'
+import { lt, gt } from '@/utils/safe-math'
 
 export default Vue.extend({
   components: {
@@ -77,6 +91,14 @@ export default Vue.extend({
       type: Boolean,
       default: true
     },
+    showHalf: {
+      type: Boolean,
+      default: false
+    },
+    showClear: {
+      type: Boolean,
+      default: false
+    },
     disabled: {
       type: Boolean,
       default: false
@@ -85,7 +107,8 @@ export default Vue.extend({
 
   methods: {
     importIcon,
-    lt
+    lt,
+    gt
   }
 })
 </script>
