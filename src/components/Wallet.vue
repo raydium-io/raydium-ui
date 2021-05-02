@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal">
-      <Icon type="wallet" />
+    <Button v-if="!wallet.connected" ghost :loading="autoConnectWallet" @click="$accessor.wallet.openModal">
+      <Icon v-if="!autoConnectWallet" type="wallet" />
       Connect
     </Button>
     <Button v-else ghost @click="$accessor.wallet.openModal">
@@ -91,6 +91,8 @@ export default class Wallet extends Vue {
   // web3 listener
   walletListenerId = null as number | null
 
+  autoConnectWallet: boolean = false
+
   /* ========== COMPUTED ========== */
   get wallet() {
     return this.$accessor.wallet
@@ -126,6 +128,23 @@ export default class Wallet extends Vue {
     this.setIdoTimer()
   }
 
+  mounted() {
+    // automatically connect wallet after page refresh if user already connected
+    if (this.wallet.walletName) {
+      this.autoConnectWallet = true // will be reset later in connect/disconnect/fail handler
+      // wait till page loaded == extensions injected
+      window.addEventListener('load', () => {
+        const success = this.connect(this.wallet.walletName)
+        if (!success) {
+          // clears local storage when unsuccessfully connected
+          // this happens when a user connects with a wallet, then disables the wallet extension
+          this.$accessor.wallet.setDisconnected()
+          this.autoConnectWallet = false
+        }
+      })
+    }
+  }
+
   beforeDestroy() {
     window.clearInterval(this.walletTimer)
     window.clearInterval(this.priceTimer)
@@ -139,7 +158,7 @@ export default class Wallet extends Vue {
   /* ========== METHODS ========== */
   importIcon = importIcon
 
-  connect(walletName: string) {
+  connect(walletName: string): boolean {
     let wallet: WalletAdapter
     const endpoint = getRandomEndpoint()
 
@@ -154,7 +173,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Sollet wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new SolanaWalletAdapter((window as any).sollet, endpoint)
@@ -166,7 +185,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Solong wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new SolongWalletAdapter()
@@ -178,7 +197,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Math wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new MathWalletAdapter()
@@ -190,7 +209,7 @@ export default class Wallet extends Vue {
             message: 'Connect wallet failed',
             description: 'Please install and initialize Phantom wallet extension first'
           })
-          return
+          return false
         }
 
         wallet = new PhantomWalletAdapter()
@@ -204,9 +223,10 @@ export default class Wallet extends Vue {
 
     wallet.on('connect', () => {
       this.$accessor.wallet.closeModal().then(() => {
+        this.autoConnectWallet = false
         if (wallet.publicKey) {
           Vue.prototype.$wallet = wallet
-          this.$accessor.wallet.setConnected(wallet.publicKey.toBase58())
+          this.$accessor.wallet.setConnected({ address: wallet.publicKey.toBase58(), walletName })
 
           this.subWallet()
           this.$notify.success({
@@ -223,15 +243,19 @@ export default class Wallet extends Vue {
 
     try {
       wallet.connect()
+      return true
     } catch (error) {
+      this.autoConnectWallet = false
       this.$notify.error({
         message: 'Connect wallet failed',
         description: error.message
       })
+      return false
     }
   }
 
   disconnect() {
+    this.autoConnectWallet = false
     Vue.prototype.$wallet.disconnect()
     Vue.prototype.$wallet = null
 
