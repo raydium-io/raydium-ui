@@ -60,7 +60,11 @@
           <Collapse expand-icon-position="right">
             <CollapsePanel
               v-for="farm in farms"
-              v-show="!farm.farmInfo.legacy && !farm.userInfo.pendingRewardB.isNullOrZero()"
+              v-show="
+                !farm.farmInfo.legacy &&
+                ((farm.userInfo.pendingRewardB && !farm.userInfo.pendingRewardB.isNullOrZero()) ||
+                  !farm.userInfo.pendingReward.isNullOrZero())
+              "
               :key="farm.farmInfo.poolId"
             >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
@@ -75,10 +79,12 @@
                 <Col class="state" :span="isMobile ? 6 : 4">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div class="value">
-                    <div v-if="farm.farmInfo.dual">
+                    <div v-if="farm.farmInfo.dual || !farm.farmInfo.rewardB">
                       {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                     </div>
-                    <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
+                    <div v-if="farm.userInfo.pendingRewardB && farm.farmInfo.rewardB">
+                      {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
+                    </div>
                   </div>
                 </Col>
                 <Col v-if="!isMobile" class="state" :span="4">
@@ -90,8 +96,10 @@
                 <Col class="state" :span="isMobile ? 6 : 4">
                   <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
                   <div class="value">
-                    <div v-if="farm.farmInfo.dual">{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
-                    <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                    <div v-if="farm.farmInfo.dual || !farm.farmInfo.rewardB">
+                      {{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%
+                    </div>
+                    <div v-if="farm.farmInfo.rewardB">{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
                   </div>
                 </Col>
                 <Col v-if="!isMobile" class="state" :span="4">
@@ -112,10 +120,10 @@
                     <div class="title">Pending Rewards</div>
                     <div class="pending">
                       <div class="reward">
-                        <div v-if="farm.farmInfo.dual" class="token">
+                        <div v-if="farm.farmInfo.dual || !farm.farmInfo.rewardB" class="token">
                           {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                         </div>
-                        <div class="token">
+                        <div v-if="farm.farmInfo.rewardB" class="token">
                           {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
                         </div>
                       </div>
@@ -127,7 +135,9 @@
                         :disabled="
                           !wallet.connected ||
                           harvesting ||
-                          (farm.userInfo.pendingReward.isNullOrZero() && farm.userInfo.pendingRewardB.isNullOrZero())
+                          (farm.userInfo.pendingReward.isNullOrZero() &&
+                            farm.userInfo.pendingRewardB &&
+                            farm.userInfo.pendingRewardB.isNullOrZero())
                         "
                         :loading="harvesting"
                         @click="harvest(farm.farmInfo)"
@@ -218,9 +228,10 @@ import { cloneDeep, get } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
 import { isNullOrZero, TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { depositV4 } from '@/utils/stake'
+import { deposit, depositV4 } from '@/utils/stake'
 import { getUnixTs, sleep } from '@/utils'
 import logger from '@/utils/logger'
+import { NATIVE_SOL } from '@/utils/tokens'
 
 const CollapsePanel = Collapse.Panel
 
@@ -301,18 +312,16 @@ export default Vue.extend({
     updateFarms() {
       const farms: any = []
 
-      for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
-        // @ts-ignore
-        if (!farmInfo.isStake && [4, 5].includes(farmInfo.version) && farmInfo.fusion) {
+      for (const [poolId, farmInfo] of Object.entries(this.farm.infos) as any) {
+        if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
-          // @ts-ignore
-          const { perShare, perBlock, perShareB, perBlockB } = farmInfo.poolInfo
-          // @ts-ignore
+          const { perShare, perBlock, perShareB, perBlockB, rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo
           const { reward, rewardB, lp } = farmInfo
 
           const newFarmInfo = cloneDeep(farmInfo)
 
-          if (reward && rewardB && lp) {
+          // fusion
+          if (farmInfo.fusion && reward && rewardB && lp) {
             const rewardPerBlockAmount = new TokenAmount(perBlock.toNumber(), reward.decimals)
             const rewardBPerBlockAmount = new TokenAmount(perBlockB.toNumber(), rewardB.decimals)
             const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
@@ -361,9 +370,40 @@ export default Vue.extend({
             newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+          } else if (reward && lp) {
+            // normal farms
+            const rewardPerBlockAmount = new TokenAmount(rewardPerBlock.toNumber(), reward.decimals)
+            const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
+
+            const rewardPerBlockAmountTotalValue =
+              rewardPerBlockAmount.toEther().toNumber() *
+              2 *
+              60 *
+              60 *
+              24 *
+              365 *
+              this.price.prices[reward.symbol as string]
+
+            const liquidityCoinValue =
+              (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
+              this.price.prices[liquidityItem?.coin.symbol as string]
+            const liquidityPcValue =
+              (liquidityItem?.pc.balance as TokenAmount).toEther().toNumber() *
+              this.price.prices[liquidityItem?.pc.symbol as string]
+
+            const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
+            const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
+            const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
+
+            const liquidityUsdValue = lp.balance.toEther().toNumber() * liquidityItemValue
+            const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
+
+            newFarmInfo.apr = apr
+            newFarmInfo.liquidityUsdValue = liquidityUsdValue
           }
 
-          if (userInfo) {
+          // fusion
+          if (farmInfo.fusion && userInfo) {
             userInfo = cloneDeep(userInfo)
 
             const { rewardDebt, rewardDebtB, depositBalance } = userInfo
@@ -386,14 +426,23 @@ export default Vue.extend({
 
             userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
             userInfo.pendingRewardB = new TokenAmount(pendingRewardB, rewardDebtB.decimals)
+          } else if (userInfo) {
+            // normal farms
+            userInfo = cloneDeep(userInfo)
+
+            const { rewardDebt, depositBalance } = userInfo
+
+            const pendingReward = depositBalance.wei
+              .multipliedBy(rewardPerShareNet.toNumber())
+              .dividedBy(1e9)
+              .minus(rewardDebt.wei)
+
+            userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
           } else {
             userInfo = {
-              // @ts-ignore
               depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
-              // @ts-ignore
               pendingReward: new TokenAmount(0, farmInfo.reward.decimals),
-              // @ts-ignore
-              pendingRewardB: new TokenAmount(0, farmInfo.rewardB.decimals)
+              pendingRewardB: farmInfo.rewardB && new TokenAmount(0, farmInfo.rewardB.decimals)
             }
           }
 
@@ -460,14 +509,15 @@ export default Vue.extend({
     stake(amount: string) {
       this.staking = true
 
-      // logger('stake', amount, JSON.stringify(this.farmInfo))
-
       const conn = this.$web3
       const wallet = (this as any).$wallet
 
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+      // only for fusion pools:
+      const rewardAccountB = this.farmInfo.rewardB
+        ? get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+        : undefined
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
 
       const key = getUnixTs().toString()
@@ -478,12 +528,26 @@ export default Vue.extend({
         duration: 0
       })
 
-      logger(
-        'stake',
-        JSON.stringify({ farmInfo: this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount })
-      )
+      let depositPromise
 
-      depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+      if (this.farmInfo.fusion) {
+        // fusion
+        depositPromise = depositV4(
+          conn,
+          wallet,
+          this.farmInfo,
+          lpAccount,
+          rewardAccount,
+          rewardAccountB,
+          infoAccount,
+          amount
+        )
+      } else {
+        // normal farm
+        depositPromise = deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+      }
+
+      depositPromise
         .then(async (txid) => {
           this.$notify.info({
             key,
@@ -544,8 +608,10 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      // @ts-ignore
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+      // only for fusion pools:
+      const rewardAccountB = farmInfo.rewardB
+        ? get(this.wallet.tokenAccounts, `${farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+        : undefined
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
 
       const key = getUnixTs().toString()
@@ -556,7 +622,17 @@ export default Vue.extend({
         duration: 0
       })
 
-      depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+      let depositPromise
+
+      if (farmInfo.fusion) {
+        // fusion
+        depositPromise = depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+      } else {
+        // normal farm
+        depositPromise = deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+      }
+
+      depositPromise
         .then(async (txid) => {
           this.$notify.info({
             key,
@@ -568,12 +644,32 @@ export default Vue.extend({
               ]),
             duration: 10
           })
-          // @ts-ignore
-          const description = `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
+          const description = farmInfo.rewardB
+            ? // fusion
+              `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB.symbol} from ${farmInfo.lp.name}`
+            : // normal farm
+              `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
           await this.$accessor.transaction.sub({ txid, description })
           // wait till confirmed ^
 
           await sleep(1000)
+
+          if (
+            farmInfo.lp.coin?.mintAddress === NATIVE_SOL.mintAddress ||
+            farmInfo.lp.pc?.mintAddress === NATIVE_SOL.mintAddress
+          ) {
+            this.$notify.error({
+              key,
+              message: 'Auto Farm stopped',
+              description: (h: any) =>
+                h('div', [
+                  'Add liquidity is disabled for SOL farms to avoid supplying MAX SOL into farm, that would lock your account, because you cannot pay fee anymore.',
+                  h('p', 'You can still add liquidity manually on the right side, but not 100% SOL!!!')
+                ]),
+              duration: 0
+            })
+            return
+          }
 
           // trigger supply LP
           this.changeTriggerSupplyLP(farmInfo)
