@@ -136,6 +136,8 @@
             liquidity.loading ||
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
             gt(toCoinAmount, toCoin.balance.fixed()) ||
+            isNullOrZero(fromCoinAmount) ||
+            isNullOrZero(toCoinAmount) ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
@@ -146,6 +148,7 @@
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
+          <template v-else-if="isNullOrZero(fromCoinAmount) || isNullOrZero(toCoinAmount)"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
             Insufficient {{ fromCoin.symbol }} balance
@@ -189,7 +192,7 @@ import { getLpMintByTokenMintAddresses, getOutAmount, addLiquidity } from '@/uti
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
-import { gt } from '@/utils/safe-math'
+import { gt, isNullOrZero } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 
 const RAY = getTokenBySymbol('RAY')
@@ -290,6 +293,7 @@ export default Vue.extend({
 
   methods: {
     gt,
+    isNullOrZero,
 
     openFromCoinSelect() {
       this.selectFromCoin = true
@@ -466,6 +470,16 @@ export default Vue.extend({
     },
 
     supply() {
+      // check if amount is not null or zero
+      if (isNullOrZero(this.fromCoinAmount) || isNullOrZero(this.toCoinAmount)) {
+        this.$notify.error({
+          key: getUnixTs().toString(),
+          message: 'Add liquidity failed',
+          description: 'Please enter an amount'
+        })
+        return
+      }
+
       this.suppling = true
 
       const conn = this.$web3
