@@ -140,6 +140,8 @@
             liquidity.loading ||
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
             gt(toCoinAmount, toCoin.balance.fixed()) ||
+            isNullOrZero(fromCoinAmount) ||
+            isNullOrZero(toCoinAmount) ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
@@ -150,6 +152,7 @@
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
+          <template v-else-if="isNullOrZero(fromCoinAmount) || isNullOrZero(toCoinAmount)"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
             Insufficient {{ fromCoin.symbol }} balance
@@ -187,7 +190,7 @@ import { getLpMintByTokenMintAddresses, getOutAmount, addLiquidity } from '@/uti
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
-import { gt } from '@/utils/safe-math'
+import { gt, isNullOrZero } from '@/utils/safe-math'
 import { getUnixTs, sleep } from '@/utils'
 
 const RAY = getTokenBySymbol('RAY')
@@ -309,6 +312,7 @@ export default Vue.extend({
 
   methods: {
     gt,
+    isNullOrZero,
 
     openFromCoinSelect() {
       this.selectFromCoin = true
@@ -399,6 +403,21 @@ export default Vue.extend({
         }
       }
 
+      if (this.toCoin.balance && (!this.fromCoin.balance || gt(this.fromCoinAmount, this.fromCoin.balance.fixed()))) {
+        logger(
+          `Insufficient balances on both side; only take 98% from to-coin`,
+          this.toCoin.balance.toEther().multipliedBy(0.98).toFixed()
+        )
+
+        this.fromCoinAmount = '' // reset
+        this.toCoinAmount = this.toCoin.balance.toEther().multipliedBy(0.98).toFixed()
+
+        while (!this.fromCoinAmount) {
+          // we need to wait till fromCoinAmount gets filled via watcher
+          await sleep(100)
+        }
+      }
+
       if (!this.fromCoin.balance || gt(this.fromCoinAmount, this.fromCoin.balance.fixed())) {
         // logger(`Insufficient ${this.fromCoin.symbol} balance`)
         this.$notify.error({
@@ -413,6 +432,7 @@ export default Vue.extend({
 
       // logger('✅ set amount to max for', getTokenByMintAddress(this.fixedCoin)?.symbol)
       this.coinToMaxRunning = false
+
       return true
     },
 
@@ -555,6 +575,19 @@ export default Vue.extend({
     },
 
     supply() {
+      // check if amount is not null or zero
+      if (isNullOrZero(this.fromCoinAmount) || isNullOrZero(this.toCoinAmount)) {
+        this.$notify.error({
+          key: getUnixTs().toString(),
+          message: 'Add liquidity failed',
+          description: 'Please enter an amount'
+        })
+
+        // notify parent
+        this.$emit('onError', new Error('Add liquidity failed - Please enter an amount'))
+        return
+      }
+
       this.suppling = true
 
       const conn = this.$web3

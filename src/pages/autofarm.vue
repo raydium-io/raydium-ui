@@ -635,7 +635,7 @@ export default Vue.extend({
 
       this.openStakeModal(farmInfo, farmInfo.lp)
 
-      await sleep(1000)
+      await sleep(100)
 
       if (!this.lp || isNullOrZero(this.lp.balance.fixed())) {
         this.$notify.error({
