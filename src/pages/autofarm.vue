@@ -144,6 +144,25 @@
                       >
                         Auto Farm
                       </Button>
+                      <br />
+                      <br />
+                      <Button
+                        size="small"
+                        style="height: 30px"
+                        ghost
+                        block
+                        :disabled="
+                          !wallet.connected ||
+                          harvesting ||
+                          (farm.userInfo.pendingReward.isNullOrZero() &&
+                            farm.userInfo.pendingRewardB &&
+                            farm.userInfo.pendingRewardB.isNullOrZero())
+                        "
+                        :loading="harvesting"
+                        @click="harvest(farm.farmInfo, true)"
+                      >
+                        Just Harvest
+                      </Button>
                     </div>
                   </div>
                 </Col>
@@ -259,6 +278,7 @@ export default Vue.extend({
       lp: null as any,
       farmInfo: null as any,
       harvesting: false,
+      justHarvest: false,
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
@@ -596,12 +616,13 @@ export default Vue.extend({
       this.stakeModalOpening = false
     },
 
-    harvest(farmInfo: FarmInfo) {
+    harvest(farmInfo: FarmInfo, justHarvest: boolean = false) {
       // logger('harvest farmInfo', JSON.stringify(farmInfo, null, 2))
 
       this.farmInfo = cloneDeep(farmInfo)
 
       this.harvesting = true
+      this.justHarvest = justHarvest
 
       const conn = this.$web3
       const wallet = (this as any).$wallet
@@ -671,8 +692,12 @@ export default Vue.extend({
             return
           }
 
-          // trigger supply LP
-          this.changeTriggerSupplyLP(farmInfo)
+          if (!this.justHarvest) {
+            // trigger supply LP
+            this.changeTriggerSupplyLP(farmInfo)
+          } else {
+            this.changeTriggerLowerBalanceCoinToMax(farmInfo)
+          }
         })
         .catch((error) => {
           logger('harvest error', error)
@@ -685,6 +710,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.harvesting = false
+          this.justHarvest = false
         })
     },
 
