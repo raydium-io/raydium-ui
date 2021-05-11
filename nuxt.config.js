@@ -92,7 +92,7 @@ export default {
   dayjs: {
     locales: ['en'],
     defaultLocale: 'en',
-    plugins: []
+    plugins: ['utc']
   },
 
   'google-gtag': {

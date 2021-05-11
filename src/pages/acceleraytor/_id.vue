@@ -140,6 +140,7 @@
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
+        <Button v-else-if="pool.info.startTime > getUnixTs() / 1000" size="large" ghost disabled> Upcoming </Button>
         <Button
           v-else-if="pool.info.endTime < getUnixTs() / 1000 && pool.info.startWithdrawTime > getUnixTs() / 1000"
           size="large"
@@ -191,7 +192,7 @@
         <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
         <hr />
         <Alert
-          :description="`${pool.quote.symbol} can't be withdrawn after join. Tokens can be claimed after ${$dayjs(
+          :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
             pool.info.startWithdrawTime * 1000
           ).toString()}`"
           type="warning"
@@ -223,6 +224,10 @@
             <div class="infos flex">
               <span class="key">Pool opens</span>
               <span class="text">{{ $dayjs(pool.info.startTime * 1000) }}</span>
+            </div>
+            <div class="infos flex">
+              <span class="key">Pool closes</span>
+              <span class="text">{{ $dayjs(pool.info.endTime * 1000) }}</span>
             </div>
             <div class="infos flex">
               <span class="key">Total raise</span>
