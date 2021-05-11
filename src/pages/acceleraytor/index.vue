@@ -129,11 +129,14 @@ export default class AcceleRaytor extends Vue {
       info: {}
     } as any
 
-    if (access !== 'all') {
-      if (access === 'ray') {
+    switch (access) {
+      case 'ray': {
         rules.isRayPool = true
-      } else {
+        break
+      }
+      case 'community': {
         rules.isRayPool = false
+        break
       }
     }
 
