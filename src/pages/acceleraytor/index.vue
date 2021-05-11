@@ -55,7 +55,7 @@
           <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
+        <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
         <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
             <span>{{ `RAY ${pool.info.minStakeLimit.format()} Pool` }}</span>

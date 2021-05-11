@@ -28,7 +28,7 @@
             <span class="desc"> Total raise </span>
           </div>
           <div class="state">
-            <span class="value"> {{ pool.price.format() }} {{ pool.quote.symbol }} </span>
+            <span class="value"> {{ pool.price.toEther() }} {{ pool.quote.symbol }} </span>
             <span class="desc"> Per {{ pool.base.symbol }} </span>
           </div>
           <div class="state">
@@ -235,7 +235,7 @@
             </div>
             <div class="infos flex">
               <span class="key">Price</span>
-              <span class="text">{{ pool.price.format() }} {{ pool.quote.symbol }}</span>
+              <span class="text">{{ pool.price.toEther() }} {{ pool.quote.symbol }}</span>
             </div>
             <div class="infos flex">
               <span class="key">Min. purchase limit</span>
@@ -260,6 +260,12 @@
               <span class="key">Requirements to join</span>
               <span class="text">
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
+              </span>
+            </div>
+            <div class="infos flex">
+              <span class="key">RAY staking deadline</span>
+              <span class="text">
+                {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
               </span>
             </div>
           </TabPane>
