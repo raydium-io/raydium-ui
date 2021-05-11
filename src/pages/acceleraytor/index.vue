@@ -56,9 +56,9 @@
           <span> {{ base.symbol }}</span>
         </span>
         <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
-        <span slot="access" slot-scope="isRayPool" class="access">
+        <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
-            <span>RAY Pool</span>
+            <span>{{ `${pool.info.minStakeLimit.format()} RAY Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>

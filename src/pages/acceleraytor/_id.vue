@@ -589,6 +589,7 @@ hr {
     font-size: 16px;
     line-height: 24px;
     color: #f1f1f2;
+    white-space: pre-line;
   }
 
   .infos {
