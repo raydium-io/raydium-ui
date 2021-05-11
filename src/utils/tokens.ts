@@ -356,6 +356,25 @@ export const TOKENS: Tokens = {
     mintAddress: '8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo',
     decimals: 9,
     referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF'
+  },
+  MER: {
+    symbol: 'MER',
+    name: 'Mercurial',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    decimals: 6,
+    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF',
+
+    details:
+      'Mercurial vaults are market making vaults providing low slippage swaps for stables, while also improving LP profits with dynamic fees and flexible capital allocation.',
+    docs: {
+      website: 'https://www.mercurial.finance/',
+      whitepaper: 'https://www.mercurial.finance/Mercurial-Lite-Paper-v1.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/MercurialFi',
+      Telegram: 'https://t.me/MercurialFi',
+      Medium: 'https://mercurialfi.medium.com/'
+    }
   }
 }
 
