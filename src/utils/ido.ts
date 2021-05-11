@@ -50,6 +50,38 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
+    base: { ...TOKENS.MER },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
+
+    version: 1,
+    programId: IDO_PROGRAM_ID,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: 'CMfy83XTuVGtWED9Aok3RGRmPbotUWic5JHPuRRLS6Zo',
+    baseVault: '7M8u7TeKQt94tor7zbyx5XxrxrMW3Zk6eXXx7AbYT8aF',
+    quoteVault: '5pXMRPTNaKjqJaRGNTbzPbAWUTJ4zfhcubSnZNspegkW'
+  },
+  {
+    base: { ...TOKENS.MER },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
+
+    version: 1,
+    programId: IDO_PROGRAM_ID,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: 'AUSLbxn9UgqdP61wkeMrutdvp2uTfLBxzFBfmLiVqDPS',
+    baseVault: 'GqBCDDpBR3ju3inKHAkRTFzGLGFRo7mFVYCYNAbCzuaC',
+    quoteVault: 'FqLEDQnZozFV9WiF4j1cgE9UqetgWNEzLRVbUt5AJBX4'
+  },
+  {
     base: { ...TOKENS.MEDIA },
     quote: { ...TOKENS.USDC },
 

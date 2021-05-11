@@ -55,21 +55,26 @@
           <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
-        <span slot="access" slot-scope="isRayPool" class="access">
+        <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
+        <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
-            <span>RAY Pool</span>
+            <span>{{ `RAY ${pool.info.minStakeLimit.format()} Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
+        <span slot="allocation" slot-scope="info, pool">
+          {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}
+        </span>
         <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
-        <span slot="progress" slot-scope="info, pool">
+        <span slot="filled" slot-scope="info, pool">
           {{
-            info.quoteTokenDeposited
-              .toEther()
-              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-              .multipliedBy(100)
-              .toNumber()
+            parseInt(
+              info.quoteTokenDeposited
+                .toEther()
+                .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                .multipliedBy(100)
+                .toNumber()
+            )
           }}%
         </span>
         <span slot="status" slot-scope="info" class="status">
@@ -129,11 +134,14 @@ export default class AcceleRaytor extends Vue {
       info: {}
     } as any
 
-    if (access !== 'all') {
-      if (access === 'ray') {
+    switch (access) {
+      case 'ray': {
         rules.isRayPool = true
-      } else {
+        break
+      }
+      case 'community': {
         rules.isRayPool = false
+        break
       }
     }
 
@@ -162,17 +170,24 @@ export default class AcceleRaytor extends Vue {
       align: 'center'
     },
     {
-      title: 'Total raise',
+      title: 'Max Allocation',
+      dataIndex: 'allocation',
+      key: 'allocation',
+      scopedSlots: { customRender: 'allocation' },
+      align: 'center'
+    },
+    {
+      title: 'Raise size',
       dataIndex: 'raise',
       key: 'raise',
       scopedSlots: { customRender: 'raise' },
       align: 'center'
     },
     {
-      title: 'Progress',
+      title: 'Filled',
       dataIndex: 'info',
-      key: 'progress',
-      scopedSlots: { customRender: 'progress' },
+      key: 'filled',
+      scopedSlots: { customRender: 'filled' },
       align: 'center'
     },
     {

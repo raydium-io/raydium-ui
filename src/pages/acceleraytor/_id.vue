@@ -28,7 +28,7 @@
             <span class="desc"> Total raise </span>
           </div>
           <div class="state">
-            <span class="value"> {{ pool.price.format() }} {{ pool.quote.symbol }} </span>
+            <span class="value"> {{ pool.price.toEther() }} {{ pool.quote.symbol }} </span>
             <span class="desc"> Per {{ pool.base.symbol }} </span>
           </div>
           <div class="state">
@@ -140,6 +140,7 @@
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
+        <Button v-else-if="pool.info.startTime > getUnixTs() / 1000" size="large" ghost disabled> Upcoming </Button>
         <Button
           v-else-if="pool.info.endTime < getUnixTs() / 1000 && pool.info.startWithdrawTime > getUnixTs() / 1000"
           size="large"
@@ -191,7 +192,7 @@
         <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
         <hr />
         <Alert
-          :description="`${pool.quote.symbol} can't be withdrawn after join. Tokens can be claimed after ${$dayjs(
+          :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
             pool.info.startWithdrawTime * 1000
           ).toString()}`"
           type="warning"
@@ -225,12 +226,16 @@
               <span class="text">{{ $dayjs(pool.info.startTime * 1000) }}</span>
             </div>
             <div class="infos flex">
+              <span class="key">Pool closes</span>
+              <span class="text">{{ $dayjs(pool.info.endTime * 1000) }}</span>
+            </div>
+            <div class="infos flex">
               <span class="key">Total raise</span>
               <span class="text">{{ pool.raise.format() }} {{ pool.base.symbol }} </span>
             </div>
             <div class="infos flex">
               <span class="key">Price</span>
-              <span class="text">{{ pool.price.format() }} {{ pool.quote.symbol }}</span>
+              <span class="text">{{ pool.price.toEther() }} {{ pool.quote.symbol }}</span>
             </div>
             <div class="infos flex">
               <span class="key">Min. purchase limit</span>
@@ -255,6 +260,12 @@
               <span class="key">Requirements to join</span>
               <span class="text">
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
+              </span>
+            </div>
+            <div class="infos flex">
+              <span class="key">RAY staking deadline</span>
+              <span class="text">
+                {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
               </span>
             </div>
           </TabPane>
@@ -589,6 +600,7 @@ hr {
     font-size: 16px;
     line-height: 24px;
     color: #f1f1f2;
+    white-space: pre-line;
   }
 
   .infos {

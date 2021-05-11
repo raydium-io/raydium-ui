@@ -351,7 +351,7 @@ export const TOKENS: Tokens = {
     name: 'MEDIA',
     mintAddress: 'ETAtLmCmsoiEEKfNrHKJ2kYy3MoABhU6NQvpSfij5tDs',
     decimals: 6,
-    referrer: 'DiLuXdZ5TbQ1jUNEF6tNstHNqXJ3mTCrsVrM6DeX18Mh',
+    referrer: 'AYnaG3AidNWFzjq9U3BJSsQ9DShE8g7FszriBDtRFvsx',
 
     details:
       'Media Network is a new protocol that bypasses traditional CDN providers’ centralized approach for a self-governed and open source solution where everyone can participate. Media Network creates a distributed bandwidth market that enables service providers such as media platforms to hire resources from the network and dynamically come and go as the demand for last-mile data delivery shifts. It allows anyone to organically serve content without introducing any trust assumptions or pre-authentication requirements. Participants earn MEDIA rewards for their bandwidth contributions, a fixed supply SPL token minted on Solana’s Blockchain.',
@@ -363,6 +363,32 @@ export const TOKENS: Tokens = {
       Twitter: 'https://twitter.com/Media_FDN',
       Telegram: 'https://t.me/Media_FDN',
       Medium: 'https://mediafoundation.medium.com/'
+    }
+  },
+  ROPE: {
+    symbol: 'ROPE',
+    name: 'ROPE',
+    mintAddress: '8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo',
+    decimals: 9,
+    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF'
+  },
+  MER: {
+    symbol: 'MER',
+    name: 'Mercurial',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    decimals: 6,
+    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF',
+
+    details:
+      'Mercurial Finance\nMercurial is building DeFi’s first dynamic vaults for stable assets on Solana, providing the technical tools for users to easily deposit, swap and mint stable assets.\n\nInnovations\nMercurial will be introducing several key new technical innovations, including on-chain algorithms to regulate the flow of assets and dynamic fees that tap on the market and price data to assist LPs in optimizing performance. We will also be developing a unique pricing curve that will be the first to combine high efficiency, multi-token support, and generalizability for all types of token sets.\n\nMaximizing Capital Utlilization\nMercurial vaults will dynamically utilize assets for a wide range of use cases, like low slippage swaps, lending, flash loans, and external third-party decentralized protocols. To increase pegged assets availability on Solana, we will allow the creation of synthetics, like mUSD or mBTC, which can be added to our vaults to improve liquidity for other stables and facilitate interaction with other third-party decentralized protocols.\n\nStarting with a vault for the most common stables, for example, USDC, USDT, wUSDC, and wDAI, we will be facilitating low slippage swaps with dynamic fees. Features will be added as key technical and ecosystem pieces become available on Solana, i.e. inter-program composability, price oracles, etc.\n\nMER\nThe MER token will be used to accrue value for the holder via fees from swaps, commission from yield farms, and as collateral for synthetic stables like mUSD. MER will also be intrinsically linked to the governance and growth of Mercurial, playing a crucial role in regulating the system across governance, insurance, and bootstrapping.',
+    docs: {
+      website: 'https://www.mercurial.finance/',
+      whitepaper: 'https://www.mercurial.finance/Mercurial-Lite-Paper-v1.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/MercurialFi',
+      Telegram: 'https://t.me/MercurialFi',
+      Medium: 'https://mercurialfi.medium.com/'
     }
   }
 }
@@ -774,5 +800,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'A5zanvgtioZGiJMdEyaKN4XQmJsp1p7uVxaq2696REvQ',
     decimals: TOKENS.MEDIA.decimals
+  },
+  'ROPE-USDC-V4': {
+    symbol: 'ROPE-USDC',
+    name: 'ROPE-USDC LP',
+    coin: { ...TOKENS.ROPE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Cq4HyW5xia37tKejPF2XfZeXQoPYW6KfbPvxvw5eRoUE',
+    decimals: TOKENS.ROPE.decimals
   }
 }
