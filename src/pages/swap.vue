@@ -405,11 +405,20 @@ export default Vue.extend({
           return
         }
 
-        const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
-        if (pool && pool.version === 4) {
-          this.lpMintAddress = pool.lp.mintAddress
-          this.initialized = true
-          return
+        // temp fix low liquidity
+        const lowLiquidity = ['SUSHI', 'BTC', 'LINK', 'YFI', 'ROPE']
+        if (
+          this.fromCoin.mintAddress &&
+          !lowLiquidity.includes(this.fromCoin.symbol) &&
+          this.toCoin.mintAddress &&
+          !lowLiquidity.includes(this.toCoin.symbol)
+        ) {
+          const pool = getPoolByTokenMintAddresses(this.fromCoin.mintAddress, this.toCoin.mintAddress)
+          if (pool && pool.version === 4) {
+            this.lpMintAddress = pool.lp.mintAddress
+            this.initialized = true
+            return
+          }
         }
 
         // serum

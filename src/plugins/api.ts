@@ -3,12 +3,7 @@ import { NuxtApiInstance } from '@/types/api'
 
 const apiPlugin: Plugin = (ctx, inject) => {
   const api: NuxtApiInstance = {
-    getPrices: (coins) =>
-      ctx.$axios.get('https://api.raydium.io/coin/price', {
-        params: {
-          coins
-        }
-      }),
+    getPrices: () => ctx.$axios.get('https://api.raydium.io/coin/price'),
     getInfo: () => ctx.$axios.get('https://api.raydium.io/info'),
     getPairs: () => ctx.$axios.get('https://api.raydium.io/pairs')
   }

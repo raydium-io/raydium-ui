@@ -2,7 +2,6 @@ import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import { PricesData } from '@/types/api'
 
-import { TOKENS } from '@/utils/tokens'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
@@ -52,13 +51,7 @@ export const actions = actionTree(
     async requestPrices({ commit }) {
       commit('setLoading', true)
 
-      const tokens = ['SOL']
-
-      for (const symbol of Object.keys({ ...TOKENS })) {
-        tokens.push(symbol)
-      }
-
-      const prices: PricesData = await this.$api.getPrices(tokens.join(','))
+      const prices: PricesData = await this.$api.getPrices()
 
       commit('setPrices', prices)
       logger('Price updated')

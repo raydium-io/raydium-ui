@@ -336,7 +336,7 @@ export const TOKENS: Tokens = {
     name: 'MEDIA',
     mintAddress: 'ETAtLmCmsoiEEKfNrHKJ2kYy3MoABhU6NQvpSfij5tDs',
     decimals: 6,
-    referrer: 'DiLuXdZ5TbQ1jUNEF6tNstHNqXJ3mTCrsVrM6DeX18Mh',
+    referrer: 'AYnaG3AidNWFzjq9U3BJSsQ9DShE8g7FszriBDtRFvsx',
 
     details:
       'Media Network is a new protocol that bypasses traditional CDN providers’ centralized approach for a self-governed and open source solution where everyone can participate. Media Network creates a distributed bandwidth market that enables service providers such as media platforms to hire resources from the network and dynamically come and go as the demand for last-mile data delivery shifts. It allows anyone to organically serve content without introducing any trust assumptions or pre-authentication requirements. Participants earn MEDIA rewards for their bandwidth contributions, a fixed supply SPL token minted on Solana’s Blockchain.',
@@ -349,6 +349,13 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/Media_FDN',
       Medium: 'https://mediafoundation.medium.com/'
     }
+  },
+  ROPE: {
+    symbol: 'ROPE',
+    name: 'ROPE',
+    mintAddress: '8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo',
+    decimals: 9,
+    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF'
   }
 }
 
@@ -759,5 +766,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'A5zanvgtioZGiJMdEyaKN4XQmJsp1p7uVxaq2696REvQ',
     decimals: TOKENS.MEDIA.decimals
+  },
+  'ROPE-USDC-V4': {
+    symbol: 'ROPE-USDC',
+    name: 'ROPE-USDC LP',
+    coin: { ...TOKENS.ROPE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Cq4HyW5xia37tKejPF2XfZeXQoPYW6KfbPvxvw5eRoUE',
+    decimals: TOKENS.ROPE.decimals
   }
 }
