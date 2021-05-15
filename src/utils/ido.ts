@@ -37,6 +37,7 @@ export interface IdoPool {
   snapshotProgramId: string
 
   isRayPool: boolean
+  status?: string
   idoId: string
   baseVault: string
   quoteVault: string
