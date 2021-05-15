@@ -77,10 +77,8 @@
             )
           }}%
         </span>
-        <span slot="status" slot-scope="info" class="status">
-          <span v-if="info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
-          <span v-else-if="info.startTime < getUnixTs() / 1000" class="open"> Open </span>
-          <span v-else class="upcoming"> Upcoming </span>
+        <span slot="status" slot-scope="info, pool" class="status">
+          <span :class="pool.status">{{ pool.status }}</span>
         </span>
       </Table>
     </div>
@@ -129,7 +127,7 @@ export default class AcceleRaytor extends Vue {
   pools: IdoPool[] = []
 
   @Watch('filter', { immediate: true, deep: true })
-  onFilterChanged({ access }: { access: string; status: string; mine: string }) {
+  onFilterChanged({ access, status }: { access: string; status: string; mine: string }) {
     const rules = {
       info: {}
     } as any
@@ -144,7 +142,7 @@ export default class AcceleRaytor extends Vue {
         break
       }
     }
-
+    if (status !== "all") rules.status = status
     this.pools = filter(this.$accessor.ido.pools, rules)
   }
 
@@ -265,6 +263,8 @@ export default class AcceleRaytor extends Vue {
   }
 
   .status {
+    text-transform: capitalize;
+
     .upcoming,
     .open,
     .ended {
