@@ -15,6 +15,7 @@ import {
 } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
+import {getUnixTs} from "@/utils";
 
 const AUTO_REFRESH_TIME = 60
 
@@ -106,6 +107,7 @@ export const actions = actionTree(
             minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
             quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
           }
+          pool.status = pool.info.endTime < getUnixTs() / 1000 ? "ended" : pool.info.startTime < getUnixTs() / 1000 ? "open" : "upcoming"
         }
       })
 
