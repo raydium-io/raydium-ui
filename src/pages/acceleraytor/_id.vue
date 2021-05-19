@@ -104,7 +104,29 @@
       </Col>
       <Col :span="isMobile ? 24 : 8" class="purchase">
         <div class="fs-container">
-          <span class="title">Join Pool</span>
+          <div class="fs-container">
+            <span class="title">Join Pool</span>
+            <Tooltip v-if="ido.initialized" placement="bottomRight">
+              <template slot="title">
+                <span>
+                  Quote auto refresh countdown after
+                  {{ ido.autoRefreshTime - ido.countdown }} seconds, you can click to update manually
+                </span>
+                <br />
+                <span> Automatically refreshes when the current pool had changed </span>
+              </template>
+              <Progress
+                type="circle"
+                :width="20"
+                :stroke-width="10"
+                :percent="(100 / ido.autoRefreshTime) * ido.countdown"
+                :show-info="false"
+                :class="ido.loading ? 'disabled' : ''"
+                @click="$accessor.ido.requestInfos"
+              />
+            </Tooltip>
+          </div>
+
           <div class="min-max fc-container">
             <div @click="value = pool.info.minDepositLimit.fixed()">MIN</div>
             <div @click="value = pool.info.maxDepositLimit.fixed()">MAX</div>
@@ -292,7 +314,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
-import { Row, Col, Progress, Button, Alert, Tabs } from 'ant-design-vue'
+import { Row, Col, Tooltip, Progress, Button, Alert, Tabs } from 'ant-design-vue'
 import { get as safeGet } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
@@ -310,6 +332,7 @@ const { TabPane } = Tabs
   components: {
     Row,
     Col,
+    Tooltip,
     Progress,
     Button,
     Alert,
@@ -636,6 +659,7 @@ hr {
   border-radius: 0 32px 32px 0;
 
   .title {
+    margin-right: 8px;
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
@@ -716,8 +740,12 @@ hr {
 </style>
 
 <style lang="less">
-.ant-progress {
+.ant-progress-line {
   margin-top: 20px;
+}
+
+.ant-progress-circle {
+  cursor: pointer;
 }
 
 .ant-progress-outer {
