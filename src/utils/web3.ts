@@ -12,38 +12,18 @@ import {
 
 import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
-import logger from '@/utils/logger'
 // eslint-disable-next-line
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
-export const endpoints = [
-  { url: 'https://raydium.rpcpool.com', weight: 90 },
-  { url: 'https://api.mainnet-beta.solana.com', weight: 5 },
-  { url: 'https://solana-api.projectserum.com', weight: 5 }
-]
-
-export function getRandomEndpoint() {
-  let pointer = 0
-  const random = Math.random() * 100
-  let api = endpoints[0].url
-
-  for (const endpoint of endpoints) {
-    if (random > pointer + endpoint.weight) {
-      pointer += pointer + endpoint.weight
-    } else if (random >= pointer && random < pointer + endpoint.weight) {
-      api = endpoint.url
-      break
-    } else {
-      logger(`${random} using ${endpoint.url}`)
-      api = endpoint.url
-      break
-    }
-  }
-
-  logger(`using ${api}`)
-  return api
+export const web3Config = {
+  strategy: 'speed',
+  rpcs: [
+    { url: 'https://solana-api.projectserum.com', weight: 50 },
+    { url: 'https://raydium.rpcpool.com', weight: 40 },
+    { url: 'https://api.mainnet-beta.solana.com', weight: 10 }
+  ]
 }
 
 // export const commitment: Commitment = 'processed'

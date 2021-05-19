@@ -142,7 +142,7 @@ export default class AcceleRaytor extends Vue {
         break
       }
     }
-    if (status !== "all") rules.status = status
+    if (status !== 'all') rules.status = status
     this.pools = filter(this.$accessor.ido.pools, rules)
   }
 
@@ -374,6 +374,15 @@ export default class AcceleRaytor extends Vue {
 
   .ant-table-row:hover {
     cursor: pointer;
+  }
+
+  .ant-table-placeholder {
+    background: #1c274f;
+    border-bottom: 0;
+
+    .ant-empty {
+      color: #f1f1f2bf;
+    }
   }
 }
 </style>
