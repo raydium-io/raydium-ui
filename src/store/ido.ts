@@ -127,18 +127,25 @@ export const actions = actionTree(
         const keyLength = keys.length
 
         for (const pool of idoPools) {
-          const { idoId, programId, snapshotProgramId } = pool
+          const { idoId, programId, version, snapshotProgramId } = pool
 
           const userIdoAccount = await findAssociatedIdoInfoAddress(
             new PublicKey(idoId),
             wallet.publicKey,
             new PublicKey(programId)
           )
-          const userIdoCheck = await findAssociatedIdoCheckAddress(
-            new PublicKey(idoId),
-            wallet.publicKey,
-            new PublicKey(snapshotProgramId)
-          )
+          const userIdoCheck =
+            version === 1
+              ? await findAssociatedIdoCheckAddress(
+                  new PublicKey(idoId),
+                  wallet.publicKey,
+                  new PublicKey(snapshotProgramId)
+                )
+              : await findAssociatedIdoCheckAddress(
+                  new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
+                  wallet.publicKey,
+                  new PublicKey(snapshotProgramId)
+                )
 
           publicKeys.push(userIdoAccount, userIdoCheck)
         }

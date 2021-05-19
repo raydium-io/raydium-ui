@@ -1,4 +1,11 @@
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, CLOCK_PROGRAM_ID, IDO_PROGRAM_ID } from './ids'
+import {
+  SYSTEM_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  RENT_PROGRAM_ID,
+  CLOCK_PROGRAM_ID,
+  IDO_PROGRAM_ID,
+  IDO_PROGRAM_ID_V2
+} from './ids'
 import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
 import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
@@ -56,14 +63,14 @@ export const IDO_POOLS: IdoPool[] = [
     price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
     raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
 
-    version: 1,
-    programId: IDO_PROGRAM_ID,
+    version: 2,
+    programId: IDO_PROGRAM_ID_V2,
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: 'CMfy83XTuVGtWED9Aok3RGRmPbotUWic5JHPuRRLS6Zo',
-    baseVault: '7M8u7TeKQt94tor7zbyx5XxrxrMW3Zk6eXXx7AbYT8aF',
-    quoteVault: '5pXMRPTNaKjqJaRGNTbzPbAWUTJ4zfhcubSnZNspegkW'
+    idoId: '3GANPMCSLb1NeQZZ1VNKXHrH5jCyK3DQLr4tmhvkaYng',
+    baseVault: 'Hw41WUxQjuEbNK21nBRdoefqVhgWFe6vjJ1CTJXtXryo',
+    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni'
   },
   {
     base: { ...TOKENS.MER },
@@ -72,14 +79,14 @@ export const IDO_POOLS: IdoPool[] = [
     price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
     raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
 
-    version: 1,
-    programId: IDO_PROGRAM_ID,
+    version: 2,
+    programId: IDO_PROGRAM_ID_V2,
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: 'AUSLbxn9UgqdP61wkeMrutdvp2uTfLBxzFBfmLiVqDPS',
-    baseVault: 'GqBCDDpBR3ju3inKHAkRTFzGLGFRo7mFVYCYNAbCzuaC',
-    quoteVault: 'FqLEDQnZozFV9WiF4j1cgE9UqetgWNEzLRVbUt5AJBX4'
+    idoId: 'F5Rk8Eht3JU69146uc9piwmMGCdPwAmYgJKRUaWxhwim',
+    baseVault: '3CDLcsVhRReJ4otXhfi2kD2FrppRUqQYtXXZ7LgQrNy5',
+    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven'
   },
   {
     base: { ...TOKENS.MEDIA },
@@ -202,11 +209,18 @@ export async function purchase(
     owner,
     new PublicKey(poolInfo.programId)
   )
-  const userIdoCheck = await findAssociatedIdoCheckAddress(
-    new PublicKey(poolInfo.idoId),
-    owner,
-    new PublicKey(poolInfo.snapshotProgramId)
-  )
+  const userIdoCheck =
+    poolInfo.version === 1
+      ? await findAssociatedIdoCheckAddress(
+          new PublicKey(poolInfo.idoId),
+          owner,
+          new PublicKey(poolInfo.snapshotProgramId)
+        )
+      : await findAssociatedIdoCheckAddress(
+          new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
+          owner,
+          new PublicKey(poolInfo.snapshotProgramId)
+        )
 
   transaction.add(
     purchaseInstruction(
