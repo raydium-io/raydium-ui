@@ -160,9 +160,9 @@
             <span> Slippage Tolerance </span>
             <span> {{ $accessor.setting.slippage }}% </span>
           </div>
-          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinAmount" class="fs-container">
+          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinAmount && toCoinWithSlippage" class="fs-container">
             <span> Minimum received </span>
-            <span> {{ toCoinAmount }} {{ toCoin.symbol }} </span>
+            <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -217,7 +217,7 @@
     </div>
 
     <div v-if="isFetchingUnsettled || baseUnsettledAmount || quoteUnsettledAmount" class="card extra">
-      <div class="card-body">
+      <div class="settle card-body">
         <div v-if="isFetchingUnsettled" class="fetching-unsettled">
           <Spin :spinning="true">
             <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
@@ -319,6 +319,7 @@ export default Vue.extend({
       toCoin: null as TokenInfo | null,
       fromCoinAmount: '',
       toCoinAmount: '',
+      toCoinWithSlippage: '',
 
       // wrap
       isWrap: false,
@@ -590,7 +591,7 @@ export default Vue.extend({
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
         this.toCoinAmount = this.fromCoinAmount
       } else if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
-        const { amountOut } = getSwapOutAmount(
+        const { amountOut, amountOutWithSlippage } = getSwapOutAmount(
           get(this.liquidity.infos, this.lpMintAddress),
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
@@ -608,6 +609,7 @@ export default Vue.extend({
             this.toCoin.decimals,
             false
           ).format()
+          this.toCoinWithSlippage = amountOutWithSlippage.fixed()
         }
       } else if (
         this.fromCoin &&
@@ -618,7 +620,7 @@ export default Vue.extend({
         this.bids &&
         this.fromCoinAmount
       ) {
-        const { amountOut } = getOutAmount(
+        const { amountOut, amountOutWithSlippage } = getOutAmount(
           this.market,
           this.asks,
           this.bids,
@@ -632,6 +634,7 @@ export default Vue.extend({
 
         if (out.isNullOrZero()) {
           this.toCoinAmount = ''
+          this.toCoinWithSlippage = ''
         } else {
           this.toCoinAmount = out.fixed()
           this.outToPirceValue = new TokenAmount(
@@ -639,9 +642,11 @@ export default Vue.extend({
             this.toCoin.decimals,
             false
           ).format()
+          this.toCoinWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false).fixed()
         }
       } else {
         this.toCoinAmount = ''
+        this.toCoinWithSlippage = ''
       }
     },
 
@@ -725,7 +730,7 @@ export default Vue.extend({
           // @ts-ignore
           get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount,
-          this.setting.slippage
+          this.toCoinWithSlippage
         )
           .then((txid) => {
             this.$notify.info({
@@ -863,7 +868,7 @@ export default Vue.extend({
     }
   }
 
-  .card-body {
+  .settle.card-body {
     padding: 16px 24px;
   }
   .extra {

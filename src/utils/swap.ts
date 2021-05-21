@@ -61,7 +61,11 @@ export function getSwapOutAmount(
     const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, pc.decimals) }
+    return {
+      amountIn: fromAmount,
+      amountOut: new TokenAmount(amountOutWithFee, pc.decimals),
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, pc.decimals)
+    }
   } else {
     // pc2coin
     const fromAmount = new TokenAmount(amount, pc.decimals, false)
@@ -69,7 +73,11 @@ export function getSwapOutAmount(
     const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, coin.decimals) }
+    return {
+      amountIn: fromAmount,
+      amountOut: new TokenAmount(amountOutWithFee, coin.decimals),
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, coin.decimals)
+    }
   }
 }
 
@@ -96,7 +104,7 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
   }
 
   worstPrice = (worstPrice * (100 + slippage)) / 100
-  coinOut = (coinOut * (100 - slippage)) / 100
+  const amountOutWithSlippage = (coinOut * (100 - slippage)) / 100
 
   // const avgPrice = (pcIn - availablePc) / coinOut;
   const maxInAllow = pcIn - availablePc
@@ -105,6 +113,7 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     side: 'buy',
     maxInAllow,
     amountOut: coinOut,
+    amountOutWithSlippage,
     worstPrice
   }
 }
@@ -131,7 +140,7 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
   }
 
   worstPrice = (worstPrice * (100 - slippage)) / 100
-  pcOut = (pcOut * (100 - slippage)) / 100
+  const amountOutWithSlippage = (pcOut * (100 - slippage)) / 100
 
   // const avgPrice = pcOut / (coinIn - availableCoin);
   const maxInAllow = coinIn - availableCoin
@@ -140,6 +149,7 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     side: 'sell',
     maxInAllow,
     amountOut: pcOut,
+    amountOutWithSlippage,
     worstPrice
   }
 }
@@ -223,15 +233,22 @@ export async function swap(
   toCoinMint: string,
   fromTokenAccount: string,
   toTokenAccount: string,
-  amount: string,
-  slippage: number
+  aIn: string,
+  aOut: string
 ) {
   const transaction = new Transaction()
   const signers: Account[] = []
 
   const owner = wallet.publicKey
 
-  const { amountIn, amountOut } = getSwapOutAmount(poolInfo, fromCoinMint, toCoinMint, amount, slippage)
+  const from = getTokenByMintAddress(fromCoinMint)
+  const to = getTokenByMintAddress(toCoinMint)
+  if (!from || !to) {
+    throw new Error('Miss token info')
+  }
+
+  const amountIn = new TokenAmount(aIn, from.decimals, false)
+  const amountOut = new TokenAmount(aOut, to.decimals, false)
 
   let fromMint = fromCoinMint
   let toMint = toCoinMint
