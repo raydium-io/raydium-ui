@@ -3,9 +3,9 @@
     <div class="big_div image_div hidden" style="padding-bottom: 200px">
       <img src="../assets/background/index_background.svg" class="image" />
       <div class="node_div logo">
-        <a href="/">
+        <NuxtLink to="/">
           <img src="../assets/icons/logo-text.svg" width="220" height="60" />
-        </a>
+        </NuxtLink>
       </div>
       <div class="node_div">
         <div class="title">An avenue for</div>
@@ -13,11 +13,11 @@
         <div class="subtitle">Next-level liquidity. Friction-less yield. Light-speed swaps.</div>
         <div style="padding-top: 36px; position: relative">
           <Button size="large" ghost class="button_div" style="position: absolute; z-index: 999">
-            <a href="swap" style="display: inline-block; width: 100%; height: 100%">
+            <NuxtLink to="/swap/" style="display: inline-block; width: 100%; height: 100%">
               <div class="card-body" style="padding: 0; height: 100%">
                 <div class="button_font">Launch app</div>
-              </div></a
-            >
+              </div>
+            </NuxtLink>
           </Button>
           <div class="button_div_line button_div" style="display: inline-block; position: absolute; z-index: 999">
             <a

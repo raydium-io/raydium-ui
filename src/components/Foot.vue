@@ -4,11 +4,13 @@
       <a href="/"><img src="@/assets/icons/logo-text.svg" /></a>
     </div>
     <div class="link-menu">
-      <a :href="linkUrl.home"><span>Home</span></a>
+      <NuxtLink :to="linkUrl.home"><span>Home</span></NuxtLink>
       <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
-      <a :href="linkUrl.app"><span>App</span></a>
+      <NuxtLink :to="linkUrl.app"><span>App</span></NuxtLink>
       <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
-      <a :href="linkUrl.info"><span>Info</span></a>
+      <NuxtLink :to="linkUrl.info"><span>Info</span></NuxtLink>
+      <img v-if="!isMobile" class="logo" src="@/assets/icons/round.svg" />
+      <a :href="linkUrl.listing" target="_blank"><span>Listing</span></a>
     </div>
     <div class="icon_list">
       <a :href="linkUrl.twitter" target="_blank" style="margin-left: 10px">
@@ -46,8 +48,9 @@ export default class Foot extends Vue {
   navOpened = false
   linkUrl = {
     home: '/',
-    app: '/swap',
-    info: '/info',
+    app: '/swap/',
+    info: '/info/',
+    listing: 'https://forms.gle/Ct7ySJkxQyUvrHR99',
     twitter: 'https://twitter.com/RaydiumProtocol',
     discord: 'https://discord.com/invite/6EvFwvCfpx',
     telegram: 'https://t.me/raydiumprotocol',

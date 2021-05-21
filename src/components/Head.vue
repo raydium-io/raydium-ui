@@ -1,6 +1,6 @@
 <template>
   <Header class="header fs-container" :class="isMobile ? 'mobile' : ''">
-    <a href="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></a>
+    <NuxtLink to="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></NuxtLink>
 
     <div v-if="isMobile ? (navOpened ? true : false) : true" :class="isMobile ? 'mobile-nav' : ''">
       <Nav @onSelect="() => (navOpened = false)" />
