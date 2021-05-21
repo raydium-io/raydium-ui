@@ -131,7 +131,7 @@ export default Vue.extend({
       }
 
       if (keyword) {
-        tokenList = tokenList.filter((token) => token.symbol.includes(keyword.toUpperCase()))
+        tokenList = tokenList.filter((token) => token.symbol.toUpperCase().includes(keyword.toUpperCase()))
       }
 
       this.tokenList = cloneDeep(tokenList)
