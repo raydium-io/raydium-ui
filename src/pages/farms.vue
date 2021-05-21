@@ -1,15 +1,5 @@
 <template>
   <div class="farm container">
-    <div class="fc-container">
-      <Alert type="warning" message="IMPORTANT" show-icon closable>
-        <div slot="description">
-          Wrapped USDT (WUSDT) is being phased out for native SPL USDT. As a result, liquidity must migrate to the new
-          RAY-USDT pool. To simplify the process, use the
-          <NuxtLink to="/migrate/">migration tool</NuxtLink>.
-        </div>
-      </Alert>
-    </div>
-
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
@@ -211,7 +201,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -232,8 +222,7 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button,
-    Alert
+    Button
   },
 
   data() {

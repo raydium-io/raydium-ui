@@ -139,7 +139,8 @@ export const actions = actionTree(
                   }
                 }
 
-                const { needTakePnlCoin, needTakePnlPc } = parsed
+                const { status, needTakePnlCoin, needTakePnlPc } = parsed
+                poolInfo.status = status
                 poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(needTakePnlCoin.toNumber())
                 poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(needTakePnlPc.toNumber())
 

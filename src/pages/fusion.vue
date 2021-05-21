@@ -1,5 +1,16 @@
 <template>
   <div class="fusion container">
+    <div class="fc-container">
+      <Alert type="warning" message="IMPORTANT" show-icon closable>
+        <div slot="description">
+          COPE is doing a token swap from old COPE (renamed xCOPE) to a new COPE token
+          <span>(<a href="https://www.unlimitedcope.com/faq/" target="_blank">read the FAQ here </a> </span>
+          on how to swap). <br /><br />
+          Users should remove legacy xCOPE-USDC liquidity and migrate to the new COPE-USDC pool.
+        </div>
+      </Alert>
+    </div>
+
     <div class="page-head fs-container">
       <span class="title">Fusion Pools</span>
       <div class="buttons">
@@ -227,7 +238,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -248,7 +259,8 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    Alert
   },
 
   data() {
