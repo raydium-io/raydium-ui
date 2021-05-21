@@ -794,5 +794,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Cq4HyW5xia37tKejPF2XfZeXQoPYW6KfbPvxvw5eRoUE',
     decimals: TOKENS.ROPE.decimals
+  },
+  'MER-USDC-V4': {
+    symbol: 'MER-USDC',
+    name: 'MER-USDC LP',
+    coin: { ...TOKENS.MER },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3H9NxvaZoxMZZDZcbBDdWMKbrfNj7PCF5sbRwDr7SdDW',
+    decimals: TOKENS.MER.decimals
   }
 }
