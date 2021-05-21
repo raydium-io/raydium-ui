@@ -585,3 +585,40 @@ export function memoInstruction(memo: string) {
     programId: MEMO_PROGRAM_ID
   })
 }
+export async function checkUnsettledInfo(connection: Connection, wallet: any, market: Market) {
+  if (!wallet) return
+  const owner = wallet.publicKey
+  if (!owner) return
+  const openOrderss = await market?.findOpenOrdersAccountsForOwner(connection, owner, 1000)
+  if (!openOrderss?.length) return
+  const baseTotalAmount = market.baseSplSizeToNumber(openOrderss[0].baseTokenTotal)
+  const quoteTotalAmount = market.quoteSplSizeToNumber(openOrderss[0].quoteTokenTotal)
+  const baseUnsettledAmount = market.baseSplSizeToNumber(openOrderss[0].baseTokenFree)
+  const quoteUnsettledAmount = market.quoteSplSizeToNumber(openOrderss[0].quoteTokenFree)
+  return {
+    baseSymbol: getTokenByMintAddress(market.baseMintAddress.toString())?.symbol,
+    quoteSymbol: getTokenByMintAddress(market.quoteMintAddress.toString())?.symbol,
+    baseTotalAmount,
+    quoteTotalAmount,
+    baseUnsettledAmount,
+    quoteUnsettledAmount,
+    openOrders: openOrderss[0]
+  }
+}
+
+export async function settleFunds(
+  connection: Connection,
+  market: Market,
+  openOrders: OpenOrders,
+  wallet: any,
+  baseWallet: string,
+  quoteWallet: string
+) {
+  const { transaction, signers } = await market.makeSettleFundsTransaction(
+    connection,
+    openOrders,
+    new PublicKey(baseWallet),
+    new PublicKey(quoteWallet)
+  )
+  return await sendTransaction(connection, wallet, transaction, signers)
+}

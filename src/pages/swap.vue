@@ -215,13 +215,52 @@
         </Button>
       </div>
     </div>
+
+    <div v-if="isFetchingUnsettled || baseUnsettledAmount || quoteUnsettledAmount" class="card extra">
+      <div class="card-body">
+        <div v-if="isFetchingUnsettled" class="fetching-unsettled">
+          <Spin :spinning="true">
+            <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
+          </Spin>
+          <span>Fetching info from market. Please wait.</span>
+        </div>
+
+        <table
+          v-else-if="(!isFetchingUnsettled && baseSymbol && quoteSymbol && baseUnsettledAmount) || quoteUnsettledAmount"
+          class="settel-panel"
+        >
+          <thead>
+            <tr>
+              <th colspan="2">You have unsettled balances:</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="baseSymbol && baseUnsettledAmount" class="row">
+              <td>{{ baseSymbol }}</td>
+              <td>{{ baseUnsettledAmount }}</td>
+              <td class="align-right" rowspan="2">
+                <Button class="btn" :loading="isSettlingBase" ghost @click="settleFunds('base')">Settle</Button>
+              </td>
+            </tr>
+
+            <tr v-if="quoteSymbol && quoteUnsettledAmount" class="row">
+              <td>{{ quoteSymbol }}</td>
+              <td>{{ quoteUnsettledAmount }}</td>
+              <td v-if="!baseUnsettledAmount" class="align-right" rowspan="2">
+                <Button class="btn" :loading="isSettlingBase" ghost @click="settleFunds('base')">Settle</Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Spin } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
@@ -231,7 +270,7 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { getOutAmount, getSwapOutAmount, place, swap, wrap } from '@/utils/swap'
+import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, settleFunds } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getPoolByTokenMintAddresses, canWrap } from '@/utils/liquidity'
@@ -243,7 +282,8 @@ export default Vue.extend({
     Icon,
     Tooltip,
     Button,
-    Progress
+    Progress,
+    Spin
   },
 
   data() {
@@ -259,6 +299,17 @@ export default Vue.extend({
       swaping: false,
       asks: {} as any,
       bids: {} as any,
+
+      isFetchingUnsettled: false,
+      unsettledOpenOrders: null as any,
+
+      baseSymbol: '',
+      baseUnsettledAmount: 0,
+      isSettlingBase: false,
+
+      quoteSymbol: '',
+      quoteUnsettledAmount: 0,
+      isSettlingQuote: false,
 
       coinSelectShow: false,
       selectFromCoin: true,
@@ -303,6 +354,9 @@ export default Vue.extend({
     'wallet.tokenAccounts': {
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
+        if (this.market) {
+          this.fetchUnsettledByMarket()
+        }
       },
       deep: true
     },
@@ -313,6 +367,15 @@ export default Vue.extend({
 
     toCoin() {
       this.findMarket()
+    },
+
+    market() {
+      this.baseSymbol = ''
+      this.baseUnsettledAmount = 0
+      this.quoteSymbol = ''
+      this.quoteUnsettledAmount = 0
+      this.unsettledOpenOrders = null as any
+      this.fetchUnsettledByMarket()
     },
 
     marketAddress() {
@@ -732,6 +795,43 @@ export default Vue.extend({
             this.swaping = false
           })
       }
+    },
+
+    async fetchUnsettledByMarket() {
+      if (!this.$web3 || !this.$wallet || !this.market) return
+      this.isFetchingUnsettled = true
+      try {
+        const info = await checkUnsettledInfo(this.$web3, this.$wallet, this.market)
+        if (!info) throw new Error('not enough data')
+        this.baseSymbol = info.baseSymbol ?? ''
+        this.baseUnsettledAmount = info.baseUnsettledAmount
+
+        this.quoteSymbol = info.quoteSymbol ?? ''
+        this.quoteUnsettledAmount = info.quoteUnsettledAmount
+        this.unsettledOpenOrders = info.openOrders // have to establish an extra state, to store this value
+      } catch (e) {
+      } finally {
+        this.isSettlingQuote = false
+        this.isSettlingBase = false
+        this.isFetchingUnsettled = false
+      }
+    },
+
+    async settleFunds(from: 'base' | 'quote') {
+      let baseWallet = get(this.wallet.tokenAccounts, `${(this.market as Market).baseMintAddress}.tokenAccountAddress`)
+      let quoteWallet = get(
+        this.wallet.tokenAccounts,
+        `${(this.market as Market).quoteMintAddress}.tokenAccountAddress`
+      )
+      if (from === 'quote') {
+        ;[baseWallet, quoteWallet] = [quoteWallet, baseWallet]
+      }
+      if (from === 'quote') {
+        this.isSettlingQuote = true
+      } else {
+        this.isSettlingBase = true
+      }
+      await settleFunds(this.$web3, this.market, this.unsettledOpenOrders, this.$wallet, baseWallet, quoteWallet)
     }
   }
 })
@@ -748,6 +848,52 @@ export default Vue.extend({
       border-radius: 50%;
       background: #000829;
       cursor: pointer;
+    }
+  }
+
+  .fetching-unsettled {
+    margin: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #ffffffad;
+    span {
+      margin-top: 16px;
+      text-align: center;
+    }
+  }
+
+  .card-body {
+    padding: 16px 24px;
+  }
+  .extra {
+    margin-top: 32px;
+    margin-bottom: 32px;
+
+    .settel-panel {
+      .align-right {
+        text-align: right;
+      }
+      th {
+        font-weight: normal;
+      }
+      td {
+        padding-bottom: 4px;
+        width: 25%;
+      }
+      thead {
+        font-size: 14px;
+        tr:first-child {
+          margin-top: 8px;
+        }
+      }
+      tbody {
+        tr:first-child {
+          td {
+            padding-top: 6px;
+          }
+        }
+      }
     }
   }
 }
