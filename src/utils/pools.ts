@@ -773,10 +773,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumVaultSigner: 'C5v68qSzDdGeRcs556YoEMJNsp8JiYEiEhw2hVUR8Z8y'
   },
   {
-    name: 'COPE-USDC',
-    coin: { ...TOKENS.COPE },
+    name: 'xCOPE-USDC',
+    coin: { ...TOKENS.xCOPE },
     pc: { ...TOKENS.USDC },
-    lp: { ...LP_TOKENS['COPE-USDC-V4'] },
+    lp: { ...LP_TOKENS['xCOPE-USDC-V4'] },
 
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
@@ -1387,6 +1387,34 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '4ctYuY4ZvCVRvF22QDw8LzUis9yrnupoLQNXxmZy1BGm',
     serumPcVaultAccount: 'DovDds7NEzFn493DJ2yKBRgqsYgDXg6z38pUGXe1AAWQ',
     serumVaultSigner: 'BUDJ4F1ZknbZiwHb6xHEsH6o1LuW394DE8wKT8CoAYNF'
+  },
+  {
+    name: 'COPE-USDC',
+    coin: { ...TOKENS.COPE },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['COPE-USDC-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'DiWxV1SPXPNJRCt5Ao1mJRAxjw97hJVyj8qGzZwFbAFb',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'jg8ayFZLH2cEUJULUirWy7wNggN1eyRnTMt6EjbJUun',
+    ammTargetOrders: '8pE4fzFzRT6aje7B3hYHXrZakeEqNF2kFmJtxkrxUK9b',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'FhjBg8vpVgsiW9oCUxujqoWWSPSRvnWNXucEF1G1F39Z',
+    poolPcTokenAccount: 'Dv95skm7AUr33x1p2Bu5EgvE3usB1TxgZoxjBe2rpfm6',
+    poolWithdrawQueue: '4An6jy1JocXGUjayXqVTx1jvs79o8LgsRk3VvmRgXxaq',
+    poolTempLpTokenAccount: '57hiWKd47VHVD7y8BenqnakSdgQNBvyUrkSpf9BDP6UQ',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '6fc7v3PmjZG9Lk2XTot6BywGyYLkBQuzuFKd4FpCsPxk',
+    serumBids: 'FLjCjU5wLUsqF6FeYJaH5JtTTFSTZzTCingxN1uyr9zn',
+    serumAsks: '7TcstD7AdWqjuFoRVK24zFv66v1qyMYDNDT1V5RNWKRz',
+    serumEventQueue: '2dQ1Spgc7rGSuE1t3Fb9RL7zvGc7F7pH9XwJ46u3QiJr',
+    serumCoinVaultAccount: '2ShBow4Bof4dkLjx8VTRjLXXvUydiBNF7bHzDaxPjpKq',
+    serumPcVaultAccount: 'EFdqJhawpCReiK2DcrbbUUWWc6cd8mqgZm5MSbQ3TR33',
+    serumVaultSigner: 'A6q5h5Wx9iqeoVsvYWA7xofUcKx6XUPPab8BTVrW91Bs'
   }
   // {
   //   name: 'SRM-USDT',

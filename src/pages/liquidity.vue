@@ -136,8 +136,8 @@
             gt(fromCoinAmount, fromCoin.balance.fixed()) ||
             gt(toCoinAmount, toCoin.balance.fixed()) ||
             suppling ||
-            (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
-            (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
+            (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
+            (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
           "
           :loading="suppling"
           @click="supply"
@@ -152,11 +152,11 @@
           <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
             Insufficient {{ toCoin.symbol }} balance
           </template>
-          <template v-else-if="fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(50, fromCoinAmount)">
-            COPE amount must greater than 50
+          <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, fromCoinAmount)">
+            xCOPE amount must greater than 50
           </template>
-          <template v-else-if="toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(50, toCoinAmount)">
-            COPE amount must greater than 50
+          <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, toCoinAmount)">
+            xCOPE amount must greater than 50
           </template>
           <template v-else>Supply</template>
         </Button>
@@ -528,7 +528,7 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="less" sxcoped>
 .liquidity.container {
   max-width: 450px;
 

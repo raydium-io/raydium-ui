@@ -181,8 +181,8 @@
             loading ||
             gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
             swaping ||
-            (fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)) ||
-            (toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount))
+            (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
+            (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
           "
           :loading="swaping"
           @click="placeOrder"
@@ -196,11 +196,11 @@
           <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="fromCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, fromCoinAmount)">
-            COPE amount must greater than 5
+          <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)">
+            xCOPE amount must greater than 5
           </template>
-          <template v-else-if="toCoin.mintAddress === TOKENS.COPE.mintAddress && gt(5, toCoinAmount)">
-            COPE amount must greater than 5
+          <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
+            xCOPE amount must greater than 5
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
         </Button>
@@ -727,7 +727,7 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="less" sxcoped>
 .container {
   max-width: 450px;
 

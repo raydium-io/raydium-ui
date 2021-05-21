@@ -317,12 +317,19 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
   },
-  COPE: {
-    symbol: 'COPE',
-    name: 'COPE',
+  xCOPE: {
+    symbol: 'xCOPE',
+    name: 'xCOPE',
     mintAddress: '3K6rftdAaQYMPunrtNRHgnK2UAtjm2JwyT2oCiTDouYE',
     decimals: 0,
     referrer: '8DTehuES4tfnd2SrqcjN52XofxWXGjiLZRgM12U9pB6f'
+  },
+  COPE: {
+    symbol: 'COPE',
+    name: 'COPE',
+    mintAddress: '8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh',
+    decimals: 6,
+    referrer: ''
   },
   STEP: {
     symbol: 'STEP',
@@ -606,14 +613,14 @@ export const LP_TOKENS: Tokens = {
     mintAddress: '13PoKid6cZop4sj2GfoBeujnGfthUbTERdE5tpLCDLEY',
     decimals: TOKENS.ETH.decimals
   },
-  'COPE-USDC-V4': {
-    symbol: 'COPE-USDC',
-    name: 'COPE-USDC LP',
-    coin: { ...TOKENS.COPE },
+  'xCOPE-USDC-V4': {
+    symbol: 'xCOPE-USDC',
+    name: 'xCOPE-USDC LP',
+    coin: { ...TOKENS.xCOPE },
     pc: { ...TOKENS.USDC },
 
     mintAddress: '2Vyyeuyd15Gp8aH6uKE72c4hxc8TVSLibxDP9vzspQWG',
-    decimals: TOKENS.COPE.decimals
+    decimals: TOKENS.xCOPE.decimals
   },
   'SOL-USDT-V4': {
     symbol: 'SOL-USDT',
@@ -803,5 +810,14 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3H9NxvaZoxMZZDZcbBDdWMKbrfNj7PCF5sbRwDr7SdDW',
     decimals: TOKENS.MER.decimals
+  },
+  'COPE-USDC-V4': {
+    symbol: 'COPE-USDC',
+    name: 'COPE-USDC LP',
+    coin: { ...TOKENS.COPE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Cz1kUvHw98imKkrqqu95GQB9h1frY8RikxPojMwWKGXf',
+    decimals: TOKENS.COPE.decimals
   }
 }
