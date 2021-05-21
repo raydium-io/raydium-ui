@@ -180,7 +180,8 @@
             !initialized ||
             loading ||
             gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
-            get(liquidity.infos, `${lpMintAddress}.status`) !== 1 ||
+            (get(liquidity.infos, `${lpMintAddress}.status`) &&
+              get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
             swaping ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -197,7 +198,13 @@
           <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="get(liquidity.infos, `${lpMintAddress}.status`) !== 1"> Pool coming soon </template>
+          <template
+            v-else-if="
+              get(liquidity.infos, `${lpMintAddress}.status`) && get(liquidity.infos, `${lpMintAddress}.status`) !== 1
+            "
+          >
+            Pool coming soon
+          </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)">
             xCOPE amount must greater than 5
           </template>
