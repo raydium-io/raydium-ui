@@ -276,6 +276,13 @@ export default Vue.extend({
         this.updateAmounts()
       },
       deep: true
+    },
+
+    'setting.slippage': {
+      handler() {
+        this.updateAmounts()
+      },
+      deep: true
     }
   },
 
