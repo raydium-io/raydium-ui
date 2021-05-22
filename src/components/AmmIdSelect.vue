@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <Button v-if="userClose" size="large" ghost @click="$emit('onSelect', undefined)">I WANT TO NO AMM ID</Button>
+      <Button v-if="userClose" size="large" ghost @click="$emit('onSelect', undefined)">Cancel</Button>
     </div>
   </Modal>
 </template>

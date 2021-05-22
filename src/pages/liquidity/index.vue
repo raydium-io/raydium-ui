@@ -251,7 +251,7 @@ import {
   Context
 } from '@solana/web3.js'
 
-import { getTokenBySymbol, TokenInfo, TOKENS } from '@/utils/tokens'
+import { getTokenBySymbol, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getOutAmount, addLiquidity, getLiquidityInfoSimilar } from '@/utils/liquidity'
 import logger from '@/utils/logger'
@@ -590,8 +590,8 @@ export default Vue.extend({
         const InputAmmIdOrMarket = this.userNeedAmmIdOrMarket
 
         const liquidityList = getLpListByTokenMintAddresses(
-          this.fromCoin.mintAddress,
-          this.toCoin.mintAddress,
+          this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
+          this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
           typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
         )
         let lpMintAddress

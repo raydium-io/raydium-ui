@@ -337,7 +337,12 @@ import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, 
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { canWrap, getLiquidityInfoSimilar } from '@/utils/liquidity'
-import { getLpListByTokenMintAddresses, getPoolListByTokenMintAddresses, LiquidityPoolInfo } from '@/utils/pools'
+import {
+  getLpListByTokenMintAddresses,
+  getPoolListByTokenMintAddresses,
+  isOfficalMarket,
+  LiquidityPoolInfo
+} from '@/utils/pools'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -763,13 +768,13 @@ export default Vue.extend({
         let marketAddress = ''
         if (this.fromCoin.mintAddress && this.toCoin.mintAddress) {
           const liquidityListV4 = getPoolListByTokenMintAddresses(
-            this.fromCoin.mintAddress,
-            this.toCoin.mintAddress,
+            this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
+            this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
             typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
           )
           const liquidityListV3 = getLpListByTokenMintAddresses(
-            this.fromCoin.mintAddress,
-            this.toCoin.mintAddress,
+            this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
+            this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
             typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined,
             [3]
           )
@@ -821,34 +826,28 @@ export default Vue.extend({
             this.needUserCheckUnofficialShow(ammId)
           }
         }
-        console.log(123, Object.keys(this.swap.markets))
+        console.log(123, Object.keys(this.swap.markets), marketAddress)
 
         // serum
         for (const address of Object.keys(this.swap.markets)) {
-          const info = cloneDeep(this.swap.markets[address])
-          let fromMint = this.fromCoin.mintAddress
-          let toMint = this.toCoin.mintAddress
-          if (fromMint === NATIVE_SOL.mintAddress) {
-            fromMint = TOKENS.WSOL.mintAddress
-          }
-          if (toMint === NATIVE_SOL.mintAddress) {
-            toMint = TOKENS.WSOL.mintAddress
-          }
-          console.log(
-            info.baseMint.toString(),
-            info.quoteMint.toString(),
-            fromMint,
-            toMint,
-            info.baseDepositsTotal.isZero(),
-            info.quoteDepositsTotal.isZero()
-          )
-          if (
-            (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
-            (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
-          ) {
-            // if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
-            marketAddress = address
-            // }
+          if (isOfficalMarket(address)) {
+            const info = cloneDeep(this.swap.markets[address])
+            let fromMint = this.fromCoin.mintAddress
+            let toMint = this.toCoin.mintAddress
+            if (fromMint === NATIVE_SOL.mintAddress) {
+              fromMint = TOKENS.WSOL.mintAddress
+            }
+            if (toMint === NATIVE_SOL.mintAddress) {
+              toMint = TOKENS.WSOL.mintAddress
+            }
+            if (
+              (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
+              (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
+            ) {
+              // if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
+              marketAddress = address
+              // }
+            }
           }
         }
         console.log('market', marketAddress)

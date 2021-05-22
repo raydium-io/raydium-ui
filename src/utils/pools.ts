@@ -6,7 +6,8 @@ import {
   SERUM_PROGRAM_ID_V3
 } from './ids'
 import { LP_TOKENS, NATIVE_SOL, TOKENS, TokenInfo } from './tokens'
-
+// @ts-ignore
+import SERUM_MARKETS from '@project-serum/serum/lib/markets.json'
 import { cloneDeep } from 'lodash-es'
 
 export interface LiquidityPoolInfo {
@@ -196,6 +197,22 @@ export function getAddressForWhat(address: string) {
   }
 
   return {}
+}
+
+export function isOfficalMarket(marketAddress: string) {
+  for (const market of SERUM_MARKETS) {
+    if (market.address === marketAddress && !market.deprecated) {
+      return true
+    }
+  }
+
+  for (const pool of LIQUIDITY_POOLS) {
+    if (pool.serumMarket === marketAddress && pool.official === true) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
