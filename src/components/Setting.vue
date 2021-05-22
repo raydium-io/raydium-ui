@@ -57,7 +57,7 @@ export default class Setting extends Vue {
         this.slippage = old
       } else {
         const slippage = parseFloat(val)
-        if (slippage > 100 || slippage <= 0 || isNaN(slippage)) {
+        if (slippage > 50 || slippage <= 0 || isNaN(slippage)) {
           this.errorMsg = 'Enter a valid slippage percentage'
         } else {
           if (slippage < 1) {

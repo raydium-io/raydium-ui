@@ -60,7 +60,7 @@ export function getSwapOutAmount(
     const denominator = coin.balance.wei.plus(fromAmount.wei)
     const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
 
     const outBalance = pc.balance.wei.minus(amountOut)
     const beforePrice = new TokenAmount(
@@ -90,7 +90,7 @@ export function getSwapOutAmount(
     const denominator = pc.balance.wei.plus(fromAmount.wei)
     const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
 
     const outBalance = coin.balance.wei.minus(amountOut)
 
@@ -145,6 +145,8 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     }
   }
 
+  coinOut = coinOut * 0.993
+
   const priceImpact = ((worstPrice - bestPrice) / bestPrice) * 100
 
   worstPrice = (worstPrice * (100 + slippage)) / 100
@@ -188,6 +190,8 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
       availableCoin -= size
     }
   }
+
+  pcOut = pcOut * 0.993
 
   const priceImpact = ((bestPrice - worstPrice) / bestPrice) * 100
 
