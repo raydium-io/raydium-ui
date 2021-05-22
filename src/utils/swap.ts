@@ -24,6 +24,7 @@ export function getOutAmount(
   amount: string,
   slippage: number
 ) {
+  console.log(asks, bids, market)
   const fromAmount = parseFloat(amount)
 
   let fromMint = fromCoinMint

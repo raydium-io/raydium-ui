@@ -421,7 +421,9 @@ export default Vue.extend({
 
       userNeedAmmIdOrMarket: undefined as string | undefined,
 
-      setCoinFromMintLoading: false
+      setCoinFromMintLoading: false,
+
+      asksAndBidsLoading: true
     }
   },
 
@@ -888,11 +890,12 @@ export default Vue.extend({
 
     getOrderBooks() {
       this.loading = true
+      this.asksAndBidsLoading = true
       this.countdown = this.autoRefreshTime
 
       const conn = this.$web3
-
-      if (this.marketAddress) {
+      console.log('tttt', Object.keys(this.swap.markets), this.marketAddress)
+      if (this.marketAddress && get(this.swap.markets, this.marketAddress)) {
         const marketInfo = get(this.swap.markets, this.marketAddress)
         const { bids, asks } = marketInfo
 
@@ -911,6 +914,7 @@ export default Vue.extend({
               } else {
                 this.asks = slab
               }
+              this.asksAndBidsLoading = false
             })
           })
           .finally(() => {
@@ -929,13 +933,11 @@ export default Vue.extend({
       let price = ''
       let impact = 0
       let endpoint = ''
-
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
         // wrap & unwrap
         this.toCoinAmount = this.fromCoinAmount
         return
       }
-
       if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
         // amm
         const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
@@ -958,7 +960,6 @@ export default Vue.extend({
           endpoint = 'raydium'
         }
       }
-
       if (
         this.fromCoin &&
         this.toCoin &&
@@ -966,8 +967,10 @@ export default Vue.extend({
         this.market &&
         this.asks &&
         this.bids &&
-        this.fromCoinAmount
+        this.fromCoinAmount &&
+        !this.asksAndBidsLoading
       ) {
+        console.log(1111, this.asks, this.bids)
         // serum
         const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
           this.market,
@@ -979,9 +982,11 @@ export default Vue.extend({
           this.setting.slippage
         )
 
+        console.log(1112)
         const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
         const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
 
+        console.log(1113)
         if (!out.isNullOrZero()) {
           console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
           if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
@@ -996,6 +1001,7 @@ export default Vue.extend({
             endpoint = 'serum'
           }
         }
+        console.log(1114)
       }
 
       if (toCoinWithSlippage) {
