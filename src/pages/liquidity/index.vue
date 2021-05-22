@@ -135,7 +135,7 @@
           @onMax="
             () => {
               fixedCoin = fromCoin.mintAddress
-              fromCoinAmount = fromCoin.balance.fixed()
+              fromCoinAmount = fromCoin.balance ? fromCoin.balance.fixed() : ''
             }
           "
           @onSelect="openFromCoinSelect"
@@ -161,7 +161,7 @@
           @onMax="
             () => {
               fixedCoin = toCoin.mintAddress
-              toCoinAmount = toCoin.balance.fixed()
+              toCoinAmount = toCoin.balance ? toCoin.balance.fixed() : ''
             }
           "
           @onSelect="openToCoinSelect"
@@ -202,8 +202,8 @@
             !lpMintAddress ||
             !liquidity.initialized ||
             liquidity.loading ||
-            gt(fromCoinAmount, fromCoin.balance.fixed()) ||
-            gt(toCoinAmount, toCoin.balance.fixed()) ||
+            gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '0') ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -215,10 +215,10 @@
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
+          <template v-else-if="gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
+          <template v-else-if="gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '')">
             Insufficient {{ toCoin.symbol }} balance
           </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, fromCoinAmount)">
