@@ -482,7 +482,6 @@ export default Vue.extend({
         !this.setCoinFromMintLoading &&
         (oldCoin === null || newCoin === null || newCoin.mintAddress !== oldCoin.mintAddress)
       ) {
-        console.log('fromCoin')
         this.userNeedAmmIdOrMarket = undefined
         this.findMarket()
         this.fromCoinAmount = ''
@@ -496,7 +495,6 @@ export default Vue.extend({
         !this.setCoinFromMintLoading &&
         (oldCoin === null || newCoin === null || newCoin.mintAddress !== oldCoin.mintAddress)
       ) {
-        console.log('toCoin')
         this.userNeedAmmIdOrMarket = undefined
         this.findMarket()
         this.fromCoinAmount = ''
@@ -528,7 +526,6 @@ export default Vue.extend({
 
     'liquidity.infos': {
       handler(_newInfos: any) {
-        console.log('liquidity.infos')
         this.updateAmounts()
         const { from, to, ammId } = this.$route.query
         if (this.findUrlAmmId) {
@@ -542,7 +539,6 @@ export default Vue.extend({
 
     'swap.markets': {
       handler(_newInfos: any) {
-        console.log('swap.markets')
         this.findMarket()
       },
       deep: true
@@ -660,7 +656,6 @@ export default Vue.extend({
     },
 
     needUserCheckUnofficialShow(ammId: string) {
-      console.log('needUserCheckUnofficialShow', this.wallet.connected, this.officialPool)
       if (!this.wallet.connected) {
         return
       }
@@ -670,21 +665,17 @@ export default Vue.extend({
 
       const localCheckStr = localStorage.getItem(`${this.wallet.address}--checkAmmId`)
       const localCheckAmmIdList = localCheckStr ? localCheckStr.split('---') : []
-      console.log(localCheckAmmIdList)
       if (localCheckAmmIdList.includes(ammId)) {
-        console.log(111)
         this.userCheckUnofficial = true
         this.userCheckUnofficialMint = ammId
         this.userCheckUnofficialShow = false
         return
       }
       if (this.userCheckUnofficialMint === ammId) {
-        console.log(222)
         this.userCheckUnofficial = true
         this.userCheckUnofficialShow = false
         return
       }
-      console.log(333)
       this.userCheckUnofficial = false
       this.coinSelectShow = false
       this.userCheckUnofficialShow = true
@@ -711,7 +702,6 @@ export default Vue.extend({
     },
 
     onUserCheckUnofficialSelect(userSelect: boolean, userSelectAll: boolean) {
-      console.log('onUserCheck')
       this.userCheckUnofficialShow = false
       if (userSelect) {
         this.userCheckUnofficial = true
@@ -801,11 +791,9 @@ export default Vue.extend({
           let lpMintAddress
           let ammId
           let officialPool = true
-          console.log(liquidityListV4, liquidityListV3)
           if (liquidityListV4.length === 1 && !liquidityListV4[0].official && liquidityListV3.length > 0) {
             console.log('v3')
           } else if (liquidityListV4.length === 1 && liquidityListV4[0].official) {
-            console.log('official')
             // official
             lpMintAddress = liquidityListV4[0].lp.mintAddress
             ammId = liquidityListV4[0].ammId
@@ -814,7 +802,6 @@ export default Vue.extend({
             this.userCheckUnofficialMint = undefined
             marketAddress = liquidityListV4[0].serumMarket
           } else if (liquidityListV4.length === 1 && InputAmmIdOrMarket) {
-            console.log('user select', liquidityListV4[0].serumMarket)
             ammId = liquidityListV4[0].ammId
             lpMintAddress = liquidityListV4[0].lp.mintAddress
             officialPool = liquidityListV4[0].official
@@ -822,7 +809,6 @@ export default Vue.extend({
           } else if (liquidityListV4.length > 0 && this.ammIdSelectOld) {
             console.log('last user select none')
           } else if (liquidityListV4.length > 0) {
-            console.log('user select')
             this.coinSelectShow = false
             setTimeout(() => {
               this.ammIdSelectShow = true
@@ -837,7 +823,6 @@ export default Vue.extend({
           this.initialized = true
           this.ammId = ammId
           this.officialPool = officialPool
-          console.log('ttt', lpMintAddress, lpMintAddress ?? '')
           if (ammId !== this.userCheckUnofficialMint) {
             this.userCheckUnofficialMint = undefined
           }
@@ -845,7 +830,6 @@ export default Vue.extend({
             this.needUserCheckUnofficialShow(ammId)
           }
         }
-        console.log(123, Object.keys(this.swap.markets), marketAddress)
 
         // serum
         for (const address of Object.keys(this.swap.markets)) {
@@ -869,7 +853,7 @@ export default Vue.extend({
             }
           }
         }
-        console.log('market', marketAddress)
+
         if (marketAddress) {
           // const lpPool = LIQUIDITY_POOLS.find((item) => item.serumMarket === marketAddress)
           if (this.marketAddress !== marketAddress) {
@@ -911,7 +895,6 @@ export default Vue.extend({
       this.countdown = this.autoRefreshTime
 
       const conn = this.$web3
-      console.log('tttt', Object.keys(this.swap.markets), this.marketAddress)
       if (this.marketAddress && get(this.swap.markets, this.marketAddress)) {
         const marketInfo = get(this.swap.markets, this.marketAddress)
         const { bids, asks } = marketInfo
