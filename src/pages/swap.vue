@@ -389,6 +389,20 @@ export default Vue.extend({
 
     bids() {
       this.updateAmounts()
+    },
+
+    'liquidity.infos': {
+      handler() {
+        this.updateAmounts()
+      },
+      deep: true
+    },
+
+    'setting.slippage': {
+      handler() {
+        this.updateAmounts()
+      },
+      deep: true
     }
   },
 
