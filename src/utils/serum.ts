@@ -14,7 +14,7 @@ export function startMarkets() {
       MARKETS.push(address)
     }
   }
-  console.log('find liquidity')
+
   for (const market of LIQUIDITY_POOLS) {
     if (market.serumProgramId === SERUM_PROGRAM_ID_V3 && !MARKETS.includes(market.serumMarket)) {
       MARKETS.push(market.serumMarket)

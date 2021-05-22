@@ -92,7 +92,6 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
     return { market, price, msg: '', baseMintDecimals, quoteMintDecimals }
   } catch (error) {
-    console.log(444)
     if (error.message === 'Non-base58 character') {
       return { market: null, price: null, msg: 'market input error', baseMintDecimals: 0, quoteMintDecimals: 0 }
     } else {
@@ -465,24 +464,12 @@ async function initAmm(
   const baseTokenAccount = await getFilteredTokenAccountsByOwner(conn, owner, market.baseMintAddress)
   const quoteTokenAccount = await getFilteredTokenAccountsByOwner(conn, owner, market.quoteMintAddress)
   const baseTokenList: any = baseTokenAccount.value.map((item: any) => {
-    console.log(
-      3322,
-      item.account.data.parsed.info.tokenAmount.amount,
-      coinVol.toNumber(),
-      market.baseMintAddress.toString()
-    )
     if (item.account.data.parsed.info.tokenAmount.amount >= coinVol.toNumber()) {
       return item.pubkey
     }
     return null
   })
   const quoteTokenList: any = quoteTokenAccount.value.map((item: any) => {
-    console.log(
-      3322,
-      item.account.data.parsed.info.tokenAmount.amount,
-      pcVol.toNumber(),
-      market.quoteMintAddress.toString()
-    )
     if (item.account.data.parsed.info.tokenAmount.amount >= pcVol.toNumber()) {
       return item.pubkey
     }
@@ -500,7 +487,6 @@ async function initAmm(
       quoteToken = item
     }
   }
-  console.log(333, owner, market.baseMintAddress)
   if (
     (baseToken === null && market.baseMintAddress.toString() !== TOKENS.WSOL.mintAddress) ||
     (quoteToken === null && market.quoteMintAddress.toString() !== TOKENS.WSOL.mintAddress)
@@ -528,7 +514,6 @@ async function initAmm(
     )
 
     transaction.add(transfer(newAccount.publicKey, poolCoinTokenAccount.publicKey, owner, parseInt(coinVol.toFixed())))
-    console.log(111, owner)
 
     transaction.add(
       closeAccount({
@@ -565,7 +550,6 @@ async function initAmm(
     )
 
     transaction.add(transfer(newAccount.publicKey, poolPcTokenAccount.publicKey, owner, parseInt(pcVol.toFixed())))
-    console.log(222, owner)
     transaction.add(
       closeAccount({
         source: newAccount.publicKey,

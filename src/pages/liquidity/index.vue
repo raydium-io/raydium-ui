@@ -135,7 +135,7 @@
           @onMax="
             () => {
               fixedCoin = fromCoin.mintAddress
-              fromCoinAmount = fromCoin.balance.fixed()
+              fromCoinAmount = fromCoin.balance ? fromCoin.balance.fixed() : ''
             }
           "
           @onSelect="openFromCoinSelect"
@@ -161,7 +161,7 @@
           @onMax="
             () => {
               fixedCoin = toCoin.mintAddress
-              toCoinAmount = toCoin.balance.fixed()
+              toCoinAmount = toCoin.balance ? toCoin.balance.fixed() : ''
             }
           "
           @onSelect="openToCoinSelect"
@@ -202,8 +202,8 @@
             !lpMintAddress ||
             !liquidity.initialized ||
             liquidity.loading ||
-            gt(fromCoinAmount, fromCoin.balance.fixed()) ||
-            gt(toCoinAmount, toCoin.balance.fixed()) ||
+            gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '0') ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -215,10 +215,10 @@
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance.fixed())">
+          <template v-else-if="gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance.fixed())">
+          <template v-else-if="gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '')">
             Insufficient {{ toCoin.symbol }} balance
           </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, fromCoinAmount)">
@@ -400,7 +400,6 @@ export default Vue.extend({
     const { from, to, ammId } = this.$route.query
     // @ts-ignore
     this.setCoinFromMint(ammId, from, to)
-    console.log('start')
     this.findLiquidityPool()
   },
 
@@ -463,7 +462,6 @@ export default Vue.extend({
         this.userNeedAmmIdOrMarket = ammIdOrMarket
         // @ts-ignore
         const liquidityUser = getLiquidityInfoSimilar(ammIdOrMarket, from, to)
-        console.log(222, liquidityUser)
         if (liquidityUser) {
           if (from) {
             fromCoin = liquidityUser.coin.mintAddress === from ? liquidityUser.coin : liquidityUser.pc
@@ -591,12 +589,6 @@ export default Vue.extend({
         const InputAmmIdOrMarket = this.userNeedAmmIdOrMarket
 
         const liquidityList = getLpListByTokenMintAddresses(
-          this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
-          this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
-          typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
-        )
-        console.log(
-          liquidityList,
           this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
           this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
           typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
