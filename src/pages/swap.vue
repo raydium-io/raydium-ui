@@ -350,7 +350,7 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment, createTokenAccount } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, settleFunds } from '@/utils/swap'
+import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, settleFund } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { canWrap, getLiquidityInfoSimilar } from '@/utils/liquidity'
@@ -1217,21 +1217,65 @@ export default Vue.extend({
       }
     },
 
-    async settleFunds(from: 'base' | 'quote') {
-      let baseWallet = get(this.wallet.tokenAccounts, `${(this.market as Market).baseMintAddress}.tokenAccountAddress`)
-      let quoteWallet = get(
-        this.wallet.tokenAccounts,
-        `${(this.market as Market).quoteMintAddress}.tokenAccountAddress`
-      )
+    settleFunds(from: 'base' | 'quote') {
+      const key = getUnixTs().toString()
+      this.$notify.info({
+        key,
+        message: 'Making transaction...',
+        description: '',
+        duration: 0
+      })
+
+      let baseMint = (this.market as Market).baseMintAddress.toBase58()
+      let quoteMint = (this.market as Market).quoteMintAddress.toBase58()
+
+      let baseWallet = get(this.wallet.tokenAccounts, `${baseMint}.tokenAccountAddress`)
+      let quoteWallet = get(this.wallet.tokenAccounts, `${quoteMint}.tokenAccountAddress`)
       if (from === 'quote') {
         ;[baseWallet, quoteWallet] = [quoteWallet, baseWallet]
+        ;[baseMint, quoteMint] = [quoteMint, baseMint]
       }
       if (from === 'quote') {
         this.isSettlingQuote = true
       } else {
         this.isSettlingBase = true
       }
-      await settleFunds(this.$web3, this.market, this.unsettledOpenOrders, this.$wallet, baseWallet, quoteWallet)
+
+      settleFund(
+        this.$web3,
+        this.market,
+        this.unsettledOpenOrders,
+        this.$wallet,
+        baseMint,
+        quoteMint,
+        baseWallet,
+        quoteWallet
+      )
+        .then((txid) => {
+          this.$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Settle`
+          this.$accessor.transaction.sub({ txid, description })
+        })
+        .catch((error) => {
+          this.$notify.error({
+            key,
+            message: 'Settle failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.isSettlingQuote = false
+          this.isSettlingBase = false
+        })
     },
 
     createAssociatedTokenAccount(symbol: string, mint: string) {

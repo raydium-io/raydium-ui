@@ -680,19 +680,75 @@ export async function checkUnsettledInfo(connection: Connection, wallet: any, ma
   }
 }
 
-export async function settleFunds(
+export async function settleFund(
   connection: Connection,
   market: Market,
   openOrders: OpenOrders,
   wallet: any,
+  baseMint: string,
+  quoteMint: string,
   baseWallet: string,
   quoteWallet: string
 ) {
+  const tx = new Transaction()
+  const signs: Account[] = []
+
+  const owner = wallet.publicKey
+
+  let wrappedBaseAccount
+  let wrappedQuoteAccount
+
+  if (baseMint === TOKENS.WSOL.mintAddress) {
+    wrappedBaseAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedBaseAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      tx,
+      signs
+    )
+  }
+  if (quoteMint === TOKENS.WSOL.mintAddress) {
+    wrappedQuoteAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedQuoteAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      tx,
+      signs
+    )
+  }
+
+  const quoteToken = getTokenByMintAddress(quoteMint)
+
   const { transaction, signers } = await market.makeSettleFundsTransaction(
     connection,
     openOrders,
-    new PublicKey(baseWallet),
-    new PublicKey(quoteWallet)
+    wrappedBaseAccount ?? new PublicKey(baseWallet),
+    wrappedQuoteAccount ?? new PublicKey(quoteWallet),
+    quoteToken && quoteToken.referrer ? new PublicKey(quoteToken.referrer) : null
   )
-  return await sendTransaction(connection, wallet, transaction, signers)
+
+  if (wrappedBaseAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedBaseAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+  if (wrappedQuoteAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedQuoteAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+
+  return await sendTransaction(connection, wallet, mergeTransactions([tx, transaction]), [...signs, ...signers])
 }
