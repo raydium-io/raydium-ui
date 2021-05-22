@@ -784,20 +784,25 @@ export async function getLpMintListDecimals(
 }
 
 export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to: string) {
+  // const fromCoin = from === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : from
+  // const toCoin = to === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : to
+  const fromCoin = from === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : from
+  const toCoin = to === TOKENS.WSOL.mintAddres ? NATIVE_SOL.mintAddress : to
+  console.log(from, to, fromCoin, toCoin)
   const knownLiquidity = LIQUIDITY_POOLS.find((item) => {
-    if (from !== null && to != null && from === to) {
+    if (fromCoin !== null && toCoin != null && fromCoin === toCoin) {
       return false
     }
     if (ammIdOrMarket !== undefined && !(item.ammId === ammIdOrMarket || item.serumMarket === ammIdOrMarket)) {
       return false
     }
-    if (from && item.pc.mintAddress !== from && item.coin.mintAddress !== from) {
+    if (fromCoin && item.pc.mintAddress !== fromCoin && item.coin.mintAddress !== fromCoin) {
       return false
     }
-    if (to && item.pc.mintAddress !== to && item.coin.mintAddress !== to) {
+    if (toCoin && item.pc.mintAddress !== toCoin && item.coin.mintAddress !== toCoin) {
       return false
     }
-    if (ammIdOrMarket || (from && to)) {
+    if (ammIdOrMarket || (fromCoin && toCoin)) {
       return true
     }
     return false

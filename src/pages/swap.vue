@@ -938,10 +938,11 @@ export default Vue.extend({
         this.toCoinAmount = this.fromCoinAmount
         return
       }
-      if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
+      if (this.fromCoin && this.toCoin && this.ammId && this.fromCoinAmount) {
         // amm
+        const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.ammId)
         const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
-          get(this.liquidity.infos, this.lpMintAddress),
+          poolInfo,
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
           this.fromCoinAmount,
@@ -970,7 +971,6 @@ export default Vue.extend({
         this.fromCoinAmount &&
         !this.asksAndBidsLoading
       ) {
-        console.log(1111, this.asks, this.bids)
         // serum
         const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
           this.market,
@@ -982,11 +982,9 @@ export default Vue.extend({
           this.setting.slippage
         )
 
-        console.log(1112)
         const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
         const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
 
-        console.log(1113)
         if (!out.isNullOrZero()) {
           console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
           if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
@@ -1001,7 +999,6 @@ export default Vue.extend({
             endpoint = 'serum'
           }
         }
-        console.log(1114)
       }
 
       if (toCoinWithSlippage) {

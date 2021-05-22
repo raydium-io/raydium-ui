@@ -105,20 +105,37 @@ export const actions = actionTree(
         ) {
           continue
         }
-
-        const coin = Object.values(TOKENS).find((item) => item.mintAddress === ammInfo.coinMintAddress.toString()) ?? {
+        const fromCoin =
+          ammInfo.coinMintAddress.toString() === TOKENS.WSOL.mintAddress
+            ? NATIVE_SOL.mintAddress
+            : ammInfo.coinMintAddress.toString()
+        const toCoin =
+          ammInfo.pcMintAddress.toString() === TOKENS.WSOL.mintAddress
+            ? NATIVE_SOL.mintAddress
+            : ammInfo.pcMintAddress.toString()
+        const coin = Object.values(TOKENS).find((item) => item.mintAddress === fromCoin) ?? {
           symbol: 'unknown',
           name: 'unknown',
           mintAddress: ammInfo.coinMintAddress.toString(),
           decimals: ammInfo.coinDecimals.toNumber(),
           official: false
         }
-        const pc = Object.values(TOKENS).find((item) => item.mintAddress === ammInfo.pcMintAddress.toString()) ?? {
+        const pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin) ?? {
           symbol: 'unknown',
           name: 'unknown',
           mintAddress: ammInfo.pcMintAddress.toString(),
           decimals: ammInfo.pcDecimals.toNumber(),
           official: false
+        }
+        if (coin.mintAddress === TOKENS.WSOL.mintAddress) {
+          coin.symbol = 'SOL'
+          coin.name = 'SOL'
+          coin.mintAddress = '11111111111111111111111111111111'
+        }
+        if (pc.mintAddress === TOKENS.WSOL.mintAddress) {
+          pc.symbol = 'SOL'
+          pc.name = 'SOL'
+          pc.mintAddress = '11111111111111111111111111111111'
         }
         const lp = Object.values(LP_TOKENS).find((item) => item.mintAddress === ammInfo.lpMintAddress) ?? {
           symbol: `${coin.name}-${pc.name}`,

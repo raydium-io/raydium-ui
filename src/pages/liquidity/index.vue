@@ -463,6 +463,7 @@ export default Vue.extend({
         this.userNeedAmmIdOrMarket = ammIdOrMarket
         // @ts-ignore
         const liquidityUser = getLiquidityInfoSimilar(ammIdOrMarket, from, to)
+        console.log(222, liquidityUser)
         if (liquidityUser) {
           if (from) {
             fromCoin = liquidityUser.coin.mintAddress === from ? liquidityUser.coin : liquidityUser.pc
@@ -590,8 +591,14 @@ export default Vue.extend({
         const InputAmmIdOrMarket = this.userNeedAmmIdOrMarket
 
         const liquidityList = getLpListByTokenMintAddresses(
-          this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
-          this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
+          this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
+          this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
+          typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
+        )
+        console.log(
+          liquidityList,
+          this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
+          this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
           typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
         )
         let lpMintAddress
