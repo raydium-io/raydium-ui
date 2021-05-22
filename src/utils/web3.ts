@@ -187,6 +187,17 @@ export async function createAssociatedTokenAccount(
   return associatedTokenAddress
 }
 
+export async function createTokenAccount(connection: Connection, wallet: any, mint: string) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  await createAssociatedTokenAccount(new PublicKey(mint), owner, transaction)
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
 export async function getFilteredProgramAccounts(
   connection: Connection,
   programId: PublicKey,
