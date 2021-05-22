@@ -770,13 +770,13 @@ export default Vue.extend({
         let marketAddress = ''
         if (this.fromCoin.mintAddress && this.toCoin.mintAddress) {
           const liquidityListV4 = getPoolListByTokenMintAddresses(
-            this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
-            this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
+            this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
+            this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
             typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined
           )
           const liquidityListV3 = getLpListByTokenMintAddresses(
-            this.fromCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.fromCoin.mintAddress,
-            this.toCoin.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : this.toCoin.mintAddress,
+            this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
+            this.toCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.toCoin.mintAddress,
             typeof InputAmmIdOrMarket === 'string' ? InputAmmIdOrMarket : undefined,
             [3]
           )
