@@ -15,8 +15,8 @@
         ><input type="checkbox" v-model="userCheckUnofficial" style="margin-right: 10px" />I understand</label
       >
       <label style="color: red"
-        ><input type="checkbox" v-model="userCheckUnofficialAll" style="margin-right: 10px" />I understand
-        不再确认</label
+        ><input type="checkbox" v-model="userCheckUnofficialAll" style="margin-right: 10px" />Do not warn me
+        again</label
       >
       <span>
         <Button style="width: 45%; margin-right: 8%" size="large" ghost @click="$emit('onSelect', false)">Cancel</Button

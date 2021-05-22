@@ -94,7 +94,7 @@
                   {{ getNameForMint(marketMsg.quoteMintAddress.toBase58()) }}
                 </div>
                 <div style="width: 100%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
-                  expectAmmId
+                  Expected AMM ID
                 </div>
                 <div
                   style="width: 100%; display: inline-block; text-align: right"

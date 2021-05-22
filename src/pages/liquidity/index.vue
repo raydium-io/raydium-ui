@@ -55,7 +55,7 @@
                 </div>
               </div>
               <div v-if="lpMintAddress" class="info">
-                <div class="symbol">Pool</div>
+                <div class="symbol">LP Mint</div>
                 <div class="address">
                   {{ lpMintAddress.substr(0, 14) }}
                   ...

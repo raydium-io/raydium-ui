@@ -49,13 +49,13 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
       await createAmmId(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), new PublicKey(marketAddress))
     ).toString()
     if (LIQUIDITY_POOLS.find((item) => item.ammId === expectAmmId)) {
-      throw new Error('this market has amm id')
+      throw new Error('This market already has an AMM')
     }
     const marketAddressPubKey = new PublicKey(marketAddress)
     const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey(SERUM_PROGRAM_ID_V3))
     const { asksAddress, bidsAddress, quoteMint, baseMint } = market
     let coinOrPcInTokenFlag = false
-    // for (const item of Object.values(TOKENS)) {
+
     for (const item of [TOKENS.USDT, TOKENS.USDC, TOKENS.RAY, TOKENS.WSOL, TOKENS.SRM]) {
       if (quoteMint?.toBase58() === item.mintAddress || baseMint?.toBase58() === item.mintAddress) {
         coinOrPcInTokenFlag = true
@@ -63,9 +63,9 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
       }
     }
     if (!coinOrPcInTokenFlag) {
-      // throw new Error(
-      //   'Only markets that contain USDC, USDT, SOL, RAY, or SRM as one side of the pair are currently supported.'
-      // )
+      throw new Error(
+        'Only markets that contain USDC, USDT, SOL, RAY, or SRM as one side of the pair are currently supported.'
+      )
     }
     const asks: number[] = []
     const bids: number[] = []
@@ -644,7 +644,7 @@ async function initAmm(
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
   if (txidSuccessFlag !== 1) {
-    throw new Error('Transaction has been failed')
+    throw new Error('Transaction failed')
   }
 
   clearLocal()
