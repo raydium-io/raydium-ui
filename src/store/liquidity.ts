@@ -1,15 +1,18 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
-import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
-import { LIQUIDITY_POOLS, getAddressForWhat } from '@/utils/pools'
-import { commitment, getMultipleAccounts } from '@/utils/web3'
+import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
+import { LIQUIDITY_POOLS, getAddressForWhat, LiquidityPoolInfo } from '@/utils/pools'
+import { commitment, createAmmAuthority, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
 import { OpenOrders } from '@project-serum/serum'
 import { PublicKey } from '@solana/web3.js'
 import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
+import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
+import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
+import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -63,6 +66,125 @@ export const actions = actionTree(
       commit('setLoading', true)
 
       const conn = this.$web3
+
+      const ammAll = await getFilteredProgramAccounts(conn, new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), [
+        {
+          dataSize: AMM_INFO_LAYOUT_V4.span
+        }
+      ])
+      const marketAll = await getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), [
+        {
+          dataSize: _MARKET_STATE_LAYOUT_V2.span
+        }
+      ])
+      const marketToLayout: { [name: string]: any } = {}
+      marketAll.forEach((item) => {
+        marketToLayout[item.publicKey.toString()] = _MARKET_STATE_LAYOUT_V2.decode(item.accountInfo.data)
+      })
+
+      const lpMintAddressList: string[] = []
+      ammAll.forEach((item) => {
+        const ammLayout = AMM_INFO_LAYOUT_V4.decode(Buffer.from(item.accountInfo.data))
+        if (
+          ammLayout.pcMintAddress.toString() === ammLayout.serumMarket.toString() ||
+          ammLayout.lpMintAddress.toString() === '11111111111111111111111111111111'
+        ) {
+          return
+        }
+        lpMintAddressList.push(ammLayout.lpMintAddress.toString())
+      })
+      const lpMintListDecimls = await getLpMintListDecimals(conn, lpMintAddressList)
+
+      for (let indexAmmInfo = 0; indexAmmInfo < ammAll.length; indexAmmInfo += 1) {
+        const ammInfo = AMM_INFO_LAYOUT_V4.decode(Buffer.from(ammAll[indexAmmInfo].accountInfo.data))
+        if (
+          !Object.keys(lpMintListDecimls).includes(ammInfo.lpMintAddress.toString()) ||
+          ammInfo.pcMintAddress.toString() === ammInfo.serumMarket.toString() ||
+          ammInfo.lpMintAddress.toString() === '11111111111111111111111111111111' ||
+          !Object.keys(marketToLayout).includes(ammInfo.serumMarket.toString())
+        ) {
+          continue
+        }
+
+        const coin = Object.values(TOKENS).find((item) => item.mintAddress === ammInfo.coinMintAddress.toString()) ?? {
+          symbol: 'unknown',
+          name: 'unknown',
+          mintAddress: ammInfo.coinMintAddress.toString(),
+          decimals: ammInfo.coinDecimals.toNumber(),
+          official: false
+        }
+        const pc = Object.values(TOKENS).find((item) => item.mintAddress === ammInfo.pcMintAddress.toString()) ?? {
+          symbol: 'unknown',
+          name: 'unknown',
+          mintAddress: ammInfo.pcMintAddress.toString(),
+          decimals: ammInfo.pcDecimals.toNumber(),
+          official: false
+        }
+        const lp = Object.values(LP_TOKENS).find((item) => item.mintAddress === ammInfo.lpMintAddress) ?? {
+          symbol: `${coin.name}-${pc.name}`,
+          name: `${coin.name}-${pc.name}`,
+          coin,
+          pc,
+          mintAddress: ammInfo.lpMintAddress.toString(),
+          decimals: lpMintListDecimls[ammInfo.lpMintAddress]
+        }
+
+        const { publicKey } = await createAmmAuthority(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4))
+
+        const market = marketToLayout[ammInfo.serumMarket]
+
+        const serumVaultSigner = await PublicKey.createProgramAddress(
+          [ammInfo.serumMarket.toBuffer(), market.vaultSignerNonce.toArrayLike(Buffer, 'le', 8)],
+          new PublicKey(SERUM_PROGRAM_ID_V3)
+        )
+
+        const itemLiquidity: LiquidityPoolInfo = {
+          name: `${coin.symbol}-${pc.name}`,
+          coin,
+          pc,
+          lp,
+          version: 4,
+          programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+          ammId: ammAll[indexAmmInfo].publicKey.toString(),
+          ammAuthority: publicKey.toString(),
+          ammOpenOrders: ammInfo.ammOpenOrders.toString(),
+          ammTargetOrders: ammInfo.ammTargetOrders.toString(),
+          ammQuantities: NATIVE_SOL.mintAddress,
+          poolCoinTokenAccount: ammInfo.poolCoinTokenAccount.toString(),
+          poolPcTokenAccount: ammInfo.poolPcTokenAccount.toString(),
+          poolWithdrawQueue: ammInfo.poolWithdrawQueue.toString(),
+          poolTempLpTokenAccount: ammInfo.poolTempLpTokenAccount.toString(),
+          serumProgramId: SERUM_PROGRAM_ID_V3,
+          serumMarket: ammInfo.serumMarket.toString(),
+
+          serumCoinVaultAccount: market.baseVault?.toString() ?? '',
+          serumPcVaultAccount: market.quoteVault?.toString() ?? '',
+          serumVaultSigner: serumVaultSigner.toString(),
+          official: false
+        }
+        if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
+          console.log(
+            'official false',
+            itemLiquidity.ammId,
+            lp.mintAddress,
+            itemLiquidity,
+            itemLiquidity.serumMarket,
+            itemLiquidity.ammId,
+            LIQUIDITY_POOLS.length
+          )
+          LIQUIDITY_POOLS.push(itemLiquidity)
+        } else {
+          for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {
+            if (
+              LIQUIDITY_POOLS[itemIndex].ammId === itemLiquidity.ammId &&
+              LIQUIDITY_POOLS[itemIndex].name !== itemLiquidity.name &&
+              !LIQUIDITY_POOLS[itemIndex].official
+            ) {
+              LIQUIDITY_POOLS[itemIndex] = itemLiquidity
+            }
+          }
+        }
+      }
 
       const liquidityPools = {} as any
       const publicKeys = [] as any

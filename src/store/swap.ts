@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market.js'
 import { cloneDeep } from 'lodash-es'
-import { MARKETS } from '@/utils/serum'
+import { MARKETS, startMarkets } from '@/utils/serum'
 import { getFilteredProgramAccounts } from '@/utils/web3'
 import logger from '@/utils/logger'
 
@@ -32,6 +32,8 @@ export const actions = actionTree(
         }
       ]
 
+      startMarkets()
+
       getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), filters)
         .then((marketInfos) => {
           const markets: any = {}
@@ -41,7 +43,7 @@ export const actions = actionTree(
 
             if (MARKETS.includes(address)) {
               const { data } = marketInfo.accountInfo
-
+              console.log(address, _MARKET_STATE_LAYOUT_V2.decode(data))
               markets[address] = _MARKET_STATE_LAYOUT_V2.decode(data)
             }
           })

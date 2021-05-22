@@ -1,12 +1,14 @@
+import { MINT_LAYOUT } from './layouts'
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   LiquidityPoolInfo,
   getLpMintByTokenMintAddresses,
   getPoolByLpMintAddress,
   getPoolByTokenMintAddresses,
-  canWrap
+  canWrap,
+  LIQUIDITY_POOLS
 } from '@/utils/pools'
-import { NATIVE_SOL, TOKENS, TokenInfo } from '@/utils/tokens'
+import { NATIVE_SOL, TOKENS, TokenInfo, LP_TOKENS } from '@/utils/tokens'
 import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8 } from 'buffer-layout'
@@ -16,6 +18,7 @@ import BigNumber from 'bignumber.js'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { commitment, getMultipleAccounts } from '@/utils/web3'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
@@ -725,3 +728,91 @@ export const AMM_INFO_LAYOUT_V4 = struct([
   publicKey('ammOwner'),
   publicKey('pnlOwner')
 ])
+
+export async function getLpMintInfo(conn: any, mintAddress: string, coin: any, pc: any): Promise<TokenInfo> {
+  let lpInfo = Object.values(LP_TOKENS).find((item) => item.mintAddress === mintAddress)
+  if (!lpInfo) {
+    const mintAll = await getMultipleAccounts(conn, [new PublicKey(mintAddress)], commitment)
+    if (mintAll !== null) {
+      const data = Buffer.from(mintAll[0]?.account.data ?? '')
+      const mintLayoutData = MINT_LAYOUT.decode(data)
+      lpInfo = {
+        symbol: 'unknown',
+        name: 'unknown',
+        coin,
+        pc,
+        mintAddress: mintAddress,
+        decimals: mintLayoutData.decimals
+      }
+    }
+  }
+  return lpInfo
+}
+
+export async function getLpMintListDecimals(
+  conn: any,
+  mintAddressInfos: string[]
+): Promise<{ [name: string]: number }> {
+  const reLpInfoDict: { [name: string]: number } = {}
+  const mintList = [] as PublicKey[]
+  mintAddressInfos.forEach((item) => {
+    let lpInfo = Object.values(LP_TOKENS).find((itemLpToken) => itemLpToken.mintAddress === item)
+    if (!lpInfo) {
+      mintList.push(new PublicKey(item))
+      lpInfo = {
+        decimals: null
+      }
+    }
+    reLpInfoDict[item] = lpInfo.decimals
+  })
+
+  const mintAll = await getMultipleAccounts(conn, mintList, commitment)
+  for (let mintIndex = 0; mintIndex < mintAll.length; mintIndex += 1) {
+    const itemMint = mintAll[mintIndex]
+    if (itemMint) {
+      const mintLayoutData = MINT_LAYOUT.decode(Buffer.from(itemMint.account.data))
+      reLpInfoDict[mintList[mintIndex].toString()] = mintLayoutData.decimals
+    }
+  }
+  const reInfo: { [name: string]: number } = {}
+  for (const key of Object.keys(reLpInfoDict)) {
+    if (reLpInfoDict[key] !== null) {
+      reInfo[key] = reLpInfoDict[key]
+    }
+  }
+  return reInfo
+}
+
+export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to: string) {
+  const knownLiquidity = LIQUIDITY_POOLS.find((item) => {
+    if (from !== null && to != null && from === to) {
+      return false
+    }
+    if (ammIdOrMarket !== undefined && !(item.ammId === ammIdOrMarket || item.serumMarket === ammIdOrMarket)) {
+      return false
+    }
+    if (from && item.pc.mintAddress !== from && item.coin.mintAddress !== from) {
+      return false
+    }
+    if (to && item.pc.mintAddress !== to && item.coin.mintAddress !== to) {
+      return false
+    }
+    if (ammIdOrMarket || (from && to)) {
+      return true
+    }
+    return false
+  })
+  return knownLiquidity
+}
+
+export function getQueryVariable(variable: string) {
+  var query = window.location.search.substring(1)
+  var vars = query.split('&')
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=')
+    if (pair[0] == variable) {
+      return pair[1]
+    }
+  }
+  return undefined
+}

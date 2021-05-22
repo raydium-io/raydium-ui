@@ -7,17 +7,21 @@ import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 
 const MARKETS: Array<string> = []
 
-for (const market of SERUM_MARKETS) {
-  const address = market.address.toBase58()
-  if (!market.deprecated && !(address in MARKETS)) {
-    MARKETS.push(address)
+export function startMarkets() {
+  for (const market of SERUM_MARKETS) {
+    const address = market.address.toBase58()
+    if (!market.deprecated && !MARKETS.includes(address)) {
+      MARKETS.push(address)
+    }
+  }
+  console.log('find liquidity')
+  for (const market of LIQUIDITY_POOLS) {
+    if (market.serumProgramId === SERUM_PROGRAM_ID_V3 && !MARKETS.includes(market.serumMarket)) {
+      MARKETS.push(market.serumMarket)
+    }
   }
 }
 
-for (const market of LIQUIDITY_POOLS) {
-  if (market.serumProgramId === SERUM_PROGRAM_ID_V3 && !(market.serumMarket in MARKETS)) {
-    MARKETS.push(market.serumMarket)
-  }
-}
+startMarkets()
 
 export { MARKETS }

@@ -26,21 +26,26 @@
                 <img :src="importIcon(`/coins/${info.coin.symbol.toLowerCase()}.png`)" />
                 <img :src="importIcon(`/coins/${info.pc.symbol.toLowerCase()}.png`)" />
               </div>
-              {{ info.lp.symbol }}
+              {{ info.lp.symbol }} {{ info.poolInfo.official ? '' : '(unofficial)' }}
               <Tag v-if="info.poolInfo.version === 2" color="pink">Legacy</Tag>
             </div>
-
             <div class="fs-container">
               <div>Pooled:</div>
-              <div>≈ {{ info.userCoinBalance.format() }} {{ info.coin.symbol }}</div>
+              <div>
+                ≈ {{ info.userCoinBalance ? info.userCoinBalance.toEther().toFixed(info.coin.decimals) : '' }}
+                {{ info.coin.symbol }}
+              </div>
             </div>
             <div class="fs-container">
               <div>Pooled:</div>
-              <div>≈ {{ info.userPcBalance.format() }} {{ info.pc.symbol }}</div>
+              <div>
+                ≈ {{ info.userPcBalance ? info.userPcBalance.toEther().toFixed(info.pc.decimals) : '' }}
+                {{ info.pc.symbol }}
+              </div>
             </div>
             <div class="fs-container">
               <div>Your pool tokens:</div>
-              <div>{{ info.userLpBalance.format() }}</div>
+              <div>{{ info.userLpBalance ? info.userLpBalance.toEther() : '' }}</div>
             </div>
             <div class="fs-container">
               <div>Your pool share:</div>
@@ -50,7 +55,9 @@
             </div>
             <Row v-if="[3, 4].includes(info.poolInfo.version)" :gutter="32" class="actions">
               <Col :span="12">
-                <Button ghost @click="$emit('onAdd', info.coin.mintAddress, info.pc.mintAddress)"> Add </Button>
+                <Button ghost @click="$emit('onAdd', info.poolInfo.ammId, info.coin.mintAddress, info.pc.mintAddress)">
+                  Add
+                </Button>
               </Col>
               <Col :span="12">
                 <Button ghost @click="openModal(info.poolInfo, info.lp, info.userLpBalance)"> Remove </Button>
@@ -58,7 +65,7 @@
             </Row>
             <Row v-else :gutter="32" class="actions">
               <Col :span="24">
-                <Button ghost @click="$router.replace({ path: '/migrate/' })"> Remove & Migrate </Button>
+                <Button ghost @click="$router.push({ path: '/migrate/' })"> Remove & Migrate </Button>
               </Col>
             </Row>
           </CollapsePanel>
@@ -117,6 +124,13 @@ export default Vue.extend({
         this.updateLiquids(newTokenAccounts)
 
         this.updateCurrentLp(newTokenAccounts)
+      },
+      deep: true
+    },
+    'liquidity.infos': {
+      handler() {
+        this.updateLiquids(this.wallet.tokenAccounts)
+        this.updateCurrentLp(this.wallet.tokenAccounts)
       },
       deep: true
     }

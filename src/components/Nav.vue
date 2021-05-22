@@ -57,7 +57,7 @@ export default class Nav extends Vue {
 
   changeRoute({ key }: { key: string }): void {
     if (!(this as any).navs[key]) {
-      this.$router.push(`/${key}/`)
+      this.$router.push({ path: `/${key}/` })
     }
 
     // to close menu on mobile mode

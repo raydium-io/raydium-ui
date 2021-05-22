@@ -17,6 +17,8 @@ export interface TokenInfo {
 
   tokenAccountAddress?: string
   balance?: TokenAmount
+  official?: boolean
+  showDefault?: boolean
 }
 
 /**
@@ -51,21 +53,11 @@ export function getTokenByMintAddress(mintAddress: string): TokenInfo | null {
   if (mintAddress === NATIVE_SOL.mintAddress) {
     return cloneDeep(NATIVE_SOL)
   }
-
-  let token = null
-
-  for (const symbol of Object.keys(TOKENS)) {
-    const info = cloneDeep(TOKENS[symbol])
-
-    if (info.mintAddress === mintAddress) {
-      token = info
-    }
-  }
-
-  return token
+  const token = Object.values(TOKENS).find((item) => item.mintAddress === mintAddress)
+  return token ? cloneDeep(token) : null
 }
 
-interface Tokens {
+export interface Tokens {
   [key: string]: any
   [index: number]: any
 }
@@ -74,7 +66,9 @@ export const NATIVE_SOL: TokenInfo = {
   symbol: 'SOL',
   name: 'Native Solana',
   mintAddress: '11111111111111111111111111111111',
-  decimals: 9
+  decimals: 9,
+  official: true,
+  showDefault: true
 }
 
 export const TOKENS: Tokens = {
@@ -83,260 +77,336 @@ export const TOKENS: Tokens = {
     name: 'Wrapped Solana',
     mintAddress: 'So11111111111111111111111111111111111111112',
     decimals: 9,
-    referrer: 'HTcarLHe7WRxBQCWvhVB8AP56pnEtJUV2jDGvcpY3xo5'
+    referrer: 'HTcarLHe7WRxBQCWvhVB8AP56pnEtJUV2jDGvcpY3xo5',
+    official: true,
+    showDefault: true
   },
   BTC: {
     symbol: 'BTC',
     name: 'Wrapped Bitcoin',
     mintAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
     decimals: 6,
-    referrer: 'GZpS8cY8Nt8HuqxzJh6PXTdSxc38vFUjBmi7eEUkkQtG'
+    referrer: 'GZpS8cY8Nt8HuqxzJh6PXTdSxc38vFUjBmi7eEUkkQtG',
+    official: true,
+    showDefault: true
   },
   ETH: {
     symbol: 'ETH',
     name: 'Wrapped Ethereum',
     mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
     decimals: 6,
-    referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN'
+    referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN',
+    official: true,
+    showDefault: true
   },
   USDT: {
     symbol: 'USDT',
     name: 'USDT',
     mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     decimals: 6,
-    referrer: '8DwwDNagph8SdwMUdcXS5L9YAyutTyDJmK6cTKrmNFk3'
+    referrer: '8DwwDNagph8SdwMUdcXS5L9YAyutTyDJmK6cTKrmNFk3',
+    official: true,
+    showDefault: true
   },
   WUSDT: {
     symbol: 'WUSDT',
     name: 'Wrapped USDT',
     mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
     decimals: 6,
-    referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3'
+    referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3',
+    official: true,
+    showDefault: true
   },
   USDC: {
     symbol: 'USDC',
     name: 'USDC',
     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
-    referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg'
+    referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
+    official: true,
+    showDefault: true
   },
   WUSDC: {
     symbol: 'WUSDC',
     name: 'Wrapped USDC',
     mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
-    decimals: 6
+    decimals: 6,
+    official: true,
+    showDefault: true
   },
   YFI: {
     symbol: 'YFI',
     name: 'Wrapped YFI',
     mintAddress: '3JSf5tPeuscJGtaCp5giEiDhv51gQ4v3zWg8DGgyLfAB',
     decimals: 6,
-    referrer: 'DZjgzKfYzZBBSTo5vytMYvGdNF933DvuX8TftDMrThrb'
+    referrer: 'DZjgzKfYzZBBSTo5vytMYvGdNF933DvuX8TftDMrThrb',
+    official: true,
+    showDefault: true
   },
   LINK: {
     symbol: 'LINK',
     name: 'Wrapped Chainlink',
     mintAddress: 'CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG',
     decimals: 6,
-    referrer: 'DRSKKsYZaPEFkRgGywo7KWBGZikf71R9aDr8tjtpr41V'
+    referrer: 'DRSKKsYZaPEFkRgGywo7KWBGZikf71R9aDr8tjtpr41V',
+    official: true,
+    showDefault: true
   },
   XRP: {
     symbol: 'XRP',
     name: 'Wrapped XRP',
     mintAddress: 'Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8',
     decimals: 6,
-    referrer: '6NeHPXG142tAE2Ej3gHgT2N66i1KH6PFR6PBZw6RyrwH'
+    referrer: '6NeHPXG142tAE2Ej3gHgT2N66i1KH6PFR6PBZw6RyrwH',
+    official: true,
+    showDefault: true
   },
   SUSHI: {
     symbol: 'SUSHI',
     name: 'Wrapped SUSHI',
     mintAddress: 'AR1Mtgh7zAtxuxGd2XPovXPVjcSdY3i4rQYisNadjfKy',
     decimals: 6,
-    referrer: '59QxHeHgb28tDc3gStnrW8FNKC9qWuRmRZHBaAqCerJX'
+    referrer: '59QxHeHgb28tDc3gStnrW8FNKC9qWuRmRZHBaAqCerJX',
+    official: true,
+    showDefault: true
   },
   ALEPH: {
     symbol: 'ALEPH',
     name: 'Wrapped ALEPH',
     mintAddress: 'CsZ5LZkDS7h9TDKjrbL7VAwQZ9nsRu8vJLhRYfmGaN8K',
     decimals: 6,
-    referrer: '8FKAKrenJMDd7V6cxnM5BsymHTjqxgodtHbLwZReMnWW'
+    referrer: '8FKAKrenJMDd7V6cxnM5BsymHTjqxgodtHbLwZReMnWW',
+    official: true,
+    showDefault: true
   },
   SXP: {
     symbol: 'SXP',
     name: 'Wrapped SXP',
     mintAddress: 'SF3oTvfWzEP3DTwGSvUXRrGTvr75pdZNnBLAH9bzMuX',
     decimals: 6,
-    referrer: '97Vyotr284UM2Fyq9gbfQ3azMYtgf7cjnsf8pN1PFfY9'
+    referrer: '97Vyotr284UM2Fyq9gbfQ3azMYtgf7cjnsf8pN1PFfY9',
+    official: true,
+    showDefault: true
   },
   HGET: {
     symbol: 'HGET',
     name: 'Wrapped HGET',
     mintAddress: 'BtZQfWqDGbk9Wf2rXEiWyQBdBY1etnUUn6zEphvVS7yN',
     decimals: 6,
-    referrer: 'AGY2wy1ANzLM2jJLSkVxPUYAY5iAYXYsLMQkoQsAhucj'
+    referrer: 'AGY2wy1ANzLM2jJLSkVxPUYAY5iAYXYsLMQkoQsAhucj',
+    official: true,
+    showDefault: true
   },
   CREAM: {
     symbol: 'CREAM',
     name: 'Wrapped CREAM',
     mintAddress: '5Fu5UUgbjpUvdBveb3a1JTNirL8rXtiYeSMWvKjtUNQv',
     decimals: 6,
-    referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P'
+    referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P',
+    official: true,
+    showDefault: true
   },
   UBXT: {
     symbol: 'UBXT',
     name: 'Wrapped UBXT',
     mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
     decimals: 6,
-    referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879'
+    referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879',
+    official: true,
+    showDefault: true
   },
   HNT: {
     symbol: 'HNT',
     name: 'Wrapped HNT',
     mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
     decimals: 6,
-    referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV'
+    referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV',
+    official: true,
+    showDefault: true
   },
   FRONT: {
     symbol: 'FRONT',
     name: 'Wrapped FRONT',
     mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
     decimals: 6,
-    referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h'
+    referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h',
+    official: true,
+    showDefault: true
   },
   AKRO: {
     symbol: 'AKRO',
     name: 'Wrapped AKRO',
     mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
     decimals: 6,
-    referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH'
+    referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH',
+    official: true,
+    showDefault: true
   },
   HXRO: {
     symbol: 'HXRO',
     name: 'Wrapped HXRO',
     mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
     decimals: 6,
-    referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC'
+    referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC',
+    official: true,
+    showDefault: true
   },
   UNI: {
     symbol: 'UNI',
     name: 'Wrapped UNI',
     mintAddress: 'DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw',
     decimals: 6,
-    referrer: '4ntxDv95ajBbXfZyGy3UhcQDx8xmH1yJ6eKvuNNH466x'
+    referrer: '4ntxDv95ajBbXfZyGy3UhcQDx8xmH1yJ6eKvuNNH466x',
+    official: true,
+    showDefault: true
   },
   SRM: {
     symbol: 'SRM',
     name: 'Serum',
     mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
     decimals: 6,
-    referrer: 'HYxa4Ea1dz7ya17Cx18rEGUA1WbCvKjXjFKrnu8CwugH'
+    referrer: 'HYxa4Ea1dz7ya17Cx18rEGUA1WbCvKjXjFKrnu8CwugH',
+    official: true,
+    showDefault: true
   },
   FTT: {
     symbol: 'FTT',
     name: 'Wrapped FTT',
     mintAddress: 'AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3',
     decimals: 6,
-    referrer: 'CafpgSh8KGL2GPTjdXfctD3vXngNZDJ3Q92FTfV71Hmt'
+    referrer: 'CafpgSh8KGL2GPTjdXfctD3vXngNZDJ3Q92FTfV71Hmt',
+    official: true,
+    showDefault: true
   },
   MSRM: {
     symbol: 'MSRM',
     name: 'MegaSerum',
     mintAddress: 'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L',
     decimals: 0,
-    referrer: 'Ge5q9x8gDUNYqqLA1MdnCzWNJGsbj3M15Yxse2cDbw9z'
+    referrer: 'Ge5q9x8gDUNYqqLA1MdnCzWNJGsbj3M15Yxse2cDbw9z',
+    official: true,
+    showDefault: true
   },
   TOMO: {
     symbol: 'TOMO',
     name: 'Wrapped TOMO',
     mintAddress: 'GXMvfY2jpQctDqZ9RoU3oWPhufKiCcFEfchvYumtX7jd',
     decimals: 6,
-    referrer: '9fexfN3eZomF5gfenG5L9ydbKRQkPhq6x74rb5iLrvXP'
+    referrer: '9fexfN3eZomF5gfenG5L9ydbKRQkPhq6x74rb5iLrvXP',
+    official: true,
+    showDefault: true
   },
   KARMA: {
     symbol: 'KARMA',
     name: 'Wrapped KARMA',
     mintAddress: 'EcqExpGNFBve2i1cMJUTR4bPXj4ZoqmDD2rTkeCcaTFX',
-    decimals: 4
+    decimals: 4,
+    official: true,
+    showDefault: true
   },
   LUA: {
     symbol: 'LUA',
     name: 'Wrapped LUA',
     mintAddress: 'EqWCKXfs3x47uVosDpTRgFniThL9Y8iCztJaapxbEaVX',
     decimals: 6,
-    referrer: 'HuZwNApjVFuFSDgrwZA8GP2JD7WMby4qt6rkWDnaMo7j'
+    referrer: 'HuZwNApjVFuFSDgrwZA8GP2JD7WMby4qt6rkWDnaMo7j',
+    official: true,
+    showDefault: true
   },
   MATH: {
     symbol: 'MATH',
     name: 'Wrapped MATH',
     mintAddress: 'GeDS162t9yGJuLEHPWXXGrb1zwkzinCgRwnT8vHYjKza',
     decimals: 6,
-    referrer: 'C9K1M8sJX8WMdsnFT7DuzdiHHunEj79EsLuz4DixQYGm'
+    referrer: 'C9K1M8sJX8WMdsnFT7DuzdiHHunEj79EsLuz4DixQYGm',
+    official: true,
+    showDefault: true
   },
   KEEP: {
     symbol: 'KEEP',
     name: 'Wrapped KEEP',
     mintAddress: 'GUohe4DJUA5FKPWo3joiPgsB7yzer7LpDmt1Vhzy3Zht',
-    decimals: 6
+    decimals: 6,
+    official: true,
+    showDefault: true
   },
   SWAG: {
     symbol: 'SWAG',
     name: 'Wrapped SWAG',
     mintAddress: '9F9fNTT6qwjsu4X4yWYKZpsbw5qT7o6yR2i57JF2jagy',
-    decimals: 6
+    decimals: 6,
+    official: true,
+    showDefault: true
   },
   FIDA: {
     symbol: 'FIDA',
     name: 'Bonfida',
     mintAddress: 'EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp',
     decimals: 6,
-    referrer: 'AeAsG75UmyPDB271c6NHonHxXAPXfkvhcf2xjfJhReS8'
+    referrer: 'AeAsG75UmyPDB271c6NHonHxXAPXfkvhcf2xjfJhReS8',
+    official: true,
+    showDefault: true
   },
   KIN: {
     symbol: 'KIN',
     name: 'KIN',
     mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
     decimals: 5,
-    referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9'
+    referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9',
+    official: true,
+    showDefault: true
   },
   MAPS: {
     symbol: 'MAPS',
     name: 'MAPS',
     mintAddress: 'MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb',
-    decimals: 6
+    decimals: 6,
+    official: true,
+    showDefault: true
   },
   OXY: {
     symbol: 'OXY',
     name: 'OXY',
     mintAddress: 'z3dn17yLaGMKffVogeFHQ9zWVcXgqgf3PQnDsNs2g6M',
-    decimals: 6
+    decimals: 6,
+    official: true,
+    showDefault: true
   },
   RAY: {
     symbol: 'RAY',
     name: 'Raydium',
     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
     decimals: 6,
-    referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy'
+    referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy',
+    official: true,
+    showDefault: true
   },
   xCOPE: {
     symbol: 'xCOPE',
     name: 'xCOPE',
     mintAddress: '3K6rftdAaQYMPunrtNRHgnK2UAtjm2JwyT2oCiTDouYE',
     decimals: 0,
-    referrer: '8DTehuES4tfnd2SrqcjN52XofxWXGjiLZRgM12U9pB6f'
+    referrer: '8DTehuES4tfnd2SrqcjN52XofxWXGjiLZRgM12U9pB6f',
+    official: true,
+    showDefault: true
   },
   COPE: {
     symbol: 'COPE',
     name: 'COPE',
     mintAddress: '8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh',
     decimals: 6,
-    referrer: 'G7UYwWhkmgeL57SUKFF45K663V9TdXZw6Ho6ZLQ7p4p'
+    referrer: 'G7UYwWhkmgeL57SUKFF45K663V9TdXZw6Ho6ZLQ7p4p',
+    official: true,
+    showDefault: true
   },
   STEP: {
     symbol: 'STEP',
     name: 'STEP',
     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
     decimals: 9,
-    referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY'
+    referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
+    official: true,
+    showDefault: true
   },
   MEDIA: {
     symbol: 'MEDIA',
@@ -355,14 +425,18 @@ export const TOKENS: Tokens = {
       Twitter: 'https://twitter.com/Media_FDN',
       Telegram: 'https://t.me/Media_FDN',
       Medium: 'https://mediafoundation.medium.com/'
-    }
+    },
+    official: true,
+    showDefault: true
   },
   ROPE: {
     symbol: 'ROPE',
     name: 'ROPE',
     mintAddress: '8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo',
     decimals: 9,
-    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF'
+    referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF',
+    official: true,
+    showDefault: true
   },
   MER: {
     symbol: 'MER',
@@ -381,7 +455,9 @@ export const TOKENS: Tokens = {
       Twitter: 'https://twitter.com/MercurialFi',
       Telegram: 'https://t.me/MercurialFi',
       Medium: 'https://mercurialfi.medium.com/'
-    }
+    },
+    official: true,
+    showDefault: true
   }
 }
 
@@ -821,3 +897,72 @@ export const LP_TOKENS: Tokens = {
     decimals: TOKENS.COPE.decimals
   }
 }
+
+function addUserLocalCoinMint() {
+  const localMintStr = window.localStorage.user_add_coin_mint
+  const localMintList = (localMintStr ?? '').split('---')
+  if (localMintList.length % 3 !== 0) {
+    window.localStorage.removeItem('user_add_coin_mint')
+  } else {
+    for (let index = 0; index < Math.floor(localMintList.length / 3); index += 1) {
+      const name = localMintList[index * 3 + 0]
+      const mintAddress = localMintList[index * 3 + 1]
+      const decimals = localMintList[index * 3 + 2]
+      if (!Object.keys(TOKENS).includes(name)) {
+        TOKENS[name] = {
+          name,
+          symbol: name,
+          decimals: parseInt(decimals),
+          mintAddress,
+          official: false,
+          showDefault: true
+        }
+      } else {
+        TOKENS[name].showDefault = true
+      }
+    }
+  }
+}
+addUserLocalCoinMint()
+
+function addTokensSolana() {
+  fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
+    .then(function (response) {
+      return response.json()
+    })
+    .then(function (myJson) {
+      const tokens = myJson.tokens
+      tokens.forEach((itemToken: any) => {
+        if (
+          !(
+            Object.keys(TOKENS).find(
+              (itemName) => itemName === itemToken.symbol || TOKENS[itemName].mintAddress === itemToken.address
+            ) || itemToken.address === NATIVE_SOL.mintAddress
+          )
+        ) {
+          TOKENS[itemToken.symbol] = {
+            symbol: itemToken.symbol,
+            name: itemToken.symbol,
+            mintAddress: itemToken.address,
+            decimals: itemToken.decimals,
+            official: true,
+            showDefault: false
+          }
+        }
+      })
+
+      if (window.localStorage.addSolanaCoin) {
+        window.localStorage.addSolanaCoin.split('---').forEach((itemMint: string) => {
+          Object.keys(TOKENS).forEach((item) => {
+            if (TOKENS[item].mintAddress === itemMint) {
+              TOKENS[item].showDefault = true
+
+              console.log('add', itemMint)
+            }
+          })
+        })
+      }
+    })
+}
+
+addTokensSolana()

@@ -115,8 +115,8 @@ export default class Wallet extends Vue {
   /* ========== LIFECYCLE ========== */
   async beforeMount() {
     await this.$accessor.price.requestPrices()
-    await this.$accessor.swap.getMarkets()
     await this.$accessor.liquidity.requestInfos()
+    await this.$accessor.swap.getMarkets()
     await this.$accessor.farm.requestInfos()
 
     this.setWalletTimer()
