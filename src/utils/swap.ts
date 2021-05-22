@@ -61,10 +61,28 @@ export function getSwapOutAmount(
     const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+
+    const outBalance = pc.balance.wei.minus(amountOut)
+    const beforePrice = new TokenAmount(
+      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const afterPrice = new TokenAmount(
+      parseFloat(new TokenAmount(outBalance, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(denominator, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const priceImpact =
+      ((parseFloat(beforePrice.fixed()) - parseFloat(afterPrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+
     return {
       amountIn: fromAmount,
       amountOut: new TokenAmount(amountOutWithFee, pc.decimals),
-      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, pc.decimals)
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, pc.decimals),
+      priceImpact
     }
   } else {
     // pc2coin
@@ -73,22 +91,46 @@ export function getSwapOutAmount(
     const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
     const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
+
+    const outBalance = coin.balance.wei.minus(amountOut)
+
+    const beforePrice = new TokenAmount(
+      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const afterPrice = new TokenAmount(
+      parseFloat(new TokenAmount(denominator, coin.decimals).fixed()) /
+        parseFloat(new TokenAmount(outBalance, pc.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const priceImpact =
+      ((parseFloat(afterPrice.fixed()) - parseFloat(beforePrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+
     return {
       amountIn: fromAmount,
       amountOut: new TokenAmount(amountOutWithFee, coin.decimals),
-      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, coin.decimals)
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, coin.decimals),
+      priceImpact
     }
   }
 }
 
 export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: number) {
   let coinOut = 0
+  let bestPrice = null
   let worstPrice = 0
   let availablePc = pcIn
 
   for (const { key, quantity } of orderBook.items(false)) {
     const price = market?.priceLotsToNumber(key.ushrn(64)) || 0
     const size = market?.baseSizeLotsToNumber(quantity) || 0
+
+    if (!bestPrice && price !== 0) {
+      bestPrice = price
+    }
 
     const orderPcVaule = price * size
     worstPrice = price
@@ -103,6 +145,8 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     }
   }
 
+  const priceImpact = ((worstPrice - bestPrice) / bestPrice) * 100
+
   worstPrice = (worstPrice * (100 + slippage)) / 100
   const amountOutWithSlippage = (coinOut * (100 - slippage)) / 100
 
@@ -114,18 +158,24 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     maxInAllow,
     amountOut: coinOut,
     amountOutWithSlippage,
-    worstPrice
+    worstPrice,
+    priceImpact
   }
 }
 
 export function forecastSell(market: any, orderBook: any, coinIn: any, slippage: number) {
   let pcOut = 0
+  let bestPrice = null
   let worstPrice = 0
   let availableCoin = coinIn
 
   for (const { key, quantity } of orderBook.items(true)) {
     const price = market.priceLotsToNumber(key.ushrn(64)) || 0
     const size = market?.baseSizeLotsToNumber(quantity) || 0
+
+    if (!bestPrice && price !== 0) {
+      bestPrice = price
+    }
 
     worstPrice = price
 
@@ -139,6 +189,8 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     }
   }
 
+  const priceImpact = ((bestPrice - worstPrice) / bestPrice) * 100
+
   worstPrice = (worstPrice * (100 - slippage)) / 100
   const amountOutWithSlippage = (pcOut * (100 - slippage)) / 100
 
@@ -150,7 +202,8 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     maxInAllow,
     amountOut: pcOut,
     amountOutWithSlippage,
-    worstPrice
+    worstPrice,
+    priceImpact
   }
 }
 

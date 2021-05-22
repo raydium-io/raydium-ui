@@ -196,9 +196,9 @@
             <span> Swap powered by </span>
             <span style="text-transform: capitalize"> {{ endpoint }} </span>
           </div>
-          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinAmount" class="fs-container">
+          <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
             <span> Minimum received </span>
-            <span> {{ toCoinAmount }} {{ toCoin.symbol }} </span>
+            <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
           <div v-if="endpoint" class="fs-container">
             <span> Price Impact </span>
@@ -822,8 +822,8 @@ export default Vue.extend({
           }
         }
         console.log(123, Object.keys(this.swap.markets))
-        // serum
 
+        // serum
         for (const address of Object.keys(this.swap.markets)) {
           const info = cloneDeep(this.swap.markets[address])
           let fromMint = this.fromCoin.mintAddress
@@ -925,30 +925,42 @@ export default Vue.extend({
     },
 
     updateAmounts() {
+      let toCoinAmount = ''
+      let toCoinWithSlippage = null
+      let price = ''
+      let impact = 0
+      let endpoint = ''
+
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
+        // wrap & unwrap
         this.toCoinAmount = this.fromCoinAmount
-      } else if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
-        const { amountOut, amountOutWithSlippage } = getSwapOutAmount(
+        return
+      }
+
+      if (this.fromCoin && this.toCoin && this.lpMintAddress && this.fromCoinAmount) {
+        // amm
+        const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
           get(this.liquidity.infos, this.lpMintAddress),
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
           this.fromCoinAmount,
           this.setting.slippage
         )
-        if (amountOut.isNullOrZero()) {
-          this.toCoinAmount = ''
-        } else {
-          const toCoinAmount = amountOut.fixed()
-
-          this.toCoinAmount = toCoinAmount
-          this.outToPirceValue = new TokenAmount(
-            parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
+        if (!amountOut.isNullOrZero()) {
+          console.log(`input: ${this.fromCoinAmount} raydium out: ${amountOutWithSlippage.fixed()}`)
+          toCoinAmount = amountOut.fixed()
+          toCoinWithSlippage = amountOutWithSlippage
+          price = new TokenAmount(
+            parseFloat(amountOutWithSlippage.fixed()) / parseFloat(this.fromCoinAmount),
             this.toCoin.decimals,
             false
           ).format()
-          this.toCoinWithSlippage = amountOutWithSlippage.fixed()
+          impact = priceImpact
+          endpoint = 'raydium'
         }
-      } else if (
+      }
+
+      if (
         this.fromCoin &&
         this.toCoin &&
         this.marketAddress &&
@@ -957,7 +969,8 @@ export default Vue.extend({
         this.bids &&
         this.fromCoinAmount
       ) {
-        const { amountOut, amountOutWithSlippage } = getOutAmount(
+        // serum
+        const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
           this.market,
           this.asks,
           this.bids,
@@ -968,22 +981,36 @@ export default Vue.extend({
         )
 
         const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
+        const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
 
-        if (out.isNullOrZero()) {
-          this.toCoinAmount = ''
-          this.toCoinWithSlippage = ''
-        } else {
-          this.toCoinAmount = out.fixed()
-          this.outToPirceValue = new TokenAmount(
-            amountOut / parseFloat(this.fromCoinAmount),
-            this.toCoin.decimals,
-            false
-          ).format()
-          this.toCoinWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false).fixed()
+        if (!out.isNullOrZero()) {
+          console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
+          if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
+            toCoinAmount = out.fixed()
+            toCoinWithSlippage = outWithSlippage
+            price = new TokenAmount(
+              parseFloat(outWithSlippage.fixed()) / parseFloat(this.fromCoinAmount),
+              this.toCoin.decimals,
+              false
+            ).format()
+            impact = priceImpact
+            endpoint = 'serum'
+          }
         }
+      }
+
+      if (toCoinWithSlippage) {
+        this.toCoinAmount = toCoinAmount
+        this.toCoinWithSlippage = toCoinWithSlippage.fixed()
+        this.outToPirceValue = price
+        this.priceImpact = impact
+        this.endpoint = endpoint
       } else {
         this.toCoinAmount = ''
         this.toCoinWithSlippage = ''
+        this.outToPirceValue = ''
+        this.priceImpact = 0
+        this.endpoint = ''
       }
     },
 
