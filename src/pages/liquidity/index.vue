@@ -3,7 +3,7 @@
     <div class="page-head fs-container">
       <span class="title">Add Liquidity</span>
       <div class="buttons">
-        <Tooltip v-if="lpMintAddress" placement="bottomRight">
+        <Tooltip placement="bottomRight">
           <template slot="title">
             <span>
               Quote auto refresh countdown after
