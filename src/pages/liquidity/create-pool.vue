@@ -488,7 +488,7 @@ export default class CreatePool extends Vue {
         localStorage.setItem(
           'userCreateAMMID',
           localStorage.getItem('userCreateAMMID') +
-            `${new Date()}---${data}---${
+            `${new Date().getTime()}---${data}---${
               this.marketMsg.address
             }---${this.marketMsg.baseMint.toString()}---${this.marketMsg.quoteMint.toString()}`
         )
