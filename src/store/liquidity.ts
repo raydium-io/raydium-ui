@@ -173,9 +173,11 @@ export const actions = actionTree(
           poolTempLpTokenAccount: ammInfo.poolTempLpTokenAccount.toString(),
           serumProgramId: SERUM_PROGRAM_ID_V3,
           serumMarket: ammInfo.serumMarket.toString(),
-
-          serumCoinVaultAccount: market.baseVault?.toString() ?? '',
-          serumPcVaultAccount: market.quoteVault?.toString() ?? '',
+          serumBids: market.bids.toString(),
+          serumAsks: market.asks.toString(),
+          serumEventQueue: market.eventQueue.toString(),
+          serumCoinVaultAccount: market.baseVault.toString(),
+          serumPcVaultAccount: market.quoteVault.toString(),
           serumVaultSigner: serumVaultSigner.toString(),
           official: false
         }

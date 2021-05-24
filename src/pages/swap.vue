@@ -1123,12 +1123,13 @@ export default Vue.extend({
           .finally(() => {
             this.swaping = false
           })
-      } else if (this.lpMintAddress) {
+      } else if (this.ammId) {
+        const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.ammId)
         swap(
           this.$web3,
           // @ts-ignore
           this.$wallet,
-          get(this.liquidity.infos, this.lpMintAddress),
+          poolInfo,
           // @ts-ignore
           this.fromCoin.mintAddress,
           // @ts-ignore
