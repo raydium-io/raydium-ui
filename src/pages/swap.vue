@@ -225,7 +225,13 @@
           v-else-if="!(officialPool || (!officialPool && userCheckUnofficial))"
           size="large"
           ghost
-          @click="userCheckUnofficialShow = true"
+          @click="
+            () => {
+              setTimeout(() => {
+                userCheckUnofficialShow = true
+              }, 1)
+            }
+          "
         >
           Please identify known risk warnings
         </Button>
@@ -582,12 +588,18 @@ export default Vue.extend({
 
     openFromCoinSelect() {
       this.selectFromCoin = true
-      this.coinSelectShow = true
+      this.closeAllModal()
+      setTimeout(() => {
+        this.coinSelectShow = true
+      }, 1)
     },
 
     openToCoinSelect() {
       this.selectFromCoin = false
-      this.coinSelectShow = true
+      this.closeAllModal()
+      setTimeout(() => {
+        this.coinSelectShow = true
+      }, 1)
     },
 
     onCoinSelect(tokenInfo: TokenInfo) {
@@ -691,8 +703,10 @@ export default Vue.extend({
         return
       }
       this.userCheckUnofficial = false
-      this.coinSelectShow = false
-      this.userCheckUnofficialShow = true
+      this.closeAllModal()
+      setTimeout(() => {
+        this.userCheckUnofficialShow = true
+      }, 1)
     },
 
     onAmmIdSelect(liquidityInfo: LiquidityPoolInfo | undefined) {
@@ -731,6 +745,8 @@ export default Vue.extend({
       } else {
         this.fromCoin = null
         this.toCoin = null
+        this.ammId = undefined
+        this.officialPool = true
       }
     },
 
@@ -1217,6 +1233,13 @@ export default Vue.extend({
           path: '/swap/'
         })
       }
+    },
+
+    closeAllModal() {
+      this.coinSelectShow = false
+      this.ammIdSelectShow = false
+      this.userCheckUnofficialShow = false
+      this.ammIdOrMarketSearchShow = false
     },
 
     async fetchUnsettledByMarket() {
