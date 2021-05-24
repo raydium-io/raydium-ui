@@ -839,7 +839,10 @@ export default Vue.extend({
             officialPool = liquidityListV4[0].official
             this.userCheckUnofficialMint = undefined
             marketAddress = liquidityListV4[0].serumMarket
-          } else if (marketAddress !== '' && InputAmmIdOrMarket === undefined) {
+          } else if (
+            marketAddress !== '' &&
+            (InputAmmIdOrMarket === undefined || InputAmmIdOrMarket === marketAddress)
+          ) {
             console.log('official market')
           } else if (liquidityListV4.length === 1 && InputAmmIdOrMarket) {
             // user select
