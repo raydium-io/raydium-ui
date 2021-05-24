@@ -11,8 +11,10 @@
               {{ stepTitleInputMarket }}
               <Tooltip placement="right">
                 <div slot="title">
-                  Serum market can be created
-                  <a href="https://dex.projectserum.com/#/list-new-market" target="_blank">here</a>
+                  For details on creating a Serum Market, see
+                  <a href="https://raydium.gitbook.io/raydium/permissionless/creating-a-pool" target="_blank"
+                    >this guide.</a
+                  >
                 </div>
                 <Icon type="info-circle" />
               </Tooltip>
@@ -46,7 +48,10 @@
           <Col style="line-height: 20px" :span="24" :class="isMobile ? 'item-title-mobile' : 'item-title'"
             ><div style="padding-bottom: 10px; word-break: break-word">
               This tool is for advanced users. Before attempting to create a new liquidity pool, we suggest going
-              through this detailed guide.
+              through this
+              <a href="https://raydium.gitbook.io/raydium/permissionless/creating-a-pool" target="_blank">
+                detailed guide.</a
+              >
             </div>
             <div>Input Serum Market ID:</div>
           </Col>
@@ -231,15 +236,17 @@
       </div>
     </div>
     <div class="card" v-if="userLocalAmmIdList.length > 0" style="margin-top: 20px">
-      <div class="card-body" style="grid-row-gap: 0; row-gap: 0; padding-bottom: 15px">
-        <h1>Your Created Pools</h1>
+      <div class="card-body" style="grid-row-gap: 0; row-gap: 0; padding-bottom: 15px; padding-top: 12px">
+        <div style="font-size: 30px; font-weight: 700">Your Created Pools</div>
         <template v-for="item in userLocalAmmIdList">
-          <div v-if="item.split('---').length === 5" :key="item">
+          <div v-if="item.split('---').length === 5" :key="item" style="margin: 10px 0">
             <div>AMM ID: {{ item.split('---')[1] }}</div>
-            <div>Market: {{ item.split('---')[2] }}</div>
-            <div>Base: {{ item.split('---')[3] }}</div>
-            <div>Quote: {{ item.split('---')[4] }}</div>
-            <div style="text-indent: 2em">Created on: {{ $dayjs(parseInt(item.split('---')[0])).toString() }}</div>
+            <div style="text-indent: 1em; font-size: 13px">Serum Market ID: {{ item.split('---')[2] }}</div>
+            <div style="text-indent: 1em; font-size: 13px">Base Token: {{ item.split('---')[3] }}</div>
+            <div style="text-indent: 1em; font-size: 13px">Quote Token: {{ item.split('---')[4] }}</div>
+            <div style="text-indent: 1em; font-size: 13px">
+              Created on: {{ $dayjs(parseInt(item.split('---')[0])).toString() }}
+            </div>
           </div>
         </template>
       </div>

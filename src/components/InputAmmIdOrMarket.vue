@@ -1,7 +1,7 @@
 <template>
-  <Modal title="Search AMM ID" :visible="true" :footer="null" @cancel="$emit('onClose')">
+  <Modal title="Search for an existing pool" :visible="true" :footer="null" @cancel="$emit('onClose')">
     <div class="select-token">
-      <input v-model="keyword" placeholder=" Input AMM ID" />
+      <input v-model="keyword" placeholder=" Input AMM ID or Serum Market ID" />
       <div>
         <div style="width: 40%; float: right">
           <Button

@@ -6,11 +6,9 @@
         <Tooltip placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ autoRefreshTime - countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ autoRefreshTime - countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -90,7 +88,10 @@
           <Icon type="info-circle" />
         </Tooltip>
         <Icon type="setting" @click="$accessor.setting.open" />
-        <Icon type="search" @click="ammIdOrMarketSearchShow = true" />
+        <Tooltip placement="bottomRight">
+          <template slot="title"> Search for a pool </template>
+          <Icon type="search" @click="ammIdOrMarketSearchShow = true" />
+        </Tooltip>
       </div>
     </div>
 
@@ -236,7 +237,7 @@
             }
           "
         >
-          Please identify known risk warnings
+          Confirm Risk Warning
         </Button>
 
         <Button

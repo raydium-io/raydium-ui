@@ -26,7 +26,7 @@
                 <img :src="importIcon(`/coins/${info.coin.symbol.toLowerCase()}.png`)" />
                 <img :src="importIcon(`/coins/${info.pc.symbol.toLowerCase()}.png`)" />
               </div>
-              {{ info.lp.symbol }} {{ info.poolInfo.official ? '' : '(unofficial)' }}
+              {{ info.lp.symbol }} {{ info.poolInfo.official ? '' : '(Permissionless)' }}
               <Tag v-if="info.poolInfo.version === 2" color="pink">Legacy</Tag>
             </div>
             <div class="fs-container">

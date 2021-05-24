@@ -1,6 +1,6 @@
 <template>
   <Modal
-    title="Permissionless Pool Notice"
+    title="This is a Permissionless Pool"
     :visible="true"
     :footer="null"
     @cancel="$emit('onClose')"
@@ -11,12 +11,14 @@
       Anyone can create an SPL token on Solana, which may include fake versions of existing tokens or tokens that claim
       to represent projects that do not have a token. Take extra caution to confirm token addresses are for the token
       you want to trade.
+      <br /><br />
+      Always check the quoted price and that the pool has sufficient liqudity before trading.
       <label style="color: red"
         ><input type="checkbox" v-model="userCheckUnofficial" style="margin-right: 10px" />I understand</label
       >
       <label style="color: red"
-        ><input type="checkbox" v-model="userCheckUnofficialAll" style="margin-right: 10px" />Do not warn me
-        again</label
+        ><input type="checkbox" v-model="userCheckUnofficialAll" style="margin-right: 10px" />Do not warn again for this
+        pool</label
       >
       <span>
         <Button style="width: 45%; margin-right: 8%" size="large" ghost @click="$emit('onSelect', false)">Cancel</Button

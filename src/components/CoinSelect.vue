@@ -2,7 +2,7 @@
   <Modal title="Select a token" :visible="true" :footer="null" @cancel="$emit('onClose')">
     <div class="select-token">
       <input ref="userInput" v-model="keyword" placeholder="Search name or mint address" />
-      <div class="sort fs-container">
+      <div class="sort fs-container" v-if="!addUserCoin">
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
@@ -63,10 +63,15 @@
           </div>
         </template>
       </div>
+
+      <div class="sort fs-container" v-if="addUserCoin">
+        <span class="title">Create a name for this token</span>
+        <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
+      </div>
       <div class="token-list" v-if="addUserCoin">
-        <div><input placeholder="name" v-model="userInputCoinName" style="width: 100%; height: 10px" /></div>
+        <div><input placeholder="Input Name" v-model="userInputCoinName" style="width: 100%; height: 10px" /></div>
         <div style="margin: 5px 0">
-          Found by mint address
+          Located from mint address
           <button
             @click="addUserMintToLocal"
             style="
@@ -78,7 +83,7 @@
               border: 0 solid transparent;
             "
           >
-            (Add)
+            (Add to token list)
           </button>
         </div>
       </div>

@@ -49,7 +49,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
       await createAmmId(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), new PublicKey(marketAddress))
     ).toString()
     if (LIQUIDITY_POOLS.find((item) => item.ammId === expectAmmId)) {
-      throw new Error('This market already has an AMM')
+      throw new Error('There is already a pool for this Serum Market')
     }
     const marketAddressPubKey = new PublicKey(marketAddress)
     const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey(SERUM_PROGRAM_ID_V3))
