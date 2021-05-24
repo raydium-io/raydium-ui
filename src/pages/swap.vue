@@ -161,16 +161,14 @@
           "
           @onSelect="openToCoinSelect"
         />
-        <div style="padding: 0 12px">
-          <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="fs-container">
-            <span> Price </span>
+        <div class="price-info" style="padding: 0 12px">
+          <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base fc-container">
             <span>
               1 {{ fromCoin.symbol }} = 1
               {{ toCoin.symbol }}
             </span>
           </div>
-          <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="fs-container">
-            <span> Price </span>
+          <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
             <span>
               1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
               {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
@@ -180,9 +178,8 @@
           </div>
           <div
             v-else-if="fromCoin && toCoin && marketAddress && market && asks && bids && fromCoinAmount"
-            class="fs-container"
+            class="price-base fc-container"
           >
-            <span> Price </span>
             <span>
               1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
               {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
@@ -191,19 +188,19 @@
             </span>
           </div>
           <div class="fs-container">
-            <span> Slippage Tolerance </span>
+            <span class="name"> Slippage Tolerance </span>
             <span> {{ $accessor.setting.slippage }}% </span>
           </div>
           <div v-if="endpoint" class="fs-container">
-            <span> Swap powered by </span>
+            <span class="name"> Swap powered by </span>
             <span style="text-transform: capitalize"> {{ endpoint }} </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
-            <span> Minimum received </span>
+            <span class="name"> Minimum received </span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
           <div v-if="endpoint" class="fs-container">
-            <span> Price Impact </span>
+            <span class="name"> Price Impact </span>
             <span :style="`color: ${priceImpact > 10 ? '#ed4b9e' : priceImpact > 5 ? '#f0b90b' : '#31d0aa'}`">
               {{ priceImpact.toFixed(2) }}%
             </span>
@@ -1334,11 +1331,27 @@ export default Vue.extend({
 .container {
   max-width: 450px;
 
-  .fs-container {
+  .price-info {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-row-gap: 8px;
+    row-gap: 8px;
+    padding: 0 12px;
+    font-size: 12px;
+    line-height: 20px;
     .anticon-swap {
+      margin-left: 10px;
       padding: 5px;
       border-radius: 50%;
       background: #000829;
+    }
+    .price-base {
+      line-height: 24px;
+    }
+    .fs-container {
+      .name {
+        opacity: 0.75;
+      }
     }
   }
 
