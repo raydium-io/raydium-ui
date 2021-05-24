@@ -592,7 +592,7 @@ export default Vue.extend({
 
     openFromCoinSelect() {
       this.selectFromCoin = true
-      this.closeAllModal()
+      this.closeAllModal('coinSelectShow')
       setTimeout(() => {
         this.coinSelectShow = true
       }, 1)
@@ -600,7 +600,7 @@ export default Vue.extend({
 
     openToCoinSelect() {
       this.selectFromCoin = false
-      this.closeAllModal()
+      this.closeAllModal('coinSelectShow')
       setTimeout(() => {
         this.coinSelectShow = true
       }, 1)
@@ -707,7 +707,7 @@ export default Vue.extend({
         return
       }
       this.userCheckUnofficial = false
-      this.closeAllModal()
+      this.closeAllModal('userCheckUnofficialShow')
       setTimeout(() => {
         this.userCheckUnofficialShow = true
       }, 1)
@@ -1239,11 +1239,19 @@ export default Vue.extend({
       }
     },
 
-    closeAllModal() {
-      this.coinSelectShow = false
-      this.ammIdSelectShow = false
-      this.userCheckUnofficialShow = false
-      this.ammIdOrMarketSearchShow = false
+    closeAllModal(showName: string) {
+      if (showName !== 'coinSelectShow') {
+        this.coinSelectShow = false
+      }
+      if (showName !== 'ammIdSelectShow') {
+        this.ammIdSelectShow = false
+      }
+      if (showName !== 'userCheckUnofficialShow') {
+        this.userCheckUnofficialShow = false
+      }
+      if (showName !== 'ammIdOrMarketSearchShow') {
+        this.ammIdOrMarketSearchShow = false
+      }
     },
 
     async fetchUnsettledByMarket() {
