@@ -94,10 +94,10 @@
     <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
     <AmmIdSelect
       :show="ammIdSelectShow"
-      :liquidityList="ammIdSelectList"
+      :liquidity-list="ammIdSelectList"
+      :user-close="true"
       @onClose="() => ((ammIdSelectShow = false), (ammIdSelectOld = true))"
       @onSelect="onAmmIdSelect"
-      :userClose="true"
     />
 
     <UnofficialPoolConfirmUser
@@ -296,9 +296,12 @@
       </div>
     </div>
 
-    <div v-if="isFetchingUnsettled || baseUnsettledAmount || quoteUnsettledAmount" class="card extra">
+    <div
+      v-if="(!baseSymbol && !quoteSymbol && isFetchingUnsettled) || baseUnsettledAmount || quoteUnsettledAmount"
+      class="card extra"
+    >
       <div class="settle card-body">
-        <div v-if="isFetchingUnsettled" class="fetching-unsettled">
+        <div v-if="!baseSymbol && !quoteSymbol && isFetchingUnsettled" class="fetching-unsettled">
           <Spin :spinning="true">
             <Icon slot="indicator" type="loading" style="font-size: 24px" spin />
           </Spin>
@@ -306,7 +309,7 @@
         </div>
 
         <table
-          v-else-if="(!isFetchingUnsettled && baseSymbol && quoteSymbol && baseUnsettledAmount) || quoteUnsettledAmount"
+          v-else-if="(baseSymbol && quoteSymbol && !isFetchingUnsettled && baseUnsettledAmount) || quoteUnsettledAmount"
           class="settel-panel"
         >
           <thead>
@@ -389,6 +392,7 @@ export default Vue.extend({
       isFetchingUnsettled: false,
       unsettledOpenOrders: null as any,
 
+      // whether have symbol will
       baseSymbol: '',
       baseUnsettledAmount: 0,
       isSettlingBase: false,
@@ -488,6 +492,14 @@ export default Vue.extend({
         this.toCoinAmount = ''
         this.ammIdSelectOld = false
       }
+    },
+
+    baseUnsettledAmount() {
+      this.isSettlingBase = false
+    },
+
+    quoteUnsettledAmount() {
+      this.isSettlingQuote = false
     },
 
     toCoin(newCoin, oldCoin) {
@@ -1198,6 +1210,7 @@ export default Vue.extend({
     },
 
     async fetchUnsettledByMarket() {
+      if (this.isFetchingUnsettled) return
       if (!this.$web3 || !this.$wallet || !this.market) return
       this.isFetchingUnsettled = true
       try {
@@ -1211,8 +1224,6 @@ export default Vue.extend({
         this.unsettledOpenOrders = info.openOrders // have to establish an extra state, to store this value
       } catch (e) {
       } finally {
-        this.isSettlingQuote = false
-        this.isSettlingBase = false
         this.isFetchingUnsettled = false
       }
     },
@@ -1265,14 +1276,15 @@ export default Vue.extend({
           const description = `Settle`
           this.$accessor.transaction.sub({ txid, description })
         })
+        .then(() => {
+          this.fetchUnsettledByMarket()
+        })
         .catch((error) => {
           this.$notify.error({
             key,
             message: 'Settle failed',
             description: error.message
           })
-        })
-        .finally(() => {
           this.isSettlingQuote = false
           this.isSettlingBase = false
         })
