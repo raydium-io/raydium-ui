@@ -94,10 +94,10 @@
     <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
     <AmmIdSelect
       :show="ammIdSelectShow"
-      :liquidityList="ammIdSelectList"
+      :liquidity-list="ammIdSelectList"
+      :user-close="true"
       @onClose="() => ((ammIdSelectShow = false), (ammIdSelectOld = true))"
       @onSelect="onAmmIdSelect"
-      :userClose="true"
     />
 
     <UnofficialPoolConfirmUser
@@ -172,9 +172,10 @@
           <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="fs-container">
             <span> Price </span>
             <span>
-              1 {{ fromCoin.symbol }} ≈
-              {{ outToPirceValue }}
-              {{ toCoin.symbol }}
+              1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
+              {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
+              {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }}
+              <Icon type="swap" @click="() => (hasPriceSwapped = !hasPriceSwapped)" />
             </span>
           </div>
           <div
@@ -183,9 +184,10 @@
           >
             <span> Price </span>
             <span>
-              1 {{ fromCoin.symbol }} ≈
-              {{ outToPirceValue }}
-              {{ toCoin.symbol }}
+              1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
+              {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
+              {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }}
+              <Icon type="swap" @click="() => (hasPriceSwapped = !hasPriceSwapped)" />
             </span>
           </div>
           <div class="fs-container">
@@ -420,6 +422,9 @@ export default Vue.extend({
 
       coinBasePrice: true,
       outToPirceValue: null as any,
+
+      // whether user has toggle swap button
+      hasPriceSwapped: false,
 
       officialPool: true,
       userCheckUnofficial: false,
@@ -1328,6 +1333,14 @@ export default Vue.extend({
 <style lang="less" sxcoped>
 .container {
   max-width: 450px;
+
+  .fs-container {
+    .anticon-swap {
+      padding: 5px;
+      border-radius: 50%;
+      background: #000829;
+    }
+  }
 
   .change-side {
     div {
