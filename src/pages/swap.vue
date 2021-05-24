@@ -971,7 +971,7 @@ export default Vue.extend({
           console.log(`input: ${this.fromCoinAmount} raydium out: ${amountOutWithSlippage.fixed()}`)
           toCoinAmount = amountOut.fixed()
           toCoinWithSlippage = amountOutWithSlippage
-          price = new TokenAmount(
+          price = +new TokenAmount(
             parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
             this.toCoin.decimals,
             false
@@ -1009,7 +1009,7 @@ export default Vue.extend({
           if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
             toCoinAmount = out.fixed()
             toCoinWithSlippage = outWithSlippage
-            price = new TokenAmount(
+            price = +new TokenAmount(
               parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
               this.toCoin.decimals,
               false
