@@ -63,7 +63,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(marketAddress)" />
-                  <a :href="`${url.explorer}/address/${marketAddress}`" target="_blank">
+                  <a :href="`${url.trade}/${marketAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
