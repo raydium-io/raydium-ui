@@ -422,7 +422,7 @@ export default Vue.extend({
       priceImpact: 0,
 
       coinBasePrice: true,
-      outToPirceValue: null as any,
+      outToPirceValue: 0,
 
       // whether user has toggle swap button
       hasPriceSwapped: false,
@@ -949,7 +949,7 @@ export default Vue.extend({
     updateAmounts() {
       let toCoinAmount = ''
       let toCoinWithSlippage = null
-      let price = ''
+      let price = 0
       let impact = 0
       let endpoint = ''
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
@@ -975,7 +975,7 @@ export default Vue.extend({
             parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
             this.toCoin.decimals,
             false
-          ).format()
+          ).fixed()
           impact = priceImpact
           endpoint = 'Raydium Pool'
         }
@@ -1013,7 +1013,7 @@ export default Vue.extend({
               parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
               this.toCoin.decimals,
               false
-            ).format()
+            ).fixed()
             impact = priceImpact
             endpoint = 'serum DEX'
           }
@@ -1029,7 +1029,7 @@ export default Vue.extend({
       } else {
         this.toCoinAmount = ''
         this.toCoinWithSlippage = ''
-        this.outToPirceValue = ''
+        this.outToPirceValue = 0
         this.priceImpact = 0
         this.endpoint = ''
       }
