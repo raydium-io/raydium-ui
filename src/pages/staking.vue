@@ -80,7 +80,6 @@
                   <div class="pending fs-container">
                     <div class="reward">
                       <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
-                      <div class="value">0</div>
                     </div>
                     <Button
                       size="large"
