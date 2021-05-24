@@ -6,13 +6,16 @@
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
-      <div class="token-list">
+      <div class="token-list" v-if="!addUserCoin">
         <template v-for="token in tokenList">
           <div
             :key="token.symbol"
             class="token-info"
             @click="$emit('onSelect', token)"
-            v-if="token.showDefault || token.mintAddress === keyword"
+            v-if="
+              (token.showDefault || token.mintAddress === keyword) &&
+              token.mintAddress !== 'So11111111111111111111111111111111111111112'
+            "
           >
             <img :src="importIcon(`/coins/${token.symbol.toLowerCase()}.png`)" />
             <div>

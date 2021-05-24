@@ -787,7 +787,7 @@ export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to:
   // const fromCoin = from === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : from
   // const toCoin = to === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : to
   const fromCoin = from === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : from
-  const toCoin = to === TOKENS.WSOL.mintAddres ? NATIVE_SOL.mintAddress : to
+  const toCoin = to === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : to
   const knownLiquidity = LIQUIDITY_POOLS.find((item) => {
     if (fromCoin !== null && toCoin != null && fromCoin === toCoin) {
       return false

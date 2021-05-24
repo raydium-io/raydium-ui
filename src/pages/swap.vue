@@ -775,6 +775,30 @@ export default Vue.extend({
         }
 
         let marketAddress = ''
+
+        // serum
+        for (const address of Object.keys(this.swap.markets)) {
+          if (isOfficalMarket(address)) {
+            const info = cloneDeep(this.swap.markets[address])
+            let fromMint = this.fromCoin.mintAddress
+            let toMint = this.toCoin.mintAddress
+            if (fromMint === NATIVE_SOL.mintAddress) {
+              fromMint = TOKENS.WSOL.mintAddress
+            }
+            if (toMint === NATIVE_SOL.mintAddress) {
+              toMint = TOKENS.WSOL.mintAddress
+            }
+            if (
+              (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
+              (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
+            ) {
+              // if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
+              marketAddress = address
+              // }
+            }
+          }
+        }
+
         if (this.fromCoin.mintAddress && this.toCoin.mintAddress) {
           const liquidityListV4 = getPoolListByTokenMintAddresses(
             this.fromCoin.mintAddress === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : this.fromCoin.mintAddress,
@@ -801,7 +825,10 @@ export default Vue.extend({
             officialPool = liquidityListV4[0].official
             this.userCheckUnofficialMint = undefined
             marketAddress = liquidityListV4[0].serumMarket
+            } else if (marketAddress !== '' && InputAmmIdOrMarket === undefined) {
+              console.log('official market')
           } else if (liquidityListV4.length === 1 && InputAmmIdOrMarket) {
+            // user select
             ammId = liquidityListV4[0].ammId
             lpMintAddress = liquidityListV4[0].lp.mintAddress
             officialPool = liquidityListV4[0].official
@@ -809,6 +836,7 @@ export default Vue.extend({
           } else if (liquidityListV4.length > 0 && this.ammIdSelectOld) {
             console.log('last user select none')
           } else if (liquidityListV4.length > 0) {
+            // user select amm id
             this.coinSelectShow = false
             setTimeout(() => {
               this.ammIdSelectShow = true
@@ -828,29 +856,6 @@ export default Vue.extend({
           }
           if (ammId) {
             this.needUserCheckUnofficialShow(ammId)
-          }
-        }
-
-        // serum
-        for (const address of Object.keys(this.swap.markets)) {
-          if (isOfficalMarket(address)) {
-            const info = cloneDeep(this.swap.markets[address])
-            let fromMint = this.fromCoin.mintAddress
-            let toMint = this.toCoin.mintAddress
-            if (fromMint === NATIVE_SOL.mintAddress) {
-              fromMint = TOKENS.WSOL.mintAddress
-            }
-            if (toMint === NATIVE_SOL.mintAddress) {
-              toMint = TOKENS.WSOL.mintAddress
-            }
-            if (
-              (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
-              (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
-            ) {
-              // if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
-              marketAddress = address
-              // }
-            }
           }
         }
 
