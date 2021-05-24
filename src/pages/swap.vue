@@ -170,9 +170,9 @@
           </div>
           <div v-else-if="fromCoin && toCoin && lpMintAddress && fromCoinAmount" class="price-base fc-container">
             <span>
-              1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
-              {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
-              {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }}
+              1 {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }} ≈
+              {{ hasPriceSwapped ? (1 / outToPirceValue).toFixed(6) : outToPirceValue }}
+              {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }}
               <Icon type="swap" @click="() => (hasPriceSwapped = !hasPriceSwapped)" />
             </span>
           </div>
@@ -181,9 +181,9 @@
             class="price-base fc-container"
           >
             <span>
-              1 {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }} ≈
-              {{ hasPriceSwapped ? outToPirceValue : (1 / outToPirceValue).toFixed(6) }}
-              {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }}
+              1 {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }} ≈
+              {{ hasPriceSwapped ? (1 / outToPirceValue).toFixed(6) : outToPirceValue }}
+              {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }}
               <Icon type="swap" @click="() => (hasPriceSwapped = !hasPriceSwapped)" />
             </span>
           </div>
