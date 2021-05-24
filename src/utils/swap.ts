@@ -101,8 +101,8 @@ export function getSwapOutAmount(
       false
     )
     const afterPrice = new TokenAmount(
-      parseFloat(new TokenAmount(denominator, coin.decimals).fixed()) /
-        parseFloat(new TokenAmount(outBalance, pc.decimals).fixed()),
+      parseFloat(new TokenAmount(denominator, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(outBalance, coin.decimals).fixed()),
       pc.decimals,
       false
     )

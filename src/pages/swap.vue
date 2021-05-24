@@ -972,7 +972,7 @@ export default Vue.extend({
           toCoinAmount = amountOut.fixed()
           toCoinWithSlippage = amountOutWithSlippage
           price = new TokenAmount(
-            parseFloat(amountOutWithSlippage.fixed()) / parseFloat(this.fromCoinAmount),
+            parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
             this.toCoin.decimals,
             false
           ).format()
@@ -1010,7 +1010,7 @@ export default Vue.extend({
             toCoinAmount = out.fixed()
             toCoinWithSlippage = outWithSlippage
             price = new TokenAmount(
-              parseFloat(outWithSlippage.fixed()) / parseFloat(this.fromCoinAmount),
+              parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount),
               this.toCoin.decimals,
               false
             ).format()
