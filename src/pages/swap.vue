@@ -192,11 +192,11 @@
             <span> {{ $accessor.setting.slippage }}% </span>
           </div>
           <div v-if="endpoint" class="fs-container">
-            <span class="name"> Swap powered by </span>
+            <span class="name"> Swapping Through</span>
             <span style="text-transform: capitalize"> {{ endpoint }} </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
-            <span class="name"> Minimum received </span>
+            <span class="name"> Minimum Received </span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
           <div v-if="endpoint" class="fs-container">
@@ -977,7 +977,7 @@ export default Vue.extend({
             false
           ).format()
           impact = priceImpact
-          endpoint = 'raydium'
+          endpoint = 'Raydium Pool'
         }
       }
       if (
@@ -1015,7 +1015,7 @@ export default Vue.extend({
               false
             ).format()
             impact = priceImpact
-            endpoint = 'serum'
+            endpoint = 'serum DEX'
           }
         }
       }
