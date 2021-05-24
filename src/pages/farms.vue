@@ -418,6 +418,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.stakeModalOpening = false
         })
     },
 
@@ -478,6 +479,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.unstakeModalOpening = false
         })
     },
 
