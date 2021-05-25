@@ -1565,7 +1565,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumPcVaultAccount: 'EFdqJhawpCReiK2DcrbbUUWWc6cd8mqgZm5MSbQ3TR33',
     serumVaultSigner: 'A6q5h5Wx9iqeoVsvYWA7xofUcKx6XUPPab8BTVrW91Bs',
     official: true
-  },
+  }
   // {
   //   name: 'SRM-USDT',
   // coin: { ...TOKENS.SRM },
