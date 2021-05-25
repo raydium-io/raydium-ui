@@ -113,19 +113,27 @@ export const actions = actionTree(
           ammInfo.pcMintAddress.toString() === TOKENS.WSOL.mintAddress
             ? NATIVE_SOL.mintAddress
             : ammInfo.pcMintAddress.toString()
-        const coin = Object.values(TOKENS).find((item) => item.mintAddress === fromCoin) ?? {
-          symbol: 'unknown',
-          name: 'unknown',
-          mintAddress: ammInfo.coinMintAddress.toString(),
-          decimals: ammInfo.coinDecimals.toNumber(),
-          official: false
+        let coin = Object.values(TOKENS).find((item) => item.mintAddress === fromCoin)
+        if (!coin) {
+          TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`] = {
+            symbol: 'unknown',
+            name: 'unknown',
+            mintAddress: ammInfo.coinMintAddress.toString(),
+            decimals: ammInfo.coinDecimals.toNumber(),
+            official: false
+          }
+          coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
         }
-        const pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin) ?? {
-          symbol: 'unknown',
-          name: 'unknown',
-          mintAddress: ammInfo.pcMintAddress.toString(),
-          decimals: ammInfo.pcDecimals.toNumber(),
-          official: false
+        let pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin)
+        if (!pc) {
+          TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`] = {
+            symbol: 'unknown',
+            name: 'unknown',
+            mintAddress: ammInfo.pcMintAddress.toString(),
+            decimals: ammInfo.pcDecimals.toNumber(),
+            official: false
+          }
+          pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
         }
         if (coin.mintAddress === TOKENS.WSOL.mintAddress) {
           coin.symbol = 'SOL'
