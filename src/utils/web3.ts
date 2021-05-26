@@ -360,14 +360,34 @@ export async function signTransaction(
   return await wallet.signTransaction(transaction)
 }
 
+async function covertToProgramWalletTransaction(
+  connection: Connection,
+  wallet: any,
+  transaction: Transaction,
+  signers: Array<Account> = []
+) {
+  transaction.recentBlockhash = (await connection.getRecentBlockhash(commitment)).blockhash
+  transaction.feePayer = wallet.publicKey
+  if (signers.length > 0) {
+    transaction = await wallet.convertToProgramWalletTransaction(transaction)
+    transaction.partialSign(...signers)
+  }
+  return transaction
+}
+
 export async function sendTransaction(
   connection: Connection,
   wallet: any,
   transaction: Transaction,
   signers: Array<Account> = []
 ) {
-  const signedTransaction = await signTransaction(connection, wallet, transaction, signers)
-  return await sendSignedTransaction(connection, signedTransaction)
+  if (wallet.isProgramWallet) {
+    const programWalletTransaction = await covertToProgramWalletTransaction(connection, wallet, transaction, signers)
+    return await wallet.signAndSendTransaction(programWalletTransaction)
+  } else {
+    const signedTransaction = await signTransaction(connection, wallet, transaction, signers)
+    return await sendSignedTransaction(connection, signedTransaction)
+  }
 }
 
 export async function sendSignedTransaction(connection: Connection, signedTransaction: Transaction): Promise<string> {
