@@ -1123,7 +1123,7 @@ export default Vue.extend({
           .finally(() => {
             this.swaping = false
           })
-      } else if (this.ammId) {
+      } else if (this.endpoint === 'Raydium Pool' && this.ammId) {
         const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.ammId)
         swap(
           this.$web3,
