@@ -458,6 +458,14 @@ export const TOKENS: Tokens = {
     },
     official: true,
     showDefault: true
+  },
+  SLIM: {
+    symbol: 'SLIM',
+    name: 'Solanium',
+    mintAddress: 'xxxxa1sKNGwFtw2kFn8XauW9xq8hBZ5kVtcSesTT9fW',
+    decimals: 6,
+    official: true,
+    showDefault: true
   }
 }
 
@@ -895,6 +903,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Cz1kUvHw98imKkrqqu95GQB9h1frY8RikxPojMwWKGXf',
     decimals: TOKENS.COPE.decimals
+  },
+  'SLIM-SOL-V4': {
+    symbol: 'SLIM-SOL',
+    name: 'SLIM-SOL LP',
+    coin: { ...TOKENS.SLIM },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '9X4EK8E59VAVi6ChnNvvd39m6Yg9RtkBbAPq1mDVJT57',
+    decimals: TOKENS.SLIM.decimals
   }
 }
 
