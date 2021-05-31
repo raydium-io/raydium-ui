@@ -464,6 +464,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'DiebAVak6cub1Mn3yhhvgSvGhkAP1JTtyRGoAei4wrWE', // lp vault
     poolRewardTokenAccount: '4F9FaFewwsSF8Bsxukyj9NiEdPFQQ38dNKEDpZugYfdi', // reward vault A
     poolRewardTokenAccountB: '4tvLbnZEPZLuDf636DHEzrUxW8bDoZ5XyfVwk7ppDhbC' // reward vault B
+  },
+  {
+    name: 'ALEPH-USDC',
+    lp: { ...LP_TOKENS['ALEPH-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.ALEPH },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'JAP8SFagJBm6vt2LoFGNeSJ1hKDZ2p3yXb3CvBx11How',
+    poolAuthority: 'DVtR63sAnJPM9wdt1hYBqA5GTyFzjfcfdLTfsSzV85Ss',
+    poolLpTokenAccount: 'feCzxSvVX4EboJV4cubjqoPTK41noaHUanz8ZNJmiBp', // lp vault
+    poolRewardTokenAccount: '4mAhgUY8XGMY4743wuzVbLw7d5bqqTaxME8jmbC2YfH4', // reward vault A
+    poolRewardTokenAccountB: '3sGDa8ir8GrkKbnBH6HP63JaYSs7nskmmVHpF2vuzaZr' // reward vault B
   }
 ]
 

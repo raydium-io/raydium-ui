@@ -895,6 +895,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Cz1kUvHw98imKkrqqu95GQB9h1frY8RikxPojMwWKGXf',
     decimals: TOKENS.COPE.decimals
+  },
+  'ALEPH-USDC-V4': {
+    symbol: 'ALEPH-USDC',
+    name: 'ALEPH-USDC LP',
+    coin: { ...TOKENS.ALEPH },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'iUDasAP2nXm5wvTukAHEKSdSXn8vQkRtaiShs9ceGB7',
+    decimals: TOKENS.ALEPH.decimals
   }
 }
 
