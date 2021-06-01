@@ -408,7 +408,7 @@ export const TOKENS: Tokens = {
     official: true,
     showDefault: true
   },
-  SLIM: {
+  KEKW: {
     symbol: 'KEKW',
     name: 'Kekwcoin',
     mintAddress: '2QK9vxydd7WoDwvVFT5JSU8cwE9xmbJSzeqbRESiPGMG',
