@@ -5,6 +5,8 @@ export {
   CloseOutline,
   // copy
   CopyOutline,
+  // link
+  LinkOutline,
   // notify
   CheckCircleOutline,
   ExclamationCircleOutline,

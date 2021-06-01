@@ -1,4 +1,11 @@
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, CLOCK_PROGRAM_ID, IDO_PROGRAM_ID } from './ids'
+import {
+  SYSTEM_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  RENT_PROGRAM_ID,
+  CLOCK_PROGRAM_ID,
+  IDO_PROGRAM_ID,
+  IDO_PROGRAM_ID_V2
+} from './ids'
 import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
 import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
@@ -37,6 +44,7 @@ export interface IdoPool {
   snapshotProgramId: string
 
   isRayPool: boolean
+  status?: string
   idoId: string
   baseVault: string
   quoteVault: string
@@ -49,6 +57,38 @@ export interface IdoPool {
 }
 
 export const IDO_POOLS: IdoPool[] = [
+  {
+    base: { ...TOKENS.MER },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
+
+    version: 2,
+    programId: IDO_PROGRAM_ID_V2,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: '3GANPMCSLb1NeQZZ1VNKXHrH5jCyK3DQLr4tmhvkaYng',
+    baseVault: 'Hw41WUxQjuEbNK21nBRdoefqVhgWFe6vjJ1CTJXtXryo',
+    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni'
+  },
+  {
+    base: { ...TOKENS.MER },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.125, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(1000000, TOKENS.MER.decimals, false),
+
+    version: 2,
+    programId: IDO_PROGRAM_ID_V2,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: 'F5Rk8Eht3JU69146uc9piwmMGCdPwAmYgJKRUaWxhwim',
+    baseVault: '3CDLcsVhRReJ4otXhfi2kD2FrppRUqQYtXXZ7LgQrNy5',
+    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven'
+  },
   {
     base: { ...TOKENS.MEDIA },
     quote: { ...TOKENS.USDC },
@@ -170,11 +210,18 @@ export async function purchase(
     owner,
     new PublicKey(poolInfo.programId)
   )
-  const userIdoCheck = await findAssociatedIdoCheckAddress(
-    new PublicKey(poolInfo.idoId),
-    owner,
-    new PublicKey(poolInfo.snapshotProgramId)
-  )
+  const userIdoCheck =
+    poolInfo.version === 1
+      ? await findAssociatedIdoCheckAddress(
+          new PublicKey(poolInfo.idoId),
+          owner,
+          new PublicKey(poolInfo.snapshotProgramId)
+        )
+      : await findAssociatedIdoCheckAddress(
+          new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
+          owner,
+          new PublicKey(poolInfo.snapshotProgramId)
+        )
 
   transaction.add(
     purchaseInstruction(

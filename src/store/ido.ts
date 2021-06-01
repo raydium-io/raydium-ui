@@ -15,6 +15,7 @@ import {
 } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
+import {getUnixTs} from "@/utils";
 
 const AUTO_REFRESH_TIME = 60
 
@@ -106,6 +107,7 @@ export const actions = actionTree(
             minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
             quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
           }
+          pool.status = pool.info.endTime < getUnixTs() / 1000 ? "ended" : pool.info.startTime < getUnixTs() / 1000 ? "open" : "upcoming"
         }
       })
 
@@ -127,18 +129,25 @@ export const actions = actionTree(
         const keyLength = keys.length
 
         for (const pool of idoPools) {
-          const { idoId, programId, snapshotProgramId } = pool
+          const { idoId, programId, version, snapshotProgramId } = pool
 
           const userIdoAccount = await findAssociatedIdoInfoAddress(
             new PublicKey(idoId),
             wallet.publicKey,
             new PublicKey(programId)
           )
-          const userIdoCheck = await findAssociatedIdoCheckAddress(
-            new PublicKey(idoId),
-            wallet.publicKey,
-            new PublicKey(snapshotProgramId)
-          )
+          const userIdoCheck =
+            version === 1
+              ? await findAssociatedIdoCheckAddress(
+                  new PublicKey(idoId),
+                  wallet.publicKey,
+                  new PublicKey(snapshotProgramId)
+                )
+              : await findAssociatedIdoCheckAddress(
+                  new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
+                  wallet.publicKey,
+                  new PublicKey(snapshotProgramId)
+                )
 
           publicKeys.push(userIdoAccount, userIdoCheck)
         }

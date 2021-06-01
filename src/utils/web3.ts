@@ -10,40 +10,20 @@ import {
   TransactionInstruction
 } from '@solana/web3.js'
 
-import { ACCOUNT_LAYOUT } from '@/utils/layouts'
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
-import logger from '@/utils/logger'
 // eslint-disable-next-line
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
 
-export const endpoints = [
-  { url: 'https://raydium.rpcpool.com', weight: 90 },
-  { url: 'https://api.mainnet-beta.solana.com', weight: 5 },
-  { url: 'https://solana-api.projectserum.com', weight: 5 }
-]
-
-export function getRandomEndpoint() {
-  let pointer = 0
-  const random = Math.random() * 100
-  let api = endpoints[0].url
-
-  for (const endpoint of endpoints) {
-    if (random > pointer + endpoint.weight) {
-      pointer += pointer + endpoint.weight
-    } else if (random >= pointer && random < pointer + endpoint.weight) {
-      api = endpoint.url
-      break
-    } else {
-      logger(`${random} using ${endpoint.url}`)
-      api = endpoint.url
-      break
-    }
-  }
-
-  logger(`using ${api}`)
-  return api
+export const web3Config = {
+  strategy: 'speed',
+  rpcs: [
+    { url: 'https://solana-api.projectserum.com', weight: 50 },
+    { url: 'https://raydium.rpcpool.com', weight: 40 },
+    { url: 'https://api.mainnet-beta.solana.com', weight: 10 }
+  ]
 }
 
 // export const commitment: Commitment = 'processed'
@@ -60,6 +40,14 @@ export async function createAmmAuthority(programId: PublicKey) {
     [new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))],
     programId
   )
+}
+
+export async function createAmmId(infoId: PublicKey, marketAddress: PublicKey) {
+  const { publicKey } = await findProgramAddress(
+    [infoId.toBuffer(), marketAddress.toBuffer(), Buffer.from('amm_associated_seed')],
+    infoId
+  )
+  return publicKey
 }
 
 export async function findAssociatedTokenAddress(walletAddress: PublicKey, tokenMintAddress: PublicKey) {
@@ -197,6 +185,17 @@ export async function createAssociatedTokenAccount(
   )
 
   return associatedTokenAddress
+}
+
+export async function createTokenAccount(connection: Connection, wallet: any, mint: string) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+
+  const owner = wallet.publicKey
+
+  await createAssociatedTokenAccount(new PublicKey(mint), owner, transaction)
+
+  return await sendTransaction(connection, wallet, transaction, signers)
 }
 
 export async function getFilteredProgramAccounts(
@@ -353,7 +352,7 @@ export async function signTransaction(
   transaction: Transaction,
   signers: Array<Account> = []
 ) {
-  transaction.recentBlockhash = (await connection.getRecentBlockhash(commitment)).blockhash
+  transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash
   transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey))
   if (signers.length > 0) {
     transaction.partialSign(...signers)
@@ -390,4 +389,38 @@ export function mergeTransactions(transactions: (Transaction | undefined)[]) {
       transaction.add(t)
     })
   return transaction
+}
+
+function throwIfNull<T>(value: T | null, message = 'account not found'): T {
+  if (value === null) {
+    throw new Error(message)
+  }
+  return value
+}
+
+export async function getMintDecimals(connection: Connection, mint: PublicKey): Promise<number> {
+  const { data } = throwIfNull(await connection.getAccountInfo(mint), 'mint not found')
+  const { decimals } = MINT_LAYOUT.decode(data)
+  return decimals
+}
+
+export async function getFilteredTokenAccountsByOwner(
+  connection: Connection,
+  programId: PublicKey,
+  mint: PublicKey
+): Promise<{ context: {}; value: [] }> {
+  // @ts-ignore
+  const resp = await connection._rpcRequest('getTokenAccountsByOwner', [
+    programId.toBase58(),
+    {
+      mint: mint.toBase58()
+    },
+    {
+      encoding: 'jsonParsed'
+    }
+  ])
+  if (resp.error) {
+    throw new Error(resp.error.message)
+  }
+  return resp.result
 }

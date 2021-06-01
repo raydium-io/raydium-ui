@@ -116,8 +116,12 @@
                 <Button
                   ghost
                   @click="
-                    $router.replace({
-                      path: `/liquidity/?from=${TOKENS.RAY.mintAddress}&to=${TOKENS.USDT.mintAddress}`
+                    $router.push({
+                      path: '/liquidity/',
+                      query: {
+                        from: TOKENS.RAY.mintAddress,
+                        to: TOKENS.USDT.mintAddress
+                      }
                     })
                   "
                 >
@@ -194,7 +198,7 @@
               <div slot="description" class="action">
                 Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
 
-                <Button ghost @click="$router.replace({ path: '/liquidity/' })">Go to DEX3 liquidity</Button>
+                <Button ghost @click="$router.push({ path: '/liquidity/' })">Go to DEX3 liquidity</Button>
               </div>
             </Step>
           </Steps>

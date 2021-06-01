@@ -55,27 +55,30 @@
           <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
-        <span slot="access" slot-scope="isRayPool" class="access">
+        <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
+        <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
-            <span>RAY Pool</span>
+            <span>{{ `RAY ${pool.info.minStakeLimit.format()} Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
+        <span slot="allocation" slot-scope="info, pool">
+          {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}
+        </span>
         <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
-        <span slot="progress" slot-scope="info, pool">
+        <span slot="filled" slot-scope="info, pool">
           {{
-            info.quoteTokenDeposited
-              .toEther()
-              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-              .multipliedBy(100)
-              .toNumber()
+            parseInt(
+              info.quoteTokenDeposited
+                .toEther()
+                .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                .multipliedBy(100)
+                .toNumber()
+            )
           }}%
         </span>
-        <span slot="status" slot-scope="info" class="status">
-          <span v-if="info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
-          <span v-else-if="info.startTime < getUnixTs() / 1000" class="open"> Open </span>
-          <span v-else class="upcoming"> Upcoming </span>
+        <span slot="status" slot-scope="info, pool" class="status">
+          <span :class="pool.status">{{ pool.status }}</span>
         </span>
       </Table>
     </div>
@@ -124,19 +127,22 @@ export default class AcceleRaytor extends Vue {
   pools: IdoPool[] = []
 
   @Watch('filter', { immediate: true, deep: true })
-  onFilterChanged({ access }: { access: string; status: string; mine: string }) {
+  onFilterChanged({ access, status }: { access: string; status: string; mine: string }) {
     const rules = {
       info: {}
     } as any
 
-    if (access !== 'all') {
-      if (access === 'ray') {
+    switch (access) {
+      case 'ray': {
         rules.isRayPool = true
-      } else {
+        break
+      }
+      case 'community': {
         rules.isRayPool = false
+        break
       }
     }
-
+    if (status !== 'all') rules.status = status
     this.pools = filter(this.$accessor.ido.pools, rules)
   }
 
@@ -162,17 +168,24 @@ export default class AcceleRaytor extends Vue {
       align: 'center'
     },
     {
-      title: 'Total raise',
+      title: 'Max Allocation',
+      dataIndex: 'allocation',
+      key: 'allocation',
+      scopedSlots: { customRender: 'allocation' },
+      align: 'center'
+    },
+    {
+      title: 'Raise size',
       dataIndex: 'raise',
       key: 'raise',
       scopedSlots: { customRender: 'raise' },
       align: 'center'
     },
     {
-      title: 'Progress',
+      title: 'Filled',
       dataIndex: 'info',
-      key: 'progress',
-      scopedSlots: { customRender: 'progress' },
+      key: 'filled',
+      scopedSlots: { customRender: 'filled' },
       align: 'center'
     },
     {
@@ -250,6 +263,8 @@ export default class AcceleRaytor extends Vue {
   }
 
   .status {
+    text-transform: capitalize;
+
     .upcoming,
     .open,
     .ended {
@@ -359,6 +374,15 @@ export default class AcceleRaytor extends Vue {
 
   .ant-table-row:hover {
     cursor: pointer;
+  }
+
+  .ant-table-placeholder {
+    background: #1c274f;
+    border-bottom: 0;
+
+    .ant-empty {
+      color: #f1f1f2bf;
+    }
   }
 }
 </style>

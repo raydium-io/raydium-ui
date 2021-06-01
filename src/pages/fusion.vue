@@ -6,11 +6,9 @@
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -480,6 +478,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.stakeModalOpening = false
         })
     },
 
@@ -541,6 +540,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.unstakeModalOpening = false
         })
     },
 
