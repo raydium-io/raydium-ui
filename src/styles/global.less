@@ -69,6 +69,9 @@
         background: #000829;
       }
     }
+    a {
+      color: @text-color;
+    }
   }
 }
 
@@ -141,10 +144,17 @@
 
       .action {
         font-size: 16px;
-        cursor: pointer;
 
-        &:hover {
-          color: @primary-color;
+        i {
+          cursor: pointer;
+
+          &:hover {
+            color: @primary-color;
+          }
+        }
+
+        a {
+          color: @text-color;
         }
       }
     }

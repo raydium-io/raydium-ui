@@ -60,27 +60,77 @@ export function getSwapOutAmount(
     const denominator = coin.balance.wei.plus(fromAmount.wei)
     const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, pc.decimals) }
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
+
+    const outBalance = pc.balance.wei.minus(amountOut)
+    const beforePrice = new TokenAmount(
+      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const afterPrice = new TokenAmount(
+      parseFloat(new TokenAmount(outBalance, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(denominator, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const priceImpact =
+      ((parseFloat(beforePrice.fixed()) - parseFloat(afterPrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+
+    return {
+      amountIn: fromAmount,
+      amountOut: new TokenAmount(amountOutWithFee, pc.decimals),
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, pc.decimals),
+      priceImpact
+    }
   } else {
     // pc2coin
     const fromAmount = new TokenAmount(amount, pc.decimals, false)
     const denominator = pc.balance.wei.plus(fromAmount.wei)
     const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
     const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(100).multipliedBy(100 - slippage)
-    return { amountIn: fromAmount, amountOut: new TokenAmount(amountOutWithSlippage, coin.decimals) }
+    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
+
+    const outBalance = coin.balance.wei.minus(amountOut)
+
+    const beforePrice = new TokenAmount(
+      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const afterPrice = new TokenAmount(
+      parseFloat(new TokenAmount(denominator, pc.decimals).fixed()) /
+        parseFloat(new TokenAmount(outBalance, coin.decimals).fixed()),
+      pc.decimals,
+      false
+    )
+    const priceImpact =
+      ((parseFloat(afterPrice.fixed()) - parseFloat(beforePrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+
+    return {
+      amountIn: fromAmount,
+      amountOut: new TokenAmount(amountOutWithFee, coin.decimals),
+      amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, coin.decimals),
+      priceImpact
+    }
   }
 }
 
 export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: number) {
   let coinOut = 0
+  let bestPrice = null
   let worstPrice = 0
   let availablePc = pcIn
 
   for (const { key, quantity } of orderBook.items(false)) {
     const price = market?.priceLotsToNumber(key.ushrn(64)) || 0
     const size = market?.baseSizeLotsToNumber(quantity) || 0
+
+    if (!bestPrice && price !== 0) {
+      bestPrice = price
+    }
 
     const orderPcVaule = price * size
     worstPrice = price
@@ -95,8 +145,12 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     }
   }
 
+  coinOut = coinOut * 0.993
+
+  const priceImpact = ((worstPrice - bestPrice) / bestPrice) * 100
+
   worstPrice = (worstPrice * (100 + slippage)) / 100
-  coinOut = (coinOut * (100 - slippage)) / 100
+  const amountOutWithSlippage = (coinOut * (100 - slippage)) / 100
 
   // const avgPrice = (pcIn - availablePc) / coinOut;
   const maxInAllow = pcIn - availablePc
@@ -105,18 +159,25 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
     side: 'buy',
     maxInAllow,
     amountOut: coinOut,
-    worstPrice
+    amountOutWithSlippage,
+    worstPrice,
+    priceImpact
   }
 }
 
 export function forecastSell(market: any, orderBook: any, coinIn: any, slippage: number) {
   let pcOut = 0
+  let bestPrice = null
   let worstPrice = 0
   let availableCoin = coinIn
 
   for (const { key, quantity } of orderBook.items(true)) {
     const price = market.priceLotsToNumber(key.ushrn(64)) || 0
     const size = market?.baseSizeLotsToNumber(quantity) || 0
+
+    if (!bestPrice && price !== 0) {
+      bestPrice = price
+    }
 
     worstPrice = price
 
@@ -130,8 +191,12 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     }
   }
 
+  pcOut = pcOut * 0.993
+
+  const priceImpact = ((bestPrice - worstPrice) / bestPrice) * 100
+
   worstPrice = (worstPrice * (100 - slippage)) / 100
-  pcOut = (pcOut * (100 - slippage)) / 100
+  const amountOutWithSlippage = (pcOut * (100 - slippage)) / 100
 
   // const avgPrice = pcOut / (coinIn - availableCoin);
   const maxInAllow = coinIn - availableCoin
@@ -140,7 +205,9 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
     side: 'sell',
     maxInAllow,
     amountOut: pcOut,
-    worstPrice
+    amountOutWithSlippage,
+    worstPrice,
+    priceImpact
   }
 }
 
@@ -223,15 +290,22 @@ export async function swap(
   toCoinMint: string,
   fromTokenAccount: string,
   toTokenAccount: string,
-  amount: string,
-  slippage: number
+  aIn: string,
+  aOut: string
 ) {
   const transaction = new Transaction()
   const signers: Account[] = []
 
   const owner = wallet.publicKey
 
-  const { amountIn, amountOut } = getSwapOutAmount(poolInfo, fromCoinMint, toCoinMint, amount, slippage)
+  const from = getTokenByMintAddress(fromCoinMint)
+  const to = getTokenByMintAddress(toCoinMint)
+  if (!from || !to) {
+    throw new Error('Miss token info')
+  }
+
+  const amountIn = new TokenAmount(aIn, from.decimals, false)
+  const amountOut = new TokenAmount(aOut, to.decimals, false)
 
   let fromMint = fromCoinMint
   let toMint = toCoinMint
@@ -584,4 +658,97 @@ export function memoInstruction(memo: string) {
     data: Buffer.from(memo, 'utf-8'),
     programId: MEMO_PROGRAM_ID
   })
+}
+export async function checkUnsettledInfo(connection: Connection, wallet: any, market: Market) {
+  if (!wallet) return
+  const owner = wallet.publicKey
+  if (!owner) return
+  const openOrderss = await market?.findOpenOrdersAccountsForOwner(connection, owner, 1000)
+  if (!openOrderss?.length) return
+  const baseTotalAmount = market.baseSplSizeToNumber(openOrderss[0].baseTokenTotal)
+  const quoteTotalAmount = market.quoteSplSizeToNumber(openOrderss[0].quoteTokenTotal)
+  const baseUnsettledAmount = market.baseSplSizeToNumber(openOrderss[0].baseTokenFree)
+  const quoteUnsettledAmount = market.quoteSplSizeToNumber(openOrderss[0].quoteTokenFree)
+  return {
+    baseSymbol: getTokenByMintAddress(market.baseMintAddress.toString())?.symbol,
+    quoteSymbol: getTokenByMintAddress(market.quoteMintAddress.toString())?.symbol,
+    baseTotalAmount,
+    quoteTotalAmount,
+    baseUnsettledAmount,
+    quoteUnsettledAmount,
+    openOrders: openOrderss[0]
+  }
+}
+
+export async function settleFund(
+  connection: Connection,
+  market: Market,
+  openOrders: OpenOrders,
+  wallet: any,
+  baseMint: string,
+  quoteMint: string,
+  baseWallet: string,
+  quoteWallet: string
+) {
+  const tx = new Transaction()
+  const signs: Account[] = []
+
+  const owner = wallet.publicKey
+
+  let wrappedBaseAccount
+  let wrappedQuoteAccount
+
+  if (baseMint === TOKENS.WSOL.mintAddress) {
+    wrappedBaseAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedBaseAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      tx,
+      signs
+    )
+  }
+  if (quoteMint === TOKENS.WSOL.mintAddress) {
+    wrappedQuoteAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedQuoteAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      tx,
+      signs
+    )
+  }
+
+  const quoteToken = getTokenByMintAddress(quoteMint)
+
+  const { transaction, signers } = await market.makeSettleFundsTransaction(
+    connection,
+    openOrders,
+    wrappedBaseAccount ?? new PublicKey(baseWallet),
+    wrappedQuoteAccount ?? new PublicKey(quoteWallet),
+    quoteToken && quoteToken.referrer ? new PublicKey(quoteToken.referrer) : null
+  )
+
+  if (wrappedBaseAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedBaseAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+  if (wrappedQuoteAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedQuoteAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+
+  return await sendTransaction(connection, wallet, mergeTransactions([tx, transaction]), [...signs, ...signers])
 }

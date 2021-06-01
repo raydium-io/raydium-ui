@@ -1,26 +1,14 @@
 <template>
   <div class="farm container">
-    <div class="fc-container">
-      <Alert type="warning" message="IMPORTANT" show-icon closable>
-        <div slot="description">
-          Wrapped USDT (WUSDT) is being phased out for native SPL USDT. As a result, liquidity must migrate to the new
-          RAY-USDT pool. To simplify the process, use the
-          <NuxtLink to="/migrate/">migration tool</NuxtLink>.
-        </div>
-      </Alert>
-    </div>
-
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -111,7 +99,6 @@
                     <div class="pending fs-container">
                       <div class="reward">
                         <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
-                        <div class="value">0</div>
                       </div>
                       <Button
                         size="large"
@@ -211,7 +198,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -232,8 +219,7 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button,
-    Alert
+    Button
   },
 
   data() {
@@ -432,6 +418,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.stakeModalOpening = false
         })
     },
 
@@ -492,6 +479,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.unstakeModalOpening = false
         })
     },
 
