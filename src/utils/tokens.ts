@@ -408,6 +408,14 @@ export const TOKENS: Tokens = {
     official: true,
     showDefault: true
   },
+  SLIM: {
+    symbol: 'KEKW',
+    name: 'Kekwcoin',
+    mintAddress: '2QK9vxydd7WoDwvVFT5JSU8cwE9xmbJSzeqbRESiPGMG',
+    decimals: 9,
+    official: true,
+    showDefault: true
+  },
   MEDIA: {
     symbol: 'MEDIA',
     name: 'MEDIA',
