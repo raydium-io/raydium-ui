@@ -76,7 +76,8 @@ export default class Wallet extends Vue {
     Phantom: '',
     Sollet: 'https://www.sollet.io',
     // Solflare: 'https://solflare.com/access-wallet',
-    Bonfida: 'https://bonfida.com/wallet'
+    Bonfida: 'https://bonfida.com/wallet',
+    Zelcore: 'https://link.zelcore.io'
     // https://docs.coin98.app/coin98-extension/developer-guide
     // Coin98: ''
     // ezDeFi: '',
