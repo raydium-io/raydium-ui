@@ -48,6 +48,7 @@ import {
   SolongWalletAdapter,
   MathWalletAdapter,
   PhantomWalletAdapter,
+  BloctoWalletAdapter,
   LedgerWalletAdapter
 } from '@/wallets'
 
@@ -74,6 +75,7 @@ export default class Wallet extends Vue {
     // TrustWallet: '',
     MathWallet: '',
     Phantom: '',
+    Blocto: '',
     Sollet: 'https://www.sollet.io',
     // Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
@@ -195,6 +197,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new PhantomWalletAdapter()
+        break
+      }
+      case 'Blocto': {
+        if ((window as any).solana === undefined || !(window as any).solana.isBlocto) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and open Blocto app first'
+          })
+          return
+        }
+
+        wallet = new BloctoWalletAdapter()
         break
       }
       default: {
