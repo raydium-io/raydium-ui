@@ -554,6 +554,10 @@ export default Vue.extend({
 
 <style lang="less">
 .staking {
+  .card-body {
+    overflow-x: scroll;
+  }
+
   .ant-collapse-header {
     padding: 24px 32px !important;
   }

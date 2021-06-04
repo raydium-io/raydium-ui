@@ -9,7 +9,7 @@
         <Icon slot="prefix" type="search" />
       </Input>
       <div class="filter">
-        <div>
+        <div class="group">
           <h5>Access</h5>
           <RadioGroup v-model="filter.access">
             <RadioButton value="all">All</RadioButton>
@@ -17,7 +17,7 @@
             <RadioButton value="community">Community</RadioButton>
           </RadioGroup>
         </div>
-        <div>
+        <div class="group">
           <h5>Status</h5>
           <RadioGroup v-model="filter.status">
             <RadioButton value="all">All</RadioButton>
@@ -26,7 +26,7 @@
             <RadioButton value="ended">Ended</RadioButton>
           </RadioGroup>
         </div>
-        <div>
+        <div class="group">
           <h5>My pools</h5>
           <RadioGroup v-model="filter.mine">
             <RadioButton value="all">All</RadioButton>
@@ -214,12 +214,21 @@ export default class AcceleRaytor extends Vue {
     justify-content: space-between;
     align-items: center;
     margin-top: 16px;
-    padding: 24px;
+    padding: 12px;
     background: #0f1429;
     color: #f1f1f2bf;
 
+    .group {
+      padding: 12px;
+    }
     h5 {
       color: #f1f1f2bf;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .filter {
+      display: block;
     }
   }
 
@@ -317,10 +326,7 @@ export default class AcceleRaytor extends Vue {
     box-shadow: none;
     border-radius: 4px;
     color: #f1f1f2bf;
-
-    &:not(:first-child) {
-      margin-left: 8px;
-    }
+    margin: 8px 8px 0 0;
 
     &:not(:first-child)::before {
       width: 0;
@@ -348,6 +354,10 @@ export default class AcceleRaytor extends Vue {
 
   .ant-table {
     background: #1c274f;
+  }
+
+  .ant-table-body {
+    overflow-x: scroll;
   }
 
   .ant-table-thead > tr > th {
