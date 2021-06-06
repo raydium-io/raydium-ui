@@ -544,6 +544,7 @@ export default Vue.extend({
   .card {
     .card-body {
       padding: 0;
+      overflow-x: scroll;
 
       .ant-collapse {
         border: 0;

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="pool container">
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
     </div>
@@ -124,6 +124,12 @@ export default class Pools extends Vue {
 </style>
 
 <style lang="less">
+.pool {
+  .card-body {
+    overflow-x: scroll;
+  }
+}
+
 .ant-table-thead > tr > th.ant-table-column-sort {
   background: transparent;
 }
