@@ -284,7 +284,7 @@ export default Vue.extend({
       unstakeModalOpening: false,
       unstaking: false,
       poolType: true,
-      endedFarmsPoolId: []
+      endedFarmsPoolId: [] as string[]
     }
   },
 
