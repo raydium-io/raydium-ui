@@ -389,8 +389,10 @@ export default Vue.extend({
             newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
-
-            if (rewardPerBlockAmount.toEther().eq(0) && rewardBPerBlockAmount.toEther().eq(0)) {
+            if (
+              rewardPerBlockAmount.toEther().toString() === '0' &&
+              rewardBPerBlockAmount.toEther().toString() === '0'
+            ) {
               endedFarmsPoolId.push(poolId)
             }
           }
