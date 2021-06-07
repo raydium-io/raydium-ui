@@ -1,7 +1,15 @@
 <template>
   <div class="fusion container">
     <div class="page-head fs-container">
-      <span class="title">Fusion Pools</span>
+      <span class="title">
+        Fusion Pools
+        <span>
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-left: 30px">
+            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+          </RadioGroup>
+        </span>
+      </span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
@@ -42,9 +50,17 @@
 
     <div v-if="farm.initialized">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body" style="background: #000829">
           <Collapse expand-icon-position="right">
-            <CollapsePanel v-for="farm in farms" v-show="!farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
+            <CollapsePanel
+              v-for="farm in farms"
+              v-show="
+                !farm.farmInfo.legacy &&
+                ((!endedFarmsPoolId.includes(farm.poolId) && poolType) ||
+                  (endedFarmsPoolId.includes(farm.poolId) && !poolType))
+              "
+              :key="farm.farmInfo.poolId"
+            >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="isMobile ? 12 : 8">
                   <div class="icons">
@@ -225,7 +241,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Radio } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import importIcon from '@/utils/import-icon'
@@ -235,6 +251,9 @@ import { depositV4, withdrawV4 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 
 const CollapsePanel = Collapse.Panel
+
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 
 export default Vue.extend({
   components: {
@@ -246,7 +265,9 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    RadioGroup,
+    RadioButton
   },
 
   data() {
@@ -261,7 +282,9 @@ export default Vue.extend({
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
-      unstaking: false
+      unstaking: false,
+      poolType: true,
+      endedFarmsPoolId: []
     }
   },
 
@@ -306,6 +329,7 @@ export default Vue.extend({
 
     updateFarms() {
       const farms: any = []
+      const endedFarmsPoolId: string[] = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
@@ -367,6 +391,10 @@ export default Vue.extend({
             newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+
+            if (rewardPerBlockAmount.toEther().eq(0) && rewardBPerBlockAmount.toEther().eq(0)) {
+              endedFarmsPoolId.push(poolId)
+            }
           }
 
           if (userInfo) {
@@ -411,6 +439,7 @@ export default Vue.extend({
       }
 
       this.farms = farms
+      this.endedFarmsPoolId = endedFarmsPoolId
     },
 
     updateCurrentLp(newTokenAccounts: any) {
@@ -601,6 +630,36 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+.pool-filter {
+  padding-bottom: 5px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+}
+.pool-filter-select {
+  background: rgb(37, 41, 97);
+  color: #fff;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  height: 37px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+.pool-filter-unselect {
+  background: transparent;
+  border: transparent;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  height: 37px;
+  font-weight: bold;
+  color: #ccc;
+}
+.pool-filter-select:hover {
+  color: #fff;
+}
+.pool-filter-unselect:hover {
+  color: #ccc;
+}
+
 .fusion.container {
   max-width: 1200px;
 
@@ -608,6 +667,7 @@ export default Vue.extend({
     .card-body {
       padding: 0;
       overflow-x: scroll;
+      padding-top: 25px;
 
       .ant-collapse {
         border: 0;
@@ -719,6 +779,10 @@ export default Vue.extend({
     margin-bottom: 0;
   }
 }
+.radioButtonStyle {
+  width: 50%;
+  text-align: center;
+}
 </style>
 
 <style lang="less">
@@ -749,5 +813,28 @@ export default Vue.extend({
   .anticon-close {
     color: #fff;
   }
+}
+
+.ant-table-thead > tr > th.ant-table-column-sort {
+  background: transparent;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff;
+  background: #1c274f;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+  border-left-width: 0;
+}
+.ant-radio-button-wrapper {
+  color: #aaa;
+  background: transparent;
+  // border: 1px solid #d9d9d9;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
+  border: 1px solid #d9d9d9;
 }
 </style>
