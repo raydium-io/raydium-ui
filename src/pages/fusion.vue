@@ -1,16 +1,14 @@
 <template>
   <div class="fusion container">
     <div class="page-head fs-container">
-      <span class="title">
-        Fusion Pools
+      <span class="title"> Fusion Pools </span>
+      <div class="buttons">
         <span>
-          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-left: 30px">
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
             <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
             <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
           </RadioGroup>
         </span>
-      </span>
-      <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
@@ -667,7 +665,7 @@ export default Vue.extend({
     .card-body {
       padding: 0;
       overflow-x: scroll;
-      padding-top: 25px;
+      background: #131a35;
 
       .ant-collapse {
         border: 0;
