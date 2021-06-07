@@ -458,6 +458,15 @@ export const TOKENS: Tokens = {
     },
     official: true,
     showDefault: true
+  },
+  TULIP: {
+    symbol: 'TULIP',
+    name: 'TULIP',
+    mintAddress: 'TuLipcqtGVXP9XR62wM8WWCm6a9vhLs7T1uoWBk6FDs',
+    decimals: 6,
+    referrer: '',
+    official: true,
+    showDefault: true
   }
 }
 
@@ -904,6 +913,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'iUDasAP2nXm5wvTukAHEKSdSXn8vQkRtaiShs9ceGB7',
     decimals: TOKENS.ALEPH.decimals
+  },
+  'TULIP-USDC-V4': {
+    symbol: 'TULIP-USDC',
+    name: 'TULIP-USDC LP',
+    coin: { ...TOKENS.TULIP },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2doeZGLJyACtaG9DCUyqMLtswesfje1hjNA11hMdj6YU',
+    decimals: TOKENS.TULIP.decimals
   }
 }
 
