@@ -126,10 +126,12 @@ export default class Pools extends Vue {
     const pool = []
     for (const item of this.pools) {
       if (
-        (this.poolType === 'RaydiumPools' && (item.official === undefined || item.officia)) ||
+        (this.poolType === 'RaydiumPools' && (item.official === undefined || item.official)) ||
         (this.poolType !== 'RaydiumPools' && item.official !== undefined && !item.official)
       ) {
-        pool.push(item)
+        if (!item.name.includes('unknown')) {
+          pool.push(item)
+        }
       }
     }
     this.poolsShow = pool
