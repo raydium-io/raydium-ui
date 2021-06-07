@@ -270,8 +270,8 @@ export const actions = actionTree(
                 const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
                 const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toNumber())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toNumber())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toString())
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toString())
 
                 break
               }
