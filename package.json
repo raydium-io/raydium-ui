@@ -22,7 +22,7 @@
     }
   },
   "dependencies": {
-    "@ledgerhq/hw-transport-webusb": "^5.41.0",
+    "@ledgerhq/hw-transport-webusb": "^5.53.1",
     "@nuxtjs/axios": "^5.12.5",
     "@nuxtjs/dayjs": "^1.4.0",
     "@nuxtjs/google-gtag": "^1.0.4",
