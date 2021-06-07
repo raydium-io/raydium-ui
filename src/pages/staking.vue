@@ -553,9 +553,14 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
 .staking {
   .card-body {
     overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   .ant-collapse-header {

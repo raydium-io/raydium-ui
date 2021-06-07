@@ -538,6 +538,9 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
 .card-body {
   padding: 0;
   margin: 0;
@@ -549,6 +552,8 @@ export default Vue.extend({
     .card-body {
       padding: 0;
       overflow-x: scroll;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
 
       .ant-collapse {
         border: 0;

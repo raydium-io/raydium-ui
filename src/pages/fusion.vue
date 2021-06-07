@@ -628,6 +628,9 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
 .pool-filter {
   padding-bottom: 5px;
   margin-left: 10px;
@@ -666,6 +669,8 @@ export default Vue.extend({
       padding: 0;
       overflow-x: scroll;
       background: #131a35;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
 
       .ant-collapse {
         border: 0;
