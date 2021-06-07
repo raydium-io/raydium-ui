@@ -538,6 +538,10 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+.card-body {
+  padding: 0;
+  margin: 0;
+}
 .farm.container {
   max-width: 1200px;
 

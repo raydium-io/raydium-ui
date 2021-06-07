@@ -302,7 +302,7 @@ export const actions = actionTree(
               case 'lpMintAddress': {
                 const parsed = MINT_LAYOUT.decode(data)
 
-                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toNumber(), poolInfo.lp.decimals)
+                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toString(), poolInfo.lp.decimals)
 
                 break
               }
