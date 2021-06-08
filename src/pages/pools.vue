@@ -112,8 +112,8 @@ export default class Pools extends Vue {
   poolType: string = 'RaydiumPools'
 
   @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
-  async refreshThePage() {
-    this.poolsShow = await this.$api.getPairs()
+  refreshThePage() {
+    this.showPool()
   }
 
   @Watch('$accessor.liquidity.info', { immediate: true, deep: true })
