@@ -54,8 +54,8 @@
               v-for="farm in farms"
               v-show="
                 !farm.farmInfo.legacy &&
-                ((!endedFarmsPoolId.includes(farm.poolId) && poolType) ||
-                  (endedFarmsPoolId.includes(farm.poolId) && !poolType))
+                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                  (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType))
               "
               :key="farm.farmInfo.poolId"
             >
