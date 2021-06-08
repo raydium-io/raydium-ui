@@ -120,7 +120,8 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.coinMintAddress.toString(),
             decimals: ammInfo.coinDecimals.toNumber(),
-            official: false
+            official: false,
+            cache: true
           }
           coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
         }
@@ -131,7 +132,8 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.pcMintAddress.toString(),
             decimals: ammInfo.pcDecimals.toNumber(),
-            official: false
+            official: false,
+            cache: true
           }
           pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
         }

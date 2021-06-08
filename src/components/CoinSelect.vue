@@ -2,28 +2,27 @@
   <Modal title="Select a token" :visible="true" :footer="null" @cancel="$emit('onClose')">
     <div class="select-token">
       <input ref="userInput" v-model="keyword" placeholder="Search name or mint address" />
-      <div class="sort fs-container" v-if="!(addUserCoin && tokenList.length != 1)">
+      <div v-if="!addUserCoin" class="sort fs-container">
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
-      <div class="token-list" v-if="!(addUserCoin && tokenList.length != 1)">
+      <div v-if="!addUserCoin" class="token-list">
         <template v-for="token in tokenList">
           <div
+            v-if="
+              (token.showDefault || (token.mintAddress === keyword && token.cache !== true)) &&
+              token.mintAddress !== 'So11111111111111111111111111111111111111112'
+            "
             :key="token.symbol"
             class="token-info"
             @click="$emit('onSelect', token)"
-            v-if="
-              (token.showDefault || token.mintAddress === keyword) &&
-              token.mintAddress !== 'So11111111111111111111111111111111111111112'
-            "
           >
             <img :src="importIcon(`/coins/${token.symbol.toLowerCase()}.png`)" />
             <div>
               <span>{{ token.symbol }}</span>
-              <span style="margin-left: 10px" v-if="!token.official">User Added</span>
+              <span v-if="!token.official" style="margin-left: 10px">User Added</span>
               <button
                 v-if="!token.official"
-                @click="delUserMintToLocal(token.mintAddress)"
                 style="
                   margin: 0 10px;
                   color: rgb(90, 196, 190);
@@ -32,10 +31,12 @@
                   padding: 0;
                   border: 0 solid transparent;
                 "
+                @click="delUserMintToLocal(token.mintAddress)"
               >
                 (Remove)
               </button>
               <button
+                v-if="!token.showDefault && token.mintAddress === keyword"
                 style="
                   margin: 0 10px;
                   color: rgb(90, 196, 190);
@@ -44,7 +45,6 @@
                   padding: 0;
                   border: 0 solid transparent;
                 "
-                v-if="!token.showDefault && token.mintAddress === keyword"
                 @click="addSolanaCoin"
               >
                 Add
@@ -63,17 +63,15 @@
           </div>
         </template>
       </div>
-
-      <div class="sort fs-container" v-if="addUserCoin && tokenList.length != 1">
+      <div v-if="addUserCoin" class="sort fs-container">
         <span class="title">Create a name for this token</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
-      <div class="token-list" v-if="addUserCoin && tokenList.length != 1">
-        <div><input placeholder="Input Name" v-model="userInputCoinName" style="width: 100%; height: 10px" /></div>
+      <div v-if="addUserCoin" class="token-list">
+        <div><input v-model="userInputCoinName" placeholder="Input Name" style="width: 100%; height: 10px" /></div>
         <div style="margin: 5px 0">
           Located from mint address
           <button
-            @click="addUserMintToLocal"
             style="
               margin: 0 10px;
               color: rgb(90, 196, 190);
@@ -82,6 +80,7 @@
               padding: 0;
               border: 0 solid transparent;
             "
+            @click="addUserMintToLocal"
           >
             (Add to token list)
           </button>
@@ -182,10 +181,10 @@ export default Vue.extend({
       }
       window.localStorage.user_add_coin_mint = newMintList.join('---')
       // TOKENS
-      const tokensName = Object.values(TOKENS).find((item) => item.mintAddress === mintAddress)
+      const tokensName = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === mintAddress)
 
       if (tokensName) {
-        delete TOKENS[tokensName.name]
+        delete TOKENS[tokensName]
       }
       this.$emit('onSelect', null)
       this.$accessor.liquidity.requestInfos()
@@ -203,6 +202,11 @@ export default Vue.extend({
           description: ''
         })
       } else if (this.addUserCoinMint !== null) {
+        const key = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === this.keyword)
+        if (key) {
+          delete TOKENS[key]
+        }
+
         TOKENS[this.userInputCoinName ?? ''] = {
           name: this.userInputCoinName,
           symbol: this.userInputCoinName,
@@ -228,7 +232,7 @@ export default Vue.extend({
 
     async findMint(keyword = '') {
       if (keyword.length === 44) {
-        const hasToken = Object.values(TOKENS).find((item) => item.mintAddress === keyword)
+        const hasToken = Object.values(TOKENS).find((item) => item.mintAddress === keyword && item.cache !== true)
         if (hasToken && hasToken.showDefault) {
           this.keyword = hasToken.symbol
         } else {
