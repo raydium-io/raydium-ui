@@ -183,9 +183,14 @@ export default class Pools extends Vue {
 </style>
 
 <style lang="less">
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
 .pool {
   .card-body {
     overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
