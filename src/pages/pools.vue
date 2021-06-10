@@ -19,7 +19,7 @@
               <img :src="importIcon(`/coins/${pool ? pool.lp.coin.symbol.toLowerCase() : ''}.png`)" />
               <img :src="importIcon(`/coins/${pool ? pool.lp.pc.symbol.toLowerCase() : ''}.png`)" />
             </div>
-            <NuxtLink v-if="row.amm_id" :to="`/liquidity/?ammId=${row.amm_id}`">
+            <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
               {{ pool.name }}
             </NuxtLink>
             <NuxtLink
