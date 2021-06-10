@@ -13,13 +13,19 @@
           </RadioGroup>
         </div>
         <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
-          <span slot="name" slot-scope="text" class="lp-icons">
+          <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
               <img :src="importIcon(`/coins/${pool ? pool.lp.coin.symbol.toLowerCase() : ''}.png`)" />
               <img :src="importIcon(`/coins/${pool ? pool.lp.pc.symbol.toLowerCase() : ''}.png`)" />
             </div>
-            <NuxtLink v-if="pool" :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`">
+            <NuxtLink v-if="row.amm_id" :to="`/liquidity/?ammId=${row.amm_id}`">
+              {{ pool.name }}
+            </NuxtLink>
+            <NuxtLink
+              v-else-if="pool"
+              :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
+            >
               {{ pool.name }}
             </NuxtLink>
             <span v-else>{{ text }}</span>
