@@ -33,7 +33,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(fromCoin.mintAddress)" />
-                  <a :href="`${url.explorer}/address/${fromCoin.mintAddress}`" target="_blank">
+                  <a :href="`${url.explorer}/token/${fromCoin.mintAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(toCoin.mintAddress)" />
-                  <a :href="`${url.explorer}/address/${toCoin.mintAddress}`" target="_blank">
+                  <a :href="`${url.explorer}/token/${toCoin.mintAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -61,10 +61,10 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(marketAddress)" />
-                  <a :href="`${url.explorer}/address/${marketAddress}`" target="_blank" v-if="!officialPool">
+                  <a v-if="!officialPool" :href="`${url.explorer}/account/${marketAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
-                  <a :href="`${url.trade}/${marketAddress}`" target="_blank" v-else>
+                  <a v-else :href="`${url.trade}/${marketAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -78,7 +78,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(ammId)" />
-                  <a :href="`${url.explorer}/address/${ammId}`" target="_blank">
+                  <a :href="`${url.explorer}/account/${ammId}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>

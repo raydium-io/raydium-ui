@@ -33,7 +33,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(fromCoin.mintAddress)" />
-                  <a :href="`${url.explorer}/address/${fromCoin.mintAddress}`" target="_blank">
+                  <a :href="`${url.explorer}/token/${fromCoin.mintAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(toCoin.mintAddress)" />
-                  <a :href="`${url.explorer}/address/${toCoin.mintAddress}`" target="_blank">
+                  <a :href="`${url.explorer}/token/${toCoin.mintAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -61,7 +61,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(lpMintAddress)" />
-                  <a :href="`${url.explorer}/address/${lpMintAddress}`" target="_blank">
+                  <a :href="`${url.explorer}/token/${lpMintAddress}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -75,7 +75,7 @@
                 </div>
                 <div class="action">
                   <Icon type="copy" @click="$accessor.copy(ammId)" />
-                  <a :href="`${url.explorer}/address/${ammId}`" target="_blank">
+                  <a :href="`${url.explorer}/account/${ammId}`" target="_blank">
                     <Icon type="link" />
                   </a>
                 </div>
@@ -103,10 +103,10 @@
     <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
     <AmmIdSelect
       :show="ammIdSelectShow"
-      :liquidityList="ammIdSelectList"
+      :liquidity-list="ammIdSelectList"
+      :user-close="false"
       @onClose="() => (ammIdSelectShow = false)"
       @onSelect="onAmmIdSelect"
-      :userClose="false"
     />
 
     <UnofficialPoolConfirmUser

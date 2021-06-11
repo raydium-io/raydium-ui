@@ -229,7 +229,7 @@
       <Col :span="isMobile ? 24 : 12">
         <div class="flex">
           <a v-for="(link, key) in pool.base.docs" :key="key" class="link" :href="link" target="_blank">{{ key }}</a>
-          <a class="link" :href="`${url.explorer}/address/${pool.base.mintAddress}`" target="_blank">Solana Explorer</a>
+          <a class="link" :href="`${url.explorer}/token/${pool.base.mintAddress}`" target="_blank">SOLSCAN</a>
         </div>
         <p class="details">{{ pool.base.details }}</p>
         <div class="flex">
