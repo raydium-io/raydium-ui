@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
-      <span class="title">Verify</span>
+      <span class="title">Verify Telegram Username</span>
     </div>
 
     <div class="card">
