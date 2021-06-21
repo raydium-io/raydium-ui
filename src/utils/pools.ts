@@ -199,7 +199,7 @@ export function getAddressForWhat(address: string) {
   return {}
 }
 
-export function isOfficalMarket(marketAddress: string) {
+export function isOfficialMarket(marketAddress: string) {
   for (const market of SERUM_MARKETS) {
     if (market.address === marketAddress && !market.deprecated) {
       return true
