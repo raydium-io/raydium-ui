@@ -16,8 +16,10 @@
           <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
-              <img :src="importIcon(`/coins/${pool ? pool.lp.coin.symbol.toLowerCase() : ''}.png`)" />
-              <img :src="importIcon(`/coins/${pool ? pool.lp.pc.symbol.toLowerCase() : ''}.png`)" />
+              <img v-if="pool && pool.lp.coin.picUrl" :src="pool.lp.coin.picUrl" />
+              <img v-else :src="importIcon(`/coins/${pool ? pool.lp.coin.symbol.toLowerCase() : ''}.png`)" />
+              <img v-if="pool && pool.lp.pc.picUrl" :src="pool.lp.pc.picUrl" />
+              <img v-else :src="importIcon(`/coins/${pool ? pool.lp.pc.symbol.toLowerCase() : ''}.png`)" />
             </div>
             <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
               {{ pool.name }}

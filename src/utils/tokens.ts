@@ -960,6 +960,9 @@ function addTokensSolana() {
     .then(function (myJson) {
       const tokens = myJson.tokens
       tokens.forEach((itemToken: any) => {
+        if (itemToken.tags && itemToken.tags.includes('lp-token')) {
+          return
+        }
         if (
           !(
             Object.keys(TOKENS).find(
@@ -973,7 +976,8 @@ function addTokensSolana() {
             mintAddress: itemToken.address,
             decimals: itemToken.decimals,
             official: true,
-            showDefault: false
+            showDefault: false,
+            picUrl: itemToken.logoURI
           }
         }
       })
@@ -983,8 +987,6 @@ function addTokensSolana() {
           Object.keys(TOKENS).forEach((item) => {
             if (TOKENS[item].mintAddress === itemMint) {
               TOKENS[item].showDefault = true
-
-              console.log('add', itemMint)
             }
           })
         })
