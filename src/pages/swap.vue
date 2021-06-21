@@ -369,7 +369,7 @@ import { canWrap, getLiquidityInfoSimilar } from '@/utils/liquidity'
 import {
   getLpListByTokenMintAddresses,
   getPoolListByTokenMintAddresses,
-  isOfficalMarket,
+  isOfficialMarket,
   LiquidityPoolInfo
 } from '@/utils/pools'
 
