@@ -148,8 +148,8 @@ export const actions = actionTree(
           pc.mintAddress = '11111111111111111111111111111111'
         }
         const lp = Object.values(LP_TOKENS).find((item) => item.mintAddress === ammInfo.lpMintAddress) ?? {
-          symbol: `${coin.name}-${pc.name}`,
-          name: `${coin.name}-${pc.name}`,
+          symbol: `${coin.symbol}-${pc.symbol}`,
+          name: `${coin.symbol}-${pc.symbol}`,
           coin,
           pc,
           mintAddress: ammInfo.lpMintAddress.toString(),
@@ -166,7 +166,7 @@ export const actions = actionTree(
         )
 
         const itemLiquidity: LiquidityPoolInfo = {
-          name: `${coin.symbol}-${pc.name}`,
+          name: `${coin.symbol}-${pc.symbol}`,
           coin,
           pc,
           lp,

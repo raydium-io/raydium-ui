@@ -4,7 +4,7 @@
       <Col :span="isMobile ? 24 : 16" class="preview">
         <div class="fs-container">
           <div class="fc-container">
-            <img :src="importIcon(`/coins/${pool.base.symbol.toLowerCase()}.png`)" />
+            <CoinIcon :mint-address="pool.base.mintAddress" />
             <span class="symbol">{{ pool.base.symbol }}</span>
           </div>
           <div>
@@ -152,7 +152,7 @@
               spellcheck="false"
             />
             <div class="icon fc-container">
-              <img :src="importIcon(`/coins/${pool.quote.symbol.toLowerCase()}.png`)" />
+              <CoinIcon :mint-address="pool.quote.mintAddress" />
               <span>{{ pool.quote.symbol }}</span>
             </div>
           </div>

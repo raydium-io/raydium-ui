@@ -52,7 +52,7 @@
         "
       >
         <span slot="name" slot-scope="base" class="icon">
-          <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
+          <CoinIcon :mint-address="base.mintAddress" />
           <span> {{ base.symbol }}</span>
         </span>
         <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
@@ -92,7 +92,6 @@ import { Input, Icon, Radio, Table } from 'ant-design-vue'
 import { filter } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
-import importIcon from '@/utils/import-icon'
 import { IdoPool } from '@/utils/ido'
 
 const RadioGroup = Radio.Group
@@ -198,7 +197,6 @@ export default class AcceleRaytor extends Vue {
   ]
 
   getUnixTs = getUnixTs
-  importIcon = importIcon
 }
 </script>
 

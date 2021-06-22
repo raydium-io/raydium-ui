@@ -47,7 +47,7 @@
             <Row slot="header" class="farm-head" :gutter="0">
               <Col class="lp-icons" :span="8">
                 <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.symbol.toLowerCase()}.png`)" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.mintAddress" />
                 </div>
                 {{ farm.farmInfo.lp.symbol }}
               </Col>
@@ -134,7 +134,6 @@ import { mapState } from 'vuex'
 import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { deposit, withdraw } from '@/utils/stake'
@@ -207,7 +206,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
     TokenAmount,
 
     updateFarms() {

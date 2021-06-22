@@ -3,9 +3,9 @@
     title="Confirm the AMM ID of the pool you wish to trade"
     :visible="show"
     :footer="null"
-    @cancel="$emit('onClose')"
-    :maskClosable="false"
+    :mask-closable="false"
     :closable="false"
+    @cancel="$emit('onClose')"
   >
     <div class="select-token">
       <div class="sort fs-container">
@@ -47,20 +47,23 @@ import { Modal, Button } from 'ant-design-vue'
 Vue.use(Modal)
 
 export default Vue.extend({
-  props: {
-    show: {
-      default: false
-    },
-    liquidityList: {
-      default: []
-    },
-    userClose: {
-      default: false
-    }
-  },
   components: {
     Modal,
     Button
+  },
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
+    liquidityList: {
+      // type: List,
+      default: []
+    },
+    userClose: {
+      type: Boolean,
+      default: false
+    }
   }
 })
 </script>

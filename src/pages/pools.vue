@@ -16,10 +16,8 @@
           <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
-              <img v-if="pool && pool.lp.coin.picUrl" :src="pool.lp.coin.picUrl" />
-              <img v-else :src="importIcon(`/coins/${pool ? pool.lp.coin.symbol.toLowerCase() : ''}.png`)" />
-              <img v-if="pool && pool.lp.pc.picUrl" :src="pool.lp.pc.picUrl" />
-              <img v-else :src="importIcon(`/coins/${pool ? pool.lp.pc.symbol.toLowerCase() : ''}.png`)" />
+              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.coin.mintAddress : ''" />
+              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.pc.mintAddress : ''" />
             </div>
             <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
               {{ pool.name }}
@@ -47,7 +45,6 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Table, Radio } from 'ant-design-vue'
 
-import importIcon from '@/utils/import-icon'
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 
@@ -151,7 +148,6 @@ export default class Pools extends Vue {
   }
 
   getPoolByLpMintAddress = getPoolByLpMintAddress
-  importIcon = importIcon
   TokenAmount = TokenAmount
 }
 </script>

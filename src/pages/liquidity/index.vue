@@ -126,6 +126,7 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="Input"
+          :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
           @onInput="(amount) => (fromCoinAmount = amount)"
@@ -152,6 +153,7 @@
         <CoinInput
           v-model="toCoinAmount"
           label="Input"
+          :mint-address="toCoin ? toCoin.mintAddress : ''"
           :coin-name="toCoin ? toCoin.symbol : ''"
           :balance="toCoin ? toCoin.balance : null"
           @onInput="(amount) => (toCoinAmount = amount)"

@@ -963,16 +963,10 @@ function addTokensSolana() {
         if (itemToken.tags && itemToken.tags.includes('lp-token')) {
           return
         }
-        if (
-          !(
-            Object.keys(TOKENS).find(
-              (itemName) => itemName === itemToken.symbol || TOKENS[itemName].mintAddress === itemToken.address
-            ) || itemToken.address === NATIVE_SOL.mintAddress
-          )
-        ) {
-          TOKENS[itemToken.symbol] = {
+        if (!Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)) {
+          TOKENS[itemToken.symbol + itemToken.address] = {
             symbol: itemToken.symbol,
-            name: itemToken.symbol,
+            name: itemToken.name,
             mintAddress: itemToken.address,
             decimals: itemToken.decimals,
             official: true,

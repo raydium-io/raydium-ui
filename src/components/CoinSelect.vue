@@ -17,7 +17,7 @@
             class="token-info"
             @click="$emit('onSelect', token)"
           >
-            <img :src="importIcon(`/coins/${token.symbol.toLowerCase()}.png`)" />
+            <CoinIcon :mint-address="token.mintAddress" />
             <div>
               <span>{{ token.symbol }}</span>
               <span v-if="!token.official" style="margin-left: 10px">User Added</span>
@@ -95,7 +95,6 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Modal, Icon } from 'ant-design-vue'
 
-import importIcon from '@/utils/import-icon'
 import { TOKENS, TokenInfo, NATIVE_SOL, Tokens } from '@/utils/tokens'
 import { cloneDeep } from 'lodash-es'
 import { PublicKey } from '@solana/web3.js'
@@ -149,8 +148,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
-
     addSolanaCoin() {
       Object.keys(TOKENS).forEach((item) => {
         if (TOKENS[item].mintAddress === this.keyword) {
@@ -240,7 +237,7 @@ export default Vue.extend({
             const acc = await this.$web3.getAccountInfo(new PublicKey(keyword))
             if (acc != null) {
               const mint = MINT_LAYOUT.decode(acc.data)
-              if (mint.initialized === true) {
+              if (mint.initialized === true && this.tokenList.length === 0) {
                 this.addUserCoin = true
                 this.addUserCoinMint = mint
               }
@@ -265,7 +262,6 @@ export default Vue.extend({
 
       for (const symbol of Object.keys(TOKENS)) {
         let tokenInfo = cloneDeep(TOKENS[symbol])
-        tokenInfo.symbol = symbol
 
         const tokenAccount = this.wallet.tokenAccounts[tokenInfo.mintAddress]
 
