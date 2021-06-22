@@ -132,16 +132,16 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
       bestPrice = price
     }
 
-    const orderPcVaule = price * size
+    const orderPcValue = price * size
     worstPrice = price
 
-    if (orderPcVaule >= availablePc) {
+    if (orderPcValue >= availablePc) {
       coinOut += availablePc / price
       availablePc = 0
       break
     } else {
       coinOut += size
-      availablePc -= orderPcVaule
+      availablePc -= orderPcValue
     }
   }
 
