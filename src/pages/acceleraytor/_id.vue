@@ -31,32 +31,38 @@
             <span class="value"> {{ pool.price.toEther() }} {{ pool.quote.symbol }} </span>
             <span class="desc"> Per {{ pool.base.symbol }} </span>
           </div>
-          <div class="state">
-            <span class="value"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            <span class="desc"> Min. allocation </span>
-          </div>
-          <div class="state">
-            <span class="value"> {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            <span class="desc"> Max. allocation </span>
-          </div>
+          <template v-if="pool.version !== 3">
+            <div class="state">
+              <span class="value"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
+              <span class="desc"> Min. allocation </span>
+            </div>
+            <div class="state">
+              <span class="value"> {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}</span>
+              <span class="desc"> Max. allocation </span>
+            </div>
+          </template>
         </div>
         <Progress
           :percent="
             pool.info.quoteTokenDeposited
-              .toEther()
-              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-              .multipliedBy(100)
-              .toNumber()
+              ? pool.info.quoteTokenDeposited
+                  .toEther()
+                  .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                  .multipliedBy(100)
+                  .toNumber()
+              : 0
           "
           status="active"
         >
           <span slot="format">
             {{
               pool.info.quoteTokenDeposited
-                .toEther()
-                .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-                .multipliedBy(100)
-                .toNumber()
+                ? pool.info.quoteTokenDeposited
+                    .toEther()
+                    .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                    .multipliedBy(100)
+                    .toNumber()
+                : 0
             }}%
           </span>
         </Progress>
@@ -225,13 +231,16 @@
     <div class="page-head fs-container">
       <span class="title">Project details</span>
     </div>
+
     <Row class="project-details" :gutter="32">
       <Col :span="isMobile ? 24 : 12">
         <div class="flex">
           <a v-for="(link, key) in pool.base.docs" :key="key" class="link" :href="link" target="_blank">{{ key }}</a>
           <a class="link" :href="`${url.explorer}/token/${pool.base.mintAddress}`" target="_blank">SOLSCAN</a>
         </div>
+
         <p class="details">{{ pool.base.details }}</p>
+
         <div class="flex">
           <a v-for="(link, key) in pool.base.socials" :key="key" class="icon-link" :href="link" target="_blank">
             <img :src="importIcon(`/icons/${key.toLowerCase()}.svg`)" />
@@ -257,7 +266,7 @@
               <span class="key">Price</span>
               <span class="text">{{ pool.price.toEther() }} {{ pool.quote.symbol }}</span>
             </div>
-            <div class="infos flex">
+            <!-- <div class="infos flex">
               <span class="key">Min. purchase limit</span>
               <span class="text"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
             </div>
@@ -287,9 +296,23 @@
               <span class="text">
                 {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
               </span>
-            </div>
+            </div> -->
           </TabPane>
           <TabPane key="token" tab="Token information">
+            <div class="infos flex">
+              <span class="key">Name</span>
+              <span class="text">{{ pool.base.name }}</span>
+            </div>
+            <div class="infos flex">
+              <span class="key">Symbol</span>
+              <span class="text">{{ pool.base.symbol }}</span>
+            </div>
+            <div class="infos flex">
+              <span class="key">Decimals</span>
+              <span class="text">{{ pool.base.decimals }}</span>
+            </div>
+          </TabPane>
+          <TabPane v-if="pool.version === 3" key="lottery" tab="My Lottery">
             <div class="infos flex">
               <span class="key">Name</span>
               <span class="text">{{ pool.base.name }}</span>

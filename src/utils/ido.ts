@@ -18,8 +18,6 @@ import { cloneDeep } from 'lodash-es'
 import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 export interface IdoPoolInfo {
-  poolVersion: number
-
   startTime: number
   endTime: number
   startWithdrawTime: number
@@ -34,19 +32,19 @@ export interface IdoPoolInfo {
 }
 
 export interface IdoLotteryPoolInfo {
-  poolVersion: number
-
   startTime: number
   endTime: number
   startWithdrawTime: number
 
   perUserMaxLottery: number
   perUserMinLottery: number
+  perLotteryNeedMinStake: number
+  perLotteryWorthPcAmount: number
 
   stakePoolId: PublicKey
 
-  minStakeLimit: TokenAmount
-  quoteTokenDeposited: TokenAmount
+  // minStakeLimit: TokenAmount // exist?
+  // quoteTokenDeposited: TokenAmount
 }
 
 export interface IdoUserInfo {

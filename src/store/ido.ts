@@ -100,16 +100,17 @@ export const actions = actionTree(
           if (pool.version === 3) {
             const decoded = IDO_LOTTERY_POOL_INFO_LAYOUT.decode(data)
             pool.info = {
-              poolVersion: pool.version,
               startTime: decoded.startTime.toNumber(),
               endTime: decoded.endTime.toNumber(),
               startWithdrawTime: decoded.startWithdrawTime.toNumber(),
 
-              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
-              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
-              stakePoolId: decoded.stakePoolId,
-              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
-              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+              perUserMaxLottery: decoded.perUserMaxLottery.toNumber(),
+              perUserMinLottery: decoded.perUserMinLottery.toNumber(),
+              perLotteryNeedMinStake: decoded.perLotteryNeedMinStake.toNumber(),
+              perLotteryWorthPcAmount: decoded.perLotteryWorthPcAmount.toNumber(),
+
+              stakePoolId: decoded.stakePoolId
+              // quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
             } as IdoLotteryPoolInfo
             pool.status =
               pool.info.endTime < getUnixTs() / 1000
@@ -120,7 +121,6 @@ export const actions = actionTree(
           } else {
             const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
             pool.info = {
-              poolVersion: pool.version,
               startTime: decoded.startTime.toNumber(),
               endTime: decoded.endTime.toNumber(),
               startWithdrawTime: decoded.startWithdrawTime.toNumber(),
