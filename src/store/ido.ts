@@ -11,11 +11,14 @@ import {
   IDO_POOL_INFO_LAYOUT,
   IDO_USER_INFO_LAYOUT,
   findAssociatedIdoInfoAddress,
-  findAssociatedIdoCheckAddress
+  findAssociatedIdoCheckAddress,
+  IDO_LOTTERY_POOL_INFO_LAYOUT,
+  IdoPoolInfo,
+  IdoLotteryPoolInfo
 } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
-import {getUnixTs} from "@/utils";
+import { getUnixTs } from '@/utils'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -94,20 +97,47 @@ export const actions = actionTree(
 
           const pool = idoPools[poolIndex]
 
-          const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
+          if (pool.version === 3) {
+            const decoded = IDO_LOTTERY_POOL_INFO_LAYOUT.decode(data)
+            pool.info = {
+              poolVersion: pool.version,
+              startTime: decoded.startTime.toNumber(),
+              endTime: decoded.endTime.toNumber(),
+              startWithdrawTime: decoded.startWithdrawTime.toNumber(),
 
-          pool.info = {
-            startTime: decoded.startTime.toNumber(),
-            endTime: decoded.endTime.toNumber(),
-            startWithdrawTime: decoded.startWithdrawTime.toNumber(),
+              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
+              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
+              stakePoolId: decoded.stakePoolId,
+              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
+              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+            } as IdoLotteryPoolInfo
+            pool.status =
+              pool.info.endTime < getUnixTs() / 1000
+                ? 'ended'
+                : pool.info.startTime < getUnixTs() / 1000
+                ? 'open'
+                : 'upcoming'
+          } else {
+            const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
+            pool.info = {
+              poolVersion: pool.version,
+              startTime: decoded.startTime.toNumber(),
+              endTime: decoded.endTime.toNumber(),
+              startWithdrawTime: decoded.startWithdrawTime.toNumber(),
 
-            minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
-            maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
-            stakePoolId: decoded.stakePoolId,
-            minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
-            quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
+              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
+              stakePoolId: decoded.stakePoolId,
+              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
+              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+            } as IdoPoolInfo
+            pool.status =
+              pool.info.endTime < getUnixTs() / 1000
+                ? 'ended'
+                : pool.info.startTime < getUnixTs() / 1000
+                ? 'open'
+                : 'upcoming'
           }
-          pool.status = pool.info.endTime < getUnixTs() / 1000 ? "ended" : pool.info.startTime < getUnixTs() / 1000 ? "open" : "upcoming"
         }
       })
 

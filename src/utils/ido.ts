@@ -4,25 +4,44 @@ import {
   RENT_PROGRAM_ID,
   CLOCK_PROGRAM_ID,
   IDO_PROGRAM_ID,
-  IDO_PROGRAM_ID_V2
+  IDO_PROGRAM_ID_V2,
+  IDO_PROGRAM_ID_V3
 } from './ids'
 import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
 import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
 
 // @ts-ignore
-import { u8, nu64, struct } from 'buffer-layout'
+import { u8, nu64, struct, seq } from 'buffer-layout'
 import { publicKey, u64 } from '@project-serum/borsh'
 import { cloneDeep } from 'lodash-es'
 import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 export interface IdoPoolInfo {
+  poolVersion: number
+
   startTime: number
   endTime: number
   startWithdrawTime: number
 
   minDepositLimit: TokenAmount
   maxDepositLimit: TokenAmount
+
+  stakePoolId: PublicKey
+
+  minStakeLimit: TokenAmount
+  quoteTokenDeposited: TokenAmount
+}
+
+export interface IdoLotteryPoolInfo {
+  poolVersion: number
+
+  startTime: number
+  endTime: number
+  startWithdrawTime: number
+
+  perUserMaxLottery: number
+  perUserMinLottery: number
 
   stakePoolId: PublicKey
 
@@ -49,11 +68,13 @@ export interface IdoPool {
   baseVault: string
   quoteVault: string
 
-  info?: IdoPoolInfo
+  info?: IdoPoolInfo | IdoLotteryPoolInfo
   userInfo?: IdoUserInfo
 
   price: TokenAmount
   raise: TokenAmount
+
+  seedId?: string // it's a string give from backend
 }
 
 export const IDO_POOLS: IdoPool[] = [
@@ -120,6 +141,24 @@ export const IDO_POOLS: IdoPool[] = [
     idoId: '3phgXrkHbMmVLUbUvXPXsnot9WxkdyvVEyiA8odyWY8s',
     baseVault: '2Gxcw4Vo7zGGNg9JxksrWYazcpQTWNi8JdQkF3bF5yaN',
     quoteVault: '6TyVHwiEaDRQCf398QjvC6JLqPzK9REvMiS6DsCWG5o4'
+  },
+  // mock an IDO
+  {
+    base: { ...TOKENS.TEMP1 },
+    quote: { ...TOKENS.TEMP2 },
+
+    price: new TokenAmount(10 /* TEMP */, TOKENS.TEMP2.decimals, false),
+    raise: new TokenAmount(50000 /* TEMP */, TOKENS.TEMP1.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: 'Chg83YR9KVEiQ5vw1uZKC95jVWTquPGuh1y82EdePxBn',
+    baseVault: 'F8cDw5itW5CpeKYz87dFSkEBxc4zzm27jm3MoFrD4yXB',
+    quoteVault: 'Ag6RVnzMHP4foEXinFTb6Kx6cDBDXzudEjpDEoB5J9BK',
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT' // TEMP: where is it in old program?
   }
 ]
 
@@ -143,6 +182,7 @@ export const IDO_POOL_INFO_LAYOUT = struct([
   u64('denominator'),
   u64('quoteTokenDeposited'),
   u64('baseTokenSupply'),
+
   u64('minDepositLimit'),
   u64('maxDepositLimit'),
   u64('minStakeLimit'),
@@ -154,6 +194,39 @@ export const IDO_POOL_INFO_LAYOUT = struct([
   publicKey('stakeProgramId'),
   publicKey('checkProgramId'),
   publicKey('idoOwner')
+])
+
+export const IDO_LOTTERY_POOL_INFO_LAYOUT = struct([
+  u64('status'),
+  u64('nonce'),
+  u64('startTime'),
+  u64('endTime'),
+  u64('startWithdrawTime'),
+  u64('numerator'),
+  u64('denominator'),
+  u64('quoteTokenDeposited'),
+  u64('baseTokenSupply'),
+
+  u64('perUserMaxLottery'),
+  u64('perUserMinLottery'),
+  u64('perLotteryNeedMinStake'),
+  u64('perLotteryWorthPcAmount'),
+
+  u64('totalWinLotteryLimit'),
+  u64('totalDepositUserNumber'),
+  u64('currentLotteryNumber'),
+  seq(publicKey(), 10, 'luckyInfos'),
+  publicKey('quoteTokenMint'),
+  publicKey('baseTokenMint'),
+  publicKey('quoteTokenVault'),
+  publicKey('baseTokenVault'),
+  publicKey('stakePoolId'),
+  publicKey('stakeProgramId'),
+  publicKey('checkProgramId'),
+  publicKey('idoOwner'),
+
+  publicKey('poolSeedId'),
+  seq(publicKey(), 8, 'padding')
 ])
 
 export const IDO_USER_INFO_LAYOUT = struct([
@@ -218,7 +291,7 @@ export async function purchase(
           new PublicKey(poolInfo.snapshotProgramId)
         )
       : await findAssociatedIdoCheckAddress(
-          new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
+          new PublicKey(poolInfo.seedId ?? 'CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
           owner,
           new PublicKey(poolInfo.snapshotProgramId)
         )
@@ -378,6 +451,99 @@ export function claimInstruction(
   return new TransactionInstruction({
     keys,
     programId,
+    data
+  })
+}
+
+/**
+ * jest for activity: lottery (the function will become useless after activity is ended)
+ */
+export function lotteryPurchaseInstruction(options: {
+  programId: PublicKey
+  idoId: PublicKey
+  authority: PublicKey
+  poolPcVault: PublicKey
+  userPcVault: PublicKey
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+  userIdoCheck: PublicKey
+  lotteryNumber: number
+}): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    // system
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    // ido
+    { pubkey: options.idoId, isSigner: false, isWritable: true },
+    { pubkey: options.authority, isSigner: false, isWritable: true },
+    { pubkey: options.poolPcVault, isSigner: false, isWritable: true },
+    // user
+    { pubkey: options.userPcVault, isSigner: false, isWritable: true },
+    { pubkey: options.userIdoInfo, isSigner: false, isWritable: true },
+    { pubkey: options.userOwner, isSigner: true, isWritable: true },
+    { pubkey: options.userIdoCheck, isSigner: false, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 1
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId: options.programId,
+    data
+  })
+}
+
+/**
+ * jest for activity: lottery (the function will become useless after activity is ended)
+ */
+export function lotteryClaimInstruction(options: {
+  programId: PublicKey
+  idoId: PublicKey
+  authority: PublicKey
+  vaultToken: PublicKey
+  userToken: PublicKey
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+}): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    // system
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    // ido
+    { pubkey: options.idoId, isSigner: false, isWritable: true },
+    { pubkey: options.authority, isSigner: false, isWritable: true },
+    { pubkey: options.vaultToken, isSigner: false, isWritable: true },
+    // user
+    { pubkey: options.userToken, isSigner: false, isWritable: true },
+    { pubkey: options.userIdoInfo, isSigner: false, isWritable: true },
+    { pubkey: options.userOwner, isSigner: true, isWritable: true }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 2
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId: options.programId,
     data
   })
 }

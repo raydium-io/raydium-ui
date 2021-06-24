@@ -467,6 +467,24 @@ export const TOKENS: Tokens = {
     referrer: '',
     official: true,
     showDefault: true
+  },
+  TEMP1: {
+    symbol: 'TEMP1',
+    name: 'TEMP1',
+    mintAddress: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT',
+    decimals: 6,
+    referrer: '',
+    official: true,
+    showDefault: true
+  },
+  TEMP2: {
+    symbol: 'TEMP2',
+    name: 'TEMP2',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    decimals: 6,
+    referrer: '',
+    official: true,
+    showDefault: true
   }
 }
 
