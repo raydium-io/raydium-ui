@@ -31,7 +31,17 @@
             <span class="value"> {{ pool.price.toEther() }} {{ pool.quote.symbol }} </span>
             <span class="desc"> Per {{ pool.base.symbol }} </span>
           </div>
-          <template v-if="pool.version !== 3">
+          <template v-if="pool.version === 3">
+            <div class="state">
+              <span class="value"> {{ pool.info.perLotteryWorthQuoteAmount.format() }} {{ pool.quote.symbol }}</span>
+              <span class="desc"> Per Ticket Worth {{ pool.quote.symbol }} </span>
+            </div>
+            <div class="state">
+              <span class="value">Infinit Maybe</span>
+              <span class="desc"> Total Tickets Amount </span>
+            </div>
+          </template>
+          <template v-else>
             <div class="state">
               <span class="value"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
               <span class="desc"> Min. allocation </span>
@@ -76,17 +86,26 @@
             <span class="desc"> Your deposit </span>
           </div>
           <div class="state">
-            <span class="value">
-              {{
-                pool.userInfo && pool.userInfo.deposited
-                  ? pool.userInfo.deposited.wei
-                      .dividedBy(pool.info.quoteTokenDeposited.wei)
-                      .multipliedBy(100)
-                      .toFixed(2)
-                  : 0
-              }}%
-            </span>
-            <span class="desc"> Your share </span>
+            <template v-if="pool.version === 3">
+              <span class="value">
+                <!-- TEMP -->
+                0
+              </span>
+              <span class="desc"> Your deposited lottery count </span>
+            </template>
+            <template v-else>
+              <span class="value">
+                {{
+                  pool.userInfo && pool.userInfo.deposited
+                    ? pool.userInfo.deposited.wei
+                        .dividedBy(pool.info.quoteTokenDeposited.wei)
+                        .multipliedBy(100)
+                        .toFixed(2)
+                    : 0
+                }}%
+              </span>
+              <span class="desc"> Your share </span>
+            </template>
           </div>
           <div class="state">
             <span class="value">
@@ -132,8 +151,12 @@
           </div>
 
           <div class="min-max fc-container">
-            <div @click="value = pool.info.minDepositLimit.fixed()">MIN</div>
-            <div @click="value = pool.info.maxDepositLimit.fixed()">MAX</div>
+            <div :disable="pool.version === 3" class="opacity" @click="value = pool.info.minDepositLimit.fixed()">
+              MIN
+            </div>
+            <div :disable="pool.version === 3" class="opacity" @click="value = pool.info.maxDepositLimit.fixed()">
+              MAX
+            </div>
           </div>
         </div>
         <div v-if="pool.info.endTime > getUnixTs() / 1000" class="deposit">
@@ -248,7 +271,7 @@
         </div>
       </Col>
       <Col :span="isMobile ? 24 : 12">
-        <Tabs>
+        <Tabs class="tab-count-3">
           <TabPane key="pool" tab="Pool information">
             <div class="infos flex">
               <span class="key">Pool opens</span>
@@ -266,14 +289,26 @@
               <span class="key">Price</span>
               <span class="text">{{ pool.price.toEther() }} {{ pool.quote.symbol }}</span>
             </div>
-            <!-- <div class="infos flex">
-              <span class="key">Min. purchase limit</span>
-              <span class="text"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            </div>
-            <div class="infos flex">
-              <span class="key">Max. purchase limit</span>
-              <span class="text"> {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}</span>
-            </div>
+            <template v-if="pool.version === 3">
+              <div class="infos flex">
+                <span class="key">max lottery counts</span>
+                <span class="text"> {{ pool.info.perUserMaxLottery }}</span>
+              </div>
+              <div class="infos flex">
+                <span class="key">min lottery counts</span>
+                <span class="text"> {{ pool.info.perUserMaxLottery }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <div class="infos flex">
+                <span class="key">Min. purchase limit</span>
+                <span class="text"> {{ pool.info.minDepositLimit.format() }} {{ pool.quote.symbol }}</span>
+              </div>
+              <div class="infos flex">
+                <span class="key">Max. purchase limit</span>
+                <span class="text"> {{ pool.info.maxDepositLimit.format() }} {{ pool.quote.symbol }}</span>
+              </div>
+            </template>
             <div class="infos flex">
               <span class="key">Access type</span>
               <span class="text">
@@ -287,11 +322,15 @@
             </div>
             <div class="infos flex">
               <span class="key">Requirements to join</span>
-              <span class="text">
+              <span v-if="pool.version === 3">
+                For full details,
+                <a href="https://raydium.medium.com/synthetify-launching-on-acceleraytor-3755b4903f88">click here</a>
+              </span>
+              <span v-else class="text">
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
               </span>
             </div>
-            <div class="infos flex">
+            <!--<div class="infos flex">
               <span class="key">RAY staking deadline</span>
               <span class="text">
                 {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
@@ -312,18 +351,14 @@
               <span class="text">{{ pool.base.decimals }}</span>
             </div>
           </TabPane>
-          <TabPane v-if="pool.version === 3" key="lottery" tab="My Lottery">
+          <TabPane v-if="pool.version === 3" key="lottery" tab="Tickets Information">
             <div class="infos flex">
-              <span class="key">Name</span>
-              <span class="text">{{ pool.base.name }}</span>
+              <span class="key">Your Tickets</span>
+              <span class="text"></span>
             </div>
             <div class="infos flex">
-              <span class="key">Symbol</span>
-              <span class="text">{{ pool.base.symbol }}</span>
-            </div>
-            <div class="infos flex">
-              <span class="key">Decimals</span>
-              <span class="text">{{ pool.base.decimals }}</span>
+              <span class="key">Your Lucky Tickets</span>
+              <span class="text"></span>
             </div>
           </TabPane>
         </Tabs>
@@ -806,9 +841,12 @@ hr {
   background: #0f1429;
 }
 
-.ant-tabs-nav .ant-tabs-tab {
+.ant-tabs .ant-tabs-tab {
   width: 50%;
   margin: 0;
   text-align: center;
+}
+.ant-tabs.tab-count-3 .ant-tabs-tab {
+  width: 33.3333%;
 }
 </style>

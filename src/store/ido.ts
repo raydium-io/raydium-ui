@@ -104,14 +104,21 @@ export const actions = actionTree(
               endTime: decoded.endTime.toNumber(),
               startWithdrawTime: decoded.startWithdrawTime.toNumber(),
 
+              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals),
+
               perUserMaxLottery: decoded.perUserMaxLottery.toNumber(),
               perUserMinLottery: decoded.perUserMinLottery.toNumber(),
               perLotteryNeedMinStake: decoded.perLotteryNeedMinStake.toNumber(),
-              perLotteryWorthPcAmount: decoded.perLotteryWorthPcAmount.toNumber(),
+              perLotteryWorthQuoteAmount: new TokenAmount(
+                decoded.perLotteryWorthQuoteAmount.toNumber(),
+                pool.quote.decimals
+              ),
+
+              totalWinLotteryLimit: decoded.totalWinLotteryLimit.toNumber(),
 
               stakePoolId: decoded.stakePoolId
-              // quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
             } as IdoLotteryPoolInfo
+
             pool.status =
               pool.info.endTime < getUnixTs() / 1000
                 ? 'ended'

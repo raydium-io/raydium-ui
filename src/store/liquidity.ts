@@ -192,18 +192,6 @@ export const actions = actionTree(
           official: false
         }
         if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
-          console.log(
-            'official false',
-            itemLiquidity.name,
-            itemLiquidity.ammId,
-            itemLiquidity.serumMarket
-            // itemLiquidity.ammId,
-            // lp.mintAddress,
-            // itemLiquidity,
-            // itemLiquidity.serumMarket,
-            // itemLiquidity.ammId,
-            // LIQUIDITY_POOLS.length
-          )
           LIQUIDITY_POOLS.push(itemLiquidity)
         } else {
           for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {

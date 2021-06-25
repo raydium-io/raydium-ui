@@ -39,7 +39,7 @@ export interface IdoLotteryPoolInfo {
   perUserMaxLottery: number
   perUserMinLottery: number
   perLotteryNeedMinStake: number
-  perLotteryWorthPcAmount: number
+  perLotteryWorthQuoteAmount: TokenAmount
 
   stakePoolId: PublicKey
 
@@ -142,11 +142,11 @@ export const IDO_POOLS: IdoPool[] = [
   },
   // mock an IDO
   {
-    base: { ...TOKENS.TEMP1 },
-    quote: { ...TOKENS.TEMP2 },
+    base: { ...TOKENS.SNY },
+    quote: { ...TOKENS.USDC },
 
-    price: new TokenAmount(10 /* TEMP */, TOKENS.TEMP2.decimals, false),
-    raise: new TokenAmount(50000 /* TEMP */, TOKENS.TEMP1.decimals, false),
+    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
 
     version: 3, // just an identify for Lottery activity
     programId: IDO_PROGRAM_ID_V3,
@@ -208,12 +208,16 @@ export const IDO_LOTTERY_POOL_INFO_LAYOUT = struct([
   u64('perUserMaxLottery'),
   u64('perUserMinLottery'),
   u64('perLotteryNeedMinStake'),
-  u64('perLotteryWorthPcAmount'),
+  u64('perLotteryWorthQuoteAmount'),
 
   u64('totalWinLotteryLimit'),
   u64('totalDepositUserNumber'),
   u64('currentLotteryNumber'),
-  seq(publicKey(), 10, 'luckyInfos'),
+  seq(
+    struct([u64('luckyTailDigits'), u64('luckyTailNumber'), u64('luckyWithinNumber'), u64('luckyNumberExist')]),
+    10,
+    'luckyInfos'
+  ),
   publicKey('quoteTokenMint'),
   publicKey('baseTokenMint'),
   publicKey('quoteTokenVault'),
@@ -223,8 +227,7 @@ export const IDO_LOTTERY_POOL_INFO_LAYOUT = struct([
   publicKey('checkProgramId'),
   publicKey('idoOwner'),
 
-  publicKey('poolSeedId'),
-  seq(publicKey(), 8, 'padding')
+  publicKey('poolSeedId')
 ])
 
 export const IDO_USER_INFO_LAYOUT = struct([
