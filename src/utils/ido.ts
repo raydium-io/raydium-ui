@@ -41,6 +41,8 @@ export interface IdoLotteryPoolInfo {
   perLotteryNeedMinStake: number
   perLotteryWorthQuoteAmount: TokenAmount
 
+  currentLotteryNumber: number
+
   stakePoolId: PublicKey
 
   // minStakeLimit: TokenAmount // exist?
@@ -76,6 +78,23 @@ export interface IdoPool {
 }
 
 export const IDO_POOLS: IdoPool[] = [
+  {
+    base: { ...TOKENS.SNY },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: 'Chg83YR9KVEiQ5vw1uZKC95jVWTquPGuh1y82EdePxBn',
+    baseVault: 'F8cDw5itW5CpeKYz87dFSkEBxc4zzm27jm3MoFrD4yXB',
+    quoteVault: 'Ag6RVnzMHP4foEXinFTb6Kx6cDBDXzudEjpDEoB5J9BK',
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT' // TEMP: where is it in old program?
+  },
   {
     base: { ...TOKENS.MER },
     quote: { ...TOKENS.USDC },
@@ -139,24 +158,6 @@ export const IDO_POOLS: IdoPool[] = [
     idoId: '3phgXrkHbMmVLUbUvXPXsnot9WxkdyvVEyiA8odyWY8s',
     baseVault: '2Gxcw4Vo7zGGNg9JxksrWYazcpQTWNi8JdQkF3bF5yaN',
     quoteVault: '6TyVHwiEaDRQCf398QjvC6JLqPzK9REvMiS6DsCWG5o4'
-  },
-  // mock an IDO
-  {
-    base: { ...TOKENS.SNY },
-    quote: { ...TOKENS.USDC },
-
-    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
-
-    version: 3, // just an identify for Lottery activity
-    programId: IDO_PROGRAM_ID_V3,
-    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
-
-    isRayPool: true,
-    idoId: 'Chg83YR9KVEiQ5vw1uZKC95jVWTquPGuh1y82EdePxBn',
-    baseVault: 'F8cDw5itW5CpeKYz87dFSkEBxc4zzm27jm3MoFrD4yXB',
-    quoteVault: 'Ag6RVnzMHP4foEXinFTb6Kx6cDBDXzudEjpDEoB5J9BK',
-    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT' // TEMP: where is it in old program?
   }
 ]
 

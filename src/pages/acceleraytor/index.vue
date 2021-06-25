@@ -58,16 +58,12 @@
         <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
         <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
-            <span>{{ `RAY ${pool.version === 3 ? '?!?!' : pool.info.minStakeLimit.format()} Pool` }}</span>
+            <span>{{ `RAY ${pool.version === 3 ? '' : pool.info.minStakeLimit.format()} Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
         <span slot="allocation" slot-scope="info, pool">
-          {{
-            pool.version === 3
-              ? 100 * pool.info.totalWinLotteryLimit + pool.quote.symbol
-              : pool.info.maxDepositLimit.format() + pool.quote.symbol
-          }}
+          {{ pool.version === 3 ? 'Lottery' : pool.info.maxDepositLimit.format() + pool.quote.symbol }}
         </span>
         <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
         <span slot="filled" slot-scope="info, pool">

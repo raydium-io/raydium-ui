@@ -25,7 +25,7 @@
         <div class="fs-container">
           <div class="state">
             <span class="value"> {{ pool.raise.format() }} {{ pool.base.symbol }} </span>
-            <span class="desc"> Total raise </span>
+            <span class="desc"> Total Raise </span>
           </div>
           <div class="state">
             <span class="value"> {{ pool.price.toEther() }} {{ pool.quote.symbol }} </span>
@@ -34,11 +34,11 @@
           <template v-if="pool.version === 3">
             <div class="state">
               <span class="value"> {{ pool.info.perLotteryWorthQuoteAmount.format() }} {{ pool.quote.symbol }}</span>
-              <span class="desc"> Per Ticket Worth {{ pool.quote.symbol }} </span>
+              <span class="desc"> Allocation Per Winning Ticket </span>
             </div>
             <div class="state">
-              <span class="value">Infinit Maybe</span>
-              <span class="desc"> Total Tickets Amount </span>
+              <span class="value"> {{ pool.info.currentLotteryNumber }} Tickets</span>
+              <span class="desc"> Total Tickets Deposited</span>
             </div>
           </template>
           <template v-else>
@@ -78,22 +78,55 @@
         </Progress>
         <hr />
         <div class="fs-container">
-          <div class="state">
-            <span class="value">
-              {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }}
-              {{ pool.quote.symbol }}
-            </span>
-            <span class="desc"> Your deposit </span>
-          </div>
-          <div class="state">
-            <template v-if="pool.version === 3">
+          <template v-if="pool.version === 3">
+            <div class="state">
               <span class="value">
+                <!-- {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }} -->
+
                 <!-- TEMP -->
-                0
+                {{ eligibleTickets }} Ticket(s)
               </span>
-              <span class="desc"> Your deposited lottery count </span>
-            </template>
-            <template v-else>
+              <span class="desc"> Your Eligible Tickets </span>
+            </div>
+
+            <div class="state">
+              <span class="value"> {{ depositedTickets }} Ticket(s) </span>
+              <span class="desc"> Your Deposited Tickets </span>
+            </div>
+
+            <div class="state">
+              <span class="value"> {{ winningTickets }} Ticket(s) </span>
+              <span class="desc"> Your Winning Tickets </span>
+            </div>
+
+            <div class="state">
+              <span class="value">
+                {{
+                  pool.userInfo && pool.userInfo.deposited
+                    ? gt(pool.info.quoteTokenDeposited.wei, pool.raise.wei.multipliedBy(pool.price.toEther()))
+                      ? new TokenAmount(
+                          pool.userInfo.deposited.wei
+                            .dividedBy(pool.info.quoteTokenDeposited.wei)
+                            .multipliedBy(pool.raise.wei),
+                          pool.base.decimals
+                        ).format()
+                      : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
+                    : 0
+                }}
+                {{ pool.base.symbol }}
+              </span>
+              <span class="desc"> Your allocation </span>
+            </div>
+          </template>
+          <template v-else>
+            <div class="state">
+              <span class="value">
+                {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }}
+                {{ pool.quote.symbol }}
+              </span>
+              <span class="desc"> Your deposit </span>
+            </div>
+            <div class="state">
               <span class="value">
                 {{
                   pool.userInfo && pool.userInfo.deposited
@@ -105,30 +138,34 @@
                 }}%
               </span>
               <span class="desc"> Your share </span>
-            </template>
-          </div>
-          <div class="state">
-            <span class="value">
-              {{
-                pool.userInfo && pool.userInfo.deposited
-                  ? gt(pool.info.quoteTokenDeposited.wei, pool.raise.wei.multipliedBy(pool.price.toEther()))
-                    ? new TokenAmount(
-                        pool.userInfo.deposited.wei
-                          .dividedBy(pool.info.quoteTokenDeposited.wei)
-                          .multipliedBy(pool.raise.wei),
-                        pool.base.decimals
-                      ).format()
-                    : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
-                  : 0
-              }}
-              {{ pool.base.symbol }}
-            </span>
-            <span class="desc"> Your allocation </span>
-          </div>
+            </div>
+            <div class="state">
+              <span class="value">
+                {{
+                  pool.userInfo && pool.userInfo.deposited
+                    ? gt(pool.info.quoteTokenDeposited.wei, pool.raise.wei.multipliedBy(pool.price.toEther()))
+                      ? new TokenAmount(
+                          pool.userInfo.deposited.wei
+                            .dividedBy(pool.info.quoteTokenDeposited.wei)
+                            .multipliedBy(pool.raise.wei),
+                          pool.base.decimals
+                        ).format()
+                      : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
+                    : 0
+                }}
+                {{ pool.base.symbol }}
+              </span>
+              <span class="desc"> Your allocation </span>
+            </div>
+          </template>
         </div>
       </Col>
-      <Col :span="isMobile ? 24 : 8" class="purchase">
-        <div class="fs-container">
+      <Col :span="isMobile ? 24 : 8" class="purchase lottery">
+        <div v-if="pool.version === 3" class="fs-container">
+          <span class="title">Join Lottery</span>
+        </div>
+
+        <div v-else class="fs-container">
           <div class="fs-container">
             <span class="title">Join Pool</span>
             <Tooltip v-if="ido.initialized" placement="bottomRight">
@@ -149,7 +186,6 @@
               />
             </Tooltip>
           </div>
-
           <div class="min-max fc-container">
             <div :disable="pool.version === 3" class="opacity" @click="value = pool.info.minDepositLimit.fixed()">
               MIN
@@ -159,56 +195,141 @@
             </div>
           </div>
         </div>
-        <div v-if="pool.info.endTime > getUnixTs() / 1000" class="deposit">
-          <div class="label fs-container">
-            <span>Deposit</span>
-            <span>
-              {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
-              Balance: {{ wallet.connected ? (tokenAccount ? tokenAccount.balance.fixed() : '0') : '--' }}
-            </span>
-          </div>
-          <div class="input fs-container">
-            <input
-              v-model="value"
-              inputmode="decimal"
-              autocomplete="off"
-              autocorrect="off"
-              placeholder="0.00"
-              type="text"
-              pattern="^[0-9]*[.,]?[0-9]*$"
-              minlength="1"
-              maxlength="79"
-              spellcheck="false"
-            />
-            <div class="icon fc-container">
-              <CoinIcon :mint-address="pool.quote.mintAddress" />
-              <span>{{ pool.quote.symbol }}</span>
+
+        <template v-if="pool.info.endTime > getUnixTs() / 1000">
+          <template v-if="pool.version === 3">
+            <div class="input-box">
+              <div class="label fs-container">
+                <span></span>
+                <span>Eligible Ticket(s): {{ eligibleTickets }} </span>
+              </div>
+              <div class="input fs-container">
+                {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
+                <input
+                  v-model="value"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  autocorrect="off"
+                  placeholder="(ticket amount)"
+                  type="text"
+                  pattern="^[0-9]*[0-9]*$"
+                  minlength="1"
+                  maxlength="79"
+                  spellcheck="false"
+                />
+
+                <div
+                  class="min-max"
+                  @click="value = eligibleTickets < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery"
+                >
+                  MIN
+                </div>
+                <div
+                  class="min-max"
+                  @click="
+                    value =
+                      eligibleTickets > pool.info.perUserMaxLottery ? pool.info.perUserMaxLottery : eligibleTickets
+                  "
+                >
+                  MAX
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+            <div class="input-box">
+              <div class="label fs-container">
+                <span>Deposit</span>
+                <span>
+                  {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
+                  Balance: {{ wallet.connected ? (tokenAccount ? tokenAccount.balance.fixed() : '0') : '--' }}
+                </span>
+              </div>
+              <div class="input fs-container">
+                <input
+                  :value="value * pool.info.perLotteryWorthQuoteAmount.toEther()"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  minlength="1"
+                  maxlength="79"
+                  spellcheck="false"
+                  disabled
+                />
+                <div class="icon fc-container">
+                  <CoinIcon :mint-address="pool.quote.mintAddress" />
+                  <span>{{ pool.quote.symbol }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="input-box">
+              <div class="label fs-container">
+                <span>Deposit</span>
+                <span>
+                  {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
+                  Balance: {{ wallet.connected ? (tokenAccount ? tokenAccount.balance.fixed() : '0') : '--' }}
+                </span>
+              </div>
+              <div class="input fs-container">
+                <input
+                  v-model="value"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  autocorrect="off"
+                  placeholder="0.00"
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  minlength="1"
+                  maxlength="79"
+                  spellcheck="false"
+                />
+                <div class="icon fc-container">
+                  <CoinIcon :mint-address="pool.quote.mintAddress" />
+                  <span>{{ pool.quote.symbol }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
         <Button v-else-if="pool.info.startTime > getUnixTs() / 1000" size="large" ghost disabled> Upcoming </Button>
-        <Button
-          v-else-if="pool.info.endTime < getUnixTs() / 1000 && pool.info.startWithdrawTime > getUnixTs() / 1000"
-          size="large"
-          ghost
-          disabled
-          style="font-size: 13px"
-        >
-          Claim after {{ $dayjs(pool.info.startWithdrawTime * 1000) }}
-        </Button>
-        <Button
-          v-else-if="pool.info.endTime < getUnixTs() / 1000"
-          size="large"
-          ghost
-          :loading="purchasing"
-          :disabled="purchasing"
-          @click="withdraw"
-        >
-          Claim
-        </Button>
+
+        <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
+          <div v-if="pool.version === 3" class="btn-group">
+            <Button size="large" ghost style="font-size: 13px"> Claim {{ pool.quote.symbol }} </Button>
+
+            <Button
+              size="large"
+              ghost
+              :disabled="getUnixTs() / 1000 < pool.info.startWithdrawTime"
+              style="font-size: 13px"
+            >
+              Claim {{ pool.base.symbol }}
+            </Button>
+          </div>
+
+          <template v-else>
+            <Button
+              v-if="getUnixTs() / 1000 < pool.info.startWithdrawTime"
+              size="large"
+              ghost
+              disabled
+              style="font-size: 13px"
+            >
+              Claim after {{ $dayjs(pool.info.startWithdrawTime * 1000) }}
+            </Button>
+
+            <Button v-else size="large" ghost :loading="purchasing" :disabled="purchasing" @click="withdraw">
+              Claim
+            </Button>
+          </template>
+        </template>
+
         <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
           Wallet not eligible for this pool
         </Button>
@@ -330,12 +451,12 @@
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
               </span>
             </div>
-            <!--<div class="infos flex">
+            <div class="infos flex">
               <span class="key">RAY staking deadline</span>
               <span class="text">
                 {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
               </span>
-            </div> -->
+            </div>
           </TabPane>
           <TabPane key="token" tab="Token information">
             <div class="infos flex">
@@ -351,14 +472,12 @@
               <span class="text">{{ pool.base.decimals }}</span>
             </div>
           </TabPane>
-          <TabPane v-if="pool.version === 3" key="lottery" tab="Tickets Information">
-            <div class="infos flex">
-              <span class="key">Your Tickets</span>
-              <span class="text"></span>
+          <TabPane v-if="pool.version === 3" key="tickets" tab="Tickets Information">
+            <div class="infos big-box">
+              <div class="opener">Your Tickets</div>
             </div>
-            <div class="infos flex">
-              <span class="key">Your Lucky Tickets</span>
-              <span class="text"></span>
+            <div class="infos big-box">
+              <div class="opener">Your Lucky Tickets</div>
             </div>
           </TabPane>
         </Tabs>
@@ -415,6 +534,10 @@ export default class AcceleRaytor extends Vue {
   pool = {} as IdoPool
   purchasing = false
 
+  // only for lottery
+  eligibleTickets = 0 // TEMP
+  depositedTickets = 0 // TEMP
+  winningTickets = 0 // TEMP
   @Watch('$accessor.ido.pools', { immediate: true, deep: true })
   onIdoPoolsChanged(pools: any) {
     const { idoId } = this.pool
@@ -686,6 +809,13 @@ hr {
     padding: 24px;
     background: #1c274f;
 
+    &.big-box {
+      color: #00f9bb;
+      text-align: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
     .key,
     .text {
       width: 50%;
@@ -734,7 +864,7 @@ hr {
     }
   }
 
-  .deposit {
+  .input-box {
     margin-top: 24px;
     padding: 16px;
     border: 1px solid rgba(241, 241, 242, 0.75);
@@ -791,6 +921,31 @@ hr {
   button {
     margin-top: 24px;
     width: 100%;
+  }
+}
+.purchase.lottery {
+  padding: 20px 40px;
+  .min-max {
+    margin-top: 4px;
+    padding: 0 8px;
+    background: rgba(90, 196, 190, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 8px;
+  }
+  .input-box {
+    margin-top: 16px;
+    padding: 12px 16px;
+  }
+  .input.fs-container {
+    margin-top: 0;
+  }
+  button {
+    margin-top: 16px;
+  }
+  hr {
+    margin: 12px 0;
   }
 }
 </style>

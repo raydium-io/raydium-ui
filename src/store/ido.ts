@@ -115,6 +115,7 @@ export const actions = actionTree(
               ),
 
               totalWinLotteryLimit: decoded.totalWinLotteryLimit.toNumber(),
+              currentLotteryNumber: decoded.currentLotteryNumber.toNumber(),
 
               stakePoolId: decoded.stakePoolId
             } as IdoLotteryPoolInfo
