@@ -90,12 +90,12 @@
             </div>
 
             <div class="state">
-              <span class="value"> {{ depositedTickets }} Ticket(s) </span>
+              <span class="value"> {{ depositedTickets.length }} Ticket(s) </span>
               <span class="desc"> Your Deposited Tickets </span>
             </div>
 
             <div class="state">
-              <span class="value"> {{ winningTickets }} Ticket(s) </span>
+              <span class="value"> {{ winningTickets.length }} Ticket(s) </span>
               <span class="desc"> Your Winning Tickets </span>
             </div>
 
@@ -392,7 +392,7 @@
         </div>
       </Col>
       <Col :span="isMobile ? 24 : 12">
-        <Tabs class="tab-count-3">
+        <Tabs :class="pool.version === 3 ? 'tab-count-3' : 'tab-count-2'">
           <TabPane key="pool" tab="Pool information">
             <div class="infos flex">
               <span class="key">Pool opens</span>
@@ -474,10 +474,20 @@
           </TabPane>
           <TabPane v-if="pool.version === 3" key="tickets" tab="Tickets Information">
             <div class="infos big-box">
-              <div class="opener">Your Tickets</div>
+              <span class="key">Your Tickets</span>
+              <div class="content">
+                <div v-for="item in depositedTickets" :key="item" class="ticket-item">
+                  {{ item }}
+                </div>
+              </div>
             </div>
             <div class="infos big-box">
-              <div class="opener">Your Lucky Tickets</div>
+              <span class="key">Your Winning Tickets</span>
+              <div class="content">
+                <div v-for="item in winningTickets" :key="item" class="ticket-item">
+                  {{ item }}
+                </div>
+              </div>
             </div>
           </TabPane>
         </Tabs>
@@ -536,8 +546,71 @@ export default class AcceleRaytor extends Vue {
 
   // only for lottery
   eligibleTickets = 0 // TEMP
-  depositedTickets = 0 // TEMP
-  winningTickets = 0 // TEMP
+  depositedTickets = [
+    'fake: 9871',
+    'fake: 2301',
+    'fake: 9872',
+    'fake: 2302',
+    'fake: 9873',
+    'fake: 2303',
+    'fake: 9874',
+    'fake: 2304',
+    'fake: 9875',
+    'fake: 2305',
+    'fake: 8332',
+    'fake: 2306',
+    'fake: 19871',
+    'fake: 12301',
+    'fake: 19872',
+    'fake: 12302',
+    'fake: 19873',
+    'fake: 12303',
+    'fake: 19874',
+    'fake: 12304',
+    'fake: 19875',
+    'fake: 12305',
+    'fake: 18332',
+    'fake: 12306',
+    'fake: 29871',
+    'fake: 22301',
+    'fake: 29872',
+    'fake: 22302',
+    'fake: 29873',
+    'fake: 22303',
+    'fake: 29874',
+    'fake: 22304',
+    'fake: 29875',
+    'fake: 22305',
+    'fake: 28332',
+    'fake: 22306',
+    'fake: 39871',
+    'fake: 32301',
+    'fake: 39872',
+    'fake: 32302',
+    'fake: 39873',
+    'fake: 32303',
+    'fake: 39874',
+    'fake: 32304',
+    'fake: 39875',
+    'fake: 32305',
+    'fake: 38332',
+    'fake: 32306',
+    'fake: 49871',
+    'fake: 42301',
+    'fake: 49872',
+    'fake: 42302',
+    'fake: 49873',
+    'fake: 42303',
+    'fake: 49874',
+    'fake: 42304',
+    'fake: 49875',
+    'fake: 42305',
+    'fake: 48332',
+    'fake: 42306'
+  ] // TEMP
+
+  winningTickets = [] // TEMP
+
   @Watch('$accessor.ido.pools', { immediate: true, deep: true })
   onIdoPoolsChanged(pools: any) {
     const { idoId } = this.pool
@@ -809,13 +882,6 @@ hr {
     padding: 24px;
     background: #1c274f;
 
-    &.big-box {
-      color: #00f9bb;
-      text-align: center;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
     .key,
     .text {
       width: 50%;
@@ -823,6 +889,21 @@ hr {
 
     .key {
       font-weight: 600;
+    }
+  }
+  .infos.big-box {
+    display: flex;
+    align-items: flex-start;
+    .key {
+      width: 30%;
+    }
+    .content {
+      // display: inline-block;
+      width: 70%;
+      max-height: 286px;
+      overflow: auto;
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
