@@ -1,7 +1,7 @@
 <template>
   <div class="accele-raytor-project container">
     <Row>
-      <Col :span="isMobile ? 24 : 16" class="preview">
+      <Col :span="isMobile ? 24 : 16" :class="`preview ${pool.version === 3 ? 'lottery' : ''}`">
         <div class="fs-container">
           <div class="fc-container">
             <CoinIcon :mint-address="pool.base.mintAddress" />
@@ -765,6 +765,9 @@ hr {
     }
   }
 }
+.preview.lottery {
+  min-height: 425px;
+}
 
 .access {
   .community,
@@ -953,7 +956,8 @@ hr {
   }
 }
 .purchase.lottery {
-  padding: 20px 40px;
+  padding: 25px 40px;
+  min-height: 425px;
   .min-max {
     div {
       padding: 0 8px;
