@@ -80,11 +80,7 @@
         <div class="fs-container">
           <template v-if="pool.version === 3">
             <div class="state">
-              <span class="value">
-                <!-- {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }} -->
-
-                {{ eligibleTicketAmount }} Ticket(s)
-              </span>
+              <span class="value"> {{ eligibleTicketAmount }} Ticket(s) </span>
               <span class="desc"> Your Eligible Tickets </span>
             </div>
 
@@ -555,20 +551,23 @@ export default class AcceleRaytor extends Vue {
     return begin && end ? Array.from({ length: end - begin + 1 }, (_, i) => begin + i) : []
   }
 
-  whetherWin(ticketNumber: number): boolean {
+  isTicketWin(ticketNumber: number): boolean {
     const luckyInfos = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
-    return luckyInfos.some(({ luckyTailDigits, luckyTailNumber, luckyWithinNumber }) => {
+    const isTargeted = luckyInfos.some(({ luckyTailDigits, luckyTailNumber, luckyWithinNumber }) => {
       if (!luckyTailDigits || ticketNumber > luckyWithinNumber) return false
       return String(ticketNumber).padStart(luckyTailNumber, '0').endsWith(String(luckyTailNumber))
     })
+    return this.getWinProperty() < 0.5 ? isTargeted : !isTargeted
+  }
+
+  getWinProperty(): number {
+    const luckyInfos = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
+    const totalWinAmount = luckyInfos.reduce((acc, { luckyNumberExist }) => acc + luckyNumberExist, 0)
+    return totalWinAmount / (this.pool.info as IdoLotteryPoolInfo).totalWinLotteryLimit
   }
 
   get winningTickets() {
-    // const luckyInfos = this.pool.lu
-    // this.depositedTickets
-    const totelWinningTickets: never[] = []
-
-    return totelWinningTickets
+    return this.depositedTickets.filter((ticket) => this.isTicketWin(ticket))
   }
 
   @Watch('$accessor.ido.pools', { immediate: true, deep: true })

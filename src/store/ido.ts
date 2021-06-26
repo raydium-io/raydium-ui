@@ -103,12 +103,15 @@ export const actions = actionTree(
           if (pool.version === 3) {
             const decoded = IDO_LOTTERY_POOL_INFO_LAYOUT.decode(data)
             pool.info = {
+              status: decoded.status.toNumber(),
+              nonce: decoded.nonce.toNumber(),
               startTime: decoded.startTime.toNumber(),
               endTime: decoded.endTime.toNumber(),
               startWithdrawTime: decoded.startWithdrawTime.toNumber(),
-
+              numerator: decoded.numerator.toNumber(),
+              denominator: decoded.denominator.toNumber(),
               quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals),
-
+              baseTokenSupply: new TokenAmount(decoded.baseTokenSupply.toNumber(), pool.base.decimals),
               perUserMaxLottery: decoded.perUserMaxLottery.toNumber(),
               perUserMinLottery: decoded.perUserMinLottery.toNumber(),
               perLotteryNeedMinStake: decoded.perLotteryNeedMinStake.toNumber(),
@@ -116,14 +119,21 @@ export const actions = actionTree(
                 decoded.perLotteryWorthQuoteAmount.toNumber(),
                 pool.quote.decimals
               ),
-
               totalWinLotteryLimit: decoded.totalWinLotteryLimit.toNumber(),
+              totalDepositUserNumber: decoded.totalDepositUserNumber.toNumber(),
               currentLotteryNumber: decoded.currentLotteryNumber.toNumber(),
               luckyInfos: decoded.luckyInfos.map((obj: any[]) =>
                 Object.entries(obj).reduce((acc, [key, value]) => ({ ...acc, [key]: value.toNumber() }), {})
               ),
-
-              stakePoolId: decoded.stakePoolId
+              quoteTokenMint: decoded.quoteTokenMint,
+              baseTokenMint: decoded.baseTokenMint,
+              quoteTokenVault: decoded.quoteTokenVault,
+              baseTokenVault: decoded.baseTokenVault,
+              stakePoolId: decoded.stakePoolId,
+              stakeProgramId: decoded.stakeProgramId,
+              checkProgramId: decoded.checkProgramId,
+              idoOwner: decoded.idoOwner,
+              poolSeedId: decoded.poolSeedId
             } as IdoLotteryPoolInfo
           } else {
             const decoded = IDO_POOL_INFO_LAYOUT.decode(data)

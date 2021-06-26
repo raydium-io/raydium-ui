@@ -32,15 +32,23 @@ export interface IdoPoolInfo {
 }
 
 export interface IdoLotteryPoolInfo {
+  status: number
+  nonce: number
   startTime: number
   endTime: number
   startWithdrawTime: number
+  numerator: number
+  denominator: number
+  quoteTokenDeposited: TokenAmount
+  baseTokenSupply: TokenAmount
 
   perUserMaxLottery: number
   perUserMinLottery: number
   perLotteryNeedMinStake: number
   perLotteryWorthQuoteAmount: TokenAmount
 
+  totalWinLotteryLimit: number
+  totalDepositUserNumber: number
   currentLotteryNumber: number
   luckyInfos: Array<{
     luckyTailDigits: number
@@ -49,10 +57,15 @@ export interface IdoLotteryPoolInfo {
     luckyNumberExist: number
   }>
 
+  quoteTokenMint: PublicKey
+  baseTokenMint: PublicKey
+  quoteTokenVault: PublicKey
+  baseTokenVault: PublicKey
   stakePoolId: PublicKey
-
-  // minStakeLimit: TokenAmount // exist?
-  // quoteTokenDeposited: TokenAmount
+  stakeProgramId: PublicKey
+  checkProgramId: PublicKey
+  idoOwner: PublicKey
+  poolSeedId: PublicKey
 }
 
 export interface IdoUserInfo {
