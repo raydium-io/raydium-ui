@@ -126,6 +126,15 @@ export const TOKENS: Tokens = {
     official: true,
     showDefault: true
   },
+  USDCTest: {
+    symbol: 'USDCTest',
+    name: 'USDCTest',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    decimals: 6,
+    referrer: '',
+    official: true,
+    showDefault: true
+  },
   WUSDC: {
     symbol: 'WUSDC',
     name: 'Wrapped USDC',
@@ -471,7 +480,8 @@ export const TOKENS: Tokens = {
   SNY: {
     symbol: 'SNY',
     name: 'SNY',
-    mintAddress: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT',
+    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp', // Fake
+    // mintAddress: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT', // true
     decimals: 6,
     referrer: '',
 

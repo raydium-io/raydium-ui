@@ -42,6 +42,12 @@ export interface IdoLotteryPoolInfo {
   perLotteryWorthQuoteAmount: TokenAmount
 
   currentLotteryNumber: number
+  luckyInfos: Array<{
+    luckyTailDigits: number
+    luckyTailNumber: number
+    luckyWithinNumber: number
+    luckyNumberExist: number
+  }>
 
   stakePoolId: PublicKey
 
@@ -52,6 +58,18 @@ export interface IdoLotteryPoolInfo {
 export interface IdoUserInfo {
   deposited: TokenAmount
   snapshoted: boolean
+}
+export interface IdoLotteryUserInfo {
+  deposited: TokenAmount
+  snapshoted: boolean
+
+  eligibleTicketAmount: number
+
+  quoteTokenDeposited: number
+  quoteTokenWithdrawn: number
+  quotTokenWithdrawn: number
+  lotteryBeginNumber: number
+  lotteryEndNumber: number
 }
 
 export interface IdoPool {
@@ -69,7 +87,7 @@ export interface IdoPool {
   quoteVault: string
 
   info?: IdoPoolInfo | IdoLotteryPoolInfo
-  userInfo?: IdoUserInfo
+  userInfo?: IdoUserInfo | IdoLotteryUserInfo
 
   price: TokenAmount
   raise: TokenAmount
@@ -80,7 +98,7 @@ export interface IdoPool {
 export const IDO_POOLS: IdoPool[] = [
   {
     base: { ...TOKENS.SNY },
-    quote: { ...TOKENS.USDC },
+    quote: { ...TOKENS.USDCTest },
 
     price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
     raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
@@ -93,7 +111,7 @@ export const IDO_POOLS: IdoPool[] = [
     idoId: 'Chg83YR9KVEiQ5vw1uZKC95jVWTquPGuh1y82EdePxBn',
     baseVault: 'F8cDw5itW5CpeKYz87dFSkEBxc4zzm27jm3MoFrD4yXB',
     quoteVault: 'Ag6RVnzMHP4foEXinFTb6Kx6cDBDXzudEjpDEoB5J9BK',
-    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT' // TEMP: where is it in old program?
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
   },
   {
     base: { ...TOKENS.MER },
@@ -109,7 +127,8 @@ export const IDO_POOLS: IdoPool[] = [
     isRayPool: true,
     idoId: '3GANPMCSLb1NeQZZ1VNKXHrH5jCyK3DQLr4tmhvkaYng',
     baseVault: 'Hw41WUxQjuEbNK21nBRdoefqVhgWFe6vjJ1CTJXtXryo',
-    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni'
+    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni',
+    seedId: 'CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'
   },
   {
     base: { ...TOKENS.MER },
@@ -125,7 +144,8 @@ export const IDO_POOLS: IdoPool[] = [
     isRayPool: true,
     idoId: 'F5Rk8Eht3JU69146uc9piwmMGCdPwAmYgJKRUaWxhwim',
     baseVault: '3CDLcsVhRReJ4otXhfi2kD2FrppRUqQYtXXZ7LgQrNy5',
-    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven'
+    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven',
+    seedId: 'CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'
   },
   {
     base: { ...TOKENS.MEDIA },
@@ -237,6 +257,20 @@ export const IDO_USER_INFO_LAYOUT = struct([
   publicKey('owner'),
   u64('quoteTokenDeposited')
 ])
+
+export const IDO_LOTTERY_USER_INFO_LAYOUT = struct([
+  u64('state'),
+  publicKey('idoPoolId'),
+  publicKey('owner'),
+
+  u64('quoteTokenDeposited'),
+  u64('quoteTokenWithdrawn'),
+  u64('quotTokenWithdrawn'),
+
+  u64('lotteryBeginNumber'),
+  u64('lotteryEndNumber')
+])
+export const IDO_LOTTERY_SNAPSHOT_DATA_LAYOUT = struct([u64('eligibleTicketAmount')])
 
 export async function findAssociatedIdoInfoAddress(idoId: PublicKey, walletAddress: PublicKey, programId: PublicKey) {
   const { publicKey } = await findProgramAddress(

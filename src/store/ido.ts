@@ -8,13 +8,16 @@ import {
   IDO_POOLS,
   IdoPool,
   IdoUserInfo,
-  IDO_POOL_INFO_LAYOUT,
-  IDO_USER_INFO_LAYOUT,
   findAssociatedIdoInfoAddress,
   findAssociatedIdoCheckAddress,
-  IDO_LOTTERY_POOL_INFO_LAYOUT,
   IdoPoolInfo,
-  IdoLotteryPoolInfo
+  IdoLotteryPoolInfo,
+  IDO_POOL_INFO_LAYOUT,
+  IDO_USER_INFO_LAYOUT,
+  IDO_LOTTERY_POOL_INFO_LAYOUT,
+  IDO_LOTTERY_USER_INFO_LAYOUT,
+  IDO_LOTTERY_SNAPSHOT_DATA_LAYOUT,
+  IdoLotteryUserInfo
 } from '@/utils/ido'
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
@@ -116,6 +119,9 @@ export const actions = actionTree(
 
               totalWinLotteryLimit: decoded.totalWinLotteryLimit.toNumber(),
               currentLotteryNumber: decoded.currentLotteryNumber.toNumber(),
+              luckyInfos: decoded.luckyInfos.map((obj: any[]) =>
+                Object.entries(obj).reduce((acc, [key, value]) => ({ ...acc, [key]: value.toNumber() }), {})
+              ),
 
               stakePoolId: decoded.stakePoolId
             } as IdoLotteryPoolInfo
@@ -160,25 +166,18 @@ export const actions = actionTree(
         const keyLength = keys.length
 
         for (const pool of idoPools) {
-          const { idoId, programId, version, snapshotProgramId } = pool
+          const { idoId, programId, version, snapshotProgramId, seedId } = pool
 
           const userIdoAccount = await findAssociatedIdoInfoAddress(
             new PublicKey(idoId),
             wallet.publicKey,
             new PublicKey(programId)
           )
-          const userIdoCheck =
-            version === 1
-              ? await findAssociatedIdoCheckAddress(
-                  new PublicKey(idoId),
-                  wallet.publicKey,
-                  new PublicKey(snapshotProgramId)
-                )
-              : await findAssociatedIdoCheckAddress(
-                  new PublicKey('CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'),
-                  wallet.publicKey,
-                  new PublicKey(snapshotProgramId)
-                )
+          const userIdoCheck = await findAssociatedIdoCheckAddress(
+            new PublicKey(version === 1 ? idoId : seedId!),
+            wallet.publicKey,
+            new PublicKey(snapshotProgramId)
+          )
 
           publicKeys.push(userIdoAccount, userIdoCheck)
         }
@@ -197,16 +196,31 @@ export const actions = actionTree(
 
             switch (key) {
               case 'idoAccount': {
-                const decoded = IDO_USER_INFO_LAYOUT.decode(data)
                 if (!pool.userInfo) {
                   pool.userInfo = {} as IdoUserInfo
                 }
-                pool.userInfo.deposited = new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+                if (pool.version === 3) {
+                  const decoded = IDO_LOTTERY_USER_INFO_LAYOUT.decode(data)
+                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenDeposited = decoded.quoteTokenDeposited.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).quotTokenWithdrawn = decoded.quotTokenWithdrawn.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryBeginNumber = decoded.lotteryBeginNumber.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryEndNumber = decoded.lotteryEndNumber.toNumber()
+                } else {
+                  const decoded = IDO_USER_INFO_LAYOUT.decode(data)
+                  ;(pool.userInfo as IdoUserInfo).deposited = new TokenAmount(
+                    decoded.quoteTokenDeposited.toNumber(),
+                    pool.quote.decimals
+                  )
+                }
                 break
               }
               case 'idoCheck': {
                 if (!pool.userInfo) {
-                  pool.userInfo = {} as IdoUserInfo
+                  pool.userInfo = {} as IdoLotteryUserInfo
+                }
+                if (pool.version === 3) {
+                  const decoded = IDO_LOTTERY_SNAPSHOT_DATA_LAYOUT.decode(data)
+                  ;(pool.userInfo as IdoLotteryUserInfo).eligibleTicketAmount = decoded.eligibleTicketAmount.toNumber()
                 }
                 pool.userInfo.snapshoted = true
                 break
