@@ -411,7 +411,7 @@
               </div>
               <div class="infos flex">
                 <span class="key">min lottery counts</span>
-                <span class="text"> {{ pool.info.perUserMaxLottery }}</span>
+                <span class="text"> {{ pool.info.perUserMinLottery }}</span>
               </div>
             </template>
             <template v-else>
