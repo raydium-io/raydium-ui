@@ -356,6 +356,14 @@
         <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
         <hr />
         <Alert
+          v-if="pool.version === 3"
+          description="USDC can only be deposited once."
+          type="warning"
+          class="alert-text"
+          show-icon
+          banner
+        />
+        <Alert
           :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
             pool.info.startWithdrawTime * 1000
           ).toString()}`"
