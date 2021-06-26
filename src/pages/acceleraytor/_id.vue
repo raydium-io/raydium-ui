@@ -160,7 +160,7 @@
           </template>
         </div>
       </Col>
-      <Col :span="isMobile ? 24 : 8" class="purchase lottery">
+      <Col :span="isMobile ? 24 : 8" :class="`purchase ${pool.version === 3 ? 'lottery' : ''}`">
         <div v-if="pool.version === 3" class="fs-container">
           <span class="title">Join Lottery</span>
         </div>
@@ -187,12 +187,8 @@
             </Tooltip>
           </div>
           <div class="min-max fc-container">
-            <div :disable="pool.version === 3" class="opacity" @click="value = pool.info.minDepositLimit.fixed()">
-              MIN
-            </div>
-            <div :disable="pool.version === 3" class="opacity" @click="value = pool.info.maxDepositLimit.fixed()">
-              MAX
-            </div>
+            <div @click="value = pool.info.minDepositLimit.fixed()">MIN</div>
+            <div @click="value = pool.info.maxDepositLimit.fixed()">MAX</div>
           </div>
         </div>
 
@@ -218,20 +214,18 @@
                   spellcheck="false"
                 />
 
-                <div
-                  class="min-max"
-                  @click="value = eligibleTickets < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery"
-                >
-                  MIN
-                </div>
-                <div
-                  class="min-max"
-                  @click="
-                    value =
-                      eligibleTickets > pool.info.perUserMaxLottery ? pool.info.perUserMaxLottery : eligibleTickets
-                  "
-                >
-                  MAX
+                <div class="min-max fc-container">
+                  <div @click="value = eligibleTickets < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery">
+                    MIN
+                  </div>
+                  <div
+                    @click="
+                      value =
+                        eligibleTickets > pool.info.perUserMaxLottery ? pool.info.perUserMaxLottery : eligibleTickets
+                    "
+                  >
+                    MAX
+                  </div>
                 </div>
               </div>
             </div>
@@ -1007,13 +1001,10 @@ hr {
 .purchase.lottery {
   padding: 20px 40px;
   .min-max {
-    margin-top: 4px;
-    padding: 0 8px;
-    background: rgba(90, 196, 190, 0.1);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8em;
-    margin-left: 8px;
+    div {
+      padding: 0 8px;
+      font-size: 0.8em;
+    }
   }
   .input-box {
     margin-top: 16px;
