@@ -408,7 +408,7 @@
             <template v-if="pool.version === 3">
               <div class="infos flex">
                 <span class="key">Max winners</span>
-                <span class="text"> 10,500 </span>
+                <span class="text"> {{ pool.info.totalWinLotteryLimit }} </span>
               </div>
             </template>
             <template v-else>
