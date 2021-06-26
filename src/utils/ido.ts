@@ -258,14 +258,21 @@ export async function findAssociatedIdoCheckAddress(
   return publicKey
 }
 
-export async function purchase(
-  connection: Connection,
-  wallet: any,
-  poolInfo: IdoPool,
-  userQuoteTokenAccount: string,
-  stakeInfoAccount: string,
-  amount: string
-) {
+export async function purchase({
+  connection,
+  wallet,
+  poolInfo,
+  userQuoteTokenAccount,
+  stakeInfoAccount,
+  amount
+}: {
+  connection: Connection
+  wallet: any
+  poolInfo: IdoPool
+  userQuoteTokenAccount: string
+  stakeInfoAccount: string
+  amount: string | number
+}) {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo) throw new Error('Miss pool infomations')
 
@@ -299,18 +306,28 @@ export async function purchase(
         )
 
   transaction.add(
-    purchaseInstruction(
-      new PublicKey(poolInfo.programId),
-      new PublicKey(poolInfo.idoId),
-      idoAuthority,
-      new PublicKey(poolInfo.quoteVault),
-      new PublicKey(userQuoteTokenAccount),
-      userIdoInfo,
-      owner,
-      new PublicKey(stakeInfoAccount),
-      userIdoCheck,
-      new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-    )
+    poolInfo.version === 3 // transaction point to lottery
+      ? purchaseInstruction<'3'>(new PublicKey(poolInfo.programId), {
+          idoId: new PublicKey(poolInfo.idoId),
+          authority: idoAuthority,
+          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+          userIdoInfo,
+          userOwner: owner,
+          userIdoCheck,
+          amount: amount as number
+        })
+      : purchaseInstruction(new PublicKey(poolInfo.programId), {
+          idoId: new PublicKey(poolInfo.idoId),
+          authority: idoAuthority,
+          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+          userIdoInfo,
+          userOwner: owner,
+          userStakeInfo: new PublicKey(stakeInfoAccount),
+          userIdoCheck,
+          amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+        })
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -365,18 +382,35 @@ export async function claim(
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
-export function purchaseInstruction(
-  programId: PublicKey,
-  idoId: PublicKey,
-  authority: PublicKey,
-  poolQuoteTokenAccount: PublicKey,
-  userQuoteTokenAccount: PublicKey,
-  userIdoInfo: PublicKey,
-  userOwner: PublicKey,
-  userStakeInfo: PublicKey,
-  userIdoCheck: PublicKey,
-
+interface TranstructionKeys {
+  // ido
+  idoId: PublicKey
+  authority: PublicKey
+  poolQuoteTokenAccount: PublicKey
+  // user
+  userQuoteTokenAccount: PublicKey
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+  userStakeInfo: PublicKey
+  userIdoCheck: PublicKey
   amount: number
+}
+interface TranstructionKeysV3 {
+  // ido
+  idoId: PublicKey
+  authority: PublicKey
+  poolQuoteTokenAccount: PublicKey
+  // user
+  userQuoteTokenAccount: PublicKey
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+  userIdoCheck: PublicKey
+  amount: number
+}
+
+export function purchaseInstruction<Version extends '' | '3' = ''>(
+  programId: PublicKey,
+  transactionKeys: Version extends '3' ? TranstructionKeysV3 : TranstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
@@ -386,23 +420,15 @@ export function purchaseInstruction(
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
-    // ido
-    { pubkey: idoId, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: true },
-    { pubkey: poolQuoteTokenAccount, isSigner: false, isWritable: true },
-    // user
-    { pubkey: userQuoteTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userIdoInfo, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
-    { pubkey: userStakeInfo, isSigner: false, isWritable: true },
-    { pubkey: userIdoCheck, isSigner: false, isWritable: true }
+    // pubkeys
+    ...Object.values(transactionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
   ]
 
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
       instruction: 1,
-      amount
+      amount: transactionKeys.amount
     },
     data
   )
@@ -453,54 +479,6 @@ export function claimInstruction(
   return new TransactionInstruction({
     keys,
     programId,
-    data
-  })
-}
-
-/**
- * jest for activity: lottery (the function will become useless after activity is ended)
- */
-export function lotteryPurchaseInstruction(options: {
-  programId: PublicKey
-  idoId: PublicKey
-  authority: PublicKey
-  poolPcVault: PublicKey
-  userPcVault: PublicKey
-  userIdoInfo: PublicKey
-  userOwner: PublicKey
-  userIdoCheck: PublicKey
-  lotteryNumber: number
-}): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), nu64('amount')])
-
-  const keys = [
-    // system
-    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
-    // ido
-    { pubkey: options.idoId, isSigner: false, isWritable: true },
-    { pubkey: options.authority, isSigner: false, isWritable: true },
-    { pubkey: options.poolPcVault, isSigner: false, isWritable: true },
-    // user
-    { pubkey: options.userPcVault, isSigner: false, isWritable: true },
-    { pubkey: options.userIdoInfo, isSigner: false, isWritable: true },
-    { pubkey: options.userOwner, isSigner: true, isWritable: true },
-    { pubkey: options.userIdoCheck, isSigner: false, isWritable: true }
-  ]
-
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: 1
-    },
-    data
-  )
-
-  return new TransactionInstruction({
-    keys,
-    programId: options.programId,
     data
   })
 }

@@ -664,7 +664,14 @@ export default class AcceleRaytor extends Vue {
       duration: 0
     })
 
-    purchase(conn, wallet, this.pool, userQuoteTokenAccount, stakeInfoAccount, this.value)
+    purchase({
+      connection: conn,
+      wallet,
+      poolInfo: this.pool,
+      userQuoteTokenAccount,
+      stakeInfoAccount,
+      amount: this.value
+    })
       .then((txid) => {
         this.$notify.info({
           key,
@@ -675,14 +682,13 @@ export default class AcceleRaytor extends Vue {
               h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
             ])
         })
-
-        const description = `Join ${this.pool.base.symbol} pool`
+        const description = this.pool.version === 3 ? 'Join lottery' : `Join ${this.pool.base.symbol} pool`
         this.$accessor.transaction.sub({ txid, description })
       })
       .catch((error) => {
         this.$notify.error({
           key,
-          message: 'Join pool failed',
+          message: this.pool.version === 3 ? 'Join lottery failed' : 'Join pool failed',
           description: error.message
         })
       })
