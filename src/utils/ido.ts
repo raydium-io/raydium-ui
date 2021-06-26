@@ -333,13 +333,19 @@ export async function purchase({
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
-export async function claim(
-  connection: Connection,
-  wallet: any,
-  poolInfo: IdoPool,
-  userBaseTokenAccount: string,
+export async function claim({
+  connection,
+  wallet,
+  poolInfo,
+  userBaseTokenAccount,
+  userQuoteTokenAccount
+}: {
+  connection: Connection
+  wallet: any
+  poolInfo: IdoPool
+  userBaseTokenAccount: string
   userQuoteTokenAccount: string
-) {
+}) {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo) throw new Error('Miss pool infomations')
 
@@ -366,23 +372,31 @@ export async function claim(
   )
 
   transaction.add(
-    claimInstruction(
-      new PublicKey(poolInfo.programId),
-      new PublicKey(poolInfo.idoId),
-      idoAuthority,
-      new PublicKey(poolInfo.quoteVault),
-      new PublicKey(poolInfo.baseVault),
-      newUserQuoteTokenAccount,
-      newUserBaseTokenAccount,
-      userIdoInfo,
-      owner
-    )
+    poolInfo.version === 3 // transaction point to lottery
+      ? claimInstruction<'3'>(new PublicKey(poolInfo.programId), {
+          idoId: new PublicKey(poolInfo.idoId),
+          authority: idoAuthority,
+          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+          userQuoteTokenAccount: newUserQuoteTokenAccount,
+          userIdoInfo,
+          userOwner: owner
+        })
+      : claimInstruction(new PublicKey(poolInfo.programId), {
+          idoId: new PublicKey(poolInfo.idoId),
+          authority: idoAuthority,
+          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+          poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
+          userQuoteTokenAccount: newUserQuoteTokenAccount,
+          userBaseTokenAccount: newUserBaseTokenAccount,
+          userIdoInfo,
+          userOwner: owner
+        })
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
-interface TranstructionKeys {
+interface PurchaseInstructionKeys {
   // ido
   idoId: PublicKey
   authority: PublicKey
@@ -395,7 +409,7 @@ interface TranstructionKeys {
   userIdoCheck: PublicKey
   amount: number
 }
-interface TranstructionKeysV3 {
+interface PurchaseInstructionKeysV3 {
   // ido
   idoId: PublicKey
   authority: PublicKey
@@ -407,10 +421,9 @@ interface TranstructionKeysV3 {
   userIdoCheck: PublicKey
   amount: number
 }
-
 export function purchaseInstruction<Version extends '' | '3' = ''>(
   programId: PublicKey,
-  transactionKeys: Version extends '3' ? TranstructionKeysV3 : TranstructionKeys
+  instructionKeys: Version extends '3' ? PurchaseInstructionKeysV3 : PurchaseInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
@@ -421,109 +434,51 @@ export function purchaseInstruction<Version extends '' | '3' = ''>(
     { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
     // pubkeys
-    ...Object.values(transactionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
+    ...Object.values(instructionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
   ]
 
   const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: 1,
-      amount: transactionKeys.amount
-    },
-    data
-  )
+  dataLayout.encode({ instruction: 1, amount: instructionKeys.amount }, data)
 
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data
-  })
+  return new TransactionInstruction({ keys, programId, data })
 }
 
-export function claimInstruction(
-  programId: PublicKey,
-  idoId: PublicKey,
-  authority: PublicKey,
-  poolQuoteTokenAccount: PublicKey,
-  poolBaseTokenAccount: PublicKey,
-  userQuoteTokenAccount: PublicKey,
-  userBaseTokenAccount: PublicKey,
-  userIdoInfo: PublicKey,
+interface ClaimInstructionKeys {
+  // ido
+  idoId: PublicKey
+  authority: PublicKey
+  poolQuoteTokenAccount: PublicKey
+  poolBaseTokenAccount: PublicKey
+  // user
+  userQuoteTokenAccount: PublicKey
+  userBaseTokenAccount: PublicKey
+  userIdoInfo: PublicKey
   userOwner: PublicKey
+}
+interface ClaimInstructionKeysV3 {
+  // ido
+  idoId: PublicKey
+  authority: PublicKey
+  poolQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+  // user
+  userQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+}
+export function claimInstruction<Version extends '' | '3' = ''>(
+  programId: PublicKey,
+  instructionKeys: Version extends '3' ? ClaimInstructionKeysV3 : ClaimInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction')])
 
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
-    // ido
-    { pubkey: idoId, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: true },
-    { pubkey: poolQuoteTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: poolBaseTokenAccount, isSigner: false, isWritable: true },
-    // user
-    { pubkey: userQuoteTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userBaseTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userIdoInfo, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    ...Object.values(instructionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
   ]
 
   const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: 2
-    },
-    data
-  )
+  dataLayout.encode({ instruction: 2 }, data)
 
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data
-  })
-}
-
-/**
- * jest for activity: lottery (the function will become useless after activity is ended)
- */
-export function lotteryClaimInstruction(options: {
-  programId: PublicKey
-  idoId: PublicKey
-  authority: PublicKey
-  vaultToken: PublicKey
-  userToken: PublicKey
-  userIdoInfo: PublicKey
-  userOwner: PublicKey
-}): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), nu64('amount')])
-
-  const keys = [
-    // system
-    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
-    // ido
-    { pubkey: options.idoId, isSigner: false, isWritable: true },
-    { pubkey: options.authority, isSigner: false, isWritable: true },
-    { pubkey: options.vaultToken, isSigner: false, isWritable: true },
-    // user
-    { pubkey: options.userToken, isSigner: false, isWritable: true },
-    { pubkey: options.userIdoInfo, isSigner: false, isWritable: true },
-    { pubkey: options.userOwner, isSigner: true, isWritable: true }
-  ]
-
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: 2
-    },
-    data
-  )
-
-  return new TransactionInstruction({
-    keys,
-    programId: options.programId,
-    data
-  })
+  return new TransactionInstruction({ keys, programId, data })
 }

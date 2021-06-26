@@ -717,7 +717,7 @@ export default class AcceleRaytor extends Vue {
       duration: 0
     })
 
-    claim(conn, wallet, this.pool, userBaseTokenAccount, userQuoteTokenAccount)
+    claim({ connection: conn, wallet, poolInfo: this.pool, userBaseTokenAccount, userQuoteTokenAccount })
       .then((txid) => {
         this.$notify.info({
           key,
