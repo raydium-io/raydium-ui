@@ -360,6 +360,7 @@
             pool.info.startWithdrawTime * 1000
           ).toString()}`"
           type="warning"
+          class="alert-text"
           show-icon
           banner
         />
@@ -406,12 +407,8 @@
             </div>
             <template v-if="pool.version === 3">
               <div class="infos flex">
-                <span class="key">max lottery counts</span>
-                <span class="text"> {{ pool.info.perUserMaxLottery }}</span>
-              </div>
-              <div class="infos flex">
-                <span class="key">min lottery counts</span>
-                <span class="text"> {{ pool.info.perUserMinLottery }}</span>
+                <span class="key">Max winners</span>
+                <span class="text"> 10,500 </span>
               </div>
             </template>
             <template v-else>
@@ -686,6 +683,10 @@ export default class AcceleRaytor extends Vue {
 </script>
 
 <style lang="less" scoped>
+.alert-text {
+  width: 100%;
+  white-space: pre-wrap;
+}
 .accele-raytor-project.container {
   max-width: 1200px;
 }
@@ -963,6 +964,11 @@ hr {
   }
   hr {
     margin: 12px 0;
+  }
+  input::placeholder {
+    font-size: 0.9em;
+    color: white;
+    opacity: 0.5;
   }
 }
 </style>
