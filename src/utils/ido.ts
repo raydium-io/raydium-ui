@@ -354,27 +354,34 @@ export async function purchase({
 
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
-      ? purchaseInstruction<'3'>(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-          userIdoInfo,
-          userOwner: owner,
-          userIdoCheck,
-          amount: amount as number
-        })
-      : purchaseInstruction(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-          userIdoInfo,
-          userOwner: owner,
-          userStakeInfo: new PublicKey(stakeInfoAccount),
-          userIdoCheck,
-          amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-        })
+      ? purchaseInstruction<'3'>(
+          { programId: new PublicKey(poolInfo.programId), amount },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userIdoCheck
+          }
+        )
+      : purchaseInstruction(
+          {
+            programId: new PublicKey(poolInfo.programId),
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+          },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userStakeInfo: new PublicKey(stakeInfoAccount),
+            userIdoCheck
+          }
+        )
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -398,7 +405,6 @@ export async function claim({
 
   const transaction = new Transaction()
   const signers: Account[] = []
-
   const owner = wallet.publicKey
 
   const newUserBaseTokenAccount = userBaseTokenAccount
@@ -420,24 +426,30 @@ export async function claim({
 
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
-      ? claimInstruction<'3'>(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: newUserQuoteTokenAccount,
-          userIdoInfo,
-          userOwner: owner
-        })
-      : claimInstruction(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
-          userQuoteTokenAccount: newUserQuoteTokenAccount,
-          userBaseTokenAccount: newUserBaseTokenAccount,
-          userIdoInfo,
-          userOwner: owner
-        })
+      ? claimInstruction<'3'>(
+          { programId: new PublicKey(poolInfo.programId) },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userTokenAccount: newUserBaseTokenAccount,
+            userIdoInfo,
+            userOwner: owner
+          }
+        )
+      : claimInstruction(
+          { programId: new PublicKey(poolInfo.programId) },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
+            userQuoteTokenAccount: newUserQuoteTokenAccount,
+            userBaseTokenAccount: newUserBaseTokenAccount,
+            userIdoInfo,
+            userOwner: owner
+          }
+        )
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -454,7 +466,6 @@ interface PurchaseInstructionKeys {
   userOwner: PublicKey
   userStakeInfo: PublicKey
   userIdoCheck: PublicKey
-  amount: number
 }
 interface PurchaseInstructionKeysV3 {
   // ido
@@ -466,14 +477,12 @@ interface PurchaseInstructionKeysV3 {
   userIdoInfo: PublicKey
   userOwner: PublicKey
   userIdoCheck: PublicKey
-  amount: number
 }
 export function purchaseInstruction<Version extends '' | '3' = ''>(
-  programId: PublicKey,
+  { programId, amount }: { programId: PublicKey; amount: string | number },
   instructionKeys: Version extends '3' ? PurchaseInstructionKeysV3 : PurchaseInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
-
   const keys = [
     // system
     { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
@@ -485,7 +494,7 @@ export function purchaseInstruction<Version extends '' | '3' = ''>(
   ]
 
   const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode({ instruction: 1, amount: instructionKeys.amount }, data)
+  dataLayout.encode({ instruction: 1, amount: Number(amount) }, data)
 
   return new TransactionInstruction({ keys, programId, data })
 }
@@ -506,14 +515,15 @@ interface ClaimInstructionKeysV3 {
   // ido
   idoId: PublicKey
   authority: PublicKey
-  poolQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+
+  poolTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
   // user
-  userQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+  userTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base? // differernt account in user wallet
   userIdoInfo: PublicKey
   userOwner: PublicKey
 }
 export function claimInstruction<Version extends '' | '3' = ''>(
-  programId: PublicKey,
+  { programId }: { programId: PublicKey },
   instructionKeys: Version extends '3' ? ClaimInstructionKeysV3 : ClaimInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction')])

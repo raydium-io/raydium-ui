@@ -335,32 +335,56 @@
           Wallet not eligible for this pool
         </Button>
         <Button
-          v-else-if="pool.info.startTime < getUnixTs() / 1000"
+          v-else-if="pool.info.startTime < getUnixTs() / 1000 || true /* TEMP: for testing */"
           size="large"
           ghost
           :loading="purchasing"
           :disabled="
             !value ||
-            lt(value, pool.info.minDepositLimit.toEther()) ||
-            gt(value, pool.info.maxDepositLimit.toEther()) ||
+            (pool.version === 3
+              ? eligibleTicketAmount > 0 &&
+                (lt(value, pool.info.perUserMinLottery) || gt(value, pool.info.perUserMaxLottery))
+              : lt(value, pool.info.minDepositLimit.toEther()) || gt(value, pool.info.maxDepositLimit.toEther())) ||
             gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0') ||
             purchasing
           "
           @click="deposit"
         >
           <template v-if="!value">{{ pool.version === 3 ? 'Enter ticket amount' : 'Enter an amount' }}</template>
-          <template v-else-if="lt(value, pool.info.minDepositLimit.toEther())">
-            Min. allocation is {{ pool.info.minDepositLimit.toEther() }} {{ pool.quote.symbol }}
+          <template
+            v-else-if="
+              pool.version === 3
+                ? lt(value, pool.info.perUserMinLottery)
+                : lt(value, pool.info.minDepositLimit.toEther())
+            "
+          >
+            {{
+              pool.version === 3
+                ? `Min. tickets amount is ${pool.info.perUserMinLottery}`
+                : `Min. allocation is ${pool.info.minDepositLimit.toEther()} ${pool.quote.symbol}`
+            }}
           </template>
-          <template v-else-if="gt(value, pool.info.maxDepositLimit.toEther())">
-            Max. allocation is {{ pool.info.maxDepositLimit.toEther() }} {{ pool.quote.symbol }}
+          <template
+            v-else-if="
+              pool.version === 3
+                ? gt(value, pool.info.perUserMaxLottery)
+                : gt(value, pool.info.maxDepositLimit.toEther())
+            "
+          >
+            {{
+              pool.version === 3
+                ? `Max. tickets amount is ${pool.info.perUserMaxLottery}`
+                : `Max. allocation is ${pool.info.maxDepositLimit.toEther()} ${pool.quote.symbol}`
+            }}
           </template>
           <template v-else-if="gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0')">
             Insufficient {{ pool.quote.symbol }} balance
           </template>
           <template v-else>Join {{ pool.version === 3 ? 'Lottery' : 'pool' }}</template>
         </Button>
-        <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
+        <Button v-else size="large" ghost disabled
+          >{{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
+        </Button>
         <hr />
         <Alert
           :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
