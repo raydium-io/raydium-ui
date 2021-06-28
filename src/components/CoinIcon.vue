@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { TOKENS } from '@/utils/tokens'
+import { TOKENS, NATIVE_SOL } from '@/utils/tokens'
 import importIcon from '@/utils/import-icon'
 import Vue from 'vue'
 import { mapState } from 'vuex'
@@ -46,7 +46,12 @@ export default Vue.extend({
   methods: {
     importIcon,
     getCoinPicUrl() {
-      const token = Object.values(TOKENS).find((item) => item.mintAddress === this.mintAddress)
+      let token
+      if (this.mintAddress === NATIVE_SOL.mintAddress) {
+        token = NATIVE_SOL
+      } else {
+        token = Object.values(TOKENS).find((item) => item.mintAddress === this.mintAddress)
+      }
       if (token) {
         this.coinName = token.symbol.toLowerCase()
         if (token.picUrl) {
