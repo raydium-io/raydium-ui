@@ -1,7 +1,7 @@
 <template>
   <div class="accele-raytor-project container">
     <Row>
-      <Col :span="isMobile ? 24 : 16" class="preview">
+      <Col :span="isMobile ? 24 : 16" :class="`preview ${pool.version === 3 ? 'lottery' : ''}`">
         <div class="fs-container">
           <div class="fc-container">
             <CoinIcon :mint-address="pool.base.mintAddress" />
@@ -412,6 +412,14 @@
           >{{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
         </Button>
         <hr />
+        <Alert
+          v-if="pool.version === 3"
+          description="USDC can only be deposited once."
+          type="warning"
+          class="alert-text"
+          show-icon
+          banner
+        />
         <Alert
           :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
             pool.info.startWithdrawTime * 1000
@@ -845,6 +853,9 @@ hr {
     }
   }
 }
+.preview.lottery {
+  min-height: 425px;
+}
 
 .access {
   .community,
@@ -1033,7 +1044,9 @@ hr {
   }
 }
 .purchase.lottery {
-  padding: 20px 40px;
+  padding: 25px 40px;
+  min-height: 425px;
+
   .feedback {
     opacity: 0.6;
     padding: 48px 0 76px;
