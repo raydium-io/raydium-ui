@@ -56,7 +56,27 @@ export default class Nav extends Vue {
   set currentRoute(route) {}
 
   changeRoute({ key }: { key: string }): void {
-    if (!(this as any).navs[key]) {
+    const { from, to, ammId } = this.$route.query
+    if (['swap', 'liquidity'].includes(key) && (ammId || (from && to))) {
+      if (ammId) {
+        this.$router.push({
+          path: `/${key}/`,
+          query: {
+            ammId
+          }
+        })
+      } else if (from && to) {
+        this.$router.push({
+          path: `/${key}/`,
+          query: {
+            from,
+            to
+          }
+        })
+      } else {
+        this.$router.push({ path: `/${key}/` })
+      }
+    } else if (!(this as any).navs[key]) {
       this.$router.push({ path: `/${key}/` })
     }
 
