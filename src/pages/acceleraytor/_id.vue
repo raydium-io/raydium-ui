@@ -81,10 +81,11 @@
           <template v-if="pool.version === 3">
             <div class="state">
               <span class="value">
-                <!-- {{ pool.userInfo && pool.userInfo.deposited ? pool.userInfo.deposited.format() : 0 }} -->
-
-                <!-- TEMP -->
-                {{ eligibleTickets }} Ticket(s)
+                {{
+                  (pool.userInfo && pool.userInfo.eligibleTicketAmount) ||
+                  0 /* i don't know why, but this code will force computed get recalculate */
+                }}
+                Ticket(s)
               </span>
               <span class="desc"> Your Eligible Tickets </span>
             </div>
@@ -165,7 +166,16 @@
           <span class="title">Join Lottery</span>
         </div>
 
-        <div v-else class="fs-container">
+        <Alert
+          v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > getUnixTs() / 1000"
+          description="Note: Users can only deposit once, and cannot add tickets or deposit a second time."
+          type="warning"
+          class="alert-text"
+          show-icon
+          banner
+        />
+
+        <div v-if="pool.version !== 3" class="fs-container">
           <div class="fs-container">
             <span class="title">Join Pool</span>
             <Tooltip v-if="ido.initialized" placement="bottomRight">
@@ -197,7 +207,7 @@
             <div class="input-box">
               <div class="label fs-container">
                 <span></span>
-                <span>Eligible Ticket(s): {{ eligibleTickets }} </span>
+                <span>Eligible Ticket(s): {{ eligibleTicketAmount }} </span>
               </div>
               <div class="input fs-container">
                 {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
@@ -212,16 +222,22 @@
                   minlength="1"
                   maxlength="79"
                   spellcheck="false"
+                  :disabled="Boolean(depositedTickets.length)"
                 />
-
                 <div class="min-max fc-container">
-                  <div @click="value = eligibleTickets < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery">
+                  <div
+                    @click="
+                      value = eligibleTicketAmount < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery
+                    "
+                  >
                     MIN
                   </div>
                   <div
                     @click="
                       value =
-                        eligibleTickets > pool.info.perUserMaxLottery ? pool.info.perUserMaxLottery : eligibleTickets
+                        eligibleTicketAmount > pool.info.perUserMaxLottery
+                          ? pool.info.perUserMaxLottery
+                          : eligibleTicketAmount
                     "
                   >
                     MAX
@@ -295,13 +311,31 @@
 
         <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
           <div v-if="pool.version === 3" class="btn-group">
-            <Button size="large" ghost style="font-size: 13px"> Claim {{ pool.quote.symbol }} </Button>
+            <Button
+              size="large"
+              ghost
+              style="font-size: 13px"
+              :disabled="
+                !(
+                  (
+                    pool.info.status === 2 /* allow user withdraw pc and coin */ || pool.info.status === 3
+                  ) /* allow user withdraw pc */
+                ) || Boolean(pool.userInfo && pool.userInfo.quoteTokenWithdrawn)
+              "
+              @click="withdraw('quote')"
+            >
+              Claim {{ pool.quote.symbol }}
+            </Button>
 
             <Button
               size="large"
               ghost
-              :disabled="getUnixTs() / 1000 < pool.info.startWithdrawTime"
+              :disabled="
+                !(pool.info.status === 2) /* allow user withdraw pc */ ||
+                Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn)
+              "
               style="font-size: 13px"
+              @click="withdraw('base')"
             >
               Claim {{ pool.base.symbol }}
             </Button>
@@ -323,50 +357,81 @@
             </Button>
           </template>
         </template>
-
+        <Button v-else-if="depositedTickets.length > 0" size="large" ghost disabled>
+          You have already deposited
+        </Button>
         <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
           Wallet not eligible for this pool
         </Button>
-        <Button
-          v-else-if="pool.info.startTime < getUnixTs() / 1000"
-          size="large"
-          ghost
-          :loading="purchasing"
-          :disabled="
-            !value ||
-            lt(value, pool.info.minDepositLimit.toEther()) ||
-            gt(value, pool.info.maxDepositLimit.toEther()) ||
-            gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0') ||
-            purchasing
-          "
-          @click="deposit"
-        >
-          <template v-if="!value"> Enter an amount </template>
-          <template v-else-if="lt(value, pool.info.minDepositLimit.toEther())">
-            Min. allocation is {{ pool.info.minDepositLimit.toEther() }} {{ pool.quote.symbol }}
-          </template>
-          <template v-else-if="gt(value, pool.info.maxDepositLimit.toEther())">
-            Max. allocation is {{ pool.info.maxDepositLimit.toEther() }} {{ pool.quote.symbol }}
-          </template>
-          <template v-else-if="gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0')">
-            Insufficient {{ pool.quote.symbol }} balance
-          </template>
-          <template v-else>Join pool</template>
+
+        <template v-else-if="pool.info.startTime < getUnixTs() / 1000">
+          <template v-if="depositedTickets.length"></template>
+          <Button
+            v-else-if="pool.info.startTime < getUnixTs() / 1000"
+            size="large"
+            ghost
+            :loading="purchasing"
+            :disabled="
+              !value ||
+              (pool.version === 3
+                ? eligibleTicketAmount > 0 &&
+                  (lt(value, pool.info.perUserMinLottery) || gt(value, pool.info.perUserMaxLottery))
+                : lt(value, pool.info.minDepositLimit.toEther()) || gt(value, pool.info.maxDepositLimit.toEther())) ||
+              gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0') ||
+              purchasing
+            "
+            @click="deposit"
+          >
+            <template v-if="!value">{{ pool.version === 3 ? 'Enter ticket amount' : 'Enter an amount' }}</template>
+            <template
+              v-else-if="
+                pool.version === 3
+                  ? lt(value, pool.info.perUserMinLottery)
+                  : lt(value, pool.info.minDepositLimit.toEther())
+              "
+            >
+              {{
+                pool.version === 3
+                  ? `Min. tickets amount is ${pool.info.perUserMinLottery}`
+                  : `Min. allocation is ${pool.info.minDepositLimit.toEther()} ${pool.quote.symbol}`
+              }}
+            </template>
+            <template
+              v-else-if="
+                pool.version === 3
+                  ? gt(value, pool.info.perUserMaxLottery)
+                  : gt(value, pool.info.maxDepositLimit.toEther())
+              "
+            >
+              {{
+                pool.version === 3
+                  ? `Max. tickets amount is ${pool.info.perUserMaxLottery}`
+                  : `Max. allocation is ${pool.info.maxDepositLimit.toEther()} ${pool.quote.symbol}`
+              }}
+            </template>
+            <template v-else-if="gt(value, tokenAccount ? tokenAccount.balance.fixed() : '0')">
+              Insufficient {{ pool.quote.symbol }} balance
+            </template>
+            <template v-else>Join {{ pool.version === 3 ? 'Lottery' : 'pool' }}</template>
+          </Button>
+        </template>
+
+        <Button v-else size="large" ghost disabled
+          >{{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
         </Button>
-        <Button v-else size="large" ghost disabled> Upcoming Pool </Button>
         <hr />
         <Alert
-          v-if="pool.version === 3"
-          description="USDC can only be deposited once."
-          type="warning"
-          class="alert-text"
-          show-icon
-          banner
-        />
-        <Alert
-          :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
-            pool.info.startWithdrawTime * 1000
-          ).toString()}`"
+          :description="
+            pool.version === 3
+              ? `Once deposited, ${
+                  pool.quote.symbol
+                } can be claimed after the lottery ends. Token allocations can be claimed after ${$dayjs(
+                  pool.info.startWithdrawTime * 1000
+                ).toString()}`
+              : `${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
+                  pool.info.startWithdrawTime * 1000
+                ).toString()}`
+          "
           type="warning"
           class="alert-text"
           show-icon
@@ -475,17 +540,13 @@
             <div class="infos big-box">
               <span class="key">Your Tickets</span>
               <div class="content">
-                <div v-for="item in depositedTickets" :key="item" class="ticket-item">
-                  {{ item }}
-                </div>
+                <div v-for="item in depositedTickets" :key="item" class="ticket-item">ticket: {{ item }}</div>
               </div>
             </div>
             <div class="infos big-box">
               <span class="key">Your Winning Tickets</span>
               <div class="content">
-                <div v-for="item in winningTickets" :key="item" class="ticket-item">
-                  {{ item }}
-                </div>
+                <div v-for="item in winningTickets" :key="item" class="ticket-item">ticket: {{ item }}</div>
               </div>
             </div>
           </TabPane>
@@ -504,7 +565,7 @@ import { get as safeGet } from 'lodash-es'
 import { getUnixTs } from '@/utils'
 import importIcon from '@/utils/import-icon'
 import { TokenAmount, gt, lt } from '@/utils/safe-math'
-import { IdoPool, purchase, claim } from '@/utils/ido'
+import { IdoPool, purchase, claim, IdoLotteryUserInfo, IdoLotteryPoolInfo } from '@/utils/ido'
 
 const { TabPane } = Tabs
 
@@ -544,10 +605,38 @@ export default class AcceleRaytor extends Vue {
   purchasing = false
 
   // only for lottery
-  eligibleTickets = 0 // TEMP
-  depositedTickets = [] // TEMP
+  get eligibleTicketAmount() {
+    return (this.pool.userInfo as IdoLotteryUserInfo)?.eligibleTicketAmount ?? 0
+  }
 
-  winningTickets = [] // TEMP
+  get depositedTickets() {
+    const begin = (this.pool.userInfo as IdoLotteryUserInfo)?.lotteryBeginNumber
+    const end = (this.pool.userInfo as IdoLotteryUserInfo)?.lotteryEndNumber
+    return begin && end ? Array.from({ length: end - begin + 1 }, (_, i) => begin + i) : []
+  }
+
+  isTicketWin(ticketNumber: number): boolean {
+    const luckyInfos = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
+    const isTargeted = luckyInfos.some(
+      ({ luckyTailDigits, luckyTailNumber, luckyWithinNumber }) =>
+        luckyTailDigits &&
+        ticketNumber <= luckyWithinNumber &&
+        String(ticketNumber)
+          .padStart(luckyTailDigits, '0')
+          .endsWith(String(luckyTailNumber).padStart(luckyTailDigits, '0'))
+    )
+    return this.getWinProperty() < 0.5 ? isTargeted : !isTargeted
+  }
+
+  getWinProperty(): number {
+    const luckyInfos = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
+    const totalWinAmount = luckyInfos.reduce((acc, { luckyNumberExist }) => acc + luckyNumberExist, 0)
+    return totalWinAmount / (this.pool.info as IdoLotteryPoolInfo).currentLotteryNumber
+  }
+
+  get winningTickets() {
+    return this.depositedTickets.filter((ticket) => this.isTicketWin(ticket))
+  }
 
   @Watch('$accessor.ido.pools', { immediate: true, deep: true })
   onIdoPoolsChanged(pools: any) {
@@ -641,7 +730,7 @@ export default class AcceleRaytor extends Vue {
       })
   }
 
-  withdraw() {
+  withdraw(/* this prarmeter is only for lottery */ aim?: 'quote' | 'base') {
     this.purchasing = true
 
     const conn = this.$web3
@@ -661,7 +750,14 @@ export default class AcceleRaytor extends Vue {
       duration: 0
     })
 
-    claim({ connection: conn, wallet, poolInfo: this.pool, userBaseTokenAccount, userQuoteTokenAccount })
+    claim({
+      connection: conn,
+      wallet,
+      poolInfo: this.pool,
+      userBaseTokenAccount,
+      userQuoteTokenAccount,
+      aim: this.pool.version === 3 ? aim : undefined
+    })
       .then((txid) => {
         this.$notify.info({
           key,
@@ -695,6 +791,7 @@ export default class AcceleRaytor extends Vue {
   width: 100%;
   white-space: pre-wrap;
 }
+
 .accele-raytor-project.container {
   max-width: 1200px;
 }
@@ -766,7 +863,7 @@ hr {
   }
 }
 .preview.lottery {
-  min-height: 425px;
+  min-height: 450px;
 }
 
 .access {
@@ -957,7 +1054,11 @@ hr {
 }
 .purchase.lottery {
   padding: 25px 40px;
-  min-height: 425px;
+  min-height: 450px;
+
+  .title {
+    margin-bottom: 8px;
+  }
   .min-max {
     div {
       padding: 0 8px;
@@ -976,6 +1077,10 @@ hr {
   }
   hr {
     margin: 12px 0;
+  }
+  .btn-group {
+    display: flex;
+    gap: 8px;
   }
   input::placeholder {
     font-size: 0.9em;
@@ -1038,5 +1143,7 @@ hr {
 }
 .ant-tabs.tab-count-3 .ant-tabs-tab {
   width: 33.3333%;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>

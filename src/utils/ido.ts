@@ -32,26 +32,57 @@ export interface IdoPoolInfo {
 }
 
 export interface IdoLotteryPoolInfo {
+  status: number
+  nonce: number
   startTime: number
   endTime: number
   startWithdrawTime: number
+  numerator: number
+  denominator: number
+  quoteTokenDeposited: TokenAmount
+  baseTokenSupply: TokenAmount
 
   perUserMaxLottery: number
   perUserMinLottery: number
   perLotteryNeedMinStake: number
   perLotteryWorthQuoteAmount: TokenAmount
 
+  totalWinLotteryLimit: number
+  totalDepositUserNumber: number
   currentLotteryNumber: number
+  luckyInfos: Array<{
+    luckyTailDigits: number
+    luckyTailNumber: number
+    luckyWithinNumber: number
+    luckyNumberExist: number
+  }>
 
+  quoteTokenMint: PublicKey
+  baseTokenMint: PublicKey
+  quoteTokenVault: PublicKey
+  baseTokenVault: PublicKey
   stakePoolId: PublicKey
-
-  // minStakeLimit: TokenAmount // exist?
-  // quoteTokenDeposited: TokenAmount
+  stakeProgramId: PublicKey
+  checkProgramId: PublicKey
+  idoOwner: PublicKey
+  poolSeedId: PublicKey
 }
 
 export interface IdoUserInfo {
   deposited: TokenAmount
   snapshoted: boolean
+}
+export interface IdoLotteryUserInfo {
+  deposited: TokenAmount
+  snapshoted: boolean
+
+  eligibleTicketAmount: number
+
+  quoteTokenDeposited: number
+  quoteTokenWithdrawn: number
+  baseTokenWithdrawn: number
+  lotteryBeginNumber: number
+  lotteryEndNumber: number
 }
 
 export interface IdoPool {
@@ -69,7 +100,7 @@ export interface IdoPool {
   quoteVault: string
 
   info?: IdoPoolInfo | IdoLotteryPoolInfo
-  userInfo?: IdoUserInfo
+  userInfo?: IdoUserInfo | IdoLotteryUserInfo
 
   price: TokenAmount
   raise: TokenAmount
@@ -79,21 +110,21 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
-    base: { ...TOKENS.SNY },
-    quote: { ...TOKENS.USDC },
+    base: { ...TOKENS.SNYTest },
+    quote: { ...TOKENS.USDCTest },
 
-    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
+    price: new TokenAmount(1.5, TOKENS.USDCTest.decimals, false),
+    raise: new TokenAmount(700000, TOKENS.SNYTest.decimals, false),
 
     version: 3, // just an identify for Lottery activity
     programId: IDO_PROGRAM_ID_V3,
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: 'Chg83YR9KVEiQ5vw1uZKC95jVWTquPGuh1y82EdePxBn',
-    baseVault: 'F8cDw5itW5CpeKYz87dFSkEBxc4zzm27jm3MoFrD4yXB',
-    quoteVault: 'Ag6RVnzMHP4foEXinFTb6Kx6cDBDXzudEjpDEoB5J9BK',
-    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT' // TEMP: where is it in old program?
+    idoId: '6SjYkHcSPAxj8bgNbRcZ6Dkwz9etR966aeZ99D7tb3rx',
+    baseVault: '8iFzD5Jdo88G55jBnviJ7QNQsakHcPANUS8ihMCLhFCN',
+    quoteVault: 'H3Yg2kYz44kJxfUNfLEwXdi7Kh9SbceYpuVj2ZeirsTz',
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
   },
   {
     base: { ...TOKENS.MER },
@@ -109,7 +140,8 @@ export const IDO_POOLS: IdoPool[] = [
     isRayPool: true,
     idoId: '3GANPMCSLb1NeQZZ1VNKXHrH5jCyK3DQLr4tmhvkaYng',
     baseVault: 'Hw41WUxQjuEbNK21nBRdoefqVhgWFe6vjJ1CTJXtXryo',
-    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni'
+    quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni',
+    seedId: 'CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'
   },
   {
     base: { ...TOKENS.MER },
@@ -125,7 +157,8 @@ export const IDO_POOLS: IdoPool[] = [
     isRayPool: true,
     idoId: 'F5Rk8Eht3JU69146uc9piwmMGCdPwAmYgJKRUaWxhwim',
     baseVault: '3CDLcsVhRReJ4otXhfi2kD2FrppRUqQYtXXZ7LgQrNy5',
-    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven'
+    quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven',
+    seedId: 'CAQi1pkhRPsCi24uyF6NnGm5Two1Bq2AhrDZrM9Mtfjs'
   },
   {
     base: { ...TOKENS.MEDIA },
@@ -238,6 +271,20 @@ export const IDO_USER_INFO_LAYOUT = struct([
   u64('quoteTokenDeposited')
 ])
 
+export const IDO_LOTTERY_USER_INFO_LAYOUT = struct([
+  u64('state'),
+  publicKey('idoPoolId'),
+  publicKey('owner'),
+
+  u64('quoteTokenDeposited'),
+  u64('quoteTokenWithdrawn'),
+  u64('baseTokenWithdrawn'),
+
+  u64('lotteryBeginNumber'),
+  u64('lotteryEndNumber')
+])
+export const IDO_LOTTERY_SNAPSHOT_DATA_LAYOUT = struct([u64('eligibleTicketAmount')])
+
 export async function findAssociatedIdoInfoAddress(idoId: PublicKey, walletAddress: PublicKey, programId: PublicKey) {
   const { publicKey } = await findProgramAddress(
     [idoId.toBuffer(), walletAddress.toBuffer(), new Uint8Array(Buffer.from('ido_associated_seed', 'utf-8'))],
@@ -307,27 +354,34 @@ export async function purchase({
 
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
-      ? purchaseInstruction<'3'>(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-          userIdoInfo,
-          userOwner: owner,
-          userIdoCheck,
-          amount: amount as number
-        })
-      : purchaseInstruction(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-          userIdoInfo,
-          userOwner: owner,
-          userStakeInfo: new PublicKey(stakeInfoAccount),
-          userIdoCheck,
-          amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-        })
+      ? purchaseInstruction<'3'>(
+          { programId: new PublicKey(poolInfo.programId), amount },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userIdoCheck
+          }
+        )
+      : purchaseInstruction(
+          {
+            programId: new PublicKey(poolInfo.programId),
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+          },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userStakeInfo: new PublicKey(stakeInfoAccount),
+            userIdoCheck
+          }
+        )
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -338,20 +392,26 @@ export async function claim({
   wallet,
   poolInfo,
   userBaseTokenAccount,
-  userQuoteTokenAccount
+  userQuoteTokenAccount,
+  aim
 }: {
   connection: Connection
   wallet: any
   poolInfo: IdoPool
   userBaseTokenAccount: string
   userQuoteTokenAccount: string
+
+  /**
+   * this is only for lottery
+   * the property indicate which coin user want to withdraw
+   */
+  aim?: 'quote' | 'base'
 }) {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo) throw new Error('Miss pool infomations')
 
   const transaction = new Transaction()
   const signers: Account[] = []
-
   const owner = wallet.publicKey
 
   const newUserBaseTokenAccount = userBaseTokenAccount
@@ -370,27 +430,32 @@ export async function claim({
     owner,
     new PublicKey(poolInfo.programId)
   )
-
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
-      ? claimInstruction<'3'>(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: newUserQuoteTokenAccount,
-          userIdoInfo,
-          userOwner: owner
-        })
-      : claimInstruction(new PublicKey(poolInfo.programId), {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
-          userQuoteTokenAccount: newUserQuoteTokenAccount,
-          userBaseTokenAccount: newUserBaseTokenAccount,
-          userIdoInfo,
-          userOwner: owner
-        })
+      ? claimInstruction<'3'>(
+          { programId: new PublicKey(poolInfo.programId) },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolTokenAccount: new PublicKey(aim === 'base' ? poolInfo.baseVault : poolInfo.quoteVault),
+            userTokenAccount: aim === 'base' ? newUserBaseTokenAccount : newUserQuoteTokenAccount,
+            userIdoInfo,
+            userOwner: owner
+          }
+        )
+      : claimInstruction(
+          { programId: new PublicKey(poolInfo.programId) },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
+            userQuoteTokenAccount: newUserQuoteTokenAccount,
+            userBaseTokenAccount: newUserBaseTokenAccount,
+            userIdoInfo,
+            userOwner: owner
+          }
+        )
   )
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -407,7 +472,6 @@ interface PurchaseInstructionKeys {
   userOwner: PublicKey
   userStakeInfo: PublicKey
   userIdoCheck: PublicKey
-  amount: number
 }
 interface PurchaseInstructionKeysV3 {
   // ido
@@ -419,14 +483,12 @@ interface PurchaseInstructionKeysV3 {
   userIdoInfo: PublicKey
   userOwner: PublicKey
   userIdoCheck: PublicKey
-  amount: number
 }
 export function purchaseInstruction<Version extends '' | '3' = ''>(
-  programId: PublicKey,
+  { programId, amount }: { programId: PublicKey; amount: string | number },
   instructionKeys: Version extends '3' ? PurchaseInstructionKeysV3 : PurchaseInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
-
   const keys = [
     // system
     { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
@@ -438,7 +500,7 @@ export function purchaseInstruction<Version extends '' | '3' = ''>(
   ]
 
   const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode({ instruction: 1, amount: instructionKeys.amount }, data)
+  dataLayout.encode({ instruction: 1, amount: Number(amount) }, data)
 
   return new TransactionInstruction({ keys, programId, data })
 }
@@ -459,14 +521,15 @@ interface ClaimInstructionKeysV3 {
   // ido
   idoId: PublicKey
   authority: PublicKey
-  poolQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+
+  poolTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
   // user
-  userQuoteTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base?
+  userTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base? // differernt account in user wallet
   userIdoInfo: PublicKey
   userOwner: PublicKey
 }
 export function claimInstruction<Version extends '' | '3' = ''>(
-  programId: PublicKey,
+  { programId }: { programId: PublicKey },
   instructionKeys: Version extends '3' ? ClaimInstructionKeysV3 : ClaimInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction')])
