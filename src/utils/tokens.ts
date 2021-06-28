@@ -464,7 +464,7 @@ export const TOKENS: Tokens = {
     name: 'TULIP',
     mintAddress: 'TuLipcqtGVXP9XR62wM8WWCm6a9vhLs7T1uoWBk6FDs',
     decimals: 6,
-    referrer: '',
+    referrer: 'Bcw1TvX8jUj6CtY2a7GU2THeYVAudvmT8yzRypVMVsSH',
     official: true,
     showDefault: true
   },
@@ -486,6 +486,15 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/synthetify',
       Medium: 'https://synthetify.medium.com/'
     },
+    official: true,
+    showDefault: true
+  },
+  WOO: {
+    symbol: 'WOO',
+    name: 'Wootrade Network',
+    mintAddress: 'E5rk3nmgLUuKUiS94gg4bpWwWwyjCMtddsAXkTFLtHEy',
+    decimals: 6,
+    referrer: '7UbeAZxpza5zN3QawQ5KsUo88zXvohUncYB9Zk5QCiim',
     official: true,
     showDefault: true
   }
@@ -942,6 +951,15 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.USDC },
 
     mintAddress: '2doeZGLJyACtaG9DCUyqMLtswesfje1hjNA11hMdj6YU',
+    decimals: TOKENS.TULIP.decimals
+  },
+  'WOO-USDC-V4': {
+    symbol: 'WOO-USDC',
+    name: 'WOO-USDC LP',
+    coin: { ...TOKENS.WOO },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7cu42ao8Jgrd5A3y3bNQsCxq5poyGZNmTydkGfJYQfzh',
     decimals: TOKENS.TULIP.decimals
   }
 }
