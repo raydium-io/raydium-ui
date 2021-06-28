@@ -47,7 +47,6 @@ export default Vue.extend({
     importIcon,
     getCoinPicUrl() {
       const token = Object.values(TOKENS).find((item) => item.mintAddress === this.mintAddress)
-      console.log(this.mintAddress, token)
       if (token) {
         this.coinName = token.symbol.toLowerCase()
         if (token.picUrl) {
