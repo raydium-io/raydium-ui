@@ -121,9 +121,9 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: 'CyaS5Q5W8xje5Y6HN8kbRpPRDtJG7xcwSEC5xusXDkuv',
-    baseVault: 'iHmvcVt6Uz66fW2avSRyQCEdozWn4cQ4Ez93RiJefN9',
-    quoteVault: 'D1gx4WGfFHZz4GpJCogPfXCet9aNh5vtPEWf2F99Y9gV',
+    idoId: '6SjYkHcSPAxj8bgNbRcZ6Dkwz9etR966aeZ99D7tb3rx',
+    baseVault: '8iFzD5Jdo88G55jBnviJ7QNQsakHcPANUS8ihMCLhFCN',
+    quoteVault: 'H3Yg2kYz44kJxfUNfLEwXdi7Kh9SbceYpuVj2ZeirsTz',
     seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
   },
   {

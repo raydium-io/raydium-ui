@@ -127,8 +127,8 @@ export const TOKENS: Tokens = {
     showDefault: true
   },
   USDCTest: {
-    symbol: 'USDCTest',
-    name: 'USDCTest',
+    symbol: 'USDC',
+    name: 'USDC',
     mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
     decimals: 6,
     referrer: '',
@@ -499,9 +499,9 @@ export const TOKENS: Tokens = {
     showDefault: true
   },
   SNYTest: {
-    symbol: 'SNYTest',
-    name: 'SNYTest',
-    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp',
+    symbol: 'SNY',
+    name: 'SNY',
+    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
     referrer: '',
 

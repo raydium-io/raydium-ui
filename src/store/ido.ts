@@ -157,7 +157,6 @@ export const actions = actionTree(
               : 'upcoming'
         }
       })
-
       commit('setPools', idoPools)
       logger('Ido pool infomations updated')
       commit('setInitialized')

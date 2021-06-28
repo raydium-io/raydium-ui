@@ -166,7 +166,16 @@
           <span class="title">Join Lottery</span>
         </div>
 
-        <div v-else class="fs-container">
+        <Alert
+          v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > getUnixTs() / 1000"
+          description="Note: Users can only deposit once, and cannot add tickets or deposit a second time."
+          type="warning"
+          class="alert-text"
+          show-icon
+          banner
+        />
+
+        <div v-if="pool.version !== 3" class="fs-container">
           <div class="fs-container">
             <span class="title">Join Pool</span>
             <Tooltip v-if="ido.initialized" placement="bottomRight">
@@ -195,76 +204,73 @@
 
         <template v-if="pool.info.endTime > getUnixTs() / 1000">
           <template v-if="pool.version === 3">
-            <template v-if="depositedTickets.length"><div class="feedback">you have deposited already</div></template>
-            <template v-else>
-              <div class="input-box">
-                <div class="label fs-container">
-                  <span></span>
-                  <span>Eligible Ticket(s): {{ eligibleTicketAmount }} </span>
+            <div class="input-box">
+              <div class="label fs-container">
+                <span></span>
+                <span>Eligible Ticket(s): {{ eligibleTicketAmount }} </span>
+              </div>
+              <div class="input fs-container">
+                {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
+                <input
+                  v-model="value"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  autocorrect="off"
+                  placeholder="(ticket amount)"
+                  type="text"
+                  pattern="^[0-9]*[0-9]*$"
+                  minlength="1"
+                  maxlength="79"
+                  spellcheck="false"
+                  :disabled="Boolean(depositedTickets.length)"
+                />
+                <div class="min-max fc-container">
+                  <div
+                    @click="
+                      value = eligibleTicketAmount < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery
+                    "
+                  >
+                    MIN
+                  </div>
+                  <div
+                    @click="
+                      value =
+                        eligibleTicketAmount > pool.info.perUserMaxLottery
+                          ? pool.info.perUserMaxLottery
+                          : eligibleTicketAmount
+                    "
+                  >
+                    MAX
+                  </div>
                 </div>
-                <div class="input fs-container">
+              </div>
+            </div>
+            <div class="input-box">
+              <div class="label fs-container">
+                <span>Deposit</span>
+                <span>
                   {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
-                  <input
-                    v-model="value"
-                    inputmode="numeric"
-                    autocomplete="off"
-                    autocorrect="off"
-                    placeholder="(ticket amount)"
-                    type="text"
-                    pattern="^[0-9]*[0-9]*$"
-                    minlength="1"
-                    maxlength="79"
-                    spellcheck="false"
-                    :disabled="depositedTickets.length"
-                  />
-                  <div class="min-max fc-container">
-                    <div
-                      @click="
-                        value = eligibleTicketAmount < pool.info.perUserMinLottery ? 0 : pool.info.perUserMinLottery
-                      "
-                    >
-                      MIN
-                    </div>
-                    <div
-                      @click="
-                        value =
-                          eligibleTicketAmount > pool.info.perUserMaxLottery
-                            ? pool.info.perUserMaxLottery
-                            : eligibleTicketAmount
-                      "
-                    >
-                      MAX
-                    </div>
-                  </div>
+                  Balance: {{ wallet.connected ? (tokenAccount ? tokenAccount.balance.fixed() : '0') : '--' }}
+                </span>
+              </div>
+              <div class="input fs-container">
+                <input
+                  :value="value * pool.info.perLotteryWorthQuoteAmount.toEther()"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  minlength="1"
+                  maxlength="79"
+                  spellcheck="false"
+                  disabled
+                />
+                <div class="icon fc-container">
+                  <CoinIcon :mint-address="pool.quote.mintAddress" />
+                  <span>{{ pool.quote.symbol }}</span>
                 </div>
               </div>
-              <div class="input-box">
-                <div class="label fs-container">
-                  <span>Deposit</span>
-                  <span>
-                    {{ void (tokenAccount = safeGet(wallet.tokenAccounts, pool.quote.mintAddress)) }}
-                    Balance: {{ wallet.connected ? (tokenAccount ? tokenAccount.balance.fixed() : '0') : '--' }}
-                  </span>
-                </div>
-                <div class="input fs-container">
-                  <input
-                    :value="value * pool.info.perLotteryWorthQuoteAmount.toEther()"
-                    inputmode="decimal"
-                    placeholder="0.00"
-                    type="text"
-                    pattern="^[0-9]*[.,]?[0-9]*$"
-                    minlength="1"
-                    maxlength="79"
-                    spellcheck="false"
-                    disabled
-                  />
-                  <div class="icon fc-container">
-                    <CoinIcon :mint-address="pool.quote.mintAddress" />
-                    <span>{{ pool.quote.symbol }}</span>
-                  </div>
-                </div>
-              </div>
-            </template>
+            </div>
           </template>
 
           <template v-else>
@@ -325,7 +331,7 @@
               size="large"
               ghost
               :disabled="
-                !(pool.info.status === 3) /* allow user withdraw pc */ ||
+                !(pool.info.status === 2) /* allow user withdraw pc */ ||
                 Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn)
               "
               style="font-size: 13px"
@@ -351,7 +357,9 @@
             </Button>
           </template>
         </template>
-
+        <Button v-else-if="depositedTickets.length > 0" size="large" ghost disabled>
+          You have already deposited
+        </Button>
         <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
           Wallet not eligible for this pool
         </Button>
@@ -413,17 +421,17 @@
         </Button>
         <hr />
         <Alert
-          v-if="pool.version === 3"
-          description="USDC can only be deposited once."
-          type="warning"
-          class="alert-text"
-          show-icon
-          banner
-        />
-        <Alert
-          :description="`${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
-            pool.info.startWithdrawTime * 1000
-          ).toString()}`"
+          :description="
+            pool.version === 3
+              ? `Once deposited, ${
+                  pool.quote.symbol
+                } can be claimed after the lottery ends. Token allocations can be claimed after ${$dayjs(
+                  pool.info.startWithdrawTime * 1000
+                ).toString()}`
+              : `${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
+                  pool.info.startWithdrawTime * 1000
+                ).toString()}`
+          "
           type="warning"
           class="alert-text"
           show-icon
@@ -783,6 +791,7 @@ export default class AcceleRaytor extends Vue {
   width: 100%;
   white-space: pre-wrap;
 }
+
 .accele-raytor-project.container {
   max-width: 1200px;
 }
@@ -854,7 +863,7 @@ hr {
   }
 }
 .preview.lottery {
-  min-height: 425px;
+  min-height: 450px;
 }
 
 .access {
@@ -1045,12 +1054,10 @@ hr {
 }
 .purchase.lottery {
   padding: 25px 40px;
-  min-height: 425px;
+  min-height: 450px;
 
-  .feedback {
-    opacity: 0.6;
-    padding: 48px 0 76px;
-    font-size: 1.5em;
+  .title {
+    margin-bottom: 8px;
   }
   .min-max {
     div {
