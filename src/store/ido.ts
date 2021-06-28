@@ -212,16 +212,16 @@ export const actions = actionTree(
                 if (pool.version === 3) {
                   const decoded = IDO_LOTTERY_USER_INFO_LAYOUT.decode(data)
                   ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenDeposited = decoded.quoteTokenDeposited.toNumber()
-                  ;(pool.userInfo as IdoLotteryUserInfo).quotTokenWithdrawn = decoded.quotTokenWithdrawn.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenWithdrawn = decoded.quoteTokenWithdrawn.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).baseTokenWithdrawn = decoded.baseTokenWithdrawn.toNumber()
                   ;(pool.userInfo as IdoLotteryUserInfo).lotteryBeginNumber = decoded.lotteryBeginNumber.toNumber()
                   ;(pool.userInfo as IdoLotteryUserInfo).lotteryEndNumber = decoded.lotteryEndNumber.toNumber()
-                } else {
-                  const decoded = IDO_USER_INFO_LAYOUT.decode(data)
-                  ;(pool.userInfo as IdoUserInfo).deposited = new TokenAmount(
-                    decoded.quoteTokenDeposited.toNumber(),
-                    pool.quote.decimals
-                  )
                 }
+                const decoded = IDO_USER_INFO_LAYOUT.decode(data)
+                ;(pool.userInfo as IdoUserInfo).deposited = new TokenAmount(
+                  decoded.quoteTokenDeposited.toNumber(),
+                  pool.quote.decimals
+                )
                 break
               }
               case 'idoCheck': {

@@ -80,7 +80,7 @@ export interface IdoLotteryUserInfo {
 
   quoteTokenDeposited: number
   quoteTokenWithdrawn: number
-  quotTokenWithdrawn: number
+  baseTokenWithdrawn: number
   lotteryBeginNumber: number
   lotteryEndNumber: number
 }
@@ -278,7 +278,7 @@ export const IDO_LOTTERY_USER_INFO_LAYOUT = struct([
 
   u64('quoteTokenDeposited'),
   u64('quoteTokenWithdrawn'),
-  u64('quotTokenWithdrawn'),
+  u64('baseTokenWithdrawn'),
 
   u64('lotteryBeginNumber'),
   u64('lotteryEndNumber')
@@ -392,13 +392,20 @@ export async function claim({
   wallet,
   poolInfo,
   userBaseTokenAccount,
-  userQuoteTokenAccount
+  userQuoteTokenAccount,
+  aim
 }: {
   connection: Connection
   wallet: any
   poolInfo: IdoPool
   userBaseTokenAccount: string
   userQuoteTokenAccount: string
+
+  /**
+   * this is only for lottery
+   * the property indicate which coin user want to withdraw
+   */
+  aim?: 'quote' | 'base'
 }) {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo) throw new Error('Miss pool infomations')
@@ -423,7 +430,6 @@ export async function claim({
     owner,
     new PublicKey(poolInfo.programId)
   )
-
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
       ? claimInstruction<'3'>(
@@ -431,8 +437,8 @@ export async function claim({
           {
             idoId: new PublicKey(poolInfo.idoId),
             authority: idoAuthority,
-            poolTokenAccount: new PublicKey(poolInfo.quoteVault),
-            userTokenAccount: newUserBaseTokenAccount,
+            poolTokenAccount: new PublicKey(aim === 'base' ? poolInfo.baseVault : poolInfo.quoteVault),
+            userTokenAccount: aim === 'base' ? newUserBaseTokenAccount : newUserQuoteTokenAccount,
             userIdoInfo,
             userOwner: owner
           }
