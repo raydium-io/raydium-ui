@@ -549,7 +549,7 @@
               <span class="key">Requirements to join</span>
               <span v-if="pool.version === 3">
                 For full details,
-                <a href="https://raydium.medium.com/synthetify-launching-on-acceleraytor-3755b4903f88">click here</a>
+                <a :href="pool.base.detailLink">click here</a>
               </span>
               <span v-else class="text">
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
