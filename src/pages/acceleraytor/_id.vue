@@ -352,7 +352,9 @@
                   (
                     pool.info.status === 2 /* allow user withdraw pc and coin */ || pool.info.status === 3
                   ) /* allow user withdraw pc */
-                ) || !Boolean(pool.userInfo && pool.userInfo.quoteTokenWithdrawn)
+                ) ||
+                !Boolean(pool.userInfo) ||
+                Boolean(pool.userInfo && pool.userInfo.quoteTokenWithdrawn > 0)
               "
               @click="withdraw('quote')"
             >
@@ -367,7 +369,8 @@
                 !(pool.info.status === 2) /* allow user withdraw pc */ ||
                 winningTickets.length === 0 || // have no winning tickets
                 getUnixTs() / 1000 < pool.info.startWithdrawTime ||
-                !Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn)
+                !Boolean(pool.userInfo) ||
+                Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn > 0)
               "
               style="font-size: 13px"
               @click="withdraw('base')"
