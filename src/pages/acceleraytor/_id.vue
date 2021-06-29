@@ -1,5 +1,6 @@
 <template>
   <div class="accele-raytor-project container">
+    <div>status:{{ pool.info.status }}</div>
     <Row>
       <Col :span="isMobile ? 24 : 16" :class="`preview ${pool.version === 3 ? 'lottery' : ''}`">
         <div class="fs-container">
@@ -71,7 +72,7 @@
                     .toEther()
                     .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
                     .multipliedBy(100)
-                    .toNumber()
+                    .toFixed(2)
                 : 0
             }}%
           </span>
@@ -101,7 +102,21 @@
             </div>
 
             <div class="state">
-              <span class="value">
+              <span v-if="pool.version === 3" class="value">
+                {{
+                  pool.userInfo && pool.userInfo.deposited
+                    ? new TokenAmount(
+                        pool.info.perLotteryWorthQuoteAmount.wei
+                          .dividedBy(pool.price.wei)
+                          .multipliedBy(winningTickets.length),
+                        pool.base.decimals,
+                        false
+                      ).format()
+                    : 0
+                }}
+                {{ pool.base.symbol }}
+              </span>
+              <span v-else class="value">
                 {{
                   pool.userInfo && pool.userInfo.deposited
                     ? gt(pool.info.quoteTokenDeposited.wei, pool.raise.wei.multipliedBy(pool.price.toEther()))
@@ -162,8 +177,25 @@
         </div>
       </Col>
       <Col :span="isMobile ? 24 : 8" :class="`purchase ${pool.version === 3 ? 'lottery' : ''}`">
-        <div v-if="pool.version === 3" class="fs-container">
+        <div v-if="pool.version === 3">
           <span class="title">Join Lottery</span>
+          <Tooltip v-if="ido.initialized" placement="bottomRight">
+            <template slot="title">
+              <span>
+                Displayed data will auto-refresh after
+                {{ ido.autoRefreshTime - ido.countdown }} seconds. Click this circle to update manually.
+              </span>
+            </template>
+            <Progress
+              type="circle"
+              :width="20"
+              :stroke-width="10"
+              :percent="(100 / ido.autoRefreshTime) * ido.countdown"
+              :show-info="false"
+              :class="ido.loading ? 'disabled' : ''"
+              @click="$accessor.ido.requestInfos"
+            />
+          </Tooltip>
         </div>
 
         <Alert
@@ -312,6 +344,7 @@
         <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
           <div v-if="pool.version === 3" class="btn-group">
             <Button
+              v-if="pool.info.quoteTokenDeposited.toEther() > 0"
               size="large"
               ghost
               style="font-size: 13px"
@@ -328,10 +361,13 @@
             </Button>
 
             <Button
+              v-if="pool.info.quoteTokenDeposited.toEther() > 0"
               size="large"
               ghost
               :disabled="
                 !(pool.info.status === 2) /* allow user withdraw pc */ ||
+                winningTickets.length === 0 || // have no winning tickets
+                getUnixTs() / 1000 < pool.info.startWithdrawTime ||
                 Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn)
               "
               style="font-size: 13px"
@@ -339,6 +375,8 @@
             >
               Claim {{ pool.base.symbol }}
             </Button>
+
+            <Button v-else size="large" ghost disabled style="font-size: 13px"> You have not deposited </Button>
           </div>
 
           <template v-else>
