@@ -268,7 +268,7 @@ export default class Wallet extends Vue {
       this.$accessor.wallet.setLastSubBlock(slot)
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 
@@ -279,7 +279,7 @@ export default class Wallet extends Vue {
 
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 

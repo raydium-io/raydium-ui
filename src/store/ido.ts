@@ -73,7 +73,6 @@ export const actions = actionTree(
   {
     async requestInfos({ commit, dispatch }) {
       commit('setLoading', true)
-      dispatch('getIdoAccounts')
 
       const conn = this.$web3
 
@@ -157,18 +156,22 @@ export const actions = actionTree(
               : 'upcoming'
         }
       })
-      commit('setPools', idoPools)
-      logger('Ido pool infomations updated')
+
+      const pools = await dispatch('getIdoAccounts', { pools: idoPools })
+
+      commit('setPools', pools)
+      logger('Ido pool & user infomations updated')
       commit('setInitialized')
       commit('setLoading', false)
     },
 
-    async getIdoAccounts({ state, commit }) {
+    async getIdoAccounts(_, { pools }) {
       const conn = this.$web3
       const wallet = (this as any)._vm.$wallet
 
+      const idoPools: Array<IdoPool> = pools
+
       if (wallet && wallet.connected) {
-        const idoPools: Array<IdoPool> = cloneDeep(state.pools)
         const publicKeys: Array<PublicKey> = []
 
         const keys = ['idoAccount', 'idoCheck']
@@ -237,10 +240,9 @@ export const actions = actionTree(
             }
           }
         })
-
-        commit('setPools', idoPools)
-        logger('Ido user infomations updated')
       }
+
+      return idoPools
     }
   }
 )
