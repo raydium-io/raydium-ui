@@ -110,8 +110,8 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
-    base: { ...TOKENS.SNYTest },
-    quote: { ...TOKENS.USDCTest },
+    base: { ...TOKENS.SNY },
+    quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(1.5, TOKENS.USDCTest.decimals, false),
     raise: new TokenAmount(700000, TOKENS.SNYTest.decimals, false),
@@ -121,10 +121,10 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: '6XqX6KGYDrVmHhd71siDKCNsNsUMuXhJ5EfY1uP4Knd5',
-    baseVault: 'F8G6PjKfWDsrF9QYobkeASdUsCPzZrNZHCWPrnWdehav',
-    quoteVault: '7XupveaHYA2aM6qj1kKELQBqSYMxCgtzyipxGPSmhqet',
-    seedId: '4LncjfQmWA4Rd2zPoGy71eejJeqtEk2BBmKa97CxvvtB'
+    idoId: '9aAMMBcRVfPEa7quoRyofR3rG7qF4QJTehUhV3o1mPzf',
+    baseVault: 'D9X5KoDgC9sKFwPQcjYySGkHpe7akMvSSVDsorRgXYER',
+    quoteVault: 'Emuu4LH3Y2c7RmC97RWw944foRUSU28QbAyx9ocyMJsS',
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
   },
   {
     base: { ...TOKENS.MER },
