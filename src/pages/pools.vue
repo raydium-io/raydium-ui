@@ -2,6 +2,25 @@
   <div class="pool container">
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
+      <div class="buttons">
+        <Tooltip placement="bottomRight">
+          <template slot="title">
+            <span>
+              Displayed data will auto-refresh after
+              {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds. Click this circle to update manually.
+            </span>
+          </template>
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
+            :show-info="false"
+            :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
+            @click="flush"
+          />
+        </Tooltip>
+      </div>
     </div>
 
     <div class="card">
@@ -43,7 +62,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Table, Radio } from 'ant-design-vue'
+import { Table, Radio, Progress, Tooltip } from 'ant-design-vue'
 
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
@@ -58,7 +77,9 @@ const RadioButton = Radio.Button
   components: {
     Table,
     RadioGroup,
-    RadioButton
+    RadioButton,
+    Progress,
+    Tooltip
   },
 
   async asyncData({ $api }) {
@@ -116,6 +137,10 @@ export default class Pools extends Vue {
   poolsShow: any = []
   poolType: string = 'RaydiumPools'
 
+  get liquidity() {
+    return this.$accessor.liquidity
+  }
+
   @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
   refreshThePage() {
     this.showPool()
@@ -145,6 +170,11 @@ export default class Pools extends Vue {
       }
     }
     this.poolsShow = pool
+  }
+
+  async flush() {
+    this.pools = await this.$api.getPairs()
+    this.showPool()
   }
 
   getPoolByLpMintAddress = getPoolByLpMintAddress
