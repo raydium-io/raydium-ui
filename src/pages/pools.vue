@@ -7,16 +7,16 @@
           <template slot="title">
             <span>
               Displayed data will auto-refresh after
-              {{ liquidity.autoRefreshTime - liquidity.countdown }} seconds. Click this circle to update manually.
+              {{ autoRefreshTime - countdown }} seconds. Click this circle to update manually.
             </span>
           </template>
           <Progress
             type="circle"
             :width="20"
             :stroke-width="10"
-            :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
+            :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
-            :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
+            :class="loading ? 'disabled' : ''"
             @click="flush"
           />
         </Tooltip>
@@ -137,6 +137,11 @@ export default class Pools extends Vue {
   poolsShow: any = []
   poolType: string = 'RaydiumPools'
 
+  autoRefreshTime: number = 60
+  countdown: number = 0
+  timer: any = null
+  loading: boolean = false
+
   get liquidity() {
     return this.$accessor.liquidity
   }
@@ -172,9 +177,30 @@ export default class Pools extends Vue {
     this.poolsShow = pool
   }
 
+  mounted() {
+    this.setTimer()
+  }
+
+  setTimer() {
+    this.timer = setInterval(async () => {
+      if (!this.loading) {
+        if (this.countdown < this.autoRefreshTime) {
+          this.countdown += 1
+
+          if (this.countdown === this.autoRefreshTime) {
+            await this.flush()
+          }
+        }
+      }
+    }, 1000)
+  }
+
   async flush() {
+    this.loading = true
     this.pools = await this.$api.getPairs()
     this.showPool()
+    this.loading = false
+    this.countdown = 0
   }
 
   getPoolByLpMintAddress = getPoolByLpMintAddress
