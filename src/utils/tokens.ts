@@ -508,7 +508,8 @@ export const TOKENS: Tokens = {
     details:
       'Solrise Finance is a fully decentralized and non-custodial protocol for investment funds on Solana. What this means in practice is that anyone can open a fund, and anyone can invest in it.\n\nSolrise’s platform allows fund managers from all across the globe — whether they are well-established and looking for a new channel, or ambitious rookies with something to prove — to open a fund, with performance kept completely transparent.\n\nExisting decentralized fund management platforms on Ethereum are suffering from brutally high transaction fees. With Solrise, you can create, enter, and exit funds all for under $0.01.',
     docs: {
-      website: 'https://solrise.finance/'
+      website: 'https://solrise.finance/',
+      docs: 'https://docs.solrise.finance/'
     },
     socials: {
       Twitter: 'https://twitter.com/SolriseFinance',
