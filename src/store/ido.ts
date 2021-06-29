@@ -154,6 +154,7 @@ export const actions = actionTree(
               : pool.info.startTime < getUnixTs() / 1000
               ? 'open'
               : 'upcoming'
+          console.log('pool.info: ', pool.info)
         }
       })
 
