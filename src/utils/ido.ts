@@ -121,10 +121,10 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
-    idoId: '6SjYkHcSPAxj8bgNbRcZ6Dkwz9etR966aeZ99D7tb3rx',
-    baseVault: '8iFzD5Jdo88G55jBnviJ7QNQsakHcPANUS8ihMCLhFCN',
-    quoteVault: 'H3Yg2kYz44kJxfUNfLEwXdi7Kh9SbceYpuVj2ZeirsTz',
-    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
+    idoId: '6XqX6KGYDrVmHhd71siDKCNsNsUMuXhJ5EfY1uP4Knd5',
+    baseVault: 'F8G6PjKfWDsrF9QYobkeASdUsCPzZrNZHCWPrnWdehav',
+    quoteVault: '7XupveaHYA2aM6qj1kKELQBqSYMxCgtzyipxGPSmhqet',
+    seedId: '4LncjfQmWA4Rd2zPoGy71eejJeqtEk2BBmKa97CxvvtB'
   },
   {
     base: { ...TOKENS.MER },

@@ -225,6 +225,7 @@ export const actions = actionTree(
                   decoded.quoteTokenDeposited.toNumber(),
                   pool.quote.decimals
                 )
+                console.log('pool.userInfo: ', pool.userInfo)
                 break
               }
               case 'idoCheck': {
@@ -236,6 +237,7 @@ export const actions = actionTree(
                   ;(pool.userInfo as IdoLotteryUserInfo).eligibleTicketAmount = decoded.eligibleTicketAmount.toNumber()
                 }
                 pool.userInfo.snapshoted = true
+                console.log('pool.userInfo: ', pool.userInfo)
                 break
               }
             }
