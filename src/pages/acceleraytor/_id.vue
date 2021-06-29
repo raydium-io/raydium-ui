@@ -1,6 +1,6 @@
 <template>
   <div class="accele-raytor-project container">
-    <Row>
+    <Row class="top-box">
       <Col :span="isMobile ? 24 : 16" :class="`preview ${pool.version === 3 ? 'lottery' : ''}`">
         <div class="fs-container">
           <div class="fc-container">
@@ -199,7 +199,7 @@
 
         <Alert
           v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > getUnixTs() / 1000"
-          description="Note: Users can only deposit once, and cannot add tickets or deposit a second time."
+          description="Users can only deposit once, and cannot add tickets or deposit a second time."
           type="warning"
           class="alert-text"
           show-icon
@@ -465,7 +465,7 @@
             pool.version === 3
               ? `Once deposited, ${
                   pool.quote.symbol
-                } can be claimed after the lottery ends. Token allocations can be claimed after ${$dayjs(
+                } can be claimed after lottery ends. Tokens can be claimed after ${$dayjs(
                   pool.info.startWithdrawTime * 1000
                 ).toString()}`
               : `${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
@@ -832,6 +832,9 @@ export default class AcceleRaytor extends Vue {
   white-space: pre-wrap;
 }
 
+.top-box {
+  display: flex;
+}
 .accele-raytor-project.container {
   max-width: 1200px;
 }
@@ -903,7 +906,7 @@ hr {
   }
 }
 .preview.lottery {
-  min-height: 450px;
+  min-height: 350px;
 }
 
 .access {
@@ -1094,7 +1097,7 @@ hr {
 }
 .purchase.lottery {
   padding: 25px 40px;
-  min-height: 450px;
+  min-height: 350px;
 
   .title {
     margin-bottom: 8px;
