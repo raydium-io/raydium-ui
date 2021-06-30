@@ -473,7 +473,7 @@ export const TOKENS: Tokens = {
     name: 'SNY',
     mintAddress: '4dmKkXNHdgYsXqBHCuMikNQWwVomZURhYvkkX5c4pQ7y',
     decimals: 6,
-    referrer: '',
+    referrer: 'G7gyaTNn2hgjF67SWs4Ee9PEaFU2xadhtXL8HmkJ2cNL',
 
     detailLink: 'https://raydium.medium.com/synthetify-launching-on-acceleraytor-3755b4903f88',
     details:
@@ -983,7 +983,16 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.USDC },
 
     mintAddress: '7cu42ao8Jgrd5A3y3bNQsCxq5poyGZNmTydkGfJYQfzh',
-    decimals: TOKENS.TULIP.decimals
+    decimals: TOKENS.WOO.decimals
+  },
+  'SNY-USDC-V4': {
+    symbol: 'SNY-USDC',
+    name: 'SNY-USDC LP',
+    coin: { ...TOKENS.SNY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'G8qcfeFqxwbCqpxv5LpLWxUCd1PyMB5nWb5e5YyxLMKg',
+    decimals: TOKENS.SNY.decimals
   }
 }
 

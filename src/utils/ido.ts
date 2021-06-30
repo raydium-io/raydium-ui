@@ -110,23 +110,6 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
-    base: { ...TOKENS.SNY },
-    quote: { ...TOKENS.USDC },
-
-    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
-
-    version: 3, // just an identify for Lottery activity
-    programId: IDO_PROGRAM_ID_V3,
-    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
-
-    isRayPool: true,
-    idoId: '9aAMMBcRVfPEa7quoRyofR3rG7qF4QJTehUhV3o1mPzf',
-    baseVault: 'D9X5KoDgC9sKFwPQcjYySGkHpe7akMvSSVDsorRgXYER',
-    quoteVault: 'Emuu4LH3Y2c7RmC97RWw944foRUSU28QbAyx9ocyMJsS',
-    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
-  },
-  {
     base: { ...TOKENS.SLRS },
     quote: { ...TOKENS.USDC },
 
@@ -142,6 +125,23 @@ export const IDO_POOLS: IdoPool[] = [
     baseVault: 'E6A985RSVzJYhfEzW9B7e86xtYfHz5h9wxRe2KLHWnTZ',
     quoteVault: '8Q8xr7X7asGL82SdniAcrN8f9hTa1DjDcbJVLNVN38zg',
     seedId: 'APDE8Mc9abyigJb9cWcS95mMCyyA4QN4kv5Zi4YePygt'
+  },
+  {
+    base: { ...TOKENS.SNY },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(1.5, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(700000, TOKENS.SNY.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    idoId: '9aAMMBcRVfPEa7quoRyofR3rG7qF4QJTehUhV3o1mPzf',
+    baseVault: 'D9X5KoDgC9sKFwPQcjYySGkHpe7akMvSSVDsorRgXYER',
+    quoteVault: 'Emuu4LH3Y2c7RmC97RWw944foRUSU28QbAyx9ocyMJsS',
+    seedId: 'AjLbEuXP49PTx1Hwb93gNC4EbeCSATWDbDoo2nyAzVrT'
   },
   {
     base: { ...TOKENS.MER },
