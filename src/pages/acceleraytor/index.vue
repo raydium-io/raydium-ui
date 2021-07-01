@@ -68,13 +68,15 @@
         <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
         <span slot="filled" slot-scope="info, pool">
           {{
-            parseInt(
-              info.quoteTokenDeposited
-                .toEther()
-                .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-                .multipliedBy(100)
-                .toNumber()
-            ) + '%'
+            (pool.version === 3
+              ? (pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100
+              : parseInt(
+                  info.quoteTokenDeposited
+                    .toEther()
+                    .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                    .multipliedBy(100)
+                    .toNumber()
+                )) + '%'
           }}
         </span>
         <span slot="status" slot-scope="info, pool" class="status">
