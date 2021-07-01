@@ -1,21 +1,53 @@
 <template>
-  <div class="container">
+  <div class="pool container">
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
+      <div class="buttons">
+        <Tooltip placement="bottomRight">
+          <template slot="title">
+            <span>
+              Displayed data will auto-refresh after
+              {{ autoRefreshTime - countdown }} seconds. Click this circle to update manually.
+            </span>
+          </template>
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / autoRefreshTime) * countdown"
+            :show-info="false"
+            :class="loading ? 'disabled' : ''"
+            @click="flush"
+          />
+        </Tooltip>
+      </div>
     </div>
 
     <div class="card">
       <div class="card-body">
-        <Table :columns="columns" :data-source="pools" :pagination="false" row-key="lp_mint">
-          <span slot="name" slot-scope="text" class="lp-icons">
+        <div style="text-align: center">
+          <RadioGroup v-model="poolType" style="display: inline-block; width: 70%; margin: 0 auto">
+            <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
+            <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
+          </RadioGroup>
+        </div>
+        <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
+          <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
-              <img :src="importIcon(`/coins/${pool.lp.coin.symbol.toLowerCase()}.png`)" />
-              <img :src="importIcon(`/coins/${pool.lp.pc.symbol.toLowerCase()}.png`)" />
+              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.coin.mintAddress : ''" />
+              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.pc.mintAddress : ''" />
             </div>
-            <NuxtLink :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`">
+            <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
               {{ pool.name }}
             </NuxtLink>
+            <NuxtLink
+              v-else-if="pool"
+              :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
+            >
+              {{ pool.name }}
+            </NuxtLink>
+            <span v-else>{{ text }}</span>
           </span>
           <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
@@ -29,20 +61,25 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
-import { Table } from 'ant-design-vue'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
+import { Table, Radio, Progress, Tooltip } from 'ant-design-vue'
 
-import importIcon from '@/utils/import-icon'
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 @Component({
   head: {
     title: 'Raydium Pools'
   },
 
   components: {
-    Table
+    Table,
+    RadioGroup,
+    RadioButton,
+    Progress,
+    Tooltip
   },
 
   async asyncData({ $api }) {
@@ -96,8 +133,77 @@ export default class Pools extends Vue {
     }
   ]
 
+  pools: any = []
+  poolsShow: any = []
+  poolType: string = 'RaydiumPools'
+
+  autoRefreshTime: number = 60
+  countdown: number = 0
+  timer: any = null
+  loading: boolean = false
+
+  get liquidity() {
+    return this.$accessor.liquidity
+  }
+
+  @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
+  refreshThePage() {
+    this.showPool()
+  }
+
+  @Watch('$accessor.liquidity.info', { immediate: true, deep: true })
+  async onLiquidityChanged() {
+    this.pools = await this.$api.getPairs()
+    this.showPool()
+  }
+
+  @Watch('poolType')
+  onPoolTypeChanged() {
+    this.showPool()
+  }
+
+  showPool() {
+    const pool = []
+    for (const item of this.pools) {
+      if (
+        (this.poolType === 'RaydiumPools' && (item.official === undefined || item.official)) ||
+        (this.poolType !== 'RaydiumPools' && item.official !== undefined && !item.official)
+      ) {
+        if (!item.name.includes('unknown')) {
+          pool.push(item)
+        }
+      }
+    }
+    this.poolsShow = pool
+  }
+
+  mounted() {
+    this.setTimer()
+  }
+
+  setTimer() {
+    this.timer = setInterval(async () => {
+      if (!this.loading) {
+        if (this.countdown < this.autoRefreshTime) {
+          this.countdown += 1
+
+          if (this.countdown === this.autoRefreshTime) {
+            await this.flush()
+          }
+        }
+      }
+    }, 1000)
+  }
+
+  async flush() {
+    this.loading = true
+    this.pools = await this.$api.getPairs()
+    this.showPool()
+    this.loading = false
+    this.countdown = 0
+  }
+
   getPoolByLpMintAddress = getPoolByLpMintAddress
-  importIcon = importIcon
   TokenAmount = TokenAmount
 }
 </script>
@@ -121,10 +227,47 @@ export default class Pools extends Vue {
     }
   }
 }
+.radioButtonStyle {
+  width: 50%;
+  text-align: center;
+}
+.card-body {
+  padding-top: 25px;
+}
 </style>
 
 <style lang="less">
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
+.pool {
+  .card-body {
+    overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
 .ant-table-thead > tr > th.ant-table-column-sort {
   background: transparent;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff;
+  background: #1c274f;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+  border-left-width: 0;
+}
+.ant-radio-button-wrapper {
+  color: #aaa;
+  background: transparent;
+  // border: 1px solid #d9d9d9;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
+  border: 1px solid #d9d9d9;
 }
 </style>

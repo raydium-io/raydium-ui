@@ -120,7 +120,8 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.coinMintAddress.toString(),
             decimals: ammInfo.coinDecimals.toNumber(),
-            official: false
+            official: false,
+            cache: true
           }
           coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
         }
@@ -131,7 +132,8 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.pcMintAddress.toString(),
             decimals: ammInfo.pcDecimals.toNumber(),
-            official: false
+            official: false,
+            cache: true
           }
           pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
         }
@@ -146,8 +148,8 @@ export const actions = actionTree(
           pc.mintAddress = '11111111111111111111111111111111'
         }
         const lp = Object.values(LP_TOKENS).find((item) => item.mintAddress === ammInfo.lpMintAddress) ?? {
-          symbol: `${coin.name}-${pc.name}`,
-          name: `${coin.name}-${pc.name}`,
+          symbol: `${coin.symbol}-${pc.symbol}`,
+          name: `${coin.symbol}-${pc.symbol}`,
           coin,
           pc,
           mintAddress: ammInfo.lpMintAddress.toString(),
@@ -164,7 +166,7 @@ export const actions = actionTree(
         )
 
         const itemLiquidity: LiquidityPoolInfo = {
-          name: `${coin.symbol}-${pc.name}`,
+          name: `${coin.symbol}-${pc.symbol}`,
           coin,
           pc,
           lp,
@@ -190,18 +192,6 @@ export const actions = actionTree(
           official: false
         }
         if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
-          console.log(
-            'official false',
-            itemLiquidity.name,
-            itemLiquidity.ammId,
-            itemLiquidity.serumMarket
-            // itemLiquidity.ammId,
-            // lp.mintAddress,
-            // itemLiquidity,
-            // itemLiquidity.serumMarket,
-            // itemLiquidity.ammId,
-            // LIQUIDITY_POOLS.length
-          )
           LIQUIDITY_POOLS.push(itemLiquidity)
         } else {
           for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {
@@ -270,8 +260,8 @@ export const actions = actionTree(
                 const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
                 const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toNumber())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toNumber())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toString())
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toString())
 
                 break
               }
@@ -302,7 +292,7 @@ export const actions = actionTree(
               case 'lpMintAddress': {
                 const parsed = MINT_LAYOUT.decode(data)
 
-                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toNumber(), poolInfo.lp.decimals)
+                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toString(), poolInfo.lp.decimals)
 
                 break
               }

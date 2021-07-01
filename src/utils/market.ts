@@ -53,18 +53,23 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     }
     const marketAddressPubKey = new PublicKey(marketAddress)
     const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey(SERUM_PROGRAM_ID_V3))
-    const { asksAddress, bidsAddress, quoteMint, baseMint } = market
+    const {
+      asksAddress,
+      bidsAddress,
+      quoteMint
+      // baseMint
+    } = market
     let coinOrPcInTokenFlag = false
 
     for (const item of [TOKENS.USDT, TOKENS.USDC, TOKENS.RAY, TOKENS.WSOL, TOKENS.SRM]) {
-      if (quoteMint?.toBase58() === item.mintAddress || baseMint?.toBase58() === item.mintAddress) {
+      if (quoteMint?.toBase58() === item.mintAddress) {
         coinOrPcInTokenFlag = true
         break
       }
     }
     if (!coinOrPcInTokenFlag) {
       throw new Error(
-        'Only markets that contain USDC, USDT, SOL, RAY, or SRM as one side of the pair are currently supported.'
+        'Only markets that contain USDC, USDT, SOL, RAY, or SRM as the Quote Token are currently supported.'
       )
     }
     const asks: number[] = []

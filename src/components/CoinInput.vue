@@ -29,7 +29,7 @@
       </button>
       <button class="select-button fc-container" @click="$emit('onSelect')">
         <div v-if="coinName" class="fc-container">
-          <img :src="importIcon(`/coins/${coinName.toLowerCase()}.png`)" />
+          <CoinIcon :mint-address="mintAddress" />
           <span>{{ coinName }}</span>
         </div>
         <span v-else>Select a token</span>
@@ -43,7 +43,6 @@
 import Vue from 'vue'
 import { Icon } from 'ant-design-vue'
 
-import importIcon from '@/utils/import-icon'
 import { lt } from '@/utils/safe-math'
 
 export default Vue.extend({
@@ -62,6 +61,10 @@ export default Vue.extend({
       default: 'From'
     },
     coinName: {
+      type: String,
+      default: ''
+    },
+    mintAddress: {
       type: String,
       default: ''
     },
@@ -84,7 +87,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
     lt
   }
 })
