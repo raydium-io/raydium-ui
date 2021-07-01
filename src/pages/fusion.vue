@@ -1,16 +1,20 @@
 <template>
   <div class="fusion container">
     <div class="page-head fs-container">
-      <span class="title">Fusion Pools</span>
+      <span class="title"> Fusion Pools </span>
       <div class="buttons">
+        <span>
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
+            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+          </RadioGroup>
+        </span>
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -44,14 +48,22 @@
 
     <div v-if="farm.initialized">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body" style="background: #000829">
           <Collapse expand-icon-position="right">
-            <CollapsePanel v-for="farm in farms" v-show="!farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
+            <CollapsePanel
+              v-for="farm in farms"
+              v-show="
+                !farm.farmInfo.legacy &&
+                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                  (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType))
+              "
+              :key="farm.farmInfo.poolId"
+            >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="isMobile ? 12 : 8">
                   <div class="icons">
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                    <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
+                    <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
 
@@ -175,8 +187,8 @@
             >
               <Col class="lp-icons" :span="isMobile ? 12 : 8">
                 <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                 </div>
                 {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
               </Col>
@@ -227,16 +239,18 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Radio } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { depositV4, withdrawV4 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 
 const CollapsePanel = Collapse.Panel
+
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 
 export default Vue.extend({
   components: {
@@ -248,7 +262,9 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    RadioGroup,
+    RadioButton
   },
 
   data() {
@@ -263,7 +279,9 @@ export default Vue.extend({
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
-      unstaking: false
+      unstaking: false,
+      poolType: true,
+      endedFarmsPoolId: [] as string[]
     }
   },
 
@@ -303,11 +321,11 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
     TokenAmount,
 
     updateFarms() {
       const farms: any = []
+      const endedFarmsPoolId: string[] = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
@@ -369,6 +387,12 @@ export default Vue.extend({
             newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+            if (
+              rewardPerBlockAmount.toEther().toString() === '0' &&
+              rewardBPerBlockAmount.toEther().toString() === '0'
+            ) {
+              endedFarmsPoolId.push(poolId)
+            }
           }
 
           if (userInfo) {
@@ -413,6 +437,7 @@ export default Vue.extend({
       }
 
       this.farms = farms
+      this.endedFarmsPoolId = endedFarmsPoolId
     },
 
     updateCurrentLp(newTokenAccounts: any) {
@@ -480,6 +505,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.stakeModalOpening = false
         })
     },
 
@@ -541,6 +567,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.unstakeModalOpening = false
         })
     },
 
@@ -601,12 +628,49 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
+.pool-filter {
+  padding-bottom: 5px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+}
+.pool-filter-select {
+  background: rgb(37, 41, 97);
+  color: #fff;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  height: 37px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+.pool-filter-unselect {
+  background: transparent;
+  border: transparent;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  height: 37px;
+  font-weight: bold;
+  color: #ccc;
+}
+.pool-filter-select:hover {
+  color: #fff;
+}
+.pool-filter-unselect:hover {
+  color: #ccc;
+}
+
 .fusion.container {
   max-width: 1200px;
 
   .card {
     .card-body {
       padding: 0;
+      overflow-x: scroll;
+      background: #131a35;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
 
       .ant-collapse {
         border: 0;
@@ -718,6 +782,10 @@ export default Vue.extend({
     margin-bottom: 0;
   }
 }
+.radioButtonStyle {
+  width: 50%;
+  text-align: center;
+}
 </style>
 
 <style lang="less">
@@ -748,5 +816,28 @@ export default Vue.extend({
   .anticon-close {
     color: #fff;
   }
+}
+
+.ant-table-thead > tr > th.ant-table-column-sort {
+  background: transparent;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff;
+  background: #1c274f;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+  border-left-width: 0;
+}
+.ant-radio-button-wrapper {
+  color: #aaa;
+  background: transparent;
+  // border: 1px solid #d9d9d9;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
+  border: 1px solid #d9d9d9;
 }
 </style>

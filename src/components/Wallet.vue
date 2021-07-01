@@ -42,12 +42,13 @@ import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
-import { getRandomEndpoint, commitment } from '@/utils/web3'
+import { web3Config, commitment } from '@/utils/web3'
 import {
   WalletAdapter,
   SolongWalletAdapter,
   MathWalletAdapter,
   PhantomWalletAdapter,
+  BloctoWalletAdapter,
   LedgerWalletAdapter
 } from '@/wallets'
 import { sleep } from '@/utils'
@@ -75,8 +76,9 @@ export default class Wallet extends Vue {
     // TrustWallet: '',
     MathWallet: '',
     Phantom: '',
+    Blocto: '',
     Sollet: 'https://www.sollet.io',
-    // Solflare: 'https://solflare.com/access-wallet',
+    Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
     // https://docs.coin98.app/coin98-extension/developer-guide
     // Coin98: ''
@@ -118,8 +120,8 @@ export default class Wallet extends Vue {
   /* ========== LIFECYCLE ========== */
   async beforeMount() {
     await this.$accessor.price.requestPrices()
-    await this.$accessor.swap.getMarkets()
     await this.$accessor.liquidity.requestInfos()
+    await this.$accessor.swap.getMarkets()
     await this.$accessor.farm.requestInfos()
 
     this.setWalletTimer()
@@ -177,7 +179,8 @@ export default class Wallet extends Vue {
 
   connect(walletName: string): boolean {
     let wallet: WalletAdapter
-    const endpoint = getRandomEndpoint()
+    const { rpcs } = web3Config
+    const endpoint = rpcs[0]
 
     switch (walletName) {
       case 'Ledger': {
@@ -230,6 +233,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new PhantomWalletAdapter()
+        break
+      }
+      case 'Blocto': {
+        if ((window as any).solana === undefined || !(window as any).solana.isBlocto) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and open Blocto app first'
+          })
+          return
+        }
+
+        wallet = new BloctoWalletAdapter()
         break
       }
       default: {
@@ -294,7 +309,7 @@ export default class Wallet extends Vue {
       this.$accessor.wallet.setLastSubBlock(slot)
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 
@@ -305,7 +320,7 @@ export default class Wallet extends Vue {
 
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 

@@ -6,11 +6,9 @@
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -49,7 +47,7 @@
             <Row slot="header" class="farm-head" :gutter="0">
               <Col class="lp-icons" :span="8">
                 <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.symbol.toLowerCase()}.png`)" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.mintAddress" />
                 </div>
                 {{ farm.farmInfo.lp.symbol }}
               </Col>
@@ -80,7 +78,6 @@
                   <div class="pending fs-container">
                     <div class="reward">
                       <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
-                      <div class="value">0</div>
                     </div>
                     <Button
                       size="large"
@@ -137,7 +134,6 @@ import { mapState } from 'vuex'
 import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { deposit, withdraw } from '@/utils/stake'
@@ -210,7 +206,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
     TokenAmount,
 
     updateFarms() {
@@ -556,7 +551,16 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
 .staking {
+  .card-body {
+    overflow-x: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
   .ant-collapse-header {
     padding: 24px 32px !important;
   }

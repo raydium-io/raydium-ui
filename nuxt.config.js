@@ -51,7 +51,7 @@ export default {
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/web3.ts', '@/plugins/axios.ts', '@/plugins/api.ts', '@/plugins/notify.ts'],
+  plugins: ['@/plugins/axios.ts', '@/plugins/api.ts', '@/plugins/web3.ts', '@/plugins/notify.ts'],
 
   router: {
     middleware: ['route']
@@ -92,7 +92,7 @@ export default {
   dayjs: {
     locales: ['en'],
     defaultLocale: 'en',
-    plugins: []
+    plugins: ['utc']
   },
 
   'google-gtag': {
