@@ -53,6 +53,14 @@
           </template>
         </div>
         <Progress
+          v-if="pool.version === 3"
+          :percent="(pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100"
+          status="active"
+        >
+          <span slot="format"> {{ (pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100 }}% </span>
+        </Progress>
+        <Progress
+          v-else
           :percent="
             pool.info.quoteTokenDeposited
               ? pool.info.quoteTokenDeposited
