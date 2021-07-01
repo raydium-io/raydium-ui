@@ -48,6 +48,7 @@ import {
   SolongWalletAdapter,
   MathWalletAdapter,
   PhantomWalletAdapter,
+  BloctoWalletAdapter,
   LedgerWalletAdapter
 } from '@/wallets'
 import { sleep } from '@/utils'
@@ -75,8 +76,9 @@ export default class Wallet extends Vue {
     // TrustWallet: '',
     MathWallet: '',
     Phantom: '',
+    Blocto: '',
     Sollet: 'https://www.sollet.io',
-    // Solflare: 'https://solflare.com/access-wallet',
+    Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
     // https://docs.coin98.app/coin98-extension/developer-guide
     // Coin98: ''
@@ -233,6 +235,18 @@ export default class Wallet extends Vue {
         wallet = new PhantomWalletAdapter()
         break
       }
+      case 'Blocto': {
+        if ((window as any).solana === undefined || !(window as any).solana.isBlocto) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and open Blocto app first'
+          })
+          return
+        }
+
+        wallet = new BloctoWalletAdapter()
+        break
+      }
       default: {
         wallet = new SolanaWalletAdapter(this.wallets[walletName], endpoint)
         break
@@ -295,7 +309,7 @@ export default class Wallet extends Vue {
       this.$accessor.wallet.setLastSubBlock(slot)
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 
@@ -306,7 +320,7 @@ export default class Wallet extends Vue {
 
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
-      this.$accessor.ido.getIdoAccounts()
+      this.$accessor.ido.requestInfos()
     }
   }
 

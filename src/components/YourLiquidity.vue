@@ -23,8 +23,8 @@
           <CollapsePanel class="liquidity-info">
             <div slot="header" class="lp-icons">
               <div class="icons">
-                <img :src="importIcon(`/coins/${info.coin.symbol.toLowerCase()}.png`)" />
-                <img :src="importIcon(`/coins/${info.pc.symbol.toLowerCase()}.png`)" />
+                <CoinIcon :mint-address="info.coin.mintAddress" />
+                <CoinIcon :mint-address="info.pc.mintAddress" />
               </div>
               {{ info.lp.symbol }} {{ info.poolInfo.official ? '' : '(Permissionless)' }}
               <Tag v-if="info.poolInfo.version === 2" color="pink">Legacy</Tag>
@@ -86,7 +86,6 @@ import { cloneDeep, get } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { LiquidityPoolInfo } from '@/utils/pools'
 import { removeLiquidity } from '@/utils/liquidity'
-import importIcon from '@/utils/import-icon'
 import { getUnixTs } from '@/utils'
 
 const CollapsePanel = Collapse.Panel
@@ -141,8 +140,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
-
     updateLiquids(tokenAccounts: any) {
       let liquids = [] as any
 
