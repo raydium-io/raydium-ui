@@ -79,7 +79,7 @@ export const actions = actionTree(
 
             notify.error({
               key: txid,
-              message: 'Transaction has been failed',
+              message: 'Transaction failed',
               description
             })
           }

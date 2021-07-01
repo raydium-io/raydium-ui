@@ -1,26 +1,14 @@
 <template>
   <div class="farm container">
-    <div class="fc-container">
-      <Alert type="warning" message="IMPORTANT" show-icon closable>
-        <div slot="description">
-          Wrapped USDT (WUSDT) is being phased out for native SPL USDT. As a result, liquidity must migrate to the new
-          RAY-USDT pool. To simplify the process, use the
-          <NuxtLink to="/migrate/">migration tool</NuxtLink>.
-        </div>
-      </Alert>
-    </div>
-
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
-              Quote auto refresh countdown after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds, you can click to update manually
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
             </span>
-            <br />
-            <span> Automatically refreshes when the current pool had changed </span>
           </template>
           <Progress
             type="circle"
@@ -64,8 +52,8 @@
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="isMobile ? 12 : 8">
                   <div class="icons">
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                    <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                    <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
+                    <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                 </Col>
@@ -111,7 +99,6 @@
                     <div class="pending fs-container">
                       <div class="reward">
                         <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
-                        <div class="value">0</div>
                       </div>
                       <Button
                         size="large"
@@ -171,8 +158,8 @@
             >
               <Col class="lp-icons" :span="isMobile ? 12 : 8">
                 <div class="icons">
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.coin.symbol.toLowerCase()}.png`)" />
-                  <img :src="importIcon(`/coins/${farm.farmInfo.lp.pc.symbol.toLowerCase()}.png`)" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
+                  <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                 </div>
                 {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
               </Col>
@@ -211,10 +198,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Alert } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import importIcon from '@/utils/import-icon'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { deposit, withdraw } from '@/utils/stake'
@@ -232,8 +218,7 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button,
-    Alert
+    Button
   },
 
   data() {
@@ -288,7 +273,6 @@ export default Vue.extend({
   },
 
   methods: {
-    importIcon,
     TokenAmount,
 
     updateFarms() {
@@ -432,6 +416,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.staking = false
+          this.stakeModalOpening = false
         })
     },
 
@@ -492,6 +477,7 @@ export default Vue.extend({
         })
         .finally(() => {
           this.unstaking = false
+          this.unstakeModalOpening = false
         })
     },
 
@@ -550,12 +536,22 @@ export default Vue.extend({
 </script>
 
 <style lang="less" scoped>
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
+.card-body {
+  padding: 0;
+  margin: 0;
+}
 .farm.container {
   max-width: 1200px;
 
   .card {
     .card-body {
       padding: 0;
+      overflow-x: scroll;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
 
       .ant-collapse {
         border: 0;
