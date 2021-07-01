@@ -9,7 +9,7 @@
         <Icon slot="prefix" type="search" />
       </Input>
       <div class="filter">
-        <div>
+        <div class="group">
           <h5>Access</h5>
           <RadioGroup v-model="filter.access">
             <RadioButton value="all">All</RadioButton>
@@ -17,7 +17,7 @@
             <RadioButton value="community">Community</RadioButton>
           </RadioGroup>
         </div>
-        <div>
+        <div class="group">
           <h5>Status</h5>
           <RadioGroup v-model="filter.status">
             <RadioButton value="all">All</RadioButton>
@@ -26,7 +26,7 @@
             <RadioButton value="ended">Ended</RadioButton>
           </RadioGroup>
         </div>
-        <div>
+        <div class="group">
           <h5>My pools</h5>
           <RadioGroup v-model="filter.mine">
             <RadioButton value="all">All</RadioButton>
@@ -52,30 +52,35 @@
         "
       >
         <span slot="name" slot-scope="base" class="icon">
-          <img :src="importIcon(`/coins/${base.symbol.toLowerCase()}.png`)" />
+          <CoinIcon :mint-address="base.mintAddress" />
           <span> {{ base.symbol }}</span>
         </span>
-        <span slot="price" slot-scope="price, pool"> {{ price.format() }} {{ pool.quote.symbol }} </span>
-        <span slot="access" slot-scope="isRayPool" class="access">
+        <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
+        <span slot="access" slot-scope="isRayPool, pool" class="access">
           <span v-if="isRayPool" class="ray">
-            <span>RAY Pool</span>
+            <span>{{ `RAY ${pool.version === 3 ? '' : pool.info.minStakeLimit.format()} Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>
         </span>
-        <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
-        <span slot="progress" slot-scope="info, pool">
-          {{
-            info.quoteTokenDeposited
-              .toEther()
-              .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-              .multipliedBy(100)
-              .toNumber()
-          }}%
+        <span slot="allocation" slot-scope="info, pool">
+          {{ pool.version === 3 ? 'Lottery' : pool.info.maxDepositLimit.format() + pool.quote.symbol }}
         </span>
-        <span slot="status" slot-scope="info" class="status">
-          <span v-if="info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
-          <span v-else-if="info.startTime < getUnixTs() / 1000" class="open"> Open </span>
-          <span v-else class="upcoming"> Upcoming </span>
+        <span slot="raise" slot-scope="raise, pool"> {{ raise.format() }} {{ pool.base.symbol }} </span>
+        <span slot="filled" slot-scope="info, pool">
+          {{
+            (pool.version === 3
+              ? (pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100
+              : parseInt(
+                  info.quoteTokenDeposited
+                    .toEther()
+                    .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                    .multipliedBy(100)
+                    .toNumber()
+                )) + '%'
+          }}
+        </span>
+        <span slot="status" slot-scope="info, pool" class="status">
+          <span :class="pool.status">{{ pool.status }}</span>
         </span>
       </Table>
     </div>
@@ -89,7 +94,6 @@ import { Input, Icon, Radio, Table } from 'ant-design-vue'
 import { filter } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
-import importIcon from '@/utils/import-icon'
 import { IdoPool } from '@/utils/ido'
 
 const RadioGroup = Radio.Group
@@ -124,19 +128,22 @@ export default class AcceleRaytor extends Vue {
   pools: IdoPool[] = []
 
   @Watch('filter', { immediate: true, deep: true })
-  onFilterChanged({ access }: { access: string; status: string; mine: string }) {
+  onFilterChanged({ access, status }: { access: string; status: string; mine: string }) {
     const rules = {
       info: {}
     } as any
 
-    if (access !== 'all') {
-      if (access === 'ray') {
+    switch (access) {
+      case 'ray': {
         rules.isRayPool = true
-      } else {
+        break
+      }
+      case 'community': {
         rules.isRayPool = false
+        break
       }
     }
-
+    if (status !== 'all') rules.status = status
     this.pools = filter(this.$accessor.ido.pools, rules)
   }
 
@@ -162,17 +169,24 @@ export default class AcceleRaytor extends Vue {
       align: 'center'
     },
     {
-      title: 'Total raise',
+      title: 'Max Allocation',
+      dataIndex: 'allocation',
+      key: 'allocation',
+      scopedSlots: { customRender: 'allocation' },
+      align: 'center'
+    },
+    {
+      title: 'Raise size',
       dataIndex: 'raise',
       key: 'raise',
       scopedSlots: { customRender: 'raise' },
       align: 'center'
     },
     {
-      title: 'Progress',
+      title: 'Filled',
       dataIndex: 'info',
-      key: 'progress',
-      scopedSlots: { customRender: 'progress' },
+      key: 'filled',
+      scopedSlots: { customRender: 'filled' },
       align: 'center'
     },
     {
@@ -185,7 +199,6 @@ export default class AcceleRaytor extends Vue {
   ]
 
   getUnixTs = getUnixTs
-  importIcon = importIcon
 }
 </script>
 
@@ -201,12 +214,21 @@ export default class AcceleRaytor extends Vue {
     justify-content: space-between;
     align-items: center;
     margin-top: 16px;
-    padding: 24px;
+    padding: 12px;
     background: #0f1429;
     color: #f1f1f2bf;
 
+    .group {
+      padding: 12px;
+    }
     h5 {
       color: #f1f1f2bf;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .filter {
+      display: block;
     }
   }
 
@@ -250,6 +272,8 @@ export default class AcceleRaytor extends Vue {
   }
 
   .status {
+    text-transform: capitalize;
+
     .upcoming,
     .open,
     .ended {
@@ -302,10 +326,7 @@ export default class AcceleRaytor extends Vue {
     box-shadow: none;
     border-radius: 4px;
     color: #f1f1f2bf;
-
-    &:not(:first-child) {
-      margin-left: 8px;
-    }
+    margin: 8px 8px 0 0;
 
     &:not(:first-child)::before {
       width: 0;
@@ -335,6 +356,10 @@ export default class AcceleRaytor extends Vue {
     background: #1c274f;
   }
 
+  .ant-table-body {
+    overflow-x: scroll;
+  }
+
   .ant-table-thead > tr > th {
     border-bottom: 1px solid #364371;
   }
@@ -359,6 +384,15 @@ export default class AcceleRaytor extends Vue {
 
   .ant-table-row:hover {
     cursor: pointer;
+  }
+
+  .ant-table-placeholder {
+    background: #1c274f;
+    border-bottom: 0;
+
+    .ant-empty {
+      color: #f1f1f2bf;
+    }
   }
 }
 </style>
