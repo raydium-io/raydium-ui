@@ -520,6 +520,15 @@ export const TOKENS: Tokens = {
     referrer: '7UbeAZxpza5zN3QawQ5KsUo88zXvohUncYB9Zk5QCiim',
     official: true,
     showDefault: true
+  },
+  BOP: {
+    symbol: 'BOP',
+    name: 'Boring Protocol',
+    mintAddress: 'BLwTnYKqf7u4qjgZrrsKeNs2EzWkMLqVCu6j8iHyrNA3',
+    decimals: 8,
+    referrer: 'FWxBZmNsvNckx8DnaL2NuyMtiQmT1x529WwV4e1UWiGk',
+    official: true,
+    showDefault: true
   }
 }
 
@@ -993,6 +1002,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'G8qcfeFqxwbCqpxv5LpLWxUCd1PyMB5nWb5e5YyxLMKg',
     decimals: TOKENS.SNY.decimals
+  },
+  'BOP-RAY-V4': {
+    symbol: 'BOP-RAY',
+    name: 'BOP-RAY LP',
+    coin: { ...TOKENS.BOP },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '9nQPYJvysyfnXhQ6nkK5V7sZG26hmDgusfdNQijRk5LD',
+    decimals: TOKENS.BOP.decimals
   }
 }
 
