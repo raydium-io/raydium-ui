@@ -1684,7 +1684,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   },
   {
     name: 'BOP-RAY',
-    coin: { ...TOKENS.BOY },
+    coin: { ...TOKENS.BOP },
     pc: { ...TOKENS.RAY },
     lp: { ...LP_TOKENS['BOP-RAY-V4'] },
 
@@ -1705,7 +1705,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumMarket: '6Fcw8aEs7oP7YeuMrM2JgAQUotYxa4WHKHWdLLXssA3R',
     serumBids: '3CNgQ6KpTQYKX9s1CSy5y16ZtnXqYfcTHikmHjEjXKJm',
     serumAsks: '7VxSfKDL7i3FmpJLnK4v7YgidNa1t7SCo84FY7YinQyA',
-    serumEventQueue: '9ote3YanmgQgL6vPBUGJVZyFsp6HDJNviTw7ghxzMDLT,',
+    serumEventQueue: '9ote3YanmgQgL6vPBUGJVZyFsp6HDJNviTw7ghxzMDLT',
     serumCoinVaultAccount: 'CTv9hnW3nbANzJ2yyzmyMCoUxv5s95ndxcBbLzV39z3w',
     serumPcVaultAccount: 'GXFttVfXbH7rU6GJnBVs3LyyuiPU8a6sW2tv5K5ZGEAQ',
     serumVaultSigner: '5JEwQ7hM1qFCBwJkZ2JyjkoJ99ojJXRx2bFjLcFobDvC',
