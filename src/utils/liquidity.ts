@@ -9,7 +9,7 @@ import {
   LIQUIDITY_POOLS
 } from '@/utils/pools'
 import { NATIVE_SOL, TOKENS, TokenInfo, LP_TOKENS } from '@/utils/tokens'
-import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
+import { createTokenAccountIfNotExist, sendTransaction, commitment, getMultipleAccounts } from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8 } from 'buffer-layout'
 import { publicKey, u64, u128 } from '@project-serum/borsh'
@@ -18,7 +18,6 @@ import BigNumber from 'bignumber.js'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { commitment, getMultipleAccounts } from '@/utils/web3'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
@@ -656,6 +655,8 @@ export const AMM_INFO_LAYOUT_V3 = struct([
   u64('needTakePnlPc'),
   u64('totalPnlX'),
   u64('totalPnlY'),
+  u64('poolTotalDepositPc'),
+  u64('poolTotalDepositCoin'),
   u64('systemDecimalsValue'),
   publicKey('poolCoinTokenAccount'),
   publicKey('poolPcTokenAccount'),
