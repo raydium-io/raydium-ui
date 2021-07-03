@@ -34,7 +34,11 @@
                 (Remove Attention)
               </button>
               <button
-                v-if="!token.tags.includes('userAdd') && showUserButton[token.symbol + token.mintAddress]"
+                v-if="
+                  !token.tags.includes('userAdd') &&
+                  showUserButton[token.symbol + token.mintAddress] &&
+                  !token.tags.find((item) => tokensTags[item].mustShow)
+                "
                 style="
                   margin: 0 10px;
                   color: rgb(90, 196, 190);
