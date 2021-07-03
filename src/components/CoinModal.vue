@@ -79,6 +79,10 @@ export default Vue.extend({
     loading: {
       type: Boolean,
       default: false
+    },
+    setMaxOnInit: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -96,6 +100,12 @@ export default Vue.extend({
           this.value = oldValue
         }
       })
+    }
+  },
+
+  mounted() {
+    if (this.$props.setMaxOnInit) {
+      this.setMax()
     }
   },
 

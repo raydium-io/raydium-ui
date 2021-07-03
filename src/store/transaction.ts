@@ -6,11 +6,28 @@ import LocalStorage from '@/utils/local-storage'
 import { getUnixTs } from '@/utils'
 import logger from '@/utils/logger'
 
+const history = LocalStorage.get('RAY_TX_HISTORY')
+
 export const state = () => ({
-  history: {}
+  history: history ? JSON.parse(history) : {}
 })
 
-export const getters = getterTree(state, {})
+export const getters = getterTree(state, {
+  reverseHistory: (state) => {
+    const reversedHistory: { [key: string]: any } = {}
+    const keys = []
+
+    for (const key in state.history) {
+      keys.push(key)
+    }
+
+    for (let i = keys.length - 1; i >= 0; i--) {
+      const value = state.history[keys[i]]
+      reversedHistory[keys[i]] = value
+    }
+    return reversedHistory
+  }
+})
 
 export const mutations = mutationTree(state, {
   pushTx(state: any, [txid, description]: [txid: string, description: string]) {
@@ -52,42 +69,46 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    sub({ commit }, { txid, description }: { txid: string; description: string }) {
-      commit('pushTx', [txid, description])
-      logger('Sub', txid)
+    sub({ commit }, { txid, description }: { txid: string; description: string }): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        commit('pushTx', [txid, description])
+        logger('Sub', txid)
 
-      const conn = this.$web3
-      const notify = this.$notify
+        const conn = this.$web3
+        const notify = this.$notify
 
-      const listenerId = conn.onSignature(
-        txid,
-        function (signatureResult: SignatureResult, context: Context) {
-          const { slot } = context
+        const listenerId = conn.onSignature(
+          txid,
+          function (signatureResult: SignatureResult, context: Context) {
+            const { slot } = context
 
-          if (!signatureResult.err) {
-            // success
-            commit('setTxStatus', [txid, 's', slot])
+            if (!signatureResult.err) {
+              // success
+              commit('setTxStatus', [txid, 's', slot])
 
-            notify.success({
-              key: txid,
-              message: 'Transaction has been confirmed',
-              description
-            })
-          } else {
-            // fail
-            commit('setTxStatus', [txid, 'f', slot])
+              notify.success({
+                key: txid,
+                message: 'Transaction has been confirmed',
+                description
+              })
+              resolve(true)
+            } else {
+              // fail
+              commit('setTxStatus', [txid, 'f', slot])
 
-            notify.error({
-              key: txid,
-              message: 'Transaction failed',
-              description
-            })
-          }
-        },
-        'single'
-      )
+              notify.error({
+                key: txid,
+                message: 'Transaction failed',
+                description
+              })
+              reject(signatureResult.err)
+            }
+          },
+          'single'
+        )
 
-      commit('setListenerId', [txid, listenerId + 1])
+        commit('setListenerId', [txid, listenerId + 1])
+      })
     }
   }
 )

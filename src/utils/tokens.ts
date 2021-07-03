@@ -19,6 +19,21 @@ export interface TokenInfo {
   balance?: TokenAmount
   official?: boolean
   showDefault?: boolean
+
+  coin?: {
+    symbol: string
+    name: string
+    mintAddress: string
+    decimals: number
+    referrer: string
+  }
+  pc?: {
+    symbol: string
+    name: string
+    mintAddress: string
+    decimals: number
+    referrer: string
+  }
 }
 
 /**
