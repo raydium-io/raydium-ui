@@ -1,5 +1,5 @@
 <template>
-  <Modal title="Select a token" :visible="true" :footer="null" @cancel="$emit('onClose')">
+  <Modal v-if="!showSelectSourceFlag" title="Select a token" :visible="true" @cancel="$emit('onClose')">
     <div class="select-token">
       <input ref="userInput" v-model="keyword" placeholder="Search name or mint address" />
       <div v-if="!addUserCoin" class="sort fs-container">
@@ -7,22 +7,20 @@
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
       <div v-if="!addUserCoin" class="token-list">
-        <template v-for="token in tokenList">
+        <template v-for="token of tokenList">
           <div
-            v-if="
-              (token.showDefault || (token.mintAddress === keyword && token.cache !== true)) &&
-              token.mintAddress !== 'So11111111111111111111111111111111111111112'
-            "
-            :key="token.symbol"
+            v-if="token.cache !== true && token.mintAddress !== 'So11111111111111111111111111111111111111112'"
+            :key="token.symbol + token.mintAddress"
             class="token-info"
             @click="$emit('onSelect', token)"
+            @mouseenter="tokenHover(token)"
+            @mouseleave="tokenMove(token)"
           >
             <CoinIcon :mint-address="token.mintAddress" />
             <div>
               <span>{{ token.symbol }}</span>
-              <span v-if="!token.official" style="margin-left: 10px">User Added</span>
               <button
-                v-if="!token.official"
+                v-if="token.tags.includes('userAdd') && showUserButton[token.symbol + token.mintAddress]"
                 style="
                   margin: 0 10px;
                   color: rgb(90, 196, 190);
@@ -31,23 +29,23 @@
                   padding: 0;
                   border: 0 solid transparent;
                 "
-                @click="delUserMintToLocal(token.mintAddress)"
+                @click.stop="delCoinToAttention(token)"
               >
-                (Remove)
+                (Remove Attention)
               </button>
               <button
-                v-if="!token.showDefault && token.mintAddress === keyword"
+                v-if="!token.tags.includes('userAdd') && showUserButton[token.symbol + token.mintAddress]"
                 style="
                   margin: 0 10px;
                   color: rgb(90, 196, 190);
                   outline: none;
                   background-color: transparent;
-                  padding: 0;
+                  padding: 2px;
                   border: 0 solid transparent;
                 "
-                @click="addSolanaCoin"
+                @click.stop="addCoinToAttention(token)"
               >
-                Add
+                (Add Attention)
               </button>
             </div>
             <span></span>
@@ -82,12 +80,24 @@
             "
             @click="addUserMintToLocal"
           >
-            (Add to token list)
+            (Add To Attention)
           </button>
         </div>
       </div>
     </div>
+    <template slot="footer">
+      <Button
+        class="source-manager"
+        @click="
+          () => {
+            showSelectSourceFlag = true
+          }
+        "
+        >Change Coin Source</Button
+      >
+    </template>
   </Modal>
+  <CoinSelectSource v-else @onClose="() => (showSelectSourceFlag = false)" />
 </template>
 
 <script lang="ts">
@@ -95,7 +105,7 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Modal, Icon } from 'ant-design-vue'
 
-import { TOKENS, TokenInfo, NATIVE_SOL, Tokens } from '@/utils/tokens'
+import { TOKENS, TokenInfo, NATIVE_SOL, TOKENS_TAGS } from '@/utils/tokens'
 import { cloneDeep } from 'lodash-es'
 import { PublicKey } from '@solana/web3.js'
 // import { getFilteredProgramAccounts } from '@/utils/web3'
@@ -112,17 +122,21 @@ export default Vue.extend({
 
   data() {
     return {
+      tokensTags: TOKENS_TAGS,
       keyword: '',
       tokenList: [] as Array<TokenInfo>,
       desc: false,
       addUserCoin: false,
-      addUserCoinMint: null as Tokens | null,
-      userInputCoinName: undefined
+      addUserCoinToken: null as any | null,
+
+      userInputCoinName: undefined,
+      showSelectSourceFlag: false,
+      showUserButton: {} as { [key: string]: boolean }
     }
   },
 
   computed: {
-    ...mapState(['wallet'])
+    ...mapState(['wallet', 'liquidity'])
   },
 
   watch: {
@@ -134,6 +148,21 @@ export default Vue.extend({
     'wallet.tokenAccounts': {
       handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
         this.createTokenList()
+      },
+      deep: true
+    },
+
+    tokensTags: {
+      handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
+        this.createTokenList(this.keyword)
+        this.findMint(this.keyword)
+      },
+      deep: true
+    },
+    'liquidity.initialized': {
+      handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
+        this.createTokenList(this.keyword)
+        this.findMint(this.keyword)
       },
       deep: true
     }
@@ -148,18 +177,61 @@ export default Vue.extend({
   },
 
   methods: {
-    addSolanaCoin() {
-      Object.keys(TOKENS).forEach((item) => {
-        if (TOKENS[item].mintAddress === this.keyword) {
-          TOKENS[item].showDefault = true
-          if (window.localStorage.addSolanaCoin && !window.localStorage.addSolanaCoin.includes(this.keyword)) {
-            window.localStorage.addSolanaCoin = window.localStorage.addSolanaCoin + '---' + this.keyword
-          } else {
-            window.localStorage.addSolanaCoin = this.keyword
-          }
-        }
-      })
-      this.$accessor.liquidity.requestInfos()
+    tokenHover(token: any) {
+      this.$set(this.showUserButton, token.symbol + token.mintAddress, true)
+    },
+    tokenMove(token: any) {
+      this.$set(this.showUserButton, token.symbol + token.mintAddress, false)
+    },
+    addCoinToAttention(token: any) {
+      if (token.mintAddress === NATIVE_SOL.mintAddress) {
+        NATIVE_SOL.tags.push('userAdd')
+      }
+      if (TOKENS[token.key] && !TOKENS[token.key].tags.includes('userAdd')) {
+        TOKENS[token.key].tags.push('userAdd')
+      }
+      if (window.localStorage.addSolanaCoin) {
+        window.localStorage.addSolanaCoin = window.localStorage.addSolanaCoin + '---' + token.mintAddress
+      } else {
+        window.localStorage.addSolanaCoin = token.mintAddress
+      }
+      this.createTokenList(this.keyword)
+      this.findMint(this.keyword)
+    },
+    delCoinToAttention(token: any) {
+      if (window.localStorage.addSolanaCoin) {
+        window.localStorage.addSolanaCoin = window.localStorage.addSolanaCoin
+          .split('---')
+          .filter((item: any) => item !== token.mintAddress)
+          .join('---')
+      }
+      this.delUserMintToLocal(token.mintAddress)
+
+      if (TOKENS[token.key] && TOKENS[token.key].tags.includes('userAdd')) {
+        this.delTags(TOKENS[token.key], 'userAdd')
+      }
+      if (NATIVE_SOL.mintAddress === token.mintAddress && NATIVE_SOL.tags.includes('userAdd')) {
+        this.delTags(NATIVE_SOL, 'userAdd')
+      }
+      this.createTokenList(this.keyword)
+      this.findMint(this.keyword)
+    },
+
+    delTags(token: any, key: string) {
+      const indexItem = token.tags.indexOf(key)
+      if (indexItem === 0) {
+        token.tags = token.tags.splice(1, token.tags.length - 1)
+      } else if (indexItem > 0) {
+        token.tags = [
+          ...token.tags.splice(0, indexItem),
+          ...token.tags.splice(indexItem + 1, token.tags.length - indexItem - 1)
+        ]
+      }
+      if (token.tags.length === 0) {
+        token.cache = true
+        token.symbol = 'unknown'
+        token.name = 'unknown'
+      }
     },
 
     delUserMintToLocal(mintAddress: string) {
@@ -177,14 +249,6 @@ export default Vue.extend({
         }
       }
       window.localStorage.user_add_coin_mint = newMintList.join('---')
-      // TOKENS
-      const tokensName = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === mintAddress)
-
-      if (tokensName) {
-        delete TOKENS[tokensName]
-      }
-      this.$emit('onSelect', null)
-      this.$accessor.liquidity.requestInfos()
     },
 
     addUserMintToLocal() {
@@ -193,53 +257,71 @@ export default Vue.extend({
           message: 'Please enter name',
           description: ''
         })
-      } else if (Object.keys(TOKENS).find((itemName) => itemName === this.userInputCoinName)) {
+      } else if (Object.values(TOKENS).find((item: any) => item.symbol === this.userInputCoinName)) {
         this.$notify.warning({
           message: 'Duplicate name',
           description: ''
         })
-      } else if (this.addUserCoinMint !== null) {
+      } else if (this.addUserCoinToken !== null) {
         const key = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === this.keyword)
-        if (key) {
-          delete TOKENS[key]
+        if (key === undefined) {
+          return
         }
-
-        TOKENS[this.userInputCoinName ?? ''] = {
-          name: this.userInputCoinName,
-          symbol: this.userInputCoinName,
-          mintAddress: this.keyword,
-          decimals: this.addUserCoinMint.decimals,
-          official: false,
-          showDefault: true
-        }
+        TOKENS[key].name = this.userInputCoinName
+        TOKENS[key].symbol = this.userInputCoinName
+        TOKENS[key].cache = false
+        TOKENS[key].tags.push('userAdd')
 
         const userAddCoinMintLocal = window.localStorage.user_add_coin_mint ?? ''
         let userAddCoinMintLocalArray = userAddCoinMintLocal.split('---')
         if (userAddCoinMintLocalArray.length % 3 === 0) {
-          userAddCoinMintLocalArray.push(this.userInputCoinName ?? '', this.keyword, this.addUserCoinMint.decimals)
+          userAddCoinMintLocalArray.push(
+            this.userInputCoinName ?? '',
+            this.addUserCoinToken.mintAddress,
+            this.addUserCoinToken.decimals
+          )
         } else {
-          userAddCoinMintLocalArray = [this.userInputCoinName ?? '', this.keyword, this.addUserCoinMint.decimals]
+          userAddCoinMintLocalArray = [
+            this.userInputCoinName ?? '',
+            this.addUserCoinToken.mintAddress,
+            this.addUserCoinToken.decimals
+          ]
         }
         window.localStorage.user_add_coin_mint = userAddCoinMintLocalArray.join('---')
 
         this.keyword = this.userInputCoinName ?? ''
       }
       this.$accessor.liquidity.requestInfos()
+      this.createTokenList(this.keyword)
+      this.findMint(this.keyword)
     },
 
     async findMint(keyword = '') {
-      if (keyword.length === 44) {
-        const hasToken = Object.values(TOKENS).find((item) => item.mintAddress === keyword && item.cache !== true)
-        if (hasToken && hasToken.showDefault) {
-          this.keyword = hasToken.symbol
+      if (keyword.length > 40) {
+        const hasTokenKey = Object.keys(TOKENS).find(
+          (item) => TOKENS[item].mintAddress === keyword && TOKENS[item].cache === true
+        )
+        if (hasTokenKey) {
+          this.addUserCoinToken = { ...TOKENS[hasTokenKey], key: hasTokenKey }
+          this.addUserCoin = true
         } else {
           try {
             const acc = await this.$web3.getAccountInfo(new PublicKey(keyword))
             if (acc != null) {
               const mint = MINT_LAYOUT.decode(acc.data)
               if (mint.initialized === true && this.tokenList.length === 0) {
+                TOKENS[this.keyword + 'userSearch'] = {
+                  symbol: 'unknown',
+                  name: 'unknown',
+                  mintAddress: this.keyword,
+                  decimals: mint.decimals,
+                  cache: true,
+                  tags: []
+                }
+                this.addUserCoinToken = { ...TOKENS[this.keyword + 'userSearch'], key: this.keyword + 'userSearch' }
                 this.addUserCoin = true
-                this.addUserCoinMint = mint
+              } else {
+                this.addUserCoin = false
               }
             }
           } catch (error) {
@@ -252,6 +334,7 @@ export default Vue.extend({
     },
 
     createTokenList(keyword = '') {
+      keyword = keyword.trim()
       let tokenList = []
 
       let ray = {}
@@ -266,17 +349,17 @@ export default Vue.extend({
         const tokenAccount = this.wallet.tokenAccounts[tokenInfo.mintAddress]
 
         if (tokenAccount) {
-          tokenInfo = { ...tokenInfo, ...tokenAccount }
+          tokenInfo = { ...tokenInfo, ...tokenAccount, key: symbol }
 
           if (tokenInfo.symbol === 'RAY') {
-            ray = cloneDeep(tokenInfo)
+            ray = cloneDeep({ ...tokenInfo, key: symbol })
           } else {
-            hasBalance.push(tokenInfo)
+            hasBalance.push({ ...tokenInfo, key: symbol })
           }
         } else if (tokenInfo.symbol === 'RAY') {
-          ray = cloneDeep(tokenInfo)
+          ray = cloneDeep({ ...tokenInfo, key: symbol })
         } else {
-          noBalance.push(tokenInfo)
+          noBalance.push({ ...tokenInfo, key: symbol })
         }
       }
 
@@ -307,8 +390,25 @@ export default Vue.extend({
           (token) => token.symbol.toUpperCase().includes(keyword.toUpperCase()) || token.mintAddress === keyword
         )
       }
+      const showTagsList: string[] = []
+      for (const [itemTagsName, itemTagsValue] of Object.entries(TOKENS_TAGS)) {
+        if (itemTagsValue.show) {
+          showTagsList.push(itemTagsName)
+        }
+      }
 
-      this.tokenList = cloneDeep(tokenList)
+      const showToken = []
+      for (const item of tokenList) {
+        const showFlag = item.tags
+          ? item.tags.filter((itemTags: string) => (showTagsList.includes(itemTags) ? 1 : null)).length > 0 ||
+            item.mintAddress === this.keyword
+          : false
+
+        if (showFlag) {
+          showToken.push(item)
+        }
+      }
+      this.tokenList = cloneDeep(showToken)
     },
 
     setDesc() {
@@ -321,6 +421,12 @@ export default Vue.extend({
 
 <style lang="less" scoped>
 @import '../styles/variables';
+.source-manager {
+  text-align: center;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
 
 .select-token {
   display: grid;

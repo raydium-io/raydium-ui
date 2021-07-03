@@ -120,11 +120,15 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.coinMintAddress.toString(),
             decimals: ammInfo.coinDecimals.toNumber(),
-            official: false,
-            cache: true
+            cache: true,
+            tags: []
           }
           coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
         }
+        if (!coin.tags.includes('unofficial')) {
+          coin.tags.push('unofficial')
+        }
+
         let pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin)
         if (!pc) {
           TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`] = {
@@ -132,11 +136,15 @@ export const actions = actionTree(
             name: 'unknown',
             mintAddress: ammInfo.pcMintAddress.toString(),
             decimals: ammInfo.pcDecimals.toNumber(),
-            official: false,
-            cache: true
+            cache: true,
+            tags: []
           }
           pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
         }
+        if (!pc.tags.includes('unofficial')) {
+          pc.tags.push('unofficial')
+        }
+
         if (coin.mintAddress === TOKENS.WSOL.mintAddress) {
           coin.symbol = 'SOL'
           coin.name = 'SOL'

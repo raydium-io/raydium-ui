@@ -17,8 +17,7 @@ export interface TokenInfo {
 
   tokenAccountAddress?: string
   balance?: TokenAmount
-  official?: boolean
-  showDefault?: boolean
+  tags: string[]
 }
 
 /**
@@ -62,13 +61,19 @@ export interface Tokens {
   [index: number]: any
 }
 
+export const TOKENS_TAGS: { [key: string]: { mustShow: boolean; show: boolean; outName: string } } = {
+  raydium: { mustShow: true, show: true, outName: 'Raydium' },
+  userAdd: { mustShow: true, show: true, outName: 'UserAttention' },
+  solana: { mustShow: false, show: false, outName: 'Solana' },
+  unofficial: { mustShow: false, show: false, outName: 'Permissionless Pools Coin' }
+}
+
 export const NATIVE_SOL: TokenInfo = {
   symbol: 'SOL',
   name: 'Native Solana',
   mintAddress: '11111111111111111111111111111111',
   decimals: 9,
-  official: true,
-  showDefault: true
+  tags: ['raydium']
 }
 
 export const TOKENS: Tokens = {
@@ -78,8 +83,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'So11111111111111111111111111111111111111112',
     decimals: 9,
     referrer: 'HTcarLHe7WRxBQCWvhVB8AP56pnEtJUV2jDGvcpY3xo5',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   BTC: {
     symbol: 'BTC',
@@ -87,8 +91,7 @@ export const TOKENS: Tokens = {
     mintAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
     decimals: 6,
     referrer: 'GZpS8cY8Nt8HuqxzJh6PXTdSxc38vFUjBmi7eEUkkQtG',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   ETH: {
     symbol: 'ETH',
@@ -96,8 +99,7 @@ export const TOKENS: Tokens = {
     mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
     decimals: 6,
     referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   USDT: {
     symbol: 'USDT',
@@ -105,8 +107,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     decimals: 6,
     referrer: '8DwwDNagph8SdwMUdcXS5L9YAyutTyDJmK6cTKrmNFk3',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   WUSDT: {
     symbol: 'WUSDT',
@@ -114,8 +115,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
     decimals: 6,
     referrer: 'CA98hYunCLKgBuD6N8MJSgq1GbW9CXdksLf5mw736tS3',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   USDC: {
     symbol: 'USDC',
@@ -123,16 +123,14 @@ export const TOKENS: Tokens = {
     mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   WUSDC: {
     symbol: 'WUSDC',
     name: 'Wrapped USDC',
     mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
     decimals: 6,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   YFI: {
     symbol: 'YFI',
@@ -140,8 +138,7 @@ export const TOKENS: Tokens = {
     mintAddress: '3JSf5tPeuscJGtaCp5giEiDhv51gQ4v3zWg8DGgyLfAB',
     decimals: 6,
     referrer: 'DZjgzKfYzZBBSTo5vytMYvGdNF933DvuX8TftDMrThrb',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   LINK: {
     symbol: 'LINK',
@@ -149,8 +146,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG',
     decimals: 6,
     referrer: 'DRSKKsYZaPEFkRgGywo7KWBGZikf71R9aDr8tjtpr41V',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   XRP: {
     symbol: 'XRP',
@@ -158,8 +154,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'Ga2AXHpfAF6mv2ekZwcsJFqu7wB4NV331qNH7fW9Nst8',
     decimals: 6,
     referrer: '6NeHPXG142tAE2Ej3gHgT2N66i1KH6PFR6PBZw6RyrwH',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SUSHI: {
     symbol: 'SUSHI',
@@ -167,8 +162,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'AR1Mtgh7zAtxuxGd2XPovXPVjcSdY3i4rQYisNadjfKy',
     decimals: 6,
     referrer: '59QxHeHgb28tDc3gStnrW8FNKC9qWuRmRZHBaAqCerJX',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   ALEPH: {
     symbol: 'ALEPH',
@@ -176,8 +170,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'CsZ5LZkDS7h9TDKjrbL7VAwQZ9nsRu8vJLhRYfmGaN8K',
     decimals: 6,
     referrer: '8FKAKrenJMDd7V6cxnM5BsymHTjqxgodtHbLwZReMnWW',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SXP: {
     symbol: 'SXP',
@@ -185,8 +178,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'SF3oTvfWzEP3DTwGSvUXRrGTvr75pdZNnBLAH9bzMuX',
     decimals: 6,
     referrer: '97Vyotr284UM2Fyq9gbfQ3azMYtgf7cjnsf8pN1PFfY9',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   HGET: {
     symbol: 'HGET',
@@ -194,8 +186,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'BtZQfWqDGbk9Wf2rXEiWyQBdBY1etnUUn6zEphvVS7yN',
     decimals: 6,
     referrer: 'AGY2wy1ANzLM2jJLSkVxPUYAY5iAYXYsLMQkoQsAhucj',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   CREAM: {
     symbol: 'CREAM',
@@ -203,8 +194,7 @@ export const TOKENS: Tokens = {
     mintAddress: '5Fu5UUgbjpUvdBveb3a1JTNirL8rXtiYeSMWvKjtUNQv',
     decimals: 6,
     referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   UBXT: {
     symbol: 'UBXT',
@@ -212,8 +202,7 @@ export const TOKENS: Tokens = {
     mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
     decimals: 6,
     referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   HNT: {
     symbol: 'HNT',
@@ -221,8 +210,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
     decimals: 6,
     referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   FRONT: {
     symbol: 'FRONT',
@@ -230,8 +218,7 @@ export const TOKENS: Tokens = {
     mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
     decimals: 6,
     referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   AKRO: {
     symbol: 'AKRO',
@@ -239,8 +226,7 @@ export const TOKENS: Tokens = {
     mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
     decimals: 6,
     referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   HXRO: {
     symbol: 'HXRO',
@@ -248,8 +234,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
     decimals: 6,
     referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   UNI: {
     symbol: 'UNI',
@@ -257,8 +242,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw',
     decimals: 6,
     referrer: '4ntxDv95ajBbXfZyGy3UhcQDx8xmH1yJ6eKvuNNH466x',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SRM: {
     symbol: 'SRM',
@@ -266,8 +250,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
     decimals: 6,
     referrer: 'HYxa4Ea1dz7ya17Cx18rEGUA1WbCvKjXjFKrnu8CwugH',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   FTT: {
     symbol: 'FTT',
@@ -275,8 +258,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3',
     decimals: 6,
     referrer: 'CafpgSh8KGL2GPTjdXfctD3vXngNZDJ3Q92FTfV71Hmt',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   MSRM: {
     symbol: 'MSRM',
@@ -284,8 +266,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'MSRMcoVyrFxnSgo5uXwone5SKcGhT1KEJMFEkMEWf9L',
     decimals: 0,
     referrer: 'Ge5q9x8gDUNYqqLA1MdnCzWNJGsbj3M15Yxse2cDbw9z',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   TOMO: {
     symbol: 'TOMO',
@@ -293,16 +274,14 @@ export const TOKENS: Tokens = {
     mintAddress: 'GXMvfY2jpQctDqZ9RoU3oWPhufKiCcFEfchvYumtX7jd',
     decimals: 6,
     referrer: '9fexfN3eZomF5gfenG5L9ydbKRQkPhq6x74rb5iLrvXP',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   KARMA: {
     symbol: 'KARMA',
     name: 'Wrapped KARMA',
     mintAddress: 'EcqExpGNFBve2i1cMJUTR4bPXj4ZoqmDD2rTkeCcaTFX',
     decimals: 4,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   LUA: {
     symbol: 'LUA',
@@ -310,8 +289,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'EqWCKXfs3x47uVosDpTRgFniThL9Y8iCztJaapxbEaVX',
     decimals: 6,
     referrer: 'HuZwNApjVFuFSDgrwZA8GP2JD7WMby4qt6rkWDnaMo7j',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   MATH: {
     symbol: 'MATH',
@@ -319,24 +297,21 @@ export const TOKENS: Tokens = {
     mintAddress: 'GeDS162t9yGJuLEHPWXXGrb1zwkzinCgRwnT8vHYjKza',
     decimals: 6,
     referrer: 'C9K1M8sJX8WMdsnFT7DuzdiHHunEj79EsLuz4DixQYGm',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   KEEP: {
     symbol: 'KEEP',
     name: 'Wrapped KEEP',
     mintAddress: 'GUohe4DJUA5FKPWo3joiPgsB7yzer7LpDmt1Vhzy3Zht',
     decimals: 6,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SWAG: {
     symbol: 'SWAG',
     name: 'Wrapped SWAG',
     mintAddress: '9F9fNTT6qwjsu4X4yWYKZpsbw5qT7o6yR2i57JF2jagy',
     decimals: 6,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   FIDA: {
     symbol: 'FIDA',
@@ -344,8 +319,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp',
     decimals: 6,
     referrer: 'AeAsG75UmyPDB271c6NHonHxXAPXfkvhcf2xjfJhReS8',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   KIN: {
     symbol: 'KIN',
@@ -353,24 +327,21 @@ export const TOKENS: Tokens = {
     mintAddress: 'kinXdEcpDQeHPEuQnqmUgtYykqKGVFq6CeVX5iAHJq6',
     decimals: 5,
     referrer: 'AevFXmApVxN2yk1iemSxXc6Wy7Z1udUEfST11kuYKmr9',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   MAPS: {
     symbol: 'MAPS',
     name: 'MAPS',
     mintAddress: 'MAPS41MDahZ9QdKXhVa4dWB9RuyfV4XqhyAZ8XcYepb',
     decimals: 6,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   OXY: {
     symbol: 'OXY',
     name: 'OXY',
     mintAddress: 'z3dn17yLaGMKffVogeFHQ9zWVcXgqgf3PQnDsNs2g6M',
     decimals: 6,
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   RAY: {
     symbol: 'RAY',
@@ -378,8 +349,7 @@ export const TOKENS: Tokens = {
     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
     decimals: 6,
     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   xCOPE: {
     symbol: 'xCOPE',
@@ -387,8 +357,7 @@ export const TOKENS: Tokens = {
     mintAddress: '3K6rftdAaQYMPunrtNRHgnK2UAtjm2JwyT2oCiTDouYE',
     decimals: 0,
     referrer: '8DTehuES4tfnd2SrqcjN52XofxWXGjiLZRgM12U9pB6f',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   COPE: {
     symbol: 'COPE',
@@ -396,8 +365,7 @@ export const TOKENS: Tokens = {
     mintAddress: '8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh',
     decimals: 6,
     referrer: 'G7UYwWhkmgeL57SUKFF45K663V9TdXZw6Ho6ZLQ7p4p',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   STEP: {
     symbol: 'STEP',
@@ -405,8 +373,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'StepAscQoEioFxxWGnh2sLBDFp9d8rvKz2Yp39iDpyT',
     decimals: 9,
     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   MEDIA: {
     symbol: 'MEDIA',
@@ -426,8 +393,7 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/Media_FDN',
       Medium: 'https://mediafoundation.medium.com/'
     },
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   ROPE: {
     symbol: 'ROPE',
@@ -435,8 +401,7 @@ export const TOKENS: Tokens = {
     mintAddress: '8PMHT4swUMtBzgHnh5U564N5sjPSiUz2cjEQzFnnP1Fo',
     decimals: 9,
     referrer: '5sGVVniBSPLTwRHDETShovq7STRH2rJwbvdvvH3NcVTF',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   MER: {
     symbol: 'MER',
@@ -456,8 +421,7 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/MercurialFi',
       Medium: 'https://mercurialfi.medium.com/'
     },
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   TULIP: {
     symbol: 'TULIP',
@@ -465,8 +429,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'TuLipcqtGVXP9XR62wM8WWCm6a9vhLs7T1uoWBk6FDs',
     decimals: 6,
     referrer: 'Bcw1TvX8jUj6CtY2a7GU2THeYVAudvmT8yzRypVMVsSH',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SNY: {
     symbol: 'SNY',
@@ -487,8 +450,7 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/synthetify',
       Medium: 'https://synthetify.medium.com/'
     },
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   SLRS: {
     symbol: 'SLRS',
@@ -509,8 +471,7 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/solrisefinance',
       Medium: 'https://blog.solrise.finance/'
     },
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   WOO: {
     symbol: 'WOO',
@@ -518,8 +479,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'E5rk3nmgLUuKUiS94gg4bpWwWwyjCMtddsAXkTFLtHEy',
     decimals: 6,
     referrer: '7UbeAZxpza5zN3QawQ5KsUo88zXvohUncYB9Zk5QCiim',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   },
   BOP: {
     symbol: 'BOP',
@@ -527,8 +487,7 @@ export const TOKENS: Tokens = {
     mintAddress: 'BLwTnYKqf7u4qjgZrrsKeNs2EzWkMLqVCu6j8iHyrNA3',
     decimals: 8,
     referrer: 'FWxBZmNsvNckx8DnaL2NuyMtiQmT1x529WwV4e1UWiGk',
-    official: true,
-    showDefault: true
+    tags: ['raydium']
   }
 }
 
@@ -1024,22 +983,24 @@ function addUserLocalCoinMint() {
       const name = localMintList[index * 3 + 0]
       const mintAddress = localMintList[index * 3 + 1]
       const decimals = localMintList[index * 3 + 2]
-      if (!Object.keys(TOKENS).includes(name)) {
-        TOKENS[name] = {
+      if (!Object.values(TOKENS).find((item) => item.mintAddress === mintAddress)) {
+        TOKENS[name + mintAddress + 'unofficialUserAdd'] = {
           name,
           symbol: name,
           decimals: parseInt(decimals),
           mintAddress,
-          official: false,
-          showDefault: true
+          tags: ['userAdd']
         }
-      } else {
-        TOKENS[name].showDefault = true
+      } else if (
+        !Object.values(TOKENS)
+          .find((item) => item.mintAddress === mintAddress)
+          .tags.includes('userAdd')
+      ) {
+        TOKENS[name].tags.push('userAdd')
       }
     }
   }
 }
-addUserLocalCoinMint()
 
 function addTokensSolana() {
   fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
@@ -1053,28 +1014,49 @@ function addTokensSolana() {
           return
         }
         if (!Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)) {
-          TOKENS[itemToken.symbol + itemToken.address] = {
+          TOKENS[itemToken.symbol + itemToken.address + 'solana'] = {
             symbol: itemToken.symbol,
             name: itemToken.name,
             mintAddress: itemToken.address,
             decimals: itemToken.decimals,
-            official: true,
-            showDefault: false,
-            picUrl: itemToken.logoURI
+            picUrl: itemToken.logoURI,
+            tags: ['solana']
+          }
+        } else {
+          const token = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
+          if (token.symbol !== itemToken.symbol && !token.tags.includes('raydium')) {
+            token.symbol = itemToken.symbol
+            token.name = itemToken.name
+            token.decimals = itemToken.decimals
+            token.tags.push('solana')
           }
         }
       })
 
       if (window.localStorage.addSolanaCoin) {
         window.localStorage.addSolanaCoin.split('---').forEach((itemMint: string) => {
-          Object.keys(TOKENS).forEach((item) => {
-            if (TOKENS[item].mintAddress === itemMint) {
-              TOKENS[item].showDefault = true
-            }
-          })
+          if (itemMint === NATIVE_SOL.mintAddress) NATIVE_SOL.tags.push('userAdd')
+          else
+            Object.keys(TOKENS).forEach((item) => {
+              if (TOKENS[item].mintAddress === itemMint) {
+                TOKENS[item].tags.push('userAdd')
+              }
+            })
         })
       }
     })
 }
 
+function updateTokenTagsChange() {
+  const userSelectSource = window.localStorage.userSelectSource ?? ''
+  const userSelectSourceList: string[] = userSelectSource.split('---')
+  for (const itemSource of userSelectSourceList) {
+    if (TOKENS_TAGS[itemSource] && !TOKENS_TAGS[itemSource].mustShow) {
+      TOKENS_TAGS[itemSource].show = true
+    }
+  }
+}
+
+addUserLocalCoinMint()
 addTokensSolana()
+updateTokenTagsChange()
