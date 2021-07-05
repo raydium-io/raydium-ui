@@ -58,7 +58,7 @@
         </span>
         <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
         <span slot="access" slot-scope="isRayPool, pool" class="access">
-          <span v-if="pool.isPrivate" class="ray">
+          <span v-if="pool.isPrivate" class="community">
             <span>Private Pool</span>
           </span>
           <span v-else-if="pool.isRayPool" class="ray">
@@ -140,10 +140,16 @@ export default class AcceleRaytor extends Vue {
     switch (access) {
       case 'ray': {
         rules.isRayPool = true
+        rules.isPrivate = false
         break
       }
       case 'community': {
         rules.isRayPool = false
+        rules.isPrivate = false
+        break
+      }
+      case 'private': {
+        rules.isPrivate = true
         break
       }
     }

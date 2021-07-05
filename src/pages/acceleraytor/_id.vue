@@ -9,7 +9,7 @@
           </div>
           <div>
             <span class="access">
-              <span v-if="pool.isPrivate" class="ray">
+              <span v-if="pool.isPrivate" class="community">
                 <span>Private Pool</span>
               </span>
               <span v-else-if="pool.isRayPool" class="ray">
@@ -554,7 +554,10 @@
               <span class="key">Access type</span>
               <span class="text">
                 <span class="access">
-                  <span v-if="pool.isRayPool" class="ray">
+                  <span v-if="pool.isPrivate" class="community">
+                    <span>Private Pool</span>
+                  </span>
+                  <span v-else-if="pool.isRayPool" class="ray">
                     <span>RAY Pool</span>
                   </span>
                   <span v-else class="community"><span>Community Pool</span></span>
@@ -571,7 +574,7 @@
                 {{ pool.isRayPool ? `${pool.info.minStakeLimit.format()} RAY staked` : 'No limit' }}
               </span>
             </div>
-            <div class="infos flex">
+            <div v-if="!pool.isPrivate" class="infos flex">
               <span class="key">RAY staking deadline</span>
               <span class="text">
                 {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
