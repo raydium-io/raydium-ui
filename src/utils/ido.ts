@@ -397,14 +397,13 @@ export async function purchase({
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
       ? purchaseInstruction<'3'>(
-          { programId: new PublicKey(poolInfo.programId), amount },
+          { programId: new PublicKey(poolInfo.programId), amount, userOwner: owner },
           {
             idoId: new PublicKey(poolInfo.idoId),
             authority: idoAuthority,
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
-            userOwner: owner,
             userIdoCheck
           }
         )
@@ -412,7 +411,8 @@ export async function purchase({
       ? purchaseInstruction<'private'>(
           {
             programId: new PublicKey(poolInfo.programId),
-            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber(),
+            userOwner: owner
           },
           {
             idoId: new PublicKey(poolInfo.idoId),
@@ -420,14 +420,15 @@ export async function purchase({
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
-            userOwner: owner,
+
             userIdoCheck
           }
         )
       : purchaseInstruction(
           {
             programId: new PublicKey(poolInfo.programId),
-            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber(),
+            userOwner: owner
           },
           {
             idoId: new PublicKey(poolInfo.idoId),
@@ -435,7 +436,6 @@ export async function purchase({
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
-            userOwner: owner,
             userStakeInfo: new PublicKey(stakeInfoAccount),
             userIdoCheck
           }
@@ -491,18 +491,17 @@ export async function claim({
   transaction.add(
     poolInfo.version === 3 // transaction point to lottery
       ? claimInstruction<'3'>(
-          { programId: new PublicKey(poolInfo.programId) },
+          { programId: new PublicKey(poolInfo.programId), userOwner: owner },
           {
             idoId: new PublicKey(poolInfo.idoId),
             authority: idoAuthority,
             poolTokenAccount: new PublicKey(aim === 'base' ? poolInfo.baseVault : poolInfo.quoteVault),
             userTokenAccount: aim === 'base' ? newUserBaseTokenAccount : newUserQuoteTokenAccount,
-            userIdoInfo,
-            userOwner: owner
+            userIdoInfo
           }
         )
       : claimInstruction(
-          { programId: new PublicKey(poolInfo.programId) },
+          { programId: new PublicKey(poolInfo.programId), userOwner: owner },
           {
             idoId: new PublicKey(poolInfo.idoId),
             authority: idoAuthority,
@@ -510,8 +509,7 @@ export async function claim({
             poolBaseTokenAccount: new PublicKey(poolInfo.baseVault),
             userQuoteTokenAccount: newUserQuoteTokenAccount,
             userBaseTokenAccount: newUserBaseTokenAccount,
-            userIdoInfo,
-            userOwner: owner
+            userIdoInfo
           }
         )
   )
@@ -527,7 +525,6 @@ interface PurchaseInstructionKeys {
   // user
   userQuoteTokenAccount: PublicKey
   userIdoInfo: PublicKey
-  userOwner: PublicKey
   userStakeInfo: PublicKey
   userIdoCheck: PublicKey
 }
@@ -539,7 +536,6 @@ interface PurchaseInstructionKeysV3 {
   // user
   userQuoteTokenAccount: PublicKey
   userIdoInfo: PublicKey
-  userOwner: PublicKey
   userIdoCheck: PublicKey
 }
 interface PurchaseInstructionKeysPrivate {
@@ -550,11 +546,10 @@ interface PurchaseInstructionKeysPrivate {
   // user
   userQuoteTokenAccount: PublicKey
   userIdoInfo: PublicKey
-  userOwner: PublicKey
   userIdoCheck: PublicKey
 }
 export function purchaseInstruction<Flag extends '' | '3' | 'private' = ''>(
-  { programId, amount }: { programId: PublicKey; amount: string | number },
+  { programId, amount, userOwner }: { programId: PublicKey; amount: string | number; userOwner: PublicKey },
   instructionKeys: Flag extends '3'
     ? PurchaseInstructionKeysV3
     : Flag extends 'private'
@@ -569,6 +564,7 @@ export function purchaseInstruction<Flag extends '' | '3' | 'private' = ''>(
     { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
     // pubkeys
+    { pubkey: userOwner, isSigner: true, isWritable: true },
     ...Object.values(instructionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
   ]
 
@@ -588,7 +584,6 @@ interface ClaimInstructionKeys {
   userQuoteTokenAccount: PublicKey
   userBaseTokenAccount: PublicKey
   userIdoInfo: PublicKey
-  userOwner: PublicKey
 }
 interface ClaimInstructionKeysV3 {
   // ido
@@ -599,10 +594,9 @@ interface ClaimInstructionKeysV3 {
   // user
   userTokenAccount: PublicKey // NEED_CHECK: is it Quote or Base? // differernt account in user wallet
   userIdoInfo: PublicKey
-  userOwner: PublicKey
 }
 export function claimInstruction<Version extends '' | '3' = ''>(
-  { programId }: { programId: PublicKey },
+  { programId, userOwner }: { programId: PublicKey; userOwner: PublicKey },
   instructionKeys: Version extends '3' ? ClaimInstructionKeysV3 : ClaimInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction')])
@@ -610,6 +604,7 @@ export function claimInstruction<Version extends '' | '3' = ''>(
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
     { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: true },
     ...Object.values(instructionKeys).map((pubkey) => ({ pubkey, isSigner: false, isWritable: true }))
   ]
 
