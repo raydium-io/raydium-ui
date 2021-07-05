@@ -31,7 +31,7 @@
                 "
                 @click.stop="delCoinToAttention(token)"
               >
-                (Remove Attention)
+                (Remove Token)
               </button>
               <button
                 v-if="
@@ -49,7 +49,7 @@
                 "
                 @click.stop="addCoinToAttention(token)"
               >
-                (Add Attention)
+                (Add Token)
               </button>
             </div>
             <span></span>
@@ -97,7 +97,7 @@
             showSelectSourceFlag = true
           }
         "
-        >Change Coin Source</Button
+        >View Token Lists</Button
       >
     </template>
   </Modal>

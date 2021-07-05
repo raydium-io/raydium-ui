@@ -5,8 +5,8 @@
       <div style="display: inline-block; width: 49%; text-align: right">
         <Toggle
           v-model="value.show"
-          checked-children="SHOW"
-          un-checked-children="BLANK"
+          checked-children="ON"
+          un-checked-children="OFF"
           :disabled="value.mustShow"
           @change="test"
         ></Toggle>
