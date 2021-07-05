@@ -120,7 +120,7 @@ export const TOKENS: Tokens = {
   USDC: {
     symbol: 'USDC',
     name: 'USDC',
-    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     decimals: 6,
     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
     tags: ['raydium']
@@ -454,10 +454,10 @@ export const TOKENS: Tokens = {
   },
   SLRS: {
     symbol: 'SLRS',
-    name: 'SLRS', // TEMP
-    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp',
+    name: 'SLRS',
+    mintAddress: 'SLRSSpSLUTP7okbCUBYStWCo1vUgyt775faPqz8HUMr',
     decimals: 6,
-    referrer: '',
+    referrer: 'AmqeHgTdm6kBzy5ewZFKuMAfbynZmhve1GQxbJzQFLbP',
 
     detailLink: 'https://raydium.medium.com/solrise-is-launching-on-acceleraytor-c2c980362037',
     details:

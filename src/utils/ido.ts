@@ -133,7 +133,7 @@ export const IDO_POOLS: IdoPool[] = [
     quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(0.05, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(2000000, TOKENS.SLRS.decimals, false),
+    raise: new TokenAmount(480000, TOKENS.SLRS.decimals, false),
 
     version: 2,
     programId: IDO_PROGRAM_ID_V2,
@@ -141,9 +141,9 @@ export const IDO_POOLS: IdoPool[] = [
 
     isRayPool: false,
     isPrivate: true,
-    idoId: 'AViq7hjoJ8iKzBV9wmWfmiJSXGS439YihgADN632GL6v',
-    baseVault: '3nJ6Sp9tjeXRZnzqXM2Yf3UcsfotqEginZqDvaWhE68M',
-    quoteVault: 'Bp6VP47eJLexpvumJuycB3Qnoixea9ZMLm5NbFNqPCYu',
+    idoId: '7nJQCQFNNqrp2VXQM5u9CZ98LBH2EYk62V2zuKRBvw8G',
+    baseVault: 'C3qE7ErgGDWKiz8h9Pv6FBjfnfzJFDrF5Ubb3zacMnbL',
+    quoteVault: '5AmMZChuCAw8XWCF6RRhWTaaosemKzHc6HV89nx2Qp6z',
     seedId: 'FUbckyz9EKqTYvoPPRF3A2JpGJTJHRbHi2J6rJYhqCay'
   },
   {
@@ -404,8 +404,8 @@ export async function purchase({
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
-            userIdoCheck,
-            userOwner: owner
+            userOwner: owner,
+            userIdoCheck
           }
         )
       : poolInfo.isPrivate
@@ -420,9 +420,8 @@ export async function purchase({
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
-
-            userIdoCheck,
-            userOwner: owner
+            userOwner: owner,
+            userIdoCheck
           }
         )
       : purchaseInstruction(
@@ -436,9 +435,9 @@ export async function purchase({
             poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
             userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
             userIdoInfo,
+            userOwner: owner,
             userStakeInfo: new PublicKey(stakeInfoAccount),
-            userIdoCheck,
-            userOwner: owner
+            userIdoCheck
           }
         )
   )
