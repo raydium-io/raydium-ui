@@ -350,7 +350,10 @@
           Connect Wallet
         </Button>
         <Button
-          v-else-if="!pool.userInfo || (!pool.userInfo.snapshoted && (pool.isRayPool || pool.isPrivate))"
+          v-else-if="
+            (!pool.userInfo || (!pool.userInfo.snapshoted && (pool.isRayPool || pool.isPrivate))) &&
+            pool.info.endTime > getUnixTs() / 1000
+          "
           size="large"
           ghost
           disabled
