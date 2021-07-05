@@ -94,6 +94,7 @@ export interface IdoPool {
   snapshotProgramId: string
 
   isRayPool: boolean
+  isPrivate: boolean
   status?: string
   idoId: string
   baseVault: string
@@ -121,10 +122,29 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
+    isPrivate: false,
     idoId: '6djgqw4EXwjGJMPuxH43RdCih5DQgwop1UK5Wk2FDvWt',
     baseVault: 'E6A985RSVzJYhfEzW9B7e86xtYfHz5h9wxRe2KLHWnTZ',
     quoteVault: '8Q8xr7X7asGL82SdniAcrN8f9hTa1DjDcbJVLNVN38zg',
     seedId: 'APDE8Mc9abyigJb9cWcS95mMCyyA4QN4kv5Zi4YePygt'
+  },
+  {
+    base: { ...TOKENS.SLRS },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.05, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(2000000, TOKENS.SLRS.decimals, false),
+
+    version: 2,
+    programId: IDO_PROGRAM_ID_V2,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: false,
+    isPrivate: true,
+    idoId: 'AViq7hjoJ8iKzBV9wmWfmiJSXGS439YihgADN632GL6v',
+    baseVault: '3nJ6Sp9tjeXRZnzqXM2Yf3UcsfotqEginZqDvaWhE68M',
+    quoteVault: 'Bp6VP47eJLexpvumJuycB3Qnoixea9ZMLm5NbFNqPCYu',
+    seedId: 'FUbckyz9EKqTYvoPPRF3A2JpGJTJHRbHi2J6rJYhqCay'
   },
   {
     base: { ...TOKENS.SNY },
@@ -138,6 +158,7 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
+    isPrivate: false,
     idoId: '9aAMMBcRVfPEa7quoRyofR3rG7qF4QJTehUhV3o1mPzf',
     baseVault: 'D9X5KoDgC9sKFwPQcjYySGkHpe7akMvSSVDsorRgXYER',
     quoteVault: 'Emuu4LH3Y2c7RmC97RWw944foRUSU28QbAyx9ocyMJsS',
@@ -155,6 +176,7 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
+    isPrivate: false,
     idoId: '3GANPMCSLb1NeQZZ1VNKXHrH5jCyK3DQLr4tmhvkaYng',
     baseVault: 'Hw41WUxQjuEbNK21nBRdoefqVhgWFe6vjJ1CTJXtXryo',
     quoteVault: 'AdeaHKgjYDfvzdmiaj3WSTRh6rGUF5Rf2bdgm6c9DEni',
@@ -172,6 +194,7 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
+    isPrivate: false,
     idoId: 'F5Rk8Eht3JU69146uc9piwmMGCdPwAmYgJKRUaWxhwim',
     baseVault: '3CDLcsVhRReJ4otXhfi2kD2FrppRUqQYtXXZ7LgQrNy5',
     quoteVault: 'HrKrc1mh6jQr6Sa1DAZ9JBbpKDvTTrgkEkAHSp28tven',
@@ -189,6 +212,7 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
 
     isRayPool: true,
+    isPrivate: false,
     idoId: 'EFnvwDxehFLycdUp6DiwcyBTz88qcZFP3KUDfmPU4Fdc',
     baseVault: '2WCoJRu1w6awJR7PvCc1mWKR9XpPNZDFyBDBX713k8ng',
     quoteVault: '21XBxBZn3tX8aaJKm1KKm6sWsLUxsMedV3a1CvNBW2m9'
@@ -205,6 +229,7 @@ export const IDO_POOLS: IdoPool[] = [
     snapshotProgramId: '11111111111111111111111111111111',
 
     isRayPool: false,
+    isPrivate: false,
     idoId: '3phgXrkHbMmVLUbUvXPXsnot9WxkdyvVEyiA8odyWY8s',
     baseVault: '2Gxcw4Vo7zGGNg9JxksrWYazcpQTWNi8JdQkF3bF5yaN',
     quoteVault: '6TyVHwiEaDRQCf398QjvC6JLqPzK9REvMiS6DsCWG5o4'
@@ -369,37 +394,57 @@ export async function purchase({
           new PublicKey(poolInfo.snapshotProgramId)
         )
 
-  transaction.add(
-    poolInfo.version === 3 // transaction point to lottery
-      ? purchaseInstruction<'3'>(
-          { programId: new PublicKey(poolInfo.programId), amount },
-          {
-            idoId: new PublicKey(poolInfo.idoId),
-            authority: idoAuthority,
-            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-            userIdoInfo,
-            userOwner: owner,
-            userIdoCheck
-          }
-        )
-      : purchaseInstruction(
-          {
-            programId: new PublicKey(poolInfo.programId),
-            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-          },
-          {
-            idoId: new PublicKey(poolInfo.idoId),
-            authority: idoAuthority,
-            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-            userIdoInfo,
-            userOwner: owner,
-            userStakeInfo: new PublicKey(stakeInfoAccount),
-            userIdoCheck
-          }
-        )
-  )
+  if (poolInfo.isPrivate) {
+    transaction.add(
+      purchaseInstruction(
+        {
+          programId: new PublicKey(poolInfo.programId),
+          amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+        },
+        {
+          idoId: new PublicKey(poolInfo.idoId),
+          authority: idoAuthority,
+          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+          userIdoInfo,
+          userOwner: owner,
+          userIdoCheck
+        }
+      )
+    )
+  } else {
+    transaction.add(
+      poolInfo.version === 3 // transaction point to lottery
+        ? purchaseInstruction<'3'>(
+            { programId: new PublicKey(poolInfo.programId), amount },
+            {
+              idoId: new PublicKey(poolInfo.idoId),
+              authority: idoAuthority,
+              poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+              userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+              userIdoInfo,
+              userOwner: owner,
+              userIdoCheck
+            }
+          )
+        : purchaseInstruction(
+            {
+              programId: new PublicKey(poolInfo.programId),
+              amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+            },
+            {
+              idoId: new PublicKey(poolInfo.idoId),
+              authority: idoAuthority,
+              poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+              userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+              userIdoInfo,
+              userOwner: owner,
+              userStakeInfo: new PublicKey(stakeInfoAccount),
+              userIdoCheck
+            }
+          )
+    )
+  }
 
   return await sendTransaction(connection, wallet, transaction, signers)
 }

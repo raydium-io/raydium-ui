@@ -9,7 +9,10 @@
           </div>
           <div>
             <span class="access">
-              <span v-if="pool.isRayPool" class="ray">
+              <span v-if="pool.isPrivate" class="ray">
+                <span>Private Pool</span>
+              </span>
+              <span v-else-if="pool.isRayPool" class="ray">
                 <span>RAY Pool</span>
               </span>
               <span v-else class="community"><span>Community Pool</span></span>
@@ -346,6 +349,14 @@
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
+        <Button
+          v-else-if="!pool.userInfo || (!pool.userInfo.snapshoted && (pool.isRayPool || pool.isPrivate))"
+          size="large"
+          ghost
+          disabled
+        >
+          Wallet not eligible for this pool
+        </Button>
         <Button v-else-if="pool.info.startTime > getUnixTs() / 1000" size="large" ghost disabled> Upcoming </Button>
 
         <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
@@ -408,9 +419,6 @@
         <Button v-else-if="depositedTickets.length > 0" size="large" ghost disabled>
           You have already deposited
         </Button>
-        <Button v-else-if="(!pool.userInfo || !pool.userInfo.snapshoted) && pool.isRayPool" size="large" ghost disabled>
-          Wallet not eligible for this pool
-        </Button>
 
         <template v-else-if="pool.info.startTime < getUnixTs() / 1000">
           <template v-if="depositedTickets.length"></template>
@@ -464,8 +472,8 @@
           </Button>
         </template>
 
-        <Button v-else size="large" ghost disabled
-          >{{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
+        <Button v-else size="large" ghost disabled>
+          {{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
         </Button>
         <hr />
         <Alert

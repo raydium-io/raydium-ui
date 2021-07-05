@@ -15,6 +15,7 @@
             <RadioButton value="all">All</RadioButton>
             <RadioButton value="ray">RAY</RadioButton>
             <RadioButton value="community">Community</RadioButton>
+            <RadioButton value="private">Private</RadioButton>
           </RadioGroup>
         </div>
         <div class="group">
@@ -57,7 +58,10 @@
         </span>
         <span slot="price" slot-scope="price, pool"> {{ price.toEther() }} {{ pool.quote.symbol }} </span>
         <span slot="access" slot-scope="isRayPool, pool" class="access">
-          <span v-if="isRayPool" class="ray">
+          <span v-if="pool.isPrivate" class="ray">
+            <span>Private Pool</span>
+          </span>
+          <span v-else-if="pool.isRayPool" class="ray">
             <span>{{ `RAY ${pool.version === 3 ? '' : pool.info.minStakeLimit.format()} Pool` }}</span>
           </span>
           <span v-else class="community"><span>Community Pool</span></span>

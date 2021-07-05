@@ -120,7 +120,7 @@ export const TOKENS: Tokens = {
   USDC: {
     symbol: 'USDC',
     name: 'USDC',
-    mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
     decimals: 6,
     referrer: '92vdtNjEg6Zth3UU1MgPgTVFjSEzTHx66aCdqWdcRkrg',
     tags: ['raydium']
@@ -455,7 +455,7 @@ export const TOKENS: Tokens = {
   SLRS: {
     symbol: 'SLRS',
     name: 'SLRS', // TEMP
-    mintAddress: 'SLRSSpSLUTP7okbCUBYStWCo1vUgyt775faPqz8HUMr',
+    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp',
     decimals: 6,
     referrer: '',
 
