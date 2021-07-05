@@ -394,57 +394,53 @@ export async function purchase({
           new PublicKey(poolInfo.snapshotProgramId)
         )
 
-  if (poolInfo.isPrivate) {
-    transaction.add(
-      purchaseInstruction(
-        {
-          programId: new PublicKey(poolInfo.programId),
-          amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-        },
-        {
-          idoId: new PublicKey(poolInfo.idoId),
-          authority: idoAuthority,
-          poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-          userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-          userIdoInfo,
-          userOwner: owner,
-          userIdoCheck
-        }
-      )
-    )
-  } else {
-    transaction.add(
-      poolInfo.version === 3 // transaction point to lottery
-        ? purchaseInstruction<'3'>(
-            { programId: new PublicKey(poolInfo.programId), amount },
-            {
-              idoId: new PublicKey(poolInfo.idoId),
-              authority: idoAuthority,
-              poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-              userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-              userIdoInfo,
-              userOwner: owner,
-              userIdoCheck
-            }
-          )
-        : purchaseInstruction(
-            {
-              programId: new PublicKey(poolInfo.programId),
-              amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
-            },
-            {
-              idoId: new PublicKey(poolInfo.idoId),
-              authority: idoAuthority,
-              poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
-              userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
-              userIdoInfo,
-              userOwner: owner,
-              userStakeInfo: new PublicKey(stakeInfoAccount),
-              userIdoCheck
-            }
-          )
-    )
-  }
+  transaction.add(
+    poolInfo.version === 3 // transaction point to lottery
+      ? purchaseInstruction<'3'>(
+          { programId: new PublicKey(poolInfo.programId), amount },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userIdoCheck
+          }
+        )
+      : poolInfo.isPrivate
+      ? purchaseInstruction<'private'>(
+          {
+            programId: new PublicKey(poolInfo.programId),
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+          },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userIdoCheck
+          }
+        )
+      : purchaseInstruction(
+          {
+            programId: new PublicKey(poolInfo.programId),
+            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+          },
+          {
+            idoId: new PublicKey(poolInfo.idoId),
+            authority: idoAuthority,
+            poolQuoteTokenAccount: new PublicKey(poolInfo.quoteVault),
+            userQuoteTokenAccount: new PublicKey(userQuoteTokenAccount),
+            userIdoInfo,
+            userOwner: owner,
+            userStakeInfo: new PublicKey(stakeInfoAccount),
+            userIdoCheck
+          }
+        )
+  )
 
   return await sendTransaction(connection, wallet, transaction, signers)
 }
@@ -546,9 +542,24 @@ interface PurchaseInstructionKeysV3 {
   userOwner: PublicKey
   userIdoCheck: PublicKey
 }
-export function purchaseInstruction<Version extends '' | '3' = ''>(
+interface PurchaseInstructionKeysPrivate {
+  // ido
+  idoId: PublicKey
+  authority: PublicKey
+  poolQuoteTokenAccount: PublicKey
+  // user
+  userQuoteTokenAccount: PublicKey
+  userIdoInfo: PublicKey
+  userOwner: PublicKey
+  userIdoCheck: PublicKey
+}
+export function purchaseInstruction<Flag extends '' | '3' | 'private' = ''>(
   { programId, amount }: { programId: PublicKey; amount: string | number },
-  instructionKeys: Version extends '3' ? PurchaseInstructionKeysV3 : PurchaseInstructionKeys
+  instructionKeys: Flag extends '3'
+    ? PurchaseInstructionKeysV3
+    : Flag extends 'private'
+    ? PurchaseInstructionKeysPrivate
+    : PurchaseInstructionKeys
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
   const keys = [
