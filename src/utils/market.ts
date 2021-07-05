@@ -144,7 +144,7 @@ export function initializeMint(mint: PublicKey, decimals: number, mintAuthority:
   ])
   const keys = [
     { pubkey: mint, isSigner: false, isWritable: true },
-    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true }
+    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: false }
   ]
   const data = Buffer.alloc(dataLayout.span)
 
@@ -715,8 +715,8 @@ export function initialize2(
   const dataLayout = struct([u8('instruction'), u8('nonce')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },

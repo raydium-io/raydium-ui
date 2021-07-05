@@ -367,7 +367,7 @@ export function addLiquidityInstruction(
   const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
@@ -426,7 +426,7 @@ export function addLiquidityInstructionV4(
   const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
@@ -489,7 +489,7 @@ export function removeLiquidityInstruction(
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
@@ -556,7 +556,7 @@ export function removeLiquidityInstructionV4(
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },

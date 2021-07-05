@@ -588,7 +588,7 @@ export function swapInstruction(
 
   const keys = [
     // spl token
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     // amm
     { pubkey: ammId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: true },
