@@ -414,7 +414,16 @@
               Claim after {{ $dayjs(pool.info.startWithdrawTime * 1000) }}
             </Button>
 
-            <Button v-else size="large" ghost :loading="purchasing" :disabled="purchasing" @click="withdraw">
+            <Button
+              v-else
+              size="large"
+              ghost
+              :loading="purchasing"
+              :disabled="
+                purchasing || !pool.userInfo || !pool.userInfo.deposited || pool.userInfo.deposited.isNullOrZero()
+              "
+              @click="withdraw"
+            >
               Claim
             </Button>
           </template>
