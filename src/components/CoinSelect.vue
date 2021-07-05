@@ -431,6 +431,9 @@ export default Vue.extend({
   border: none;
   width: 100%;
 }
+.source-manager:hover {
+  color: #5ac4be;
+}
 
 .select-token {
   display: grid;
