@@ -970,6 +970,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '9nQPYJvysyfnXhQ6nkK5V7sZG26hmDgusfdNQijRk5LD',
     decimals: TOKENS.BOP.decimals
+  },
+  'SLRS-USDC-V4': {
+    symbol: 'SLRS-USDC',
+    name: 'SLRS-USDC LP',
+    coin: { ...TOKENS.SLRS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2Xxbm1hdv5wPeen5ponDSMT3VqhGMTQ7mH9stNXm9shU',
+    decimals: TOKENS.SLRS.decimals
   }
 }
 
