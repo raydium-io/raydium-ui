@@ -365,7 +365,7 @@
         <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
           <div v-if="pool.version === 3" class="btn-group">
             <Button
-              v-if="pool.info.quoteTokenDeposited.toEther() > 0"
+              v-if="pool.userInfo && pool.userInfo.quoteTokenDeposited > 0"
               size="large"
               ghost
               style="font-size: 13px"
@@ -384,7 +384,7 @@
             </Button>
 
             <Button
-              v-if="pool.info.quoteTokenDeposited.toEther() > 0"
+              v-if="pool.userInfo && pool.userInfo.quoteTokenDeposited > 0"
               size="large"
               ghost
               :disabled="
