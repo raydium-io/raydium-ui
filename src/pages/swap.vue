@@ -684,6 +684,7 @@ export default Vue.extend({
       }
       setTimeout(() => {
         this.setCoinFromMintLoading = false
+        this.findMarket()
       }, 1)
     },
 
