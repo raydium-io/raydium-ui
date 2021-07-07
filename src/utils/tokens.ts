@@ -1039,6 +1039,10 @@ function addTokensSolana() {
             token.decimals = itemToken.decimals
             token.tags.push('solana')
           }
+          const picToken = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
+          if (picToken) {
+            picToken.picUrl = itemToken.logoURI
+          }
         }
       })
 
