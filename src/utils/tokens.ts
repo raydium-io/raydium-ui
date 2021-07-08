@@ -488,6 +488,14 @@ export const TOKENS: Tokens = {
     decimals: 8,
     referrer: 'FWxBZmNsvNckx8DnaL2NuyMtiQmT1x529WwV4e1UWiGk',
     tags: ['raydium']
+  },
+  SAMO: {
+    symbol: 'SAMO',
+    name: 'Samoyed Coin',
+    mintAddress: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
+    decimals: 9,
+    referrer: 'FnMDNFL9t8EpbADSU3hLWBtx7SuwRBB6NM84U3PzSkUu',
+    tags: ['raydium']
   }
 }
 
@@ -979,6 +987,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '2Xxbm1hdv5wPeen5ponDSMT3VqhGMTQ7mH9stNXm9shU',
     decimals: TOKENS.SLRS.decimals
+  },
+  'SAMO-RAY-V4': {
+    symbol: 'SAMO-RAY',
+    name: 'SAMO-RAY LP',
+    coin: { ...TOKENS.SAMO },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'HwzkXyX8B45LsaHXwY8su92NoRBS5GQC32HzjQRDqPnr',
+    decimals: TOKENS.SAMO.decimals
   }
 }
 

@@ -559,6 +559,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'HTr2pYDBQZP13YTzLdsPzmh6e4hsNeqoGy3B777ejqTT', // lp vault
     poolRewardTokenAccount: 'Ef1tQ2E2Fe92xPVpQGzZFHmT7g7dh2hzVfWYVJJQPdbu', // reward vault A
     poolRewardTokenAccountB: 'Ffmv9Ximzk8D9oKwHkkgdq9cVxv5P5Y9LxEJdu1N1jSJ' // reward vault B
+  },
+  {
+    name: 'SAMO-RAY',
+    lp: { ...LP_TOKENS['SAMO-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SAMO },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'Bw932pURVJRYjEJwRZGWjfUNpeyz18kjMNdb833eMxoj',
+    poolAuthority: 'FzTbGLdzgWCRkq8hbS8tLf5HjfU7JzUbtRmTkjGQB9Vz',
+    poolLpTokenAccount: 'GUVKfYMiGEyp41CUw2j2NsoQJ5zDQ3Q6uSdApM8W46Ba', // lp vault
+    poolRewardTokenAccount: 'J99YW5wnfgBJcG17BgSbp1S8RNJ39JAb7kg9RGHyb3Hq', // reward vault A
+    poolRewardTokenAccountB: 'GhctEMRSwvdZF7aFeCLdK9X1sAAeGVPjr12iVLjQNvhy' // reward vault B
   }
 ]
 

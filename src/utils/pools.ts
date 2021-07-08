@@ -1739,33 +1739,34 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumPcVaultAccount: 'Bsa11vdveUhSouxAXSYCE4yXToUP58N9EEeM1P8qbtp3',
     serumVaultSigner: 'CjiJdQ9a7dnjTKfVPZ2fwn31NtgJA1kRU55pwDE8HHrM',
     official: true
+  },
+  {
+    name: 'SAMO-RAY',
+    coin: { ...TOKENS.SAMO },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['SAMO-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'EyDgEU9BdG7m6ZK4bYERxbN4NCJ129WzPtv23dBkfsLg',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '45TD9SmkGoq4hBxBnsQQD2V7pyWK53HkEXz7uNNHpezG',
+    ammTargetOrders: 'Ave8ozwW9iBGL4SpK1tM1RfrQi8CsLUFj4UGdFkWRPRp',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '9RFqA8EbTTqH3ct1fTGiGgqFAg2hziUdtyGgg1w69LJP',
+    poolPcTokenAccount: 'ArAyYYib2X8BTcURYNXKhfoUww2DWkzk67PRPGVpFAuJ',
+    poolWithdrawQueue: 'ASeXk7dri8jz466wCtkCVUYheHFEznX55EMuGivL5WPL',
+    poolTempLpTokenAccount: '2pu8zUYpwa9UEPvKkQvZHQUbbTdMg6N2mXi2Vv4DaEJV',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'AAfgwhNU5LMjHojes1SFmENNjihQBDKdDDT1jog4NV8w',
+    serumBids: 'AYEeLrFWhGDRgX9L428SqBU56iVzDSyP3A6Db4VekcjE',
+    serumAsks: 'CctHQdpAtxugQNFU7PA4ebb2T5K1ZkwDTvoFrsYrxifY',
+    serumEventQueue: 'CFtHmFydRBtw1qsoPZ4LufbdX39LKT9Aw5HzUib9JpiL',
+    serumCoinVaultAccount: 'BpHuL7HNTJDDGiw4ELpnYQdhTNNgZ53ennhtkQjGawGS',
+    serumPcVaultAccount: 'BzsbZPiwLMJHhSFNVdtGqi9MWKhYijgq34Z6YjYkQJUr',
+    serumVaultSigner: 'F2f14Nw7kqBeGwgFymm7sEPcZrKWWN56hvN5yx2vc6sE',
+    official: true
   }
-  // {
-  //   name: 'SRM-USDT',
-  // coin: { ...TOKENS.SRM },
-  // pc: { ...TOKENS.USDT },
-  // lp: { ...LP_TOKENS['SRM-USDT-V4'] },
-
-  //   version: 4,
-  //   programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
-
-  //   ammId: '',
-  //   ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
-  //   ammOpenOrders: '',
-  //   ammTargetOrders: '',
-  //   // no need
-  //   ammQuantities: NATIVE_SOL.mintAddress,
-  //   poolCoinTokenAccount: '',
-  //   poolPcTokenAccount: '',
-  //   poolWithdrawQueue: '',
-  //   poolTempLpTokenAccount: '',
-  //   serumProgramId: SERUM_PROGRAM_ID_V3,
-  //   serumMarket: '',
-  //   serumBids: '',
-  //   serumAsks: '',
-  //   serumEventQueue: '',
-  //   serumCoinVaultAccount: '',
-  //   serumPcVaultAccount: '',
-  //   serumVaultSigner: ''
-  // }
 ]
