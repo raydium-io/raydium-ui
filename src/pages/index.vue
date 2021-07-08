@@ -1,38 +1,58 @@
 <template>
   <div class="page-container">
     <nav class="home-navbar">
-      <div class="logo">
-        <NuxtLink to="/">
-          <img src="../assets/icons/logo-text.svg" width="148" height="40" />
-        </NuxtLink>
-      </div>
-      <div class="card cursor-pointer forsted-glass teal">Launch app</div>
+      <NuxtLink to="/swap/">
+        <img src="../assets/icons/logo-text.svg" width="148" height="40" />
+      </NuxtLink>
+
+      <NuxtLink to="/swap/">
+        <div class="card button-like forsted-glass teal">Launch app</div>
+      </NuxtLink>
     </nav>
 
     <section class="section-app-face children-center grid-cover-container">
       <img src="../assets/background/index_background.svg" class="image-1" />
       <div class="grid-cover-content children-center">
-        <div class="title">An avenue for</div>
-        <div class="title">the evolution of <span class="defiText">DeFi</span></div>
-        <div class="subtitle">Next-level liquidity. Friction-less yield. Light-speed swaps.</div>
+        <div class="title">
+          An avenue for <br />
+          the evolution of <span class="defi-text">DeFi</span>
+        </div>
+        <div class="subtitle">Next-level <b>liquidity</b>. Friction-less <b>yield</b>. Light-speed <b>swaps</b>.</div>
 
-        <div style="padding-top: 36px; position: relative">
-          <NuxtLink to="/swap/" style="display: inline-block; width: 100%; height: 100%">
-            <div class="card-body" style="padding: 0; height: 100%">
-              <div class="button_font">Launch app</div>
+        <div class="row-box-1">
+          <NuxtLink to="/swap/">
+            <div class="card button-like card-1">
+              Launch app <img class="icon" src="../assets/icons/button-icon-right.svg" />
             </div>
           </NuxtLink>
-          <div class="button_div_line button_div" style="display: inline-block; position: absolute; z-index: 999">
-            <a href="https://raydium.gitbook.io/raydium/" target="_blank"> READ MORE </a>
+
+          <a href="https://raydium.gitbook.io/raydium/" target="_blank">
+            <div class="card button-like card-2 forsted-glass teal">
+              Read docs <img class="icon" src="../assets/icons/gitbook.svg" />
+            </div>
+          </a>
+        </div>
+
+        <div class="row-box-2">
+          <div class="card forsted-glass smoke">
+            <div class="card-title">TOTAL VALUE LOCKED</div>
+            <div class="value">$23333333</div>
+          </div>
+
+          <div class="card forsted-glass smoke">
+            <div class="card-title">24H TRADING VOLUME</div>
+            <div class="value">$1234567890</div>
           </div>
         </div>
 
-        <img src="../assets/background/index_background6.svg" class="solana-log" />
+        <img src="../assets/background/index_background6.svg" class="solana-logo" />
       </div>
     </section>
 
     <section class="section-features children-center grid-cover-container">
-      <img src="../assets/background/index_background2.svg" class="image-2" />
+      <div class="image-2">
+        <img src="../assets/background/index_background2.svg" />
+      </div>
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -41,45 +61,53 @@
 
         <div class="boards">
           <div class="card children-center forsted-glass lightsmoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/trade.svg" />
             </div>
             <div class="feature-title">Trade</div>
-            <div class="feature-description">Swap or Trade quickly and cheaply</div>
-            <div class="card forsted-glass teal">Enter Exchange</div>
+            <div class="feature-description">Swap or Trade quickly and cheaply.</div>
+            <a class="card button-like forsted-glass teal" href="https://dex.raydium.io" target="_blank"
+              >Enter Exchange</a
+            >
           </div>
 
           <div class="card children-center forsted-glass lightsmoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/yield.svg" />
             </div>
             <div class="feature-title">Yield</div>
-            <div class="feature-description">Earn yield through fees and yield farms</div>
-            <div class="card forsted-glass teal">Enter Farms</div>
+            <div class="feature-description">Earn yield through fees and yield farms.</div>
+            <NuxtLink to="/farms/">
+              <div class="card button-like forsted-glass teal">Enter Farms</div>
+            </NuxtLink>
           </div>
 
           <div class="card children-center forsted-glass lightsmoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/pool.svg" />
             </div>
             <div class="feature-title">Pool</div>
-            <div class="feature-description">Provide liquidity for any SPL token</div>
-            <div class="card forsted-glass teal">Add Liquidity</div>
+            <div class="feature-description">Provide liquidity for any SPL token.</div>
+            <NuxtLink to="/liquidity/">
+              <div class="card button-like forsted-glass teal">Add Liquidity</div>
+            </NuxtLink>
           </div>
 
           <div class="card children-center forsted-glass lightsmoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/acceleRaytor.svg" />
             </div>
             <div class="feature-title">AcceleRaytor</div>
-            <div class="feature-description">Launchpad for new Solana projects</div>
-            <div class="card forsted-glass teal">View Projects</div>
+            <div class="feature-description">Launchpad for new Solana projects.</div>
+            <NuxtLink to="/acceleRaytor/">
+              <div class="card button-like forsted-glass teal">View Projects</div>
+            </NuxtLink>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section-features children-center grid-cover-container">
+    <section class="section-features -2 children-center grid-cover-container">
       <img src="../assets/background/index_background3.svg" class="image-3" />
       <div class="content">
         <div class="title-text">
@@ -89,7 +117,7 @@
 
         <div class="boards">
           <div class="card children-center forsted-glass smoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/order-book-AMM.svg" />
             </div>
             <div class="feature-title">Order Book AMM</div>
@@ -100,7 +128,7 @@
           </div>
 
           <div class="card children-center forsted-glass smoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/best-price-swaps.svg" />
             </div>
             <div class="feature-title">Best Price Swaps</div>
@@ -111,7 +139,7 @@
           </div>
 
           <div class="card children-center forsted-glass smoke">
-            <div class="card forsted-glass teal">
+            <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/high-liquidity-launches.svg" />
             </div>
             <div class="feature-title">High-Liquidity Launches</div>
@@ -156,13 +184,15 @@ export default class Index extends Vue {}
 
 <style scoped>
 /* utilities */
-.cursor-pointer {
-  cursor: pointer;
-}
 
 .card {
-  padding: 8px 24px;
+  padding: 12px 24px;
   border-radius: 6px;
+}
+.button-like {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .icon {
@@ -178,7 +208,7 @@ export default class Index extends Vue {}
   border-radius: var(--border-radius);
   background: linear-gradient(135deg, var(--bg-board-color), var(--bg-board-color-2, var(--bg-board-color)));
 }
-.forsted-glass::after {
+.forsted-glass::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -229,8 +259,11 @@ export default class Index extends Vue {}
   justify-content: center;
 }
 
+.title-text {
+  margin-bottom: 32px;
+}
 .title-text .line {
-  margin: auto;
+  margin: 8px auto;
   width: 40px;
   height: 1px;
   border-radius: 2px;
@@ -249,7 +282,8 @@ export default class Index extends Vue {}
   --text-primary: hsl(0, 0%, 100%);
   --text-secondary: hsl(222deg, 100%, 84%);
 
-  background: linear-gradient(45deg, hsl(235, 51%, 26%), hsl(258, 56%, 34%));
+  background: left / cover url('../assets/background/index_page_background.svg'), #131a35;
+  display: flow-root;
 }
 
 .home-navbar {
@@ -263,32 +297,119 @@ export default class Index extends Vue {}
 }
 
 .section-app-face {
-  margin-bottom: 32px;
+  margin-bottom: 72px;
+}
+.section-app-face .title {
+  font-weight: 300;
+  font-size: 64px;
+  line-height: 60px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.section-app-face .subtitle {
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+.section-app-face .defi-text {
+  font-weight: 600;
+  color: transparent;
+  background: radial-gradient(circle at 100%, #39d0d8, #2b6aff);
+  background-clip: text;
+}
+.section-app-face .row-box-1 {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 67px;
+}
+.section-app-face .row-box-1 .card-1 {
+  border-radius: 12px;
+  color: white;
+}
+.section-app-face .row-box-1 .card-1 .icon {
+  width: 4px;
+  height: 12px;
+  margin-left: 4px;
+}
+.section-app-face .row-box-1 .card-2 .icon {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
+.section-app-face .row-box-2 {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 36px;
+}
+.section-app-face .row-box-2 .card {
+  padding: 24px 52px;
+}
+.section-app-face .row-box-2 .card .card-title {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.section-app-face .row-box-2 .card .value {
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--text-primary);
 }
 
+.section-features .image-2 {
+  overflow: hidden;
+  border-radius: 100px;
+  background: #1e2160;
+  box-shadow: inset 0 0 48px #ffffff42, 0 0 40px #ffffff24;
+}
+.section-features .image-2 img {
+  opacity: 0.4;
+}
 .section-features .feature-title {
   font-weight: 600;
   font-size: 20px;
-  line-height: 27px;
   color: var(--text-primary);
+  margin-bottom: 8px;
 }
 .section-features .feature-description {
   font-size: 14px;
   line-height: 16px;
   color: var(--text-secondary);
 }
-
 .section-features .boards {
   display: flex;
-  gap: 8px;
+  gap: 16px;
 }
 .section-features .boards > .card {
   padding: 24px;
 }
+.section-features .boards > .card > .card.icon-like {
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.section-features .boards > .card > .feature-title {
+  margin-bottom: 8px;
+}
+.section-features .boards > .card > .feature-description {
+  margin-bottom: 20px;
+}
 
+.section-partners {
+  margin-bottom: 64px;
+}
 .section-partners .boards {
   width: 100%;
   display: flex;
   justify-content: space-around;
+}
+
+.section-features.\-2 .image-3 {
+  width: 100%;
+}
+.section-features.\-2 .boards {
+  gap: 24px;
+}
+.section-features.\-2 .boards > .card {
+  max-width: 360px;
 }
 </style>
