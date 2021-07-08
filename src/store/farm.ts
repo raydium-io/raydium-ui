@@ -120,7 +120,7 @@ export const actions = actionTree(
               case 'poolLpTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toNumber())
+                farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toString())
 
                 break
               }
