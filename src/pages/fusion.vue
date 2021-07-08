@@ -53,9 +53,8 @@
             <CollapsePanel
               v-for="farm in farms"
               v-show="
-                !farm.farmInfo.legacy &&
-                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
-                  (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType))
+                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType)
               "
               :key="farm.farmInfo.poolId"
             >
@@ -167,63 +166,6 @@
               </Row>
             </CollapsePanel>
           </Collapse>
-        </div>
-      </div>
-
-      <div class="page-head fs-container">
-        <span class="title">Legacy</span>
-        <div class="buttons"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <template v-for="farm in farms">
-            <Row
-              v-if="farm.farmInfo.legacy"
-              :key="farm.farmInfo.poolId"
-              class="farm-head"
-              :class="isMobile ? 'is-mobile' : ''"
-              :gutter="0"
-            >
-              <Col class="lp-icons" :span="isMobile ? 12 : 8">
-                <div class="icons">
-                  <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
-                  <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
-                </div>
-                {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                <div class="value">
-                  <div>{{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}</div>
-                  <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
-                </div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Staked</div>
-                <div class="value">
-                  {{ farm.userInfo.depositBalance.format() }}
-                </div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
-                <div class="value">
-                  <div>{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
-                  <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
-                </div>
-              </Col>
-              <Col class="fc-container" :span="isMobile ? 12 : 4">
-                <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
-                <Button
-                  v-else
-                  ghost
-                  @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                >
-                  Unstake & Harvest
-                </Button>
-              </Col>
-            </Row>
-          </template>
         </div>
       </div>
     </div>
