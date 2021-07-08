@@ -17,7 +17,7 @@
           An avenue for <br />
           the evolution of <span class="defi-text">DeFi</span>
         </div>
-        <div class="subtitle">Next-level <b>liquidity</b>. Friction-less <b>yield</b>. Light-speed <b>swaps</b>.</div>
+        <div class="subtitle">Light-speed <b>swaps</b>.Next-level <b>liquidity</b>. Friction-less <b>yield</b>.</div>
 
         <div class="row-box-1">
           <NuxtLink to="/swap/">
@@ -164,20 +164,99 @@
         <img src="../assets/icons/sushi-text-logo.svg" />
       </div>
     </section>
+
+    <footer class="page-footer grid-cover-container">
+      <img src="../assets/background/index_footer_background.svg" style="width: 100%" />
+      <div class="content">
+        <div class="group about">
+          <div class="title-text">
+            <div class="text">ABOUT</div>
+            <div class="line" />
+          </div>
+          <ul class="links">
+            <li>Meet Raydium</li>
+            <li>Ray Token</li>
+            <li>Media Assets</li>
+          </ul>
+        </div>
+
+        <div class="group protocol">
+          <div class="title-text">
+            <div class="text">PROTOCOL</div>
+            <div class="line" />
+          </div>
+          <ul class="links">
+            <li>Apply for Fusion Pool</li>
+            <li>Apply for AcceleRaytor</li>
+            <li>Permissionless Pool</li>
+            <li>API</li>
+          </ul>
+        </div>
+
+        <div class="group support">
+          <div class="title-text">
+            <div class="text">SUPPORT</div>
+            <div class="line" />
+          </div>
+          <ul class="links">
+            <li>Getting Started on Solana</li>
+            <li>Getting Started on Raydium</li>
+            <li>FAQ</li>
+          </ul>
+        </div>
+
+        <div class="group community">
+          <div class="title-text">
+            <div class="text">COMMUNITY</div>
+            <div class="line" />
+          </div>
+          <ul class="links">
+            <li>
+              <a href="https://twitter.com/RaydiumProtocol">
+                <div class="card icon-like forsted-glass teal">
+                  <img src="../assets/icons/home-icon-twitter.svg" width="20" height="20" />
+                </div>
+                <div class="media-name">Twitter</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://raydium.medium.com/">
+                <div class="card icon-like forsted-glass teal">
+                  <img src="../assets/icons/home-icon-medium.svg" width="18" height="18" />
+                </div>
+                <div class="media-name">Medium</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://discord.com/invite/6EvFwvCfpx">
+                <div class="card icon-like forsted-glass teal">
+                  <img src="../assets/icons/home-icon-discord.svg" width="20" height="20" />
+                </div>
+                <div class="media-name">Discord</div>
+              </a>
+            </li>
+            <li>
+              <a href="https://t.me/raydiumprotocol">
+                <div class="card icon-like forsted-glass teal">
+                  <img src="../assets/icons/home-icon-telegram.svg" width="24" height="24" />
+                </div>
+                <div class="media-name">Telegram</div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <img class="foot-logo" src="../assets/icons/logo-text.svg" width="148" height="40" />
+    </footer>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 
-import { Button } from 'ant-design-vue'
-
 @Component({
-  layout: 'single',
-
-  components: {
-    Button
-  }
+  layout: 'home'
 })
 export default class Index extends Vue {}
 </script>
@@ -214,7 +293,7 @@ export default class Index extends Vue {}
   inset: 0;
   opacity: 0.4;
   background: transparent;
-  border-radius: var(--border-radius);
+  border-radius: inherit;
   box-shadow: inset 0 0 0 1.5px var(--border-color);
   mask-image: radial-gradient(at -31% -58%, hsl(0, 0%, 0%, 0.5) 34%, transparent 60%),
     linear-gradient(to left, hsl(0, 0%, 0%, 0.5) 10%, transparent 30%),
@@ -269,6 +348,9 @@ export default class Index extends Vue {}
   border-radius: 2px;
   background: radial-gradient(39.84% 47.5% at 96.82% 58.33%, #39d0d8 0%, #2b6aff 100%);
 }
+.title-text .text {
+  font-size: 20px;
+}
 
 .grid-cover-container {
   place-items: center;
@@ -281,9 +363,6 @@ export default class Index extends Vue {}
 .page-container {
   --text-primary: hsl(0, 0%, 100%);
   --text-secondary: hsl(222deg, 100%, 84%);
-
-  background: left / cover url('../assets/background/index_page_background.svg'), #131a35;
-  display: flow-root;
 }
 
 .home-navbar {
@@ -356,6 +435,55 @@ export default class Index extends Vue {}
   color: var(--text-primary);
 }
 
+.page-footer {
+  position: relative;
+}
+.page-footer img {
+  width: 100%;
+}
+.page-footer .content {
+  width: 100%;
+  padding: 4%;
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+}
+.page-footer .group .title-text .text {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.page-footer .group .title-text .line {
+  width: 20px;
+  margin: 0;
+}
+.page-footer .group .links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-secondary);
+}
+.page-footer .group .links a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.page-footer .group .links > li {
+  font-size: 16px;
+  margin-bottom: 26px;
+}
+.page-footer .group .links .icon-like {
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-content: center;
+}
+.page-footer .foot-logo {
+  position: absolute;
+  bottom: 8%;
+}
+
 .section-features .image-2 {
   overflow: hidden;
   border-radius: 100px;
@@ -373,7 +501,7 @@ export default class Index extends Vue {}
 }
 .section-features .feature-description {
   font-size: 14px;
-  line-height: 16px;
+  line-height: 26px;
   color: var(--text-secondary);
 }
 .section-features .boards {
@@ -390,12 +518,9 @@ export default class Index extends Vue {}
 .section-features .boards > .card > .feature-title {
   margin-bottom: 8px;
 }
-.section-features .boards > .card > .feature-description {
-  margin-bottom: 20px;
-}
 
 .section-partners {
-  margin-bottom: 64px;
+  margin-bottom: 100px;
 }
 .section-partners .boards {
   width: 100%;
@@ -405,6 +530,9 @@ export default class Index extends Vue {}
 
 .section-features.\-2 .image-3 {
   width: 100%;
+}
+.section-features.\-2 .content {
+  margin: 64px;
 }
 .section-features.\-2 .boards {
   gap: 24px;
