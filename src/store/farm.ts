@@ -9,7 +9,7 @@ import {
 } from '@/utils/stake'
 import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
-import { ACCOUNT_LAYOUT } from '@/utils/layouts'
+import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
 import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
 import { TokenAmount, lt } from '@/utils/safe-math'
@@ -120,7 +120,7 @@ export const actions = actionTree(
               case 'poolLpTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(parsed.amount.toString())
+                farmInfo.lp.balance.wei = farmInfo.lp.balance.wei.plus(getBigNumber(parsed.amount))
 
                 break
               }
@@ -165,15 +165,15 @@ export const actions = actionTree(
 
               const poolId = userStakeInfo.poolId.toBase58()
 
-              const rewardDebt = userStakeInfo.rewardDebt.toNumber()
+              const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
 
               const farm = getFarmByPoolId(poolId)
 
               if (farm) {
-                const depositBalance = new TokenAmount(userStakeInfo.depositBalance.toNumber(), farm.lp.decimals)
+                const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
 
                 if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                  if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                  if (lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))) {
                     stakeAccounts[poolId] = {
                       depositBalance,
                       rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
@@ -213,16 +213,18 @@ export const actions = actionTree(
 
                   const poolId = userStakeInfo.poolId.toBase58()
 
-                  const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-                  const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+                  const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
+                  const rewardDebtB = getBigNumber(userStakeInfo.rewardDebtB)
 
                   const farm = getFarmByPoolId(poolId)
 
                   if (farm) {
-                    const depositBalance = new TokenAmount(userStakeInfo.depositBalance.toNumber(), farm.lp.decimals)
+                    const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
 
                     if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                      if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                      if (
+                        lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))
+                      ) {
                         stakeAccounts[poolId] = {
                           depositBalance,
                           rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
@@ -253,19 +255,21 @@ export const actions = actionTree(
 
                       const poolId = userStakeInfo.poolId.toBase58()
 
-                      const rewardDebt = userStakeInfo.rewardDebt.toNumber()
-                      const rewardDebtB = userStakeInfo.rewardDebtB.toNumber()
+                      const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
+                      const rewardDebtB = getBigNumber(userStakeInfo.rewardDebtB)
 
                       const farm = getFarmByPoolId(poolId)
 
                       if (farm) {
                         const depositBalance = new TokenAmount(
-                          userStakeInfo.depositBalance.toNumber(),
+                          getBigNumber(userStakeInfo.depositBalance),
                           farm.lp.decimals
                         )
 
                         if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                          if (lt(stakeAccounts[poolId].depositBalance.wei.toNumber(), depositBalance.wei.toNumber())) {
+                          if (
+                            lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))
+                          ) {
                             stakeAccounts[poolId] = {
                               depositBalance,
                               rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),

@@ -1,4 +1,4 @@
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from './layouts'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
 import { transfer } from './swap'
 import { throwIfNull } from './errors'
 import { LIQUIDITY_POOLS } from './pools'
@@ -469,13 +469,13 @@ async function initAmm(
   const baseTokenAccount = await getFilteredTokenAccountsByOwner(conn, owner, market.baseMintAddress)
   const quoteTokenAccount = await getFilteredTokenAccountsByOwner(conn, owner, market.quoteMintAddress)
   const baseTokenList: any = baseTokenAccount.value.map((item: any) => {
-    if (item.account.data.parsed.info.tokenAmount.amount >= coinVol.toNumber()) {
+    if (item.account.data.parsed.info.tokenAmount.amount >= getBigNumber(coinVol)) {
       return item.pubkey
     }
     return null
   })
   const quoteTokenList: any = quoteTokenAccount.value.map((item: any) => {
-    if (item.account.data.parsed.info.tokenAmount.amount >= pcVol.toNumber()) {
+    if (item.account.data.parsed.info.tokenAmount.amount >= getBigNumber(pcVol)) {
       return item.pubkey
     }
     return null

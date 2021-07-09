@@ -44,7 +44,7 @@
             </template></Step
           >
         </Steps>
-        <Row style="align-items: baseline; line-height: 40px; padding-bottom: 20px" v-if="current === 0">
+        <Row v-if="current === 0" style="align-items: baseline; line-height: 40px; padding-bottom: 20px">
           <Col style="line-height: 20px" :span="24" :class="isMobile ? 'item-title-mobile' : 'item-title'"
             ><div style="padding-bottom: 10px; word-break: break-word">
               This tool is for advanced users. Before attempting to create a new liquidity pool, we suggest going
@@ -58,7 +58,7 @@
           <Col style="line-height: 20px" :span="24"><input v-model="inputMarket" :disabled="!marketInputFlag" /></Col>
 
           <Col :span="isMobile ? 24 : 24" style="padding-bottom: 20px; padding-top: 10px">
-            <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal" style="width: 100%">
+            <Button v-if="!wallet.connected" size="large" ghost style="width: 100%" @click="$accessor.wallet.openModal">
               Connect
             </Button>
             <Button
@@ -173,8 +173,8 @@
             </div>
             <Col :span="24" style="padding-top: 10px">
               <Button
-                style="position: absolute; z-index: 999; width: 100%"
                 v-if="!wallet.connected"
+                style="position: absolute; z-index: 999; width: 100%"
                 size="large"
                 ghost
                 @click="$accessor.wallet.openModal"
@@ -216,11 +216,10 @@
                   class="button_div"
                   style="z-index: 999; width: 70%"
                   :loading="createAmmFlag"
-                  @click="createKey"
                   :disabled="
-                    createAmmFlag ||
-                    !(this.inputPrice !== null && this.inputBaseValue !== null && this.inputQuoteValue !== null)
+                    createAmmFlag || !(inputPrice !== null && inputBaseValue !== null && inputQuoteValue !== null)
                   "
+                  @click="createKey"
                 >
                   {{ createAmmFlag ? '' : 'Confirm and Initialize Liquidity Pool' }}
                 </Button>
@@ -235,7 +234,7 @@
         </div>
       </div>
     </div>
-    <div class="card" v-if="userLocalAmmIdList.length > 0" style="margin-top: 20px">
+    <div v-if="userLocalAmmIdList.length > 0" class="card" style="margin-top: 20px">
       <div class="card-body" style="grid-row-gap: 0; row-gap: 0; padding-bottom: 15px; padding-top: 12px">
         <div style="font-size: 30px; font-weight: 700">Your Created Pools</div>
         <template v-for="item in userLocalAmmIdList">
@@ -263,6 +262,7 @@ import { TOKENS } from '@/utils/tokens'
 import { createAmmId } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { LIQUIDITY_POOL_PROGRAM_ID_V4 } from '@/utils/ids'
+import { getBigNumber } from '@/utils/layouts'
 
 const Step = Steps.Step
 
@@ -429,7 +429,7 @@ export default class CreatePool extends Vue {
       this.current = 1
       this.marketMsg = market
       this.marketPrice = price
-      this.marketTickSize = new BigNumber(market.tickSize).toNumber()
+      this.marketTickSize = getBigNumber(new BigNumber(market.tickSize))
       this.baseMintDecimals = baseMintDecimals
       this.quoteMintDecimals = quoteMintDecimals
       this.marketStr = this.inputMarket

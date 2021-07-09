@@ -1,3 +1,4 @@
+import { getBigNumber } from './layouts'
 import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
 import { createProgramAccountIfNotExist, createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 // @ts-ignore
@@ -52,7 +53,7 @@ export async function deposit(
     signers
   )
 
-  const value = new TokenAmount(amount, farmInfo.lp.decimals, false).wei.toNumber()
+  const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
   transaction.add(
     depositInstruction(
@@ -129,7 +130,7 @@ export async function depositV4(
     signers
   )
 
-  const value = new TokenAmount(amount, farmInfo.lp.decimals, false).wei.toNumber()
+  const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
   transaction.add(
     depositInstructionV4(
@@ -184,7 +185,7 @@ export async function withdraw(
   )
 
   const programId = new PublicKey(farmInfo.programId)
-  const value = new TokenAmount(amount, farmInfo.lp.decimals, false).wei.toNumber()
+  const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
   transaction.add(
     withdrawInstruction(
@@ -249,7 +250,7 @@ export async function withdrawV4(
   )
 
   const programId = new PublicKey(farmInfo.programId)
-  const value = new TokenAmount(amount, farmInfo.lp.decimals, false).wei.toNumber()
+  const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
   transaction.add(
     withdrawInstructionV4(

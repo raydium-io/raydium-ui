@@ -66,11 +66,12 @@
           v-else
           :percent="
             pool.info.quoteTokenDeposited
-              ? pool.info.quoteTokenDeposited
-                  .toEther()
-                  .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-                  .multipliedBy(100)
-                  .toNumber()
+              ? getBigNumber(
+                  pool.info.quoteTokenDeposited
+                    .toEther()
+                    .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                    .multipliedBy(100)
+                )
               : 0
           "
           status="active"
@@ -136,7 +137,7 @@
                             .multipliedBy(pool.raise.wei),
                           pool.base.decimals
                         ).format()
-                      : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
+                      : getBigNumber(pool.userInfo.deposited.wei.dividedBy(pool.price.wei))
                     : 0
                 }}
                 {{ pool.base.symbol }}
@@ -176,7 +177,7 @@
                             .multipliedBy(pool.raise.wei),
                           pool.base.decimals
                         ).format()
-                      : pool.userInfo.deposited.wei.dividedBy(pool.price.wei).toNumber()
+                      : getBigNumber(pool.userInfo.deposited.wei.dividedBy(pool.price.wei))
                     : 0
                 }}
                 {{ pool.base.symbol }}
@@ -637,6 +638,7 @@ import { getUnixTs } from '@/utils'
 import importIcon from '@/utils/import-icon'
 import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { IdoPool, purchase, claim, IdoLotteryUserInfo, IdoLotteryPoolInfo } from '@/utils/ido'
+import { getBigNumber } from '@/utils/layouts'
 
 const { TabPane } = Tabs
 
@@ -742,6 +744,7 @@ export default class AcceleRaytor extends Vue {
   getUnixTs = getUnixTs
   importIcon = importIcon
   TokenAmount = TokenAmount
+  getBigNumber = getBigNumber
   gt = gt
   lt = lt
 

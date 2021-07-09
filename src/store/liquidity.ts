@@ -1,6 +1,6 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
 import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
 import { LIQUIDITY_POOLS, getAddressForWhat, LiquidityPoolInfo } from '@/utils/pools'
 import { commitment, createAmmAuthority, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
@@ -119,7 +119,7 @@ export const actions = actionTree(
             symbol: 'unknown',
             name: 'unknown',
             mintAddress: ammInfo.coinMintAddress.toString(),
-            decimals: ammInfo.coinDecimals.toNumber(),
+            decimals: getBigNumber(ammInfo.coinDecimals),
             cache: true,
             tags: []
           }
@@ -135,7 +135,7 @@ export const actions = actionTree(
             symbol: 'unknown',
             name: 'unknown',
             mintAddress: ammInfo.pcMintAddress.toString(),
-            decimals: ammInfo.pcDecimals.toNumber(),
+            decimals: getBigNumber(ammInfo.pcDecimals),
             cache: true,
             tags: []
           }
@@ -252,14 +252,14 @@ export const actions = actionTree(
               case 'poolCoinTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
                 // quick fix: Number can only safely store up to 53 bits
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(parsed.amount.toString())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(getBigNumber(parsed.amount))
 
                 break
               }
               case 'poolPcTokenAccount': {
                 const parsed = ACCOUNT_LAYOUT.decode(data)
 
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(parsed.amount.toNumber())
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(getBigNumber(parsed.amount))
 
                 break
               }
@@ -268,8 +268,8 @@ export const actions = actionTree(
                 const parsed = OPEN_ORDERS_LAYOUT.decode(data)
 
                 const { baseTokenTotal, quoteTokenTotal } = parsed
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(baseTokenTotal.toString())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(quoteTokenTotal.toString())
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.plus(getBigNumber(baseTokenTotal))
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.plus(getBigNumber(quoteTokenTotal))
 
                 break
               }
@@ -284,15 +284,15 @@ export const actions = actionTree(
 
                   const { swapFeeNumerator, swapFeeDenominator } = parsed
                   poolInfo.fees = {
-                    swapFeeNumerator: swapFeeNumerator.toNumber(),
-                    swapFeeDenominator: swapFeeDenominator.toNumber()
+                    swapFeeNumerator: getBigNumber(swapFeeNumerator),
+                    swapFeeDenominator: getBigNumber(swapFeeDenominator)
                   }
                 }
 
                 const { status, needTakePnlCoin, needTakePnlPc } = parsed
-                poolInfo.status = status.toNumber()
-                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(needTakePnlCoin.toNumber())
-                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(needTakePnlPc.toNumber())
+                poolInfo.status = getBigNumber(status)
+                poolInfo.coin.balance.wei = poolInfo.coin.balance.wei.minus(getBigNumber(needTakePnlCoin))
+                poolInfo.pc.balance.wei = poolInfo.pc.balance.wei.minus(getBigNumber(needTakePnlPc))
 
                 break
               }
@@ -300,7 +300,7 @@ export const actions = actionTree(
               case 'lpMintAddress': {
                 const parsed = MINT_LAYOUT.decode(data)
 
-                poolInfo.lp.totalSupply = new TokenAmount(parsed.supply.toString(), poolInfo.lp.decimals)
+                poolInfo.lp.totalSupply = new TokenAmount(getBigNumber(parsed.supply), poolInfo.lp.decimals)
 
                 break
               }

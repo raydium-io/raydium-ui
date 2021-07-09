@@ -138,6 +138,7 @@ import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { deposit, withdraw } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
+import { getBigNumber } from '@/utils/layouts'
 
 const CollapsePanel = Collapse.Panel
 
@@ -220,14 +221,14 @@ export default Vue.extend({
           // @ts-ignore
           const { reward, lp } = farmInfo
 
-          const rewardPerBlockAmount = new TokenAmount(rewardPerBlock.toNumber(), reward.decimals)
+          const rewardPerBlockAmount = new TokenAmount(getBigNumber(rewardPerBlock), reward.decimals)
           const rewardPerBlockAmountTotalValue =
-            rewardPerBlockAmount.toEther().toNumber() * 2 * 60 * 60 * 24 * 365 * get(this.price.prices, lp.symbol)
+            getBigNumber(rewardPerBlockAmount.toEther()) * 2 * 60 * 60 * 24 * 365 * get(this.price.prices, lp.symbol)
 
           const liquidityItemValue = get(this.price.prices, lp.symbol)
 
           const apr = (
-            (rewardPerBlockAmountTotalValue / (lp.balance.toEther().toNumber() * liquidityItemValue)) *
+            (rewardPerBlockAmountTotalValue / (getBigNumber(lp.balance.toEther()) * liquidityItemValue)) *
             100
           ).toFixed(2)
           const newFarmInfo = cloneDeep(farmInfo)
@@ -240,7 +241,7 @@ export default Vue.extend({
             const { rewardDebt, depositBalance } = userInfo
 
             const pendingReward = depositBalance.wei
-              .multipliedBy(rewardPerShareNet.toNumber())
+              .multipliedBy(getBigNumber(rewardPerShareNet))
               .dividedBy(1e9)
               .minus(rewardDebt.wei)
 

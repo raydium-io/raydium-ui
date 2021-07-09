@@ -22,7 +22,7 @@
                 <Button
                   ghost
                   :loading="creating"
-                  :disabled="creating || get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`)"
+                  :disabled="creating || get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`) === 0"
                   @click="createUsdtAccount"
                 >
                   Create USDT Account
@@ -101,7 +101,9 @@
                   v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]"
                   ghost
                   :loading="unwraping"
-                  :disabled="unwraping || wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.wei.toNumber() === 0"
+                  :disabled="
+                    unwraping || getBigNumber(wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.wei) === 0
+                  "
                   @click="unwrapWUSDT(wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.fixed())"
                 >
                   Unwrap all WUSDT
@@ -220,6 +222,7 @@ import { withdraw } from '@/utils/stake'
 import { TOKENS } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
 import { getUnixTs } from '@/utils'
+import { getBigNumber } from '@/utils/layouts'
 
 const { Step } = Steps
 
@@ -273,6 +276,7 @@ export default Vue.extend({
   },
 
   methods: {
+    getBigNumber,
     get,
 
     updateFarms() {

@@ -22,6 +22,7 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import logger from '@/utils/logger'
 import { getUnixTs } from '@/utils'
+import { getBigNumber } from '@/utils/layouts'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -102,27 +103,27 @@ export const actions = actionTree(
           if (pool.version === 3) {
             const decoded = IDO_LOTTERY_POOL_INFO_LAYOUT.decode(data)
             pool.info = {
-              status: decoded.status.toNumber(),
-              nonce: decoded.nonce.toNumber(),
-              startTime: decoded.startTime.toNumber(),
-              endTime: decoded.endTime.toNumber(),
-              startWithdrawTime: decoded.startWithdrawTime.toNumber(),
-              numerator: decoded.numerator.toNumber(),
-              denominator: decoded.denominator.toNumber(),
-              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals),
-              baseTokenSupply: new TokenAmount(decoded.baseTokenSupply.toNumber(), pool.base.decimals),
-              perUserMaxLottery: decoded.perUserMaxLottery.toNumber(),
-              perUserMinLottery: decoded.perUserMinLottery.toNumber(),
-              perLotteryNeedMinStake: decoded.perLotteryNeedMinStake.toNumber(),
+              status: getBigNumber(decoded.status),
+              nonce: getBigNumber(decoded.nonce),
+              startTime: getBigNumber(decoded.startTime),
+              endTime: getBigNumber(decoded.endTime),
+              startWithdrawTime: getBigNumber(decoded.startWithdrawTime),
+              numerator: getBigNumber(decoded.numerator),
+              denominator: getBigNumber(decoded.denominator),
+              quoteTokenDeposited: new TokenAmount(getBigNumber(decoded.quoteTokenDeposited), pool.quote.decimals),
+              baseTokenSupply: new TokenAmount(getBigNumber(decoded.baseTokenSupply), pool.base.decimals),
+              perUserMaxLottery: getBigNumber(decoded.perUserMaxLottery),
+              perUserMinLottery: getBigNumber(decoded.perUserMinLottery),
+              perLotteryNeedMinStake: getBigNumber(decoded.perLotteryNeedMinStake),
               perLotteryWorthQuoteAmount: new TokenAmount(
-                decoded.perLotteryWorthQuoteAmount.toNumber(),
+                getBigNumber(decoded.perLotteryWorthQuoteAmount),
                 pool.quote.decimals
               ),
-              totalWinLotteryLimit: decoded.totalWinLotteryLimit.toNumber(),
-              totalDepositUserNumber: decoded.totalDepositUserNumber.toNumber(),
-              currentLotteryNumber: decoded.currentLotteryNumber.toNumber(),
+              totalWinLotteryLimit: getBigNumber(decoded.totalWinLotteryLimit),
+              totalDepositUserNumber: getBigNumber(decoded.totalDepositUserNumber),
+              currentLotteryNumber: getBigNumber(decoded.currentLotteryNumber),
               luckyInfos: decoded.luckyInfos.map((obj: any[]) =>
-                Object.entries(obj).reduce((acc, [key, value]) => ({ ...acc, [key]: value.toNumber() }), {})
+                Object.entries(obj).reduce((acc, [key, value]) => ({ ...acc, [key]: getBigNumber(value) }), {})
               ),
               quoteTokenMint: decoded.quoteTokenMint,
               baseTokenMint: decoded.baseTokenMint,
@@ -137,15 +138,15 @@ export const actions = actionTree(
           } else {
             const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
             pool.info = {
-              startTime: decoded.startTime.toNumber(),
-              endTime: decoded.endTime.toNumber(),
-              startWithdrawTime: decoded.startWithdrawTime.toNumber(),
+              startTime: getBigNumber(decoded.startTime),
+              endTime: getBigNumber(decoded.endTime),
+              startWithdrawTime: getBigNumber(decoded.startWithdrawTime),
 
-              minDepositLimit: new TokenAmount(decoded.minDepositLimit.toNumber(), pool.quote.decimals),
-              maxDepositLimit: new TokenAmount(decoded.maxDepositLimit.toNumber(), pool.quote.decimals),
+              minDepositLimit: new TokenAmount(getBigNumber(decoded.minDepositLimit), pool.quote.decimals),
+              maxDepositLimit: new TokenAmount(getBigNumber(decoded.maxDepositLimit), pool.quote.decimals),
               stakePoolId: decoded.stakePoolId,
-              minStakeLimit: new TokenAmount(decoded.minStakeLimit.toNumber(), TOKENS.RAY.decimals),
-              quoteTokenDeposited: new TokenAmount(decoded.quoteTokenDeposited.toNumber(), pool.quote.decimals)
+              minStakeLimit: new TokenAmount(getBigNumber(decoded.minStakeLimit), TOKENS.RAY.decimals),
+              quoteTokenDeposited: new TokenAmount(getBigNumber(decoded.quoteTokenDeposited), pool.quote.decimals)
             } as IdoPoolInfo
           }
           pool.status =
@@ -213,15 +214,15 @@ export const actions = actionTree(
                 }
                 if (pool.version === 3) {
                   const decoded = IDO_LOTTERY_USER_INFO_LAYOUT.decode(data)
-                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenDeposited = decoded.quoteTokenDeposited.toNumber()
-                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenWithdrawn = decoded.quoteTokenWithdrawn.toNumber()
-                  ;(pool.userInfo as IdoLotteryUserInfo).baseTokenWithdrawn = decoded.baseTokenWithdrawn.toNumber()
-                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryBeginNumber = decoded.lotteryBeginNumber.toNumber()
-                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryEndNumber = decoded.lotteryEndNumber.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenDeposited = getBigNumber(decoded.quoteTokenDeposited)
+                  ;(pool.userInfo as IdoLotteryUserInfo).quoteTokenWithdrawn = getBigNumber(decoded.quoteTokenWithdrawn)
+                  ;(pool.userInfo as IdoLotteryUserInfo).baseTokenWithdrawn = getBigNumber(decoded.baseTokenWithdrawn)
+                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryBeginNumber = getBigNumber(decoded.lotteryBeginNumber)
+                  ;(pool.userInfo as IdoLotteryUserInfo).lotteryEndNumber = getBigNumber(decoded.lotteryEndNumber)
                 }
                 const decoded = IDO_USER_INFO_LAYOUT.decode(data)
                 ;(pool.userInfo as IdoUserInfo).deposited = new TokenAmount(
-                  decoded.quoteTokenDeposited.toNumber(),
+                  getBigNumber(decoded.quoteTokenDeposited),
                   pool.quote.decimals
                 )
                 break
@@ -232,7 +233,9 @@ export const actions = actionTree(
                 }
                 if (pool.version === 3) {
                   const decoded = IDO_LOTTERY_SNAPSHOT_DATA_LAYOUT.decode(data)
-                  ;(pool.userInfo as IdoLotteryUserInfo).eligibleTicketAmount = decoded.eligibleTicketAmount.toNumber()
+                  ;(pool.userInfo as IdoLotteryUserInfo).eligibleTicketAmount = getBigNumber(
+                    decoded.eligibleTicketAmount
+                  )
                 }
                 pool.userInfo.snapshoted = true
                 break
