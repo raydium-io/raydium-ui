@@ -11,8 +11,8 @@ import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
 import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
 
-// @ts-ignore
 import { getBigNumber } from './layouts'
+// @ts-ignore
 import { u8, nu64, struct, seq } from 'buffer-layout'
 import { publicKey, u64 } from '@project-serum/borsh'
 import { cloneDeep } from 'lodash-es'
