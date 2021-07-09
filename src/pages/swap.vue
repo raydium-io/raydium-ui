@@ -205,11 +205,12 @@
             <span class="name"> Minimum Received </span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
-          <div v-if="endpoint" class="fs-container">
-            <span class="name"> Price Impact </span>
-            <span :style="`color: ${priceImpact > 10 ? '#ed4b9e' : priceImpact > 5 ? '#f0b90b' : '#31d0aa'}`">
-              {{ priceImpact.toFixed(2) }}%
-            </span>
+          <div
+            v-if="endpoint"
+            :class="`fs-container price-impact ${priceImpact > 10 ? '>10' : priceImpact > 5 ? '>5' : ''}`"
+          >
+            <span class="name"> Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}</span>
+            <span :style="`color: ${priceImpact <= 5 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
 
@@ -278,15 +279,8 @@
           "
           :loading="swaping"
           style="width: 100%"
-          @click="
-            () => {
-              if (priceImpact >= -2 && !$accessor.setting.userIgnoreConfirm) {
-                confirmModalIsOpen = true
-              } else {
-                placeOrder()
-              }
-            }
-          "
+          :class="`swap-btn ${priceImpact > 10 ? '>10' : priceImpact > 5 ? '>5' : ''}`"
+          @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
@@ -310,22 +304,8 @@
           <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
             xCOPE amount must greater than 5
           </template>
-          <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
+          <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
-
-        <Modal
-          title="warn: priceImpact is too high"
-          :visible="confirmModalIsOpen"
-          @cancel="confirmModalIsOpen = false"
-          @ok="
-            () => {
-              confirmModalIsOpen = false
-              placeOrder()
-            }
-          "
-        >
-          <span class="title">PriceImpact is: {{ priceImpact.toFixed(2) + '%' }}. Sure?</span>
-        </Modal>
       </div>
     </div>
 
@@ -376,7 +356,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Spin } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
@@ -405,8 +385,7 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress,
-    Spin,
-    Modal
+    Spin
   },
 
   data() {
@@ -446,8 +425,6 @@ export default Vue.extend({
       toCoinWithSlippage: '',
 
       // wrap
-      // if priceImpact is higher than 30%, a confirm modal will be shown
-      confirmModalIsOpen: false,
       isWrap: false,
       // serum
       market: null as any,
@@ -1440,6 +1417,21 @@ export default Vue.extend({
         opacity: 0.75;
       }
     }
+
+    .price-impact.\>5 {
+      font-weight: bold;
+      color: #f0b90b;
+    }
+    .price-impact.\>10 {
+      font-weight: bold;
+      color: #ed4b9e;
+    }
+  }
+  .swap-btn.\>5 {
+    border-color: #f0b90b;
+  }
+  .swap-btn.\>10 {
+    border-color: #ed4b9e;
   }
 
   .change-side {

@@ -19,11 +19,6 @@
         </Row>
       </div>
 
-      <div class="field row">
-        <h3>Ignore swap confirm</h3>
-        <Toggle v-model="userIgnoreConfirm" />
-      </div>
-
       <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
     </div>
   </Modal>
@@ -82,13 +77,6 @@ export default class Setting extends Vue {
           this.$accessor.setting.setSlippage(parseFloat(val))
         }
       }
-    })
-  }
-
-  @Watch('userIgnoreConfirm')
-  onUserIgnoreConfirmChanged(val: boolean) {
-    this.$nextTick(() => {
-      this.$accessor.setting.setUserIgnoreConfirm(val)
     })
   }
 }

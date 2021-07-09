@@ -5,8 +5,7 @@ import LocalStorage from '@/utils/local-storage'
 export const state = () => ({
   show: false,
   // percent
-  slippage: parseFloat(LocalStorage.get('RAYDIUM_SLIPPAGE') || '1'),
-  userIgnoreConfirm: JSON.parse(LocalStorage.get('RAYDIUM_USER_IGNORE_CONFIRM') || 'false')
+  slippage: parseFloat(LocalStorage.get('RAYDIUM_SLIPPAGE') || '1')
 })
 
 export const getters = getterTree(state, {})
@@ -19,11 +18,6 @@ export const mutations = mutationTree(state, {
   setSlippage(state, slippage: number) {
     state.slippage = slippage
     LocalStorage.set('RAYDIUM_SLIPPAGE', slippage)
-  },
-
-  setUserIgnoreConfirm(state, userIgnoreConfirm: boolean) {
-    state.userIgnoreConfirm = userIgnoreConfirm
-    LocalStorage.set('RAYDIUM_USER_IGNORE_CONFIRM', JSON.stringify(userIgnoreConfirm))
   }
 })
 
