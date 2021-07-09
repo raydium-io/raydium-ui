@@ -1383,14 +1383,6 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="less">
-.ant-modal-footer {
-  .ant-btn:not(.ant-btn-primary) {
-    background: transparent;
-  }
-}
-</style>
-
 <style lang="less" sxcoped>
 .container {
   max-width: 450px;
