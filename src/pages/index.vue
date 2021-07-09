@@ -416,7 +416,7 @@ export default class Index extends Vue {
 
 .home-navbar {
   display: flex;
-  padding: 16px;
+  padding: 16px 10vw;
   justify-content: space-between;
   position: sticky;
   top: 0;
@@ -553,13 +553,17 @@ export default class Index extends Vue {
   font-size: 14px;
   line-height: 26px;
   color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.section-features .content {
+  max-width: 1120px;
 }
 .section-features .boards {
   display: flex;
-  gap: 16px;
+  gap: 22px;
 }
 .section-features .boards > .card {
-  padding: 24px;
+  padding: 24px 50px;
 }
 .section-features .boards > .card > .card.icon-like {
   padding: 12px;
