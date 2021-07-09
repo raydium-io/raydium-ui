@@ -188,6 +188,7 @@ import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { depositV4, withdrawV4 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
+import { getBigNumber } from '@/utils/layouts'
 
 const CollapsePanel = Collapse.Panel
 
@@ -281,12 +282,12 @@ export default Vue.extend({
           const newFarmInfo = cloneDeep(farmInfo)
 
           if (reward && rewardB && lp) {
-            const rewardPerBlockAmount = new TokenAmount(perBlock.toNumber(), reward.decimals)
-            const rewardBPerBlockAmount = new TokenAmount(perBlockB.toNumber(), rewardB.decimals)
+            const rewardPerBlockAmount = new TokenAmount(getBigNumber(perBlock), reward.decimals)
+            const rewardBPerBlockAmount = new TokenAmount(getBigNumber(perBlockB), rewardB.decimals)
             const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
 
             const rewardPerBlockAmountTotalValue =
-              rewardPerBlockAmount.toEther().toNumber() *
+              getBigNumber(rewardPerBlockAmount.toEther()) *
               2 *
               60 *
               60 *
@@ -294,7 +295,7 @@ export default Vue.extend({
               365 *
               this.price.prices[reward.symbol as string]
             const rewardBPerBlockAmountTotalValue =
-              rewardBPerBlockAmount.toEther().toNumber() *
+              getBigNumber(rewardBPerBlockAmount.toEther()) *
               2 *
               60 *
               60 *
@@ -303,17 +304,17 @@ export default Vue.extend({
               this.price.prices[rewardB.symbol as string]
 
             const liquidityCoinValue =
-              (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
+              getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
               this.price.prices[liquidityItem?.coin.symbol as string]
             const liquidityPcValue =
-              (liquidityItem?.pc.balance as TokenAmount).toEther().toNumber() *
+              getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
               this.price.prices[liquidityItem?.pc.symbol as string]
 
             const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
-            const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
+            const liquidityTotalSupply = getBigNumber((liquidityItem?.lp.totalSupply as TokenAmount).toEther())
             const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
 
-            const liquidityUsdValue = lp.balance.toEther().toNumber() * liquidityItemValue
+            const liquidityUsdValue = getBigNumber(lp.balance.toEther()) * liquidityItemValue
             const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
             const aprB = ((rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
             const aprTotal = (
@@ -350,11 +351,11 @@ export default Vue.extend({
               d = 1e9
             }
             const pendingReward = depositBalance.wei
-              .multipliedBy(perShare.toNumber())
+              .multipliedBy(getBigNumber(perShare))
               .dividedBy(d)
               .minus(rewardDebt.wei)
             const pendingRewardB = depositBalance.wei
-              .multipliedBy(parseInt(perShareB.toString()))
+              .multipliedBy(getBigNumber(perShareB))
               .dividedBy(d)
               .minus(rewardDebtB.wei)
 

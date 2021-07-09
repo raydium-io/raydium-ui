@@ -1,3 +1,4 @@
+import { getBigNumber } from './layouts'
 import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 // @ts-ignore
 import { u8, nu64, struct } from 'buffer-layout'
@@ -276,7 +277,7 @@ export async function wrap(
     throw new Error(`Max allow ${maxSize}`)
   }
 
-  transaction.add(transfer(newFromTokenAccount, new PublicKey(address), owner, amountOut.toWei().toNumber()))
+  transaction.add(transfer(newFromTokenAccount, new PublicKey(address), owner, getBigNumber(amountOut.toWei())))
   transaction.add(memoInstruction(newToTokenAccount.toString()))
 
   return await sendTransaction(connection, wallet, transaction, signers)
@@ -326,7 +327,7 @@ export async function swap(
       wrappedSolAccount,
       owner,
       TOKENS.WSOL.mintAddress,
-      amountIn.wei.toNumber() + 1e7,
+      getBigNumber(amountIn.wei) + 1e7,
       transaction,
       signers
     )
@@ -382,8 +383,8 @@ export async function swap(
       wrappedSolAccount ?? newFromTokenAccount,
       wrappedSolAccount2 ?? newToTokenAccount,
       owner,
-      Math.floor(amountIn.toWei().toNumber()),
-      Math.floor(amountOut.toWei().toNumber())
+      Math.floor(getBigNumber(amountIn.toWei())),
+      Math.floor(getBigNumber(amountOut.toWei()))
     )
   )
 
@@ -451,12 +452,12 @@ export async function place(
     if (forecastConfig.side === 'buy') {
       lamports = Math.round(forecastConfig.worstPrice * forecastConfig.amountOut * 1.01 * LAMPORTS_PER_SOL)
       if (openOrdersAccounts.length > 0) {
-        lamports -= openOrdersAccounts[0].quoteTokenFree.toNumber()
+        lamports -= getBigNumber(openOrdersAccounts[0].quoteTokenFree)
       }
     } else {
       lamports = Math.round(forecastConfig.maxInAllow * LAMPORTS_PER_SOL)
       if (openOrdersAccounts.length > 0) {
-        lamports -= openOrdersAccounts[0].baseTokenFree.toNumber()
+        lamports -= getBigNumber(openOrdersAccounts[0].baseTokenFree)
       }
     }
     lamports = Math.max(lamports, 0) + 1e7

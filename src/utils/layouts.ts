@@ -24,3 +24,7 @@ export const MINT_LAYOUT = struct([
   u32('freezeAuthorityOption'),
   publicKey('freezeAuthority')
 ])
+
+export function getBigNumber(num: any) {
+  return parseFloat(num.toString())
+}

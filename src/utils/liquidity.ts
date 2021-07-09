@@ -1,4 +1,4 @@
-import { MINT_LAYOUT } from './layouts'
+import { getBigNumber, MINT_LAYOUT } from './layouts'
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import {
   LiquidityPoolInfo,
@@ -107,8 +107,8 @@ export async function addLiquidity(
 
   const userCoinTokenAccount = userAccounts[0]
   const userPcTokenAccount = userAccounts[1]
-  const coinAmount = new TokenAmount(userAmounts[0], poolInfo.coin.decimals, false).wei.toNumber()
-  const pcAmount = new TokenAmount(userAmounts[1], poolInfo.pc.decimals, false).wei.toNumber()
+  const coinAmount = getBigNumber(new TokenAmount(userAmounts[0], poolInfo.coin.decimals, false).wei)
+  const pcAmount = getBigNumber(new TokenAmount(userAmounts[1], poolInfo.pc.decimals, false).wei)
 
   let wrappedCoinSolAccount
   if (poolInfo.coin.mintAddress === NATIVE_SOL.mintAddress) {
@@ -236,7 +236,7 @@ export async function removeLiquidity(
 
   const owner = wallet.publicKey
 
-  const lpAmount = new TokenAmount(amount, poolInfo.lp.decimals, false).wei.toNumber()
+  const lpAmount = getBigNumber(new TokenAmount(amount, poolInfo.lp.decimals, false).wei)
 
   let wrappedCoinSolAccount
   if (poolInfo.coin.mintAddress === NATIVE_SOL.mintAddress) {
