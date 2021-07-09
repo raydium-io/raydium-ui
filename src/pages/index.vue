@@ -36,12 +36,24 @@
         <div class="row-box-2">
           <div class="card forsted-glass smoke">
             <div class="card-title">TOTAL VALUE LOCKED</div>
-            <div class="value">$23333333</div>
+            <div class="value">
+              ${{
+                Math.round(tvl)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }}
+            </div>
           </div>
 
           <div class="card forsted-glass smoke">
-            <div class="card-title">24H TRADING VOLUME</div>
-            <div class="value">$1234567890</div>
+            <div class="card-title">24 HOUR VOLUME</div>
+            <div class="value">
+              ${{
+                Math.round(volume24h)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }}
+            </div>
           </div>
         </div>
 
@@ -256,22 +268,58 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 @Component({
-  layout: 'home'
+  layout: 'home',
+
+  async asyncData({ $accessor, $api }) {
+    if (!$accessor.price.initialized) {
+      await $accessor.price.requestPrices()
+    }
+
+    const { tvl, volume24h } = await $api.getInfo()
+    return { tvl, volume24h }
+  }
 })
-export default class Index extends Vue {}
+export default class Index extends Vue {
+  tvl = 0
+  volume24h = 0
+  timer: number | undefined = undefined
+
+  mounted() {
+    this.timer = window.setInterval(this.getInfo, 1000 * 30)
+  }
+
+  beforeDestroy() {
+    window.clearInterval(this.timer)
+  }
+
+  async getInfo() {
+    const { tvl, volume24h } = await this.$api.getInfo()
+    this.tvl = tvl
+    this.volume24h = volume24h
+  }
+}
 </script>
 
 <style scoped>
 /* utilities */
 
 .card {
-  padding: 12px 24px;
+  padding: 10px 24px;
   border-radius: 6px;
 }
 .button-like {
   cursor: pointer;
   display: flex;
   align-items: center;
+  user-select: none;
+  transition: 75ms;
+}
+.button-like:active {
+  filter: brightness(0.75);
+  transform: scale(0.95);
+}
+.button-like:hover {
+  filter: brightness(0.95);
 }
 
 .icon {
@@ -285,7 +333,7 @@ export default class Index extends Vue {}
   backdrop-filter: blur(var(--blur-size));
   color: var(--text-color);
   border-radius: var(--border-radius);
-  background: linear-gradient(135deg, var(--bg-board-color), var(--bg-board-color-2, var(--bg-board-color)));
+  background: linear-gradient(126.7deg, var(--bg-board-color) 28.7%, var(--bg-board-color-2, var(--bg-board-color)));
 }
 .forsted-glass::before {
   content: '';
@@ -304,12 +352,13 @@ export default class Index extends Vue {}
   --bg-board-color: hsl(0, 0%, 100%, 0.08);
   --bg-board-color-2: hsl(0, 0%, 100%, 0);
   --text-color: hsl(0, 0%, 100%);
-  --blur-size: 2px;
+  --blur-size: 1.5px;
   --border-radius: 20px;
 }
 .forsted-glass.smoke {
   --border-color: hsl(0, 0%, 100%);
-  --bg-board-color: hsl(0, 0%, 100%, 0.1);
+  --bg-board-color: hsl(0, 0%, 100%, 0.12);
+  --bg-board-color-2: hsl(0, 0%, 100%, 0);
   --text-color: hsl(0, 0%, 100%);
   --blur-size: 2px;
   --border-radius: 20px;
@@ -384,6 +433,7 @@ export default class Index extends Vue {}
   line-height: 60px;
   color: var(--text-primary);
   margin-bottom: 16px;
+  margin-top: 56px;
 }
 .section-app-face .subtitle {
   font-size: 22px;
@@ -409,7 +459,7 @@ export default class Index extends Vue {}
 .section-app-face .row-box-1 .card-1 .icon {
   width: 4px;
   height: 12px;
-  margin-left: 4px;
+  margin-left: 6px;
 }
 .section-app-face .row-box-1 .card-2 .icon {
   width: 14px;
@@ -422,16 +472,16 @@ export default class Index extends Vue {}
   margin-bottom: 36px;
 }
 .section-app-face .row-box-2 .card {
-  padding: 24px 52px;
+  width: 228px;
+  padding: 22px;
 }
 .section-app-face .row-box-2 .card .card-title {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 4px;
 }
 .section-app-face .row-box-2 .card .value {
-  font-weight: 500;
-  font-size: 18px;
+  font-weight: 400;
+  font-size: 22px;
   color: var(--text-primary);
 }
 
