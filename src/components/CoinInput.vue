@@ -4,37 +4,56 @@
       <span>{{ label }}</span>
       <span v-if="balance && !balance.wei.isNaN()"> Balance: {{ balance.fixed() }} </span>
     </div>
-    <div class="coin-input fs-container">
-      <input
+    <div class="coin-input">
+      <div class="main-input fs-container">
+        <input
+          ref="input"
+          :value="value"
+          inputmode="decimal"
+          autocomplete="off"
+          autocorrect="off"
+          placeholder="0.00"
+          type="text"
+          pattern="^[0-9]*[.,]?[0-9]*$"
+          minlength="1"
+          maxlength="79"
+          spellcheck="false"
+          :disabled="disabled"
+          @input="$emit('onInput', $event.target.value)"
+          @focus="$emit('onFocus')"
+        />
+        <button v-if="!disabled && showHalf && balance" class="input-button" @click="inputBalanceByPercent(0.5)">
+          HALF
+        </button>
+        <button v-if="!disabled && balance" class="input-button" @click="inputBalanceByPercent(1)">MAX</button>
+        <button class="select-button fc-container" @click="$emit('onSelect')">
+          <div v-if="coinName" class="fc-container">
+            <CoinIcon :mint-address="mintAddress" />
+            <span>{{ coinName }}</span>
+          </div>
+          <span v-else>Select a token</span>
+          <Icon type="caret-down" />
+        </button>
+      </div>
+      <!-- <input // Maybe it will use soon or later
+        v-if="!disabled && balance"
+        ref="range"
         :value="value"
-        inputmode="decimal"
-        autocomplete="off"
-        autocorrect="off"
-        placeholder="0.00"
-        type="text"
-        pattern="^[0-9]*[.,]?[0-9]*$"
-        minlength="1"
-        maxlength="79"
-        spellcheck="false"
-        :disabled="disabled"
-        @input="$emit('onInput', $event.target.value)"
-        @focus="$emit('onFocus')"
+        class="input-range"
+        type="range"
+        min="0"
+        :max="balance ? balance.toEther() : ''"
+        step="any"
+        @change="$emit('onInput', $event.target.value)"
+        @mousedown="focusInput()"
       />
-      <button
-        v-if="showMax && balance && (!value || lt(value, balance.toEther()))"
-        class="max-button"
-        @click="$emit('onMax')"
-      >
-        MAX
-      </button>
-      <button class="select-button fc-container" @click="$emit('onSelect')">
-        <div v-if="coinName" class="fc-container">
-          <CoinIcon :mint-address="mintAddress" />
-          <span>{{ coinName }}</span>
-        </div>
-        <span v-else>Select a token</span>
-        <Icon type="caret-down" />
-      </button>
+      <div v-if="!disabled && balance" class="shortcut-btns">
+        <button class="input-button" @click="inputBalanceByPercent(0)">0</button>
+        <button class="input-button" @click="inputBalanceByPercent(0.25)">25%</button>
+        <button class="input-button" @click="inputBalanceByPercent(0.5)">50%</button>
+        <button class="input-button" @click="inputBalanceByPercent(0.75)">75%</button>
+        <button class="input-button" @click="inputBalanceByPercent(1)">MAX</button>
+      </div> -->
     </div>
   </div>
 </template>
@@ -80,14 +99,27 @@ export default Vue.extend({
       type: Boolean,
       default: true
     },
+    showHalf: {
+      type: Boolean,
+      default: false
+    },
     disabled: {
       type: Boolean,
       default: false
     }
   },
-
   methods: {
-    lt
+    lt,
+    focusInput() {
+      const input = this.$refs.input as HTMLInputElement
+      input.focus()
+    },
+    inputBalanceByPercent(percent: number) {
+      if (!this.balance || this.balance.wei.isNaN()) return
+      const inputValue = String(this.balance.toEther() * percent)
+      this.focusInput()
+      this.$emit('onInput', inputValue)
+    }
   }
 })
 </script>
@@ -155,10 +187,23 @@ export default Vue.extend({
       }
     }
 
-    .max-button {
+    .input-range {
+      width: 100%;
+      // &::-webkit-slider-runnable-track {
+      //   background: #ddd;
+      // }
+      // &::-webkit-slider-thumb {
+      //   background: dodgerblue;
+      //   width: 4px;
+      //   height: 4px;
+      //   border-radius: 50%;
+      // }
+    }
+    .input-button {
       height: 32px;
-      padding: 0 16px;
+      padding: 0 4px;
       color: @primary-color;
+      font-size: 0.9em;
     }
 
     .select-button {
@@ -175,6 +220,11 @@ export default Vue.extend({
         height: 24px;
         width: 24px;
       }
+    }
+
+    .shortcut-btns {
+      display: flex;
+      justify-content: space-between;
     }
   }
 }
