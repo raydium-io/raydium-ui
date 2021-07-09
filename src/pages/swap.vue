@@ -124,6 +124,7 @@
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
+          :show-half="true"
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
