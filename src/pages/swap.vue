@@ -258,7 +258,6 @@
         >
           Create {{ toCoin.symbol }} account
         </Button>
-
         <Button
           v-else
           size="large"
@@ -278,7 +277,16 @@
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
           "
           :loading="swaping"
-          @click="placeOrder"
+          style="width: 100%"
+          @click="
+            () => {
+              if (priceImpact >= -2 && !$accessor.setting.userIgnoreConfirm) {
+                confirmModalIsOpen = true
+              } else {
+                placeOrder()
+              }
+            }
+          "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
@@ -304,6 +312,20 @@
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
         </Button>
+
+        <Modal
+          title="warn: priceImpact is too high"
+          :visible="confirmModalIsOpen"
+          @cancel="confirmModalIsOpen = false"
+          @ok="
+            () => {
+              confirmModalIsOpen = false
+              placeOrder()
+            }
+          "
+        >
+          <span class="title">PriceImpact is: {{ priceImpact.toFixed(2) + '%' }}. Sure?</span>
+        </Modal>
       </div>
     </div>
 
@@ -354,7 +376,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress, Spin } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
@@ -383,7 +405,8 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress,
-    Spin
+    Spin,
+    Modal
   },
 
   data() {
@@ -423,6 +446,8 @@ export default Vue.extend({
       toCoinWithSlippage: '',
 
       // wrap
+      // if priceImpact is higher than 30%, a confirm modal will be shown
+      confirmModalIsOpen: false,
       isWrap: false,
       // serum
       market: null as any,
@@ -1380,6 +1405,14 @@ export default Vue.extend({
   }
 })
 </script>
+
+<style lang="less">
+.ant-modal-footer {
+  .ant-btn:not(.ant-btn-primary) {
+    background: transparent;
+  }
+}
+</style>
 
 <style lang="less" sxcoped>
 .container {

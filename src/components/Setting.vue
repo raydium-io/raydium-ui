@@ -1,21 +1,29 @@
 <template>
   <Modal title="Settings" :visible="show" :footer="null" centered @cancel="$accessor.setting.close">
     <div class="slippage">
-      <h3>Slippage tolerance</h3>
-      <Row class="slippage-setting" :gutter="30">
-        <Col :span="6">
-          <button :class="slippage === '0.1' ? 'active' : ''" @click="() => (slippage = '0.1')">0.1%</button>
-        </Col>
-        <Col :span="6">
-          <button :class="slippage === '0.5' ? 'active' : ''" @click="() => (slippage = '0.5')">0.5%</button>
-        </Col>
-        <Col :span="6">
-          <button :class="slippage === '1' ? 'active' : ''" @click="() => (slippage = '1')">1%</button>
-        </Col>
-        <Col :span="6">
-          <Input v-model="slippage" :class="errorMsg ? 'has-error' : ''" size="large" suffix="%" />
-        </Col>
-      </Row>
+      <div class="field">
+        <h3>Slippage tolerance</h3>
+        <Row class="slippage-setting" :gutter="30">
+          <Col :span="6">
+            <button :class="slippage === '0.1' ? 'active' : ''" @click="() => (slippage = '0.1')">0.1%</button>
+          </Col>
+          <Col :span="6">
+            <button :class="slippage === '0.5' ? 'active' : ''" @click="() => (slippage = '0.5')">0.5%</button>
+          </Col>
+          <Col :span="6">
+            <button :class="slippage === '1' ? 'active' : ''" @click="() => (slippage = '1')">1%</button>
+          </Col>
+          <Col :span="6">
+            <Input v-model="slippage" :class="errorMsg ? 'has-error' : ''" size="large" suffix="%" />
+          </Col>
+        </Row>
+      </div>
+
+      <div class="field row">
+        <h3>Ignore swap confirm</h3>
+        <Toggle v-model="userIgnoreConfirm" />
+      </div>
+
       <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
     </div>
   </Modal>
@@ -23,7 +31,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Modal, Row, Col, Input } from 'ant-design-vue'
+import { Modal, Row, Col, Input, Switch as Toggle } from 'ant-design-vue'
 
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 
@@ -32,18 +40,23 @@ Vue.use(Modal)
 
 @Component({
   asyncData({ $accessor }) {
-    return { slippage: $accessor.setting.slippage.toString() }
+    return {
+      slippage: $accessor.setting.slippage.toString(),
+      userIgnoreConfirm: $accessor.setting.userIgnoreConfirm
+    }
   },
 
   components: {
     Modal,
     Row,
     Col,
-    Input
+    Input,
+    Toggle
   }
 })
 export default class Setting extends Vue {
   slippage = this.$accessor.setting.slippage.toString()
+  userIgnoreConfirm = this.$accessor.setting.userIgnoreConfirm
   errorMsg = ''
 
   get show() {
@@ -71,6 +84,13 @@ export default class Setting extends Vue {
       }
     })
   }
+
+  @Watch('userIgnoreConfirm')
+  onUserIgnoreConfirmChanged(val: boolean) {
+    this.$nextTick(() => {
+      this.$accessor.setting.setUserIgnoreConfirm(val)
+    })
+  }
 }
 </script>
 
@@ -78,44 +98,54 @@ export default class Setting extends Vue {
 @import '../styles/variables';
 
 .slippage {
-  h3 {
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 1.5;
-    color: @text-color;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 
-  .slippage-setting {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      background-color: @bg-color;
-      color: @text-color;
-      padding: 10px 12px;
-      border: 0;
-      border-radius: 4px;
-      font-size: 12px;
-      line-height: 20px;
+  .field {
+    &.row {
+      display: flex;
+      justify-content: space-between;
+    }
+    h3 {
       font-weight: 600;
-      cursor: pointer;
-      opacity: 1;
-
-      &:active,
-      &:focus,
-      &:hover {
-        background-color: @primary-color;
-        outline: 0;
-      }
+      font-size: 16px;
+      line-height: 1.5;
+      color: @text-color;
     }
 
-    button.active {
-      background-color: @primary-color;
+    .slippage-setting {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background-color: @bg-color;
+        color: @text-color;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        opacity: 1;
+
+        &:active,
+        &:focus,
+        &:hover {
+          background-color: @primary-color;
+          outline: 0;
+        }
+      }
+
+      button.active {
+        background-color: @primary-color;
+      }
     }
   }
 
