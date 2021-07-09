@@ -36,8 +36,7 @@ Vue.use(Modal)
 @Component({
   asyncData({ $accessor }) {
     return {
-      slippage: $accessor.setting.slippage.toString(),
-      userIgnoreConfirm: $accessor.setting.userIgnoreConfirm
+      slippage: $accessor.setting.slippage.toString()
     }
   },
 
@@ -51,7 +50,6 @@ Vue.use(Modal)
 })
 export default class Setting extends Vue {
   slippage = this.$accessor.setting.slippage.toString()
-  userIgnoreConfirm = this.$accessor.setting.userIgnoreConfirm
   errorMsg = ''
 
   get show() {
