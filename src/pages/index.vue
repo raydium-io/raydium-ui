@@ -299,7 +299,12 @@ export default class Index extends Vue {
   }
 }
 </script>
-
+<style>
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/SpaceGrotesk-VariableFont_wght.woff2') format('woff2');
+}
+</style>
 <style scoped>
 /* utilities */
 
@@ -344,7 +349,7 @@ export default class Index extends Vue {
   border-radius: inherit;
   box-shadow: inset 0 0 0 1.5px var(--border-color);
   mask-image: radial-gradient(at -31% -58%, hsl(0, 0%, 0%, 0.5) 34%, transparent 60%),
-    linear-gradient(to left, hsl(0, 0%, 0%, 0.5) 10%, transparent 30%),
+    linear-gradient(to left, hsl(0, 0%, 0%, 0.5) 0%, transparent 13%),
     linear-gradient(hsl(0deg 0% 0% / 5%), hsl(0deg 0% 0% / 5%));
 }
 .forsted-glass.buriedlightsmoke,
@@ -416,6 +421,8 @@ export default class Index extends Vue {
 .page-container {
   --text-primary: hsl(0, 0%, 100%);
   --text-secondary: hsl(222deg, 100%, 84%);
+
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .home-navbar {
@@ -440,12 +447,15 @@ export default class Index extends Vue {
   margin-top: 56px;
 }
 .section-app-face .subtitle {
+  font-style: normal;
+  font-weight: normal;
   font-size: 22px;
   line-height: 30px;
   color: var(--text-secondary);
   margin-bottom: 24px;
 }
 .section-app-face .defi-text {
+  font-family: initial;
   font-weight: 600;
   color: transparent;
   background: radial-gradient(circle at top right, #39d0d8, #2b6aff);
