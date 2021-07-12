@@ -128,7 +128,7 @@
         </div>
 
         <div class="boards">
-          <div class="card children-center forsted-glass smoke">
+          <div class="card children-center forsted-glass buriedlightsmoke">
             <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/order-book-AMM.svg" />
             </div>
@@ -139,7 +139,7 @@
             </div>
           </div>
 
-          <div class="card children-center forsted-glass smoke">
+          <div class="card children-center forsted-glass buriedlightsmoke">
             <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/best-price-swaps.svg" />
             </div>
@@ -150,7 +150,7 @@
             </div>
           </div>
 
-          <div class="card children-center forsted-glass smoke">
+          <div class="card children-center forsted-glass buriedlightsmoke">
             <div class="card icon-like forsted-glass teal">
               <img class="icon" src="../assets/icons/high-liquidity-launches.svg" />
             </div>
@@ -347,6 +347,7 @@ export default class Index extends Vue {
     linear-gradient(to left, hsl(0, 0%, 0%, 0.5) 10%, transparent 30%),
     linear-gradient(hsl(0deg 0% 0% / 5%), hsl(0deg 0% 0% / 5%));
 }
+.forsted-glass.buriedlightsmoke,
 .forsted-glass.lightsmoke {
   --border-color: hsl(0, 0%, 100%);
   --bg-board-color: hsl(0, 0%, 100%, 0.08);
@@ -355,12 +356,15 @@ export default class Index extends Vue {
   --blur-size: 1.5px;
   --border-radius: 20px;
 }
+.forsted-glass.buriedlightsmoke {
+  --blur-size: 6px;
+}
 .forsted-glass.smoke {
   --border-color: hsl(0, 0%, 100%);
   --bg-board-color: hsl(0, 0%, 100%, 0.12);
   --bg-board-color-2: hsl(0, 0%, 100%, 0);
   --text-color: hsl(0, 0%, 100%);
-  --blur-size: 2px;
+  --blur-size: 2.3px;
   --border-radius: 20px;
 }
 .forsted-glass.teal {
@@ -444,7 +448,7 @@ export default class Index extends Vue {
 .section-app-face .defi-text {
   font-weight: 600;
   color: transparent;
-  background: radial-gradient(circle at 100%, #39d0d8, #2b6aff);
+  background: radial-gradient(circle at top right, #39d0d8, #2b6aff);
   background-clip: text;
 }
 .section-app-face .row-box-1 {
@@ -537,11 +541,12 @@ export default class Index extends Vue {
 .section-features .image-2 {
   overflow: hidden;
   border-radius: 100px;
-  background: #1e2160;
-  box-shadow: inset 0 0 48px #ffffff42, 0 0 40px #ffffff24;
+  background: url('../assets/background/index_background2_lights.svg'),
+    radial-gradient(at center top, transparent, hsl(0deg 0% 0% / 27%)), #1e2160;
+  box-shadow: inset 6px 3px 20px rgb(255 255 255 / 18%), 0 -6px 24px -6px rgb(255 255 255 / 7%);
 }
 .section-features .image-2 img {
-  opacity: 0.4;
+  mask-image: radial-gradient(at bottom right, hsla(0, 0%, 0%, 0.33), black);
 }
 .section-features .feature-title {
   font-weight: 600;
@@ -564,6 +569,7 @@ export default class Index extends Vue {
 }
 .section-features .boards > .card {
   padding: 24px 50px;
+  flex: 1 0 120px;
 }
 .section-features .boards > .card > .card.icon-like {
   padding: 12px;
