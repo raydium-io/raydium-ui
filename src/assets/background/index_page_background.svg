@@ -6,7 +6,7 @@
 </g>
 <g filter="url(#filter1_f)">
 <path d="M1200.03 617.113C1332.28 653.377 1341.67 497.505 1447.66 476.121C1824.19 400.155 1859.9 1460.15 1472.48 1619.95C1105.94 1771.14 728.425 901.862 728.425 901.862C728.425 901.862 655.469 671.556 728.425 578.409C794.266 494.347 880.127 498.419 974.276 527.956C1048.66 551.293 1125.05 596.552 1200.03 617.113Z" fill="#DA2EEF"/>
-</g>
+</g>    
 <g filter="url(#filter2_f)">
 <ellipse cx="889.5" cy="1249.54" rx="446.5" ry="521.324" fill="#2B6AFF"/>
 </g>
@@ -46,7 +46,7 @@
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feGaussianBlur stdDeviation="250" result="effect1_foregroundBlur"/>
 </filter>
-<filter id="filter5_f" x="-587.023" y="795.043" width="2762.05" height="2836.91" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter5_f" x="-444.646" y="925.982" width="2477.29" height="2575.04" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feGaussianBlur stdDeviation="407.062" result="effect1_foregroundBlur"/>

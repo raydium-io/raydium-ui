@@ -17,18 +17,18 @@
           An avenue for <br />
           the evolution of <span class="defi-text">DeFi</span>
         </div>
-        <div class="subtitle">Light-speed <b>swaps</b>.Next-level <b>liquidity</b>. Friction-less <b>yield</b>.</div>
+        <div class="subtitle">Light-speed <b>swaps</b>. Next-level <b>liquidity</b>. Friction-less <b>yield</b>.</div>
 
         <div class="row-box-1">
           <NuxtLink to="/swap/">
             <div class="card button-like card-1">
-              Launch app <img class="icon" src="../assets/icons/button-icon-right.svg" />
+              <span>Launch app</span><img class="icon" src="../assets/icons/button-icon-right.svg" />
             </div>
           </NuxtLink>
 
           <a href="https://raydium.gitbook.io/raydium/" target="_blank">
             <div class="card button-like card-2 forsted-glass teal">
-              Read docs <img class="icon" src="../assets/icons/gitbook.svg" />
+              <span>Read docs</span><img class="icon" src="../assets/icons/gitbook.svg" />
             </div>
           </a>
         </div>
@@ -37,7 +37,8 @@
           <div class="card forsted-glass smoke">
             <div class="card-title">TOTAL VALUE LOCKED</div>
             <div class="value">
-              ${{
+              <span class="value-sign">$</span
+              >{{
                 Math.round(tvl)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -48,7 +49,8 @@
           <div class="card forsted-glass smoke">
             <div class="card-title">24 HOUR VOLUME</div>
             <div class="value">
-              ${{
+              <span class="value-sign">$</span
+              >{{
                 Math.round(volume24h)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -302,14 +304,18 @@ export default class Index extends Vue {
 <style>
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk-VariableFont_wght.woff2') format('woff2');
+  src: url('../assets/fonts/SpaceGroteskVariable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk semibold';
+  src: url('../assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');
 }
 </style>
 <style scoped>
 /* utilities */
 
 .card {
-  padding: 10px 24px;
+  padding: 12px 24px;
   border-radius: 6px;
 }
 .button-like {
@@ -344,12 +350,12 @@ export default class Index extends Vue {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.4;
+  opacity: 0.7;
   background: transparent;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1.5px var(--border-color);
+  box-shadow: inset 0 0 0 var(--border-line-width, 1.5px) var(--border-color);
   mask-image: radial-gradient(at -31% -58%, hsl(0, 0%, 0%, 0.5) 34%, transparent 60%),
-    linear-gradient(to left, hsl(0, 0%, 0%, 0.5) 0%, transparent 13%),
+    linear-gradient(to left, hsl(0, 0%, 0%, 0.2) 0%, transparent 13%),
     linear-gradient(hsl(0deg 0% 0% / 5%), hsl(0deg 0% 0% / 5%));
 }
 .forsted-glass.buriedlightsmoke,
@@ -360,6 +366,7 @@ export default class Index extends Vue {
   --text-color: hsl(0, 0%, 100%);
   --blur-size: 1.5px;
   --border-radius: 20px;
+  --border-line-width: 2px;
 }
 .forsted-glass.buriedlightsmoke {
   --blur-size: 6px;
@@ -408,6 +415,7 @@ export default class Index extends Vue {
 }
 .title-text .text {
   font-size: 20px;
+  line-height: 27px;
 }
 
 .grid-cover-container {
@@ -421,18 +429,15 @@ export default class Index extends Vue {
 .page-container {
   --text-primary: hsl(0, 0%, 100%);
   --text-secondary: hsl(222deg, 100%, 84%);
+  --text-secondary-light: #c4d6ff;
 
   font-family: 'Space Grotesk', sans-serif;
 }
 
 .home-navbar {
   display: flex;
-  padding: 16px 10vw;
+  padding: 50px 167px;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(16px);
 }
 
 .section-app-face {
@@ -455,8 +460,7 @@ export default class Index extends Vue {
   margin-bottom: 24px;
 }
 .section-app-face .defi-text {
-  font-family: initial;
-  font-weight: 600;
+  font-family: 'Space Grotesk semibold', sans-serif;
   color: transparent;
   background: radial-gradient(circle at top right, #39d0d8, #2b6aff);
   background-clip: text;
@@ -478,7 +482,7 @@ export default class Index extends Vue {
 .section-app-face .row-box-1 .card-2 .icon {
   width: 14px;
   height: 14px;
-  margin-left: 4px;
+  margin-left: 8px;
 }
 .section-app-face .row-box-2 {
   display: flex;
@@ -487,16 +491,22 @@ export default class Index extends Vue {
 }
 .section-app-face .row-box-2 .card {
   width: 228px;
-  padding: 22px;
+  padding: 24px;
 }
 .section-app-face .row-box-2 .card .card-title {
   font-size: 14px;
+  line-height: 19px;
   color: var(--text-secondary);
+  margin-bottom: 4px;
 }
 .section-app-face .row-box-2 .card .value {
-  font-weight: 400;
-  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
   color: var(--text-primary);
+}
+.section-app-face .row-box-2 .card .value-sign {
+  font-variant: normal;
 }
 
 .page-footer {
@@ -524,12 +534,16 @@ export default class Index extends Vue {
   margin: 0;
   padding: 0;
   list-style: none;
-  color: var(--text-secondary);
+  color: var(--text-secondary-light);
 }
 .page-footer .group .links a {
   display: flex;
   gap: 12px;
   align-items: center;
+  color: var(--text-secondary-light);
+}
+.page-footer .group .links a:hover {
+  color: var(--text-secondary);
 }
 .page-footer .group .links > li {
   font-size: 16px;
@@ -551,12 +565,12 @@ export default class Index extends Vue {
 .section-features .image-2 {
   overflow: hidden;
   border-radius: 100px;
-  background: url('../assets/background/index_background2_lights.svg'),
-    radial-gradient(at center top, transparent, hsl(0deg 0% 0% / 27%)), #1e2160;
-  box-shadow: inset 6px 3px 20px rgb(255 255 255 / 18%), 0 -6px 24px -6px rgb(255 255 255 / 7%);
+  background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
+    url('../assets/background/index_background2_lights.svg'), #1b1659;
+  box-shadow: inset 0 3px 12px rgb(255 255 255 / 18%), 0 -6px 24px -6px rgb(255 255 255 / 7%);
 }
 .section-features .image-2 img {
-  mask-image: radial-gradient(at bottom right, hsla(0, 0%, 0%, 0.33), black);
+  mask-image: radial-gradient(at center, rgb(0 0 0 / 80%), rgb(0 0 0 / 40%));
 }
 .section-features .feature-title {
   font-weight: 600;
@@ -566,8 +580,8 @@ export default class Index extends Vue {
 }
 .section-features .feature-description {
   font-size: 14px;
-  line-height: 26px;
-  color: var(--text-secondary);
+  line-height: 16px;
+  color: var(--text-secondary-light);
   margin-bottom: 20px;
 }
 .section-features .content {
@@ -607,6 +621,12 @@ export default class Index extends Vue {
 .section-features.\-2 .boards {
   gap: 24px;
 }
+
+.section-features.\-2 .feature-description {
+  font-size: 16px;
+  line-height: 24px;
+}
+
 .section-features.\-2 .boards > .card {
   max-width: 360px;
 }
