@@ -64,9 +64,7 @@
     </section>
 
     <section class="section-features children-center grid-cover-container">
-      <div class="image-2">
-        <img src="../assets/background/index_background2.svg" />
-      </div>
+      <img class="image-2" src="../assets/background/index_background2.svg" />
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -313,7 +311,6 @@ export default class Index extends Vue {
 </style>
 <style scoped>
 /* utilities */
-
 .card {
   padding: 12px 24px;
   border-radius: 6px;
@@ -423,7 +420,10 @@ export default class Index extends Vue {
   display: grid;
 }
 .grid-cover-container > * {
+  max-width: 100%;
+  min-width: 375px; /* it's the IPhone 6 width */
   grid-area: 1 / 1;
+  overflow: auto;
 }
 
 .page-container {
