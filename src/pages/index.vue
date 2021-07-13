@@ -6,7 +6,7 @@
       </NuxtLink>
 
       <NuxtLink to="/swap/">
-        <div class="card button-like forsted-glass teal">Launch app</div>
+        <div class="card button-like forsted-glass teal"><span class="font">Launch app</span></div>
       </NuxtLink>
     </nav>
 
@@ -22,13 +22,13 @@
         <div class="row-box-1">
           <NuxtLink to="/swap/">
             <div class="card button-like card-1">
-              <span>Launch app</span><img class="icon" src="../assets/icons/button-icon-right.svg" />
+              <span class="font">Launch app</span><img class="icon" src="../assets/icons/button-icon-right.svg" />
             </div>
           </NuxtLink>
 
           <a href="https://raydium.gitbook.io/raydium/" target="_blank">
             <div class="card button-like card-2 forsted-glass teal">
-              <span>Read docs</span><img class="icon" src="../assets/icons/gitbook.svg" />
+              <span class="font">Read docs</span><img class="icon" src="../assets/icons/gitbook.svg" />
             </div>
           </a>
         </div>
@@ -317,8 +317,6 @@ export default class Index extends Vue {
 }
 .button-like {
   cursor: pointer;
-  display: flex;
-  align-items: center;
   user-select: none;
   transition: 75ms;
 }
@@ -328,6 +326,11 @@ export default class Index extends Vue {
 }
 .button-like:hover {
   filter: brightness(0.95);
+}
+.button-like .font {
+  font-weight: 600;
+  transform: translateY(2px); /* forcely fix the strange position problem of font:Space Grotesk */
+  display: inline-block;
 }
 
 .icon {
@@ -585,7 +588,10 @@ export default class Index extends Vue {
   margin-bottom: 20px;
 }
 .section-features .content {
-  max-width: 1120px;
+  max-width: 1220px;
+  padding: 0 56px;
+  overflow: auto;
+  width: 100%;
 }
 .section-features .boards {
   display: flex;
