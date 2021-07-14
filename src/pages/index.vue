@@ -567,7 +567,7 @@ export default class Index extends Vue {
   overflow: hidden;
   border-radius: 100px;
   background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
-    url('../assets/background/index_background2_lights.svg'), #1b1659;
+    url('../assets/background/index_background2_lights.webp'), #1b1659;
   box-shadow: inset 0 3px 12px rgb(255 255 255 / 18%), 0 -6px 24px -6px rgb(255 255 255 / 7%);
 }
 .section-features .image-2 img {
