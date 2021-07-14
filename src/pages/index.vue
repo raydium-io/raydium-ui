@@ -302,11 +302,7 @@ export default class Index extends Vue {
 <style>
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGroteskVariable.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Space Grotesk semibold';
-  src: url('../assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');
+  src: url('../assets/fonts/SpaceGrotesk-VariableFont_wght.woff2') format('woff2');
 }
 </style>
 <style scoped>
@@ -328,8 +324,9 @@ export default class Index extends Vue {
   filter: brightness(0.95);
 }
 .button-like .font {
-  font-weight: 600;
-  transform: translateY(2px); /* forcely fix the strange position problem of font:Space Grotesk */
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 18px;
   display: inline-block;
 }
 
@@ -435,6 +432,7 @@ export default class Index extends Vue {
   --text-secondary-light: #c4d6ff;
 
   font-family: 'Space Grotesk', sans-serif;
+  font-feature-settings: 'ss04';
 }
 
 .home-navbar {
@@ -463,7 +461,7 @@ export default class Index extends Vue {
   margin-bottom: 24px;
 }
 .section-app-face .defi-text {
-  font-family: 'Space Grotesk semibold', sans-serif;
+  font-weight: 600;
   color: transparent;
   background: radial-gradient(circle at top right, #39d0d8, #2b6aff);
   background-clip: text;
