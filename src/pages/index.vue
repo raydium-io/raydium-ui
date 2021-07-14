@@ -11,7 +11,7 @@
     </nav>
 
     <section class="section-app-face children-center grid-cover-container">
-      <img src="../assets/background/index_background.svg" class="image-1" />
+      <img src="../assets/background/index_background.webp" class="image-1" />
       <div class="grid-cover-content children-center">
         <div class="title">
           An avenue for <br />
@@ -64,7 +64,7 @@
     </section>
 
     <section class="section-features children-center grid-cover-container">
-      <img class="image-2" src="../assets/background/index_background2.svg" />
+      <img class="image-2" src="../assets/background/index_background2.webp" />
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -120,7 +120,7 @@
     </section>
 
     <section class="section-features -2 children-center grid-cover-container">
-      <img src="../assets/background/index_background3.svg" class="image-3" />
+      <img src="../assets/background/index_background3.webp" class="image-3" />
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -178,7 +178,7 @@
     </section>
 
     <footer class="page-footer grid-cover-container">
-      <img src="../assets/background/index_footer_background.svg" style="width: 100%" />
+      <img src="../assets/background/index_footer_background.webp" style="width: 100%" />
       <div class="content">
         <div class="group about">
           <div class="title-text">
