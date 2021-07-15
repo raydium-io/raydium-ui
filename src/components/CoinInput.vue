@@ -125,7 +125,7 @@ export default Vue.extend({
       const availableBalance = Number(this.balance.toEther()) + (this.balanceOffset ?? 0)
 
       // can't send negative balance
-      if (availableBalance <= 0) return
+      if (availableBalance < 0) return
 
       const inputValue = (availableBalance * percent).toFixed(this.balance.decimals)
       this.focusInput()
