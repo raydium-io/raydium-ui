@@ -30,7 +30,7 @@
         <Button ghost @click="disconnect"> DISCONNECT </Button>
 
         <div v-if="Object.keys(history).length" class="tx-history-panel">
-          <h2>Recent tex</h2>
+          <h2>Recent Transactions</h2>
           <div v-for="(txInfo, txid) in history" :key="txid" class="tx-item">
             <div class="extra-info">
               <Icon
