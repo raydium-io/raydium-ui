@@ -37,24 +37,28 @@
           <div class="card forsted-glass smoke">
             <div class="card-title">TOTAL VALUE LOCKED</div>
             <div class="value">
-              <span class="value-sign">$</span
-              >{{
-                Math.round(tvl)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-              }}
+              <span class="value-sign">$</span>
+              <span class="value-number">
+                {{
+                  Math.round(tvl)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                }}
+              </span>
             </div>
           </div>
 
           <div class="card forsted-glass smoke">
             <div class="card-title">24 HOUR VOLUME</div>
             <div class="value">
-              <span class="value-sign">$</span
-              >{{
-                Math.round(volume24h)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-              }}
+              <span class="value-sign">$</span>
+              <span class="value-number">
+                {{
+                  Math.round(volume24h)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                }}
+              </span>
             </div>
           </div>
         </div>
@@ -167,7 +171,7 @@
     <section class="section-partners children-center">
       <div class="title-text">
         <div class="line" />
-        <div class="text">PARTNERS</div>
+        <div class="text">Patterns</div>
       </div>
 
       <div class="boards">
@@ -315,6 +319,9 @@ export default class Index extends Vue {
   cursor: pointer;
   user-select: none;
   transition: 75ms;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 18px;
 }
 .button-like:active {
   filter: brightness(0.75);
@@ -324,9 +331,6 @@ export default class Index extends Vue {
   filter: brightness(0.95);
 }
 .button-like .font {
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 18px;
   display: inline-block;
 }
 
@@ -432,16 +436,21 @@ export default class Index extends Vue {
   --text-secondary-light: #c4d6ff;
 
   font-family: 'Space Grotesk', sans-serif;
-  font-feature-settings: 'ss04';
+  font-feature-settings: 'ss04', 'tnum' 0;
 }
 
 .home-navbar {
   display: flex;
-  padding: 50px 167px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 50px 165px;
   justify-content: space-between;
 }
 
 .section-app-face {
+  margin-top: 80px;
   margin-bottom: 72px;
 }
 .section-app-face .title {
@@ -507,7 +516,11 @@ export default class Index extends Vue {
   color: var(--text-primary);
 }
 .section-app-face .row-box-2 .card .value-sign {
-  font-variant: normal;
+  font-size: 16px;
+}
+.section-app-face .row-box-2 .card .value-number {
+  font-size: 22px;
+  letter-spacing: 2px;
 }
 
 .page-footer {
@@ -604,6 +617,7 @@ export default class Index extends Vue {
   margin-bottom: 12px;
 }
 .section-features .boards > .card > .feature-title {
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
@@ -614,6 +628,8 @@ export default class Index extends Vue {
   width: 100%;
   display: flex;
   justify-content: space-around;
+  padding: 0 228px;
+  transform: translateX(-28px);
 }
 
 .section-features.\-2 .image-3 {
