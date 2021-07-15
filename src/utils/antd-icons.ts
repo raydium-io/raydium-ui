@@ -35,5 +35,7 @@ export {
   CaretDownFill,
   CaretUpFill,
   // search
-  SearchOutline
+  SearchOutline,
+  // pools
+  LeftOutline
 } from '@ant-design/icons'
