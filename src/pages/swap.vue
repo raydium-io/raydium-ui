@@ -121,6 +121,7 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
+          :balance-offset="fromCoin.symbol === 'SOL' ? -0.05 : 0"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
@@ -265,6 +266,7 @@
           size="large"
           ghost
           :disabled="
+            (solBalance && +solBalance.balance.fixed() - 0.05 <= 0) || // not enough SOL
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
@@ -292,6 +294,9 @@
           <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
+          <template v-else-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0"
+            >Insufficient SOL balance</template
+          >
           <template
             v-else-if="
               get(liquidity.infos, `${lpMintAddress}.status`) && get(liquidity.infos, `${lpMintAddress}.status`) !== 1
@@ -392,6 +397,9 @@ export default Vue.extend({
   data() {
     return {
       TOKENS,
+
+      // should check if user have enough SOL to have a swap
+      solBalance: null as TokenAmount | null,
 
       autoRefreshTime: 60,
       countdown: 0,
@@ -494,6 +502,7 @@ export default Vue.extend({
         if (this.market) {
           this.fetchUnsettledByMarket()
         }
+        this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
       },
       deep: true
     },
