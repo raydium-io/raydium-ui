@@ -28,6 +28,29 @@
         <p class="address">{{ wallet.address }}</p>
 
         <Button ghost @click="disconnect"> DISCONNECT </Button>
+
+        <div v-if="Object.keys(history).length" class="tx-history-panel">
+          <h2>Recent tex</h2>
+          <div v-for="(txInfo, txid) in history" :key="txid" class="tx-item">
+            <div class="extra-info">
+              <Icon
+                v-if="(txInfo.status === 'Success') | (txInfo.state === 's') /* old data polyfill*/"
+                class="icon"
+                type="check-circle"
+                :style="{ color: '#52c41a' }"
+              />
+              <Icon
+                v-else-if="(txInfo.status === 'Fail') | (txInfo.state === 'f') /* old data polyfill*/"
+                class="icon"
+                type="close-circle"
+                :style="{ color: '#f5222d' }"
+              />
+              <Icon v-else class="icon" type="loading" :style="{ color: '#1890ff' }" />
+              <a :href="`${$accessor.url.explorer}/tx/${txid}`" target="_blank">{{ txInfo.description }}</a>
+            </div>
+            <div class="extra-info">{{ $dayjs(txInfo.time) }}</div>
+          </div>
+        </div>
       </div>
     </Modal>
   </div>
@@ -112,6 +135,11 @@ export default class Wallet extends Vue {
 
   get ido() {
     return this.$accessor.ido
+  }
+
+  // history
+  get history() {
+    return this.$accessor.transaction.history
   }
 
   /* ========== LIFECYCLE ========== */
@@ -401,6 +429,30 @@ export default class Wallet extends Vue {
 
   .address {
     font-size: 17px;
+  }
+}
+.tx-history-panel {
+  h2 {
+    margin-top: 32px;
+    text-align: left;
+  }
+  .tx-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .extra-info {
+      font-size: 0.9em;
+      opacity: 0.8;
+
+      a {
+        font-size: 1.2em;
+      }
+
+      .icon {
+        margin-right: 8px;
+      }
+    }
   }
 }
 </style>
