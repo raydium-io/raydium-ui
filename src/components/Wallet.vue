@@ -29,28 +29,28 @@
 
         <Button ghost @click="disconnect"> DISCONNECT </Button>
 
-        <div v-if="Object.keys(history).length" class="tx-history-panel">
+        <div v-if="historyList.length" class="tx-history-panel">
           <h2>Recent Transactions</h2>
-          <div v-for="(txInfo, txid) in history" :key="txid" class="tx-item">
+          <div v-for="txInfo in historyList" :key="txInfo.txid" class="tx-item">
             <div class="extra-info">
               <Icon
-                v-if="txInfo.status === 'Success' || txInfo.status === 's' /* old data polyfill*/"
+                v-if="txInfo.status === 'Success' || txInfo.s === 's' /* old data polyfill*/"
                 class="icon"
                 type="check-circle"
                 :style="{ color: '#52c41a' }"
               />
               <Icon
-                v-else-if="txInfo.status === 'Fail' || txInfo.status === 'f' /* old data polyfill*/"
+                v-else-if="txInfo.status === 'Fail' || txInfo.s === 'f' /* old data polyfill*/"
                 class="icon"
                 type="close-circle"
                 :style="{ color: '#f5222d' }"
               />
               <Icon v-else class="icon" type="loading" :style="{ color: '#1890ff' }" />
-              <a :href="`${$accessor.url.explorer}/tx/${txid}`" target="_blank">{{
+              <a :href="`${$accessor.url.explorer}/tx/${txInfo.txid}`" target="_blank">{{
                 txInfo.description || txInfo.d /* old data polyfill*/
               }}</a>
             </div>
-            <div class="extra-info">{{ $dayjs(txInfo.time || txInfo.t /* old data polyfill*/) }}</div>
+            <div class="extra-info time">{{ $dayjs(txInfo.time || txInfo.t /* old data polyfill*/) }}</div>
           </div>
         </div>
       </div>
@@ -141,8 +141,14 @@ export default class Wallet extends Vue {
   }
 
   // history
-  get history() {
-    return this.$accessor.transaction.history
+  get historyList() {
+    const rawList = Object.entries(this.$accessor.transaction.history).map(([txid, txInfo]) => ({
+      ...(txInfo as any),
+      txid
+    }))
+    return rawList.sort((a, b) => {
+      return (b.time || b.t) - (a.time || a.t)
+    })
   }
 
   /* ========== LIFECYCLE ========== */
@@ -459,6 +465,9 @@ export default class Wallet extends Vue {
     .extra-info {
       font-size: 0.9em;
       opacity: 0.8;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
 
       a {
         font-size: 1.2em;
@@ -467,6 +476,9 @@ export default class Wallet extends Vue {
       .icon {
         margin-right: 8px;
       }
+    }
+    .extra-info.time {
+      flex-shrink: 0;
     }
   }
 }
