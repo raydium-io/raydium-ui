@@ -22,6 +22,7 @@
     }
   },
   "dependencies": {
+    "@ledgerhq/hw-transport": "^5.51.1",
     "@ledgerhq/hw-transport-webusb": "^5.53.1",
     "@nuxtjs/axios": "^5.12.5",
     "@nuxtjs/dayjs": "^1.4.0",

@@ -1,4 +1,4 @@
-import { getPublicKey, signTransaction } from './ledger-core'
+import { getPublicKey, signTransaction, getSolanaDerivationPath } from './ledger-core'
 import { WalletAdapter } from './types'
 
 import type Transport from '@ledgerhq/hw-transport'
@@ -8,16 +8,29 @@ import EventEmitter from 'eventemitter3'
 import { PublicKey } from '@solana/web3.js'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 
+const DEFAULT_DERIVATION_PATH = getSolanaDerivationPath()
+
+export interface LedgerHDWalletPath {
+  account?: number
+  change?: number
+}
+
+export interface LedgerHDWalletAccount extends LedgerHDWalletPath {
+  key: PublicKey
+}
+
 export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
   _connecting: boolean
   _publicKey: PublicKey | null
   _transport: Transport | null
+  _derivationPath: Buffer
 
   constructor() {
     super()
     this._connecting = false
     this._publicKey = null
     this._transport = null
+    this._derivationPath = DEFAULT_DERIVATION_PATH
   }
 
   get publicKey() {
@@ -30,6 +43,10 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
 
   get autoApprove() {
     return false
+  }
+
+  get transport(): Transport | null {
+    return this._transport
   }
 
   public async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
@@ -49,14 +66,14 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
     }
 
     // @TODO: account selection (derivation path changes with account)
-    const signature = await signTransaction(this._transport, transaction)
+    const signature = await signTransaction(this._transport, transaction, this._derivationPath)
 
     transaction.addSignature(this._publicKey, signature)
 
     return transaction
   }
 
-  async connect() {
+  async connect(args?: unknown) {
     if (this._connecting) {
       return
     }
@@ -67,7 +84,16 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
       // @TODO: transport selection (WebUSB, WebHID, bluetooth, ...)
       this._transport = await TransportWebUSB.create()
       // @TODO: account selection
-      this._publicKey = await getPublicKey(this._transport)
+      if (args) {
+        const { account, change } = args as {
+          account?: number
+          change?: number
+        }
+        this._derivationPath = getSolanaDerivationPath(account, change)
+        this._publicKey = await getPublicKey(this._transport, this._derivationPath)
+      } else {
+        this._publicKey = await getPublicKey(this._transport)
+      }
       this.emit('connect', this._publicKey)
     } catch (error) {
       await this.disconnect()
@@ -92,6 +118,26 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
 
     if (emit) {
       this.emit('disconnect')
+    }
+  }
+
+  static async fetchAccountsForPaths(paths: LedgerHDWalletPath[]): Promise<LedgerHDWalletAccount[]> {
+    let transport: Transport | null = null
+    try {
+      transport = await TransportWebUSB.create()
+      const ret = []
+      for (const path of paths) {
+        const derivationPath = getSolanaDerivationPath(path.account, path.change)
+        ret.push({
+          ...path,
+          key: await getPublicKey(transport, derivationPath)
+        })
+      }
+      return ret
+    } catch (error) {
+      throw new Error(error.message)
+    } finally {
+      await transport?.close()
     }
   }
 }
