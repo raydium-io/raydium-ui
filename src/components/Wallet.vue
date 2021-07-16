@@ -34,21 +34,23 @@
           <div v-for="(txInfo, txid) in history" :key="txid" class="tx-item">
             <div class="extra-info">
               <Icon
-                v-if="(txInfo.status === 'Success') | (txInfo.state === 's') /* old data polyfill*/"
+                v-if="txInfo.status === 'Success' || txInfo.status === 's' /* old data polyfill*/"
                 class="icon"
                 type="check-circle"
                 :style="{ color: '#52c41a' }"
               />
               <Icon
-                v-else-if="(txInfo.status === 'Fail') | (txInfo.state === 'f') /* old data polyfill*/"
+                v-else-if="txInfo.status === 'Fail' || txInfo.status === 'f' /* old data polyfill*/"
                 class="icon"
                 type="close-circle"
                 :style="{ color: '#f5222d' }"
               />
               <Icon v-else class="icon" type="loading" :style="{ color: '#1890ff' }" />
-              <a :href="`${$accessor.url.explorer}/tx/${txid}`" target="_blank">{{ txInfo.description }}</a>
+              <a :href="`${$accessor.url.explorer}/tx/${txid}`" target="_blank">{{
+                txInfo.description || txInfo.d /* old data polyfill*/
+              }}</a>
             </div>
-            <div class="extra-info">{{ $dayjs(txInfo.time) }}</div>
+            <div class="extra-info">{{ $dayjs(txInfo.time || txInfo.t /* old data polyfill*/) }}</div>
           </div>
         </div>
       </div>
