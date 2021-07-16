@@ -79,7 +79,6 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
     }
 
     this._connecting = true
-
     try {
       // @TODO: transport selection (WebUSB, WebHID, bluetooth, ...)
       this._transport = await TransportWebUSB.create()
@@ -90,10 +89,8 @@ export class LedgerWalletAdapter extends EventEmitter implements WalletAdapter {
           change?: number
         }
         this._derivationPath = getSolanaDerivationPath(account, change)
-        this._publicKey = await getPublicKey(this._transport, this._derivationPath)
-      } else {
-        this._publicKey = await getPublicKey(this._transport)
       }
+      this._publicKey = await getPublicKey(this._transport, this._derivationPath)
       this.emit('connect', this._publicKey)
     } catch (error) {
       await this.disconnect()

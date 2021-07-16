@@ -74,7 +74,8 @@ import {
   MathWalletAdapter,
   PhantomWalletAdapter,
   BloctoWalletAdapter,
-  LedgerWalletAdapter
+  LedgerWalletAdapter,
+  Coin98WalletAdapter
 } from '@/wallets'
 
 // fix: Failed to resolve directive: ant-portal
@@ -101,11 +102,11 @@ export default class Wallet extends Vue {
     MathWallet: '',
     Phantom: '',
     Blocto: '',
+    Coin98: '',
     Sollet: 'https://www.sollet.io',
     Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
     // https://docs.coin98.app/coin98-extension/developer-guide
-    // Coin98: ''
     // ezDeFi: '',
   } as Wallets
 
@@ -239,6 +240,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new BloctoWalletAdapter()
+        break
+      }
+      case 'Coin98': {
+        if ((window as any).coin98 === undefined) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and open Coin98 app first'
+          })
+          return
+        }
+
+        wallet = new Coin98WalletAdapter()
         break
       }
       default: {
