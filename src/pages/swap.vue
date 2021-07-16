@@ -329,14 +329,14 @@
           <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
-          <span class="caution-text warning-style">Caution: Your SOL balance is low</span>
+          <span class="caution-text">Caution: Your SOL balance is low</span>
 
           <Tooltip placement="bottomLeft">
             <template slot="title">
               SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
               transactions.
             </template>
-            <Icon type="question-circle" class="warning-style" />
+            <Icon type="question-circle" />
           </Tooltip>
         </div>
       </div>
@@ -1461,21 +1461,13 @@ export default Vue.extend({
         opacity: 0.75;
       }
     }
+  }
 
-    .price-impact.\>5 {
-      font-weight: bold;
-      color: #f0b90b;
-    }
-    .price-impact.\>10 {
-      font-weight: bold;
-      color: #ed4b9e;
-    }
-  }
-  .swap-btn.\>5 {
-    border-color: #f0b90b;
-  }
-  .swap-btn.\>10 {
-    border-color: #ed4b9e;
+  .not-enough-sol-alert {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
   }
 
   .change-side {
