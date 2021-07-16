@@ -1,4 +1,4 @@
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
+import { ACCOUNT_LAYOUT, getBigNumber } from './layouts'
 import { transfer } from './swap'
 import { throwIfNull } from './errors'
 import { LIQUIDITY_POOLS } from './pools'
@@ -17,7 +17,15 @@ import {
   SERUM_PROGRAM_ID_V3,
   TOKEN_PROGRAM_ID,
   RENT_PROGRAM_ID,
-  SYSTEM_PROGRAM_ID
+  SYSTEM_PROGRAM_ID,
+  AMM_ASSOCIATED_SEED,
+  TARGET_ASSOCIATED_SEED,
+  WITHDRAW_ASSOCIATED_SEED,
+  COIN_VAULT_ASSOCIATED_SEED,
+  PC_VAULT_ASSOCIATED_SEED,
+  LP_MINT_ASSOCIATED_SEED,
+  TEMP_LP_TOKEN_ASSOCIATED_SEED,
+  OPEN_ORDER_ASSOCIATED_SEED
 } from '@/utils/ids'
 import {
   commitment,
@@ -26,14 +34,15 @@ import {
   createAmmAuthority,
   getMintDecimals,
   getFilteredTokenAccountsByOwner,
-  createAmmId
+  createAssociatedId,
+  createAssociatedTokenAccount
 } from '@/utils/web3'
 // @ts-ignore
 import { struct, u8 } from 'buffer-layout'
 import { publicKey } from '@project-serum/borsh'
 
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
-import { Market as MarketSerum, OpenOrders } from '@project-serum/serum'
+import { Market as MarketSerum } from '@project-serum/serum'
 import { Orderbook } from '@project-serum/serum/lib/market.js'
 import {
   closeAccount,
@@ -46,7 +55,11 @@ import { TOKENS } from '@/utils/tokens'
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
     const expectAmmId = (
-      await createAmmId(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), new PublicKey(marketAddress))
+      await createAssociatedId(
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(marketAddress),
+        AMM_ASSOCIATED_SEED
+      )
     ).toString()
     if (LIQUIDITY_POOLS.find((item) => item.ammId === expectAmmId)) {
       throw new Error('There is already a pool for this Serum Market')
@@ -105,34 +118,34 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
   }
 }
 
-async function createTokenAccount(
-  conn: Connection,
-  transaction: Transaction,
-  mintPublic: PublicKey,
-  ammAuthority: PublicKey,
-  owner: PublicKey,
-  signers: any
-) {
-  const splAccount = new Account()
-  transaction.add(
-    SystemProgram.createAccount({
-      fromPubkey: owner,
-      newAccountPubkey: splAccount.publicKey,
-      lamports: await conn.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
-      space: ACCOUNT_LAYOUT.span,
-      programId: TOKEN_PROGRAM_ID
-    })
-  )
-  transaction.add(
-    initializeAccount({
-      account: splAccount.publicKey,
-      mint: mintPublic,
-      owner: ammAuthority
-    })
-  )
-  signers.push(splAccount)
-  return splAccount
-}
+// async function createTokenAccount(
+//   conn: Connection,
+//   transaction: Transaction,
+//   mintPublic: PublicKey,
+//   ammAuthority: PublicKey,
+//   owner: PublicKey,
+//   signers: any
+// ) {
+//   const splAccount = new Account()
+//   transaction.add(
+//     SystemProgram.createAccount({
+//       fromPubkey: owner,
+//       newAccountPubkey: splAccount.publicKey,
+//       lamports: await conn.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
+//       space: ACCOUNT_LAYOUT.span,
+//       programId: TOKEN_PROGRAM_ID
+//     })
+//   )
+//   transaction.add(
+//     initializeAccount({
+//       account: splAccount.publicKey,
+//       mint: mintPublic,
+//       owner: ammAuthority
+//     })
+//   )
+//   signers.push(splAccount)
+//   return splAccount
+// }
 
 export function initializeMint(mint: PublicKey, decimals: number, mintAuthority: PublicKey): TransactionInstruction {
   const dataLayout = struct([
@@ -148,15 +161,6 @@ export function initializeMint(mint: PublicKey, decimals: number, mintAuthority:
   ]
   const data = Buffer.alloc(dataLayout.span)
 
-  // const v = {
-  //   instruction: 0,
-  //   decimals,
-  //   mintAuthority,
-  //   freezeOption: 0,
-  //   freezeAuthority: new PublicKey(SERUM_PROGRAM_ID_V3)
-  // }
-  // console.log(v)
-  // dataLayout.encode(v, data)
   data.writeUInt8(0)
   data.writeUInt8(decimals, 1)
   mintAuthority.toBuffer().copy(data, 2, 0, 32)
@@ -169,31 +173,31 @@ export function initializeMint(mint: PublicKey, decimals: number, mintAuthority:
   })
 }
 
-async function createAndInitMint(
-  conn: any,
-  transaction: Transaction,
-  owner: PublicKey,
-  mint: Account,
-  ownerPubkey: PublicKey,
-  decimals: number,
-  signers: any
-) {
-  transaction.add(
-    SystemProgram.createAccount({
-      fromPubkey: owner,
-      newAccountPubkey: mint.publicKey,
-      lamports: await conn.getMinimumBalanceForRentExemption(MINT_LAYOUT.span),
-      space: MINT_LAYOUT.span,
-      programId: TOKEN_PROGRAM_ID
-    })
-  )
-  transaction.add(initializeMint(mint.publicKey, decimals, ownerPubkey))
-  signers.push(mint)
-}
+// async function createAndInitMint(
+//   conn: any,
+//   transaction: Transaction,
+//   owner: PublicKey,
+//   mint: Account,
+//   ownerPubkey: PublicKey,
+//   decimals: number,
+//   signers: any
+// ) {
+//   transaction.add(
+//     SystemProgram.createAccount({
+//       fromPubkey: owner,
+//       newAccountPubkey: mint.publicKey,
+//       lamports: await conn.getMinimumBalanceForRentExemption(MINT_LAYOUT.span),
+//       space: MINT_LAYOUT.span,
+//       programId: TOKEN_PROGRAM_ID
+//     })
+//   )
+//   transaction.add(initializeMint(mint.publicKey, decimals, ownerPubkey))
+//   signers.push(mint)
+// }
 
-function strToAccount(str: string) {
-  return new Account(new Uint8Array(JSON.parse('[' + str + ']')))
-}
+// function strToAccount(str: string) {
+//   return new Account(new Uint8Array(JSON.parse('[' + str + ']')))
+// }
 
 export async function createAmm(
   conn: any,
@@ -202,100 +206,111 @@ export async function createAmm(
   userInputBaseValue: number,
   userInputQuoteValue: number
 ) {
-  let transaction = new Transaction()
+  const transaction = new Transaction()
   const signers: any = []
   const owner = wallet.publicKey
 
   const { publicKey, nonce } = await createAmmAuthority(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4))
   const ammAuthority = publicKey
-  const ammId: PublicKey = await createAmmId(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), market.address)
+  const ammId: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    AMM_ASSOCIATED_SEED
+  )
 
   // 获取历史数据
   const localPoolCoinTokenAccount = localStorage.getItem('poolCoinTokenAccount')
   const localPoolPcTokenAccount = localStorage.getItem('poolPcTokenAccount')
   const localLpMintAddress = localStorage.getItem('lpMintAddress')
   const localPoolTempLpTokenAccount = localStorage.getItem('poolTempLpTokenAccount')
-
-  const localAmmOpenOrders = localStorage.getItem('ammOpenOrders')
   const localAmmTargetOrders = localStorage.getItem('ammTargetOrders')
   const localPoolWithdrawQueue = localStorage.getItem('poolWithdrawQueue')
   const localDestLpToken = localStorage.getItem('destLpToken')
 
-  let poolCoinTokenAccount: Account = new Account()
-  let poolPcTokenAccount: Account = new Account()
-  let lpMintAddress: Account = new Account()
-  let poolTempLpTokenAccount: Account = new Account()
+  let poolCoinTokenAccount: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    COIN_VAULT_ASSOCIATED_SEED
+  )
+  let poolPcTokenAccount: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    PC_VAULT_ASSOCIATED_SEED
+  )
+  let lpMintAddress: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    LP_MINT_ASSOCIATED_SEED
+  )
+  let poolTempLpTokenAccount: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    TEMP_LP_TOKEN_ASSOCIATED_SEED
+  )
+  let ammTargetOrders: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    TARGET_ASSOCIATED_SEED
+  )
+  let poolWithdrawQueue: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    WITHDRAW_ASSOCIATED_SEED
+  )
 
-  let ammOpenOrders: Account = new Account()
-  let ammTargetOrders: Account = new Account()
-  let poolWithdrawQueue: Account = new Account()
-  let destLpToken: Account = new Account()
+  let destLpToken: PublicKey | undefined
 
-  let accountSuccessFlag1 = false
-  let accountSuccessFlag2 = false
+  const ammOpenOrders: PublicKey = await createAssociatedId(
+    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+    market.address,
+    OPEN_ORDER_ASSOCIATED_SEED
+  )
+
+  let accountSuccessFlag = false
   if (
     localPoolCoinTokenAccount !== null &&
     localPoolPcTokenAccount !== null &&
     localLpMintAddress !== null &&
-    localPoolTempLpTokenAccount !== null
+    localPoolTempLpTokenAccount !== null &&
+    localAmmTargetOrders !== null &&
+    localPoolWithdrawQueue !== null &&
+    localDestLpToken !== null
   ) {
     try {
-      poolCoinTokenAccount = strToAccount(localPoolCoinTokenAccount)
-      poolPcTokenAccount = strToAccount(localPoolPcTokenAccount)
-      lpMintAddress = strToAccount(localLpMintAddress)
-      poolTempLpTokenAccount = strToAccount(localPoolTempLpTokenAccount)
-      accountSuccessFlag1 = true
+      poolCoinTokenAccount = new PublicKey(localPoolCoinTokenAccount)
+      poolPcTokenAccount = new PublicKey(localPoolPcTokenAccount)
+      lpMintAddress = new PublicKey(localLpMintAddress)
+      poolTempLpTokenAccount = new PublicKey(localPoolTempLpTokenAccount)
+      ammTargetOrders = new PublicKey(localAmmTargetOrders)
+      poolWithdrawQueue = new PublicKey(localPoolWithdrawQueue)
+      destLpToken = new PublicKey(localDestLpToken)
+      accountSuccessFlag = true
     } catch {}
   }
 
-  if (
-    localAmmOpenOrders != null &&
-    localAmmTargetOrders != null &&
-    localPoolWithdrawQueue != null &&
-    localDestLpToken != null
-  ) {
-    try {
-      ammOpenOrders = strToAccount(localAmmOpenOrders)
-      ammTargetOrders = strToAccount(localAmmTargetOrders)
-      poolWithdrawQueue = strToAccount(localPoolWithdrawQueue)
-      destLpToken = strToAccount(localDestLpToken)
-      accountSuccessFlag2 = true
-    } catch {}
-  }
-
-  if (!accountSuccessFlag1) {
-    poolCoinTokenAccount = await createTokenAccount(
-      conn,
-      transaction,
-      market.baseMintAddress as PublicKey,
-      ammAuthority,
-      owner,
-      signers
+  if (!accountSuccessFlag) {
+    transaction.add(
+      preInitialize(
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        ammTargetOrders,
+        poolWithdrawQueue,
+        ammAuthority,
+        lpMintAddress,
+        market.baseMintAddress,
+        market.quoteMintAddress,
+        poolCoinTokenAccount,
+        poolPcTokenAccount,
+        poolTempLpTokenAccount,
+        market.address,
+        owner,
+        nonce
+      )
     )
 
-    poolPcTokenAccount = await createTokenAccount(
-      conn,
-      transaction,
-      market.quoteMintAddress as PublicKey,
-      ammAuthority,
-      owner,
-      signers
-    )
+    destLpToken = await createAssociatedTokenAccount(lpMintAddress, owner, transaction)
 
-    lpMintAddress = new Account()
-    const lpDecimals = await getMintDecimals(conn, market.baseMintAddress as PublicKey)
-    await createAndInitMint(conn, transaction, owner, lpMintAddress, ammAuthority, lpDecimals, signers)
-
-    poolTempLpTokenAccount = await createTokenAccount(
-      conn,
-      transaction,
-      lpMintAddress.publicKey,
-      ammAuthority,
-      owner,
-      signers
-    )
     const txid = await sendTransaction(conn, wallet, transaction, signers)
-    console.log('txid1', txid)
+    console.log('txid', txid)
     let txidSuccessFlag = 0
     await conn.onSignature(txid, function (_signatureResult: any, _context: any) {
       if (_signatureResult.err) {
@@ -308,7 +323,7 @@ export async function createAmm(
     const timeAwait = new Date().getTime()
     let outOfWhile = false
     while (!outOfWhile) {
-      console.log('txid1', outOfWhile, txidSuccessFlag, (new Date().getTime() - timeAwait) / 1000)
+      console.log('txid', outOfWhile, txidSuccessFlag, (new Date().getTime() - timeAwait) / 1000)
       if (txidSuccessFlag !== 0) {
         outOfWhile = true
       }
@@ -319,109 +334,28 @@ export async function createAmm(
     }
 
     // 成功 存储本地
-    localStorage.setItem('poolCoinTokenAccount', poolCoinTokenAccount.secretKey.toString())
-    localStorage.setItem('poolPcTokenAccount', poolPcTokenAccount.secretKey.toString())
-    localStorage.setItem('lpMintAddress', lpMintAddress.secretKey.toString())
-    localStorage.setItem('poolTempLpTokenAccount', poolTempLpTokenAccount.secretKey.toString())
+    localStorage.setItem('poolCoinTokenAccount', poolCoinTokenAccount.toString())
+    localStorage.setItem('poolPcTokenAccount', poolPcTokenAccount.toString())
+    localStorage.setItem('lpMintAddress', lpMintAddress.toString())
+    localStorage.setItem('poolTempLpTokenAccount', poolTempLpTokenAccount.toString())
+    localStorage.setItem('ammTargetOrders', ammTargetOrders.toString())
+    localStorage.setItem('poolWithdrawQueue', poolWithdrawQueue.toString())
+    localStorage.setItem('destLpToken', destLpToken.toString())
 
     localStorage.setItem('createMarket', market.address.toBase58())
   }
 
-  if (!accountSuccessFlag2) {
-    signers.splice(0, signers.length)
-    transaction = new Transaction()
-
-    // transaction.add(
-    //   SystemProgram.createAccount({
-    //     fromPubkey: owner,
-    //     newAccountPubkey: ammId,
-    //     lamports: await conn.getMinimumBalanceForRentExemption(AMM_INFO_LAYOUT_V4.span),
-    //     space: AMM_INFO_LAYOUT_V4.span,
-    //     programId: new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4)
-    //   })
-    // )
-
-    ammOpenOrders = new Account()
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: ammOpenOrders.publicKey,
-        lamports: await conn.getMinimumBalanceForRentExemption(
-          OpenOrders.getLayout(new PublicKey(SERUM_PROGRAM_ID_V3)).span
-        ),
-        space: OpenOrders.getLayout(new PublicKey(SERUM_PROGRAM_ID_V3)).span,
-        programId: new PublicKey(SERUM_PROGRAM_ID_V3)
-      })
-    )
-    signers.push(ammOpenOrders)
-
-    ammTargetOrders = new Account()
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: ammTargetOrders.publicKey,
-        lamports: await conn.getMinimumBalanceForRentExemption(2208),
-        space: 2208,
-        programId: new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4)
-      })
-    )
-    signers.push(ammTargetOrders)
-
-    poolWithdrawQueue = new Account()
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: poolWithdrawQueue.publicKey,
-        lamports: await conn.getMinimumBalanceForRentExemption(5680),
-        space: 5680,
-        programId: new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4)
-      })
-    )
-    signers.push(poolWithdrawQueue)
-
-    destLpToken = await createTokenAccount(conn, transaction, lpMintAddress.publicKey, owner, owner, signers)
-    const txid = await sendTransaction(conn, wallet, transaction, signers)
-
-    console.log('txid2', txid)
-    let txidSuccessFlag = 0
-    await conn.onSignature(txid, function (_signatureResult: any, _context: any) {
-      if (_signatureResult.err) {
-        txidSuccessFlag = -1
-      } else {
-        txidSuccessFlag = 1
-      }
-    })
-
-    const timeAwait = new Date().getTime()
-    let outOfWhile = false
-    while (!outOfWhile) {
-      console.log('txid2', outOfWhile, txidSuccessFlag, (new Date().getTime() - timeAwait) / 1000)
-      if (txidSuccessFlag !== 0) {
-        outOfWhile = true
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-    }
-    if (txidSuccessFlag !== 1) {
-      throw new Error('create tx2 error')
-    }
-
-    // 成功 存储本地
-    localStorage.setItem('ammOpenOrders', ammOpenOrders.secretKey.toString())
-    localStorage.setItem('ammTargetOrders', ammTargetOrders.secretKey.toString())
-    localStorage.setItem('poolWithdrawQueue', poolWithdrawQueue.secretKey.toString())
-    localStorage.setItem('destLpToken', destLpToken.secretKey.toString())
-  }
   const ammKeys = {
     ammId,
     ammAuthority,
-    poolCoinTokenAccount: poolCoinTokenAccount.publicKey,
-    poolPcTokenAccount: poolPcTokenAccount.publicKey,
-    lpMintAddress: lpMintAddress.publicKey,
-    ammOpenOrders: ammOpenOrders.publicKey,
-    ammTargetOrders: ammTargetOrders.publicKey,
-    poolWithdrawQueue: poolWithdrawQueue.publicKey,
-    poolTempLpTokenAccount: poolTempLpTokenAccount.publicKey,
-    destLpToken: destLpToken.publicKey,
+    poolCoinTokenAccount,
+    poolPcTokenAccount,
+    lpMintAddress,
+    ammOpenOrders,
+    ammTargetOrders,
+    poolWithdrawQueue,
+    poolTempLpTokenAccount,
+    destLpToken,
     nonce
   }
 
@@ -452,13 +386,11 @@ async function initAmm(
   ammKeys: any,
   userInputBaseValue: number,
   userInputQuoteValue: number,
-  poolCoinTokenAccount: Account,
-  poolPcTokenAccount: Account
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey
 ) {
   const baseMintDecimals = new BigNumber(await getMintDecimals(conn, market.baseMintAddress as PublicKey))
   const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
-  // const baseLotSize = new BigNumber(market.baseLotSize)
-  // const quoteLotSize = new BigNumber(market.quoteLotSize)
 
   const coinVol = new BigNumber(10).exponentiatedBy(baseMintDecimals).multipliedBy(userInputBaseValue)
   const pcVol = new BigNumber(10).exponentiatedBy(quoteMintDecimals).multipliedBy(userInputQuoteValue)
@@ -518,7 +450,7 @@ async function initAmm(
       })
     )
 
-    transaction.add(transfer(newAccount.publicKey, poolCoinTokenAccount.publicKey, owner, parseInt(coinVol.toFixed())))
+    transaction.add(transfer(newAccount.publicKey, poolCoinTokenAccount, owner, parseInt(coinVol.toFixed())))
 
     transaction.add(
       closeAccount({
@@ -532,7 +464,7 @@ async function initAmm(
   } else {
     transaction.add(
       // @ts-ignore
-      transfer(new PublicKey(baseToken), poolCoinTokenAccount.publicKey, owner, parseInt(coinVol.toFixed()))
+      transfer(new PublicKey(baseToken), poolCoinTokenAccount, owner, parseInt(coinVol.toFixed()))
     )
   }
   if (market.quoteMintAddress.toString() === TOKENS.WSOL.mintAddress) {
@@ -554,7 +486,7 @@ async function initAmm(
       })
     )
 
-    transaction.add(transfer(newAccount.publicKey, poolPcTokenAccount.publicKey, owner, parseInt(pcVol.toFixed())))
+    transaction.add(transfer(newAccount.publicKey, poolPcTokenAccount, owner, parseInt(pcVol.toFixed())))
     transaction.add(
       closeAccount({
         source: newAccount.publicKey,
@@ -565,7 +497,7 @@ async function initAmm(
     signers.push(newAccount)
   } else {
     // @ts-ignore
-    transaction.add(transfer(new PublicKey(quoteToken), poolPcTokenAccount.publicKey, owner, parseInt(pcVol.toFixed())))
+    transaction.add(transfer(new PublicKey(quoteToken), poolPcTokenAccount, owner, parseInt(pcVol.toFixed())))
   }
 
   transaction.add(
@@ -736,6 +668,55 @@ export function initialize2(
   dataLayout.encode(
     {
       instruction: 1
+    },
+    data
+  )
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function preInitialize(
+  programId: PublicKey,
+  ammTargetOrders: PublicKey,
+  poolWithdrawQueue: PublicKey,
+  ammAuthority: PublicKey,
+  lpMintAddress: PublicKey,
+  coinMintAddress: PublicKey,
+  pcMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  poolTempLpTokenAccount: PublicKey,
+  market: PublicKey,
+  owner: PublicKey,
+  nonce: u8
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), u8('nonce')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: poolWithdrawQueue, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: coinMintAddress, isSigner: false, isWritable: false },
+    { pubkey: pcMintAddress, isSigner: false, isWritable: false },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: market, isSigner: false, isWritable: false },
+    { pubkey: owner, isSigner: true, isWritable: true }
+  ]
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 10,
+      nonce
     },
     data
   )

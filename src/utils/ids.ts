@@ -21,3 +21,13 @@ export const STAKE_PROGRAM_ID_V5 = '9KEPoZmtHUrBbhWN1v1KWLMkkvwY6WLtAVUCPRtRjP4z
 export const IDO_PROGRAM_ID = '6FJon3QE27qgPVggARueB22hLvoh22VzJpXv4rBEoSLF'
 export const IDO_PROGRAM_ID_V2 = 'CC12se5To1CdEuw7fDS27B7Geo5jJyL7t5UK2B44NgiH'
 export const IDO_PROGRAM_ID_V3 = '9HzJyW1qZsEiSfMUf6L2jo3CcTKAyBmSyKdwQeYisHrC'
+
+export const AUTHORITY_AMM = 'amm authority'
+export const AMM_ASSOCIATED_SEED = 'amm_associated_seed'
+export const TARGET_ASSOCIATED_SEED = 'target_associated_seed'
+export const WITHDRAW_ASSOCIATED_SEED = 'withdraw_associated_seed'
+export const OPEN_ORDER_ASSOCIATED_SEED = 'open_order_associated_seed'
+export const COIN_VAULT_ASSOCIATED_SEED = 'coin_vault_associated_seed'
+export const PC_VAULT_ASSOCIATED_SEED = 'pc_vault_associated_seed'
+export const LP_MINT_ASSOCIATED_SEED = 'lp_mint_associated_seed'
+export const TEMP_LP_TOKEN_ASSOCIATED_SEED = 'temp_lp_token_associated_seed'

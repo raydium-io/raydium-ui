@@ -259,9 +259,9 @@ import { Steps, Row, Col, Button, Tooltip, Icon } from 'ant-design-vue'
 import { getMarket, createAmm, clearLocal } from '@/utils/market'
 import BigNumber from '@/../node_modules/bignumber.js/bignumber'
 import { TOKENS } from '@/utils/tokens'
-import { createAmmId } from '@/utils/web3'
+import { createAssociatedId } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
-import { LIQUIDITY_POOL_PROGRAM_ID_V4 } from '@/utils/ids'
+import { AMM_ASSOCIATED_SEED, LIQUIDITY_POOL_PROGRAM_ID_V4 } from '@/utils/ids'
 import { getBigNumber } from '@/utils/layouts'
 
 const Step = Steps.Step
@@ -416,7 +416,11 @@ export default class CreatePool extends Vue {
 
     if (this.inputMarket && market !== null) {
       this.expectAmmId = (
-        await createAmmId(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), new PublicKey(this.inputMarket))
+        await createAssociatedId(
+          new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+          new PublicKey(this.inputMarket),
+          AMM_ASSOCIATED_SEED
+        )
       ).toString()
     }
     if (market === null) {

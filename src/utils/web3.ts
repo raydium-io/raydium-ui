@@ -42,9 +42,9 @@ export async function createAmmAuthority(programId: PublicKey) {
   )
 }
 
-export async function createAmmId(infoId: PublicKey, marketAddress: PublicKey) {
+export async function createAssociatedId(infoId: PublicKey, marketAddress: PublicKey, bufferKey: string) {
   const { publicKey } = await findProgramAddress(
-    [infoId.toBuffer(), marketAddress.toBuffer(), Buffer.from('amm_associated_seed')],
+    [infoId.toBuffer(), marketAddress.toBuffer(), Buffer.from(bufferKey)],
     infoId
   )
   return publicKey
