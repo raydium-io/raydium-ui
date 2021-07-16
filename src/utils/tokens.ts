@@ -496,6 +496,22 @@ export const TOKENS: Tokens = {
     decimals: 9,
     referrer: 'FnMDNFL9t8EpbADSU3hLWBtx7SuwRBB6NM84U3PzSkUu',
     tags: ['raydium']
+  },
+  renBTC: {
+    symbol: 'renBTC',
+    name: 'renBTC',
+    mintAddress: 'CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5',
+    decimals: 8,
+    referrer: '7rr64uygy3o5RKVeNv12JGDUFMXVdr2YHvA3NTxzbZT6',
+    tags: ['raydium']
+  },
+  renDOGE: {
+    symbol: 'renDOGE',
+    name: 'renDOGE',
+    mintAddress: 'ArUkYE2XDKzqy77PRRGjo4wREWwqk6RXTfM9NeqzPvjU',
+    decimals: 8,
+    referrer: 'J5g7uvJRGnpRyLnRQjFs1MqMkiTVgjxVJCXocu4B4BcZ',
+    tags: ['raydium']
   }
 }
 
@@ -996,6 +1012,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'HwzkXyX8B45LsaHXwY8su92NoRBS5GQC32HzjQRDqPnr',
     decimals: TOKENS.SAMO.decimals
+  },
+  'renBTC-USDC-V4': {
+    symbol: 'renBTC-USDC',
+    name: 'renBTC-USDC LP',
+    coin: { ...TOKENS.renBTC },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'CTEpsih91ZLo5gunvryLpJ3pzMjmt5jbS6AnSQrzYw7V',
+    decimals: TOKENS.renBTC.decimals
+  },
+  'renDOGE-USDC-V4': {
+    symbol: 'renDOGE-USDC',
+    name: 'renDOGE-USDC LP',
+    coin: { ...TOKENS.renDOGE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Hb8KnZNKvRxu7pgMRWJgoMSMcepfvNiBFFDDrdf9o3wA',
+    decimals: TOKENS.renDOGE.decimals
   }
 }
 
