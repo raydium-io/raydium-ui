@@ -67,10 +67,8 @@
       </div>
     </section>
 
-    <section class="section-features children-center grid-cover-container">
-      <div class="image-box">
-        <div class="image-2" />
-      </div>
+    <section class="section-features -1 children-center">
+      <div class="image-2" />
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -453,7 +451,7 @@ export default class Index extends Vue {
 .section-app-face {
   margin-top: 80px;
   margin-bottom: 72px;
-  min-height: 800px;
+  height: 800px;
 }
 .section-app-face .image-1 {
   background-image: url('../assets/background/index_background.webp');
@@ -512,7 +510,7 @@ export default class Index extends Vue {
 }
 .section-app-face .row-box-2 .card .card-title {
   font-size: 14px;
-  line-height: 19px;
+  line-height: 18px;
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
@@ -583,22 +581,6 @@ export default class Index extends Vue {
   bottom: 8%;
 }
 
-.section-features .image-box {
-  width: 1320px;
-  height: 506px;
-  overflow: hidden;
-  border-radius: 100px;
-  background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
-    url('../assets/background/index_background2_lights.webp'), #1b1659;
-  box-shadow: 8px 8px 10px rgba(20, 16, 65, 0.05), -8px -8px 10px rgba(197, 191, 255, 0.05),
-    inset 0 6px 20px rgba(197, 191, 255, 0.2), inset 0 -1px 25px rgba(197, 191, 255, 0.1);
-}
-.section-features .image-box .image-2 {
-  width: 100%;
-  height: 100%;
-  background-image: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
-  mask-image: url('../assets/background/index_background2.svg');
-}
 .section-features .feature-title {
   font-weight: 600;
   font-size: 20px;
@@ -613,14 +595,14 @@ export default class Index extends Vue {
 }
 .section-features .content {
   max-width: 1220px;
-  padding: 0 56px;
   overflow: auto;
   width: 100%;
 }
+
 .section-features .boards {
-  display: flex;
-  gap: 22px;
+  display: grid;
 }
+
 .section-features .boards > .card {
   padding: 24px 50px;
   flex: 1 0 120px;
@@ -642,7 +624,32 @@ export default class Index extends Vue {
   display: flex;
   justify-content: space-around;
   padding: 0 228px;
-  transform: translateX(-28px);
+}
+
+.section-features.\-1 {
+  position: relative;
+  margin: 0 auto;
+  padding: 0 96px;
+  max-width: 1320px;
+  min-height: 506px;
+  overflow: hidden;
+  border-radius: 100px;
+  background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
+    url('../assets/background/index_background2_lights.webp'), #1b1659;
+  box-shadow: 8px 8px 10px rgba(20, 16, 65, 0.05), -8px -8px 10px rgba(197, 191, 255, 0.05),
+    inset 0 6px 20px rgba(197, 191, 255, 0.2), inset 0 -1px 25px rgba(197, 191, 255, 0.1);
+}
+
+.section-features.\-1 .boards {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.section-features.\-1 .image-2 {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
+  mask-image: url('../assets/background/index_background2.svg');
 }
 
 .section-features.\-2 .image-3 {
@@ -652,9 +659,11 @@ export default class Index extends Vue {
   height: 100%;
 }
 .section-features.\-2 .content {
+  padding: 0 56px;
   margin: 108px 64px 172px;
 }
 .section-features.\-2 .boards {
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
@@ -665,5 +674,52 @@ export default class Index extends Vue {
 
 .section-features.\-2 .boards > .card {
   max-width: 360px;
+}
+
+@media (max-width: 1128px) {
+  /* is tablet */
+  .home-navbar {
+    padding: 50px 58px;
+  }
+  .section-app-face {
+    margin-top: 116px;
+    height: 720px;
+  }
+  .section-app-face .image-1 {
+    background-size: 100%;
+    width: 668px;
+  }
+  .section-app-face .title {
+    font-size: 48px;
+    line-height: 44px;
+  }
+  .section-app-face .subtitle {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .section-app-face .row-box-2 .card .card-title {
+    font-size: 12px;
+    line-height: 15px;
+  }
+  .section-app-face .row-box-2 .card .value-sign {
+    font-size: 12px;
+  }
+  .section-app-face .row-box-2 .card .value-number {
+    font-size: 18px;
+  }
+
+  .section-features.\-1 {
+    border-radius: 60px;
+    margin: 0 24px;
+    padding: 64px 40px;
+  }
+  .section-features.\-1 .boards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* is phone */
 }
 </style>
