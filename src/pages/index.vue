@@ -11,7 +11,7 @@
     </nav>
 
     <section class="section-app-face children-center grid-cover-container">
-      <img src="../assets/background/index_background.webp" class="image-1" />
+      <div class="image-1" />
       <div class="grid-cover-content children-center">
         <div class="title">
           An avenue for <br />
@@ -63,12 +63,14 @@
           </div>
         </div>
 
-        <img src="../assets/background/index_background6.svg" class="solana-logo" />
+        <img src="../assets/background/index_slogan_build_on.svg" class="solana-logo" />
       </div>
     </section>
 
     <section class="section-features children-center grid-cover-container">
-      <img class="image-2" src="../assets/background/index_background2.webp" />
+      <div class="image-box">
+        <div class="image-2" />
+      </div>
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -124,7 +126,7 @@
     </section>
 
     <section class="section-features -2 children-center grid-cover-container">
-      <img src="../assets/background/index_background3.webp" class="image-3" />
+      <div class="image-3" />
       <div class="content">
         <div class="title-text">
           <div class="line" />
@@ -177,7 +179,7 @@
       <div class="boards">
         <img src="../assets/icons/solana-text-logo.svg" />
         <img src="../assets/icons/serum-text-logo.svg" />
-        <img src="../assets/icons/sushi-text-logo.svg" />
+        <!-- <img src="../assets/icons/sushi-text-logo.svg" /> Temporary-->
       </div>
     </section>
 
@@ -425,7 +427,6 @@ export default class Index extends Vue {
 }
 .grid-cover-container > * {
   max-width: 100%;
-  min-width: 375px; /* it's the IPhone 6 width */
   grid-area: 1 / 1;
   overflow: auto;
 }
@@ -452,6 +453,12 @@ export default class Index extends Vue {
 .section-app-face {
   margin-top: 80px;
   margin-bottom: 72px;
+  min-height: 800px;
+}
+.section-app-face .image-1 {
+  background-image: url('../assets/background/index_background.webp');
+  height: 100%;
+  width: 744px;
 }
 .section-app-face .title {
   font-weight: 300;
@@ -576,15 +583,21 @@ export default class Index extends Vue {
   bottom: 8%;
 }
 
-.section-features .image-2 {
+.section-features .image-box {
+  width: 1320px;
+  height: 506px;
   overflow: hidden;
   border-radius: 100px;
   background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
     url('../assets/background/index_background2_lights.webp'), #1b1659;
-  box-shadow: inset 0 3px 12px rgb(255 255 255 / 18%), 0 -6px 24px -6px rgb(255 255 255 / 7%);
+  box-shadow: 8px 8px 10px rgba(20, 16, 65, 0.05), -8px -8px 10px rgba(197, 191, 255, 0.05),
+    inset 0 6px 20px rgba(197, 191, 255, 0.2), inset 0 -1px 25px rgba(197, 191, 255, 0.1);
 }
-.section-features .image-2 img {
-  mask-image: radial-gradient(at center, rgb(0 0 0 / 80%), rgb(0 0 0 / 40%));
+.section-features .image-box .image-2 {
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
+  mask-image: url('../assets/background/index_background2.svg');
 }
 .section-features .feature-title {
   font-weight: 600;
@@ -633,10 +646,13 @@ export default class Index extends Vue {
 }
 
 .section-features.\-2 .image-3 {
+  background: url('../assets/background/index_background3.webp');
+  background-size: 100% 100%;
   width: 100%;
+  height: 100%;
 }
 .section-features.\-2 .content {
-  margin: 64px;
+  margin: 108px 64px 172px;
 }
 .section-features.\-2 .boards {
   gap: 24px;
