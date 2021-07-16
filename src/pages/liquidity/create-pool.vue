@@ -402,9 +402,9 @@ export default class CreatePool extends Vue {
   }
 
   getNameForMint(mint: string) {
-    const mintToken = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === mint)
+    const mintToken = Object.values(TOKENS).find((item) => item.mintAddress === mint)
     if (mintToken) {
-      return `${mintToken}: ${mint}`
+      return `${mintToken.symbol}: ${mint}`
     }
     return mint
   }
