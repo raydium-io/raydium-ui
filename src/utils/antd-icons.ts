@@ -9,6 +9,8 @@ export {
   LinkOutline,
   // notify
   CheckCircleOutline,
+  // swap-alert
+  QuestionCircleOutline,
   ExclamationCircleOutline,
   CloseCircleOutline,
   // wallet
