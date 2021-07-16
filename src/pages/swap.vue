@@ -1447,6 +1447,7 @@ export default Vue.extend({
     padding: 0 12px;
     font-size: 12px;
     line-height: 20px;
+    margin-bottom: 6px;
     .anticon-swap {
       margin-left: 10px;
       padding: 5px;
@@ -1468,6 +1469,8 @@ export default Vue.extend({
     justify-content: center;
     align-items: center;
     gap: 8px;
+    margin-bottom: -18px;
+    margin-top: 4px;
   }
 
   .change-side {
