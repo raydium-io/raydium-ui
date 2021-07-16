@@ -121,6 +121,7 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
+          :balance-offset="fromCoin.symbol === 'SOL' ? -0.05 : 0"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
@@ -208,7 +209,9 @@
           </div>
           <div
             v-if="endpoint"
-            :class="`fs-container price-impact ${priceImpact > 10 ? '>10' : priceImpact > 5 ? '>5' : ''}`"
+            :class="`fs-container price-impact ${
+              priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''
+            }`"
           >
             <span class="name"> Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}</span>
             <span :style="`color: ${priceImpact <= 5 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
@@ -271,7 +274,14 @@
             (!marketAddress && !lpMintAddress && !isWrap) ||
             !initialized ||
             loading ||
-            gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(
+              fromCoinAmount,
+              fromCoin && fromCoin.balance
+                ? fromCoin.symbol === 'SOL'
+                  ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                  : fromCoin.balance.fixed()
+                : '0'
+            ) || // not enough SOL to swap SOL to another coin
             (get(liquidity.infos, `${lpMintAddress}.status`) &&
               get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
             swaping ||
@@ -280,7 +290,7 @@
           "
           :loading="swaping"
           style="width: 100%"
-          :class="`swap-btn ${priceImpact > 10 ? '>10' : priceImpact > 5 ? '>5' : ''}`"
+          :class="`swap-btn ${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
           @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
@@ -289,7 +299,18 @@
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
+          <template
+            v-else-if="
+              gt(
+                fromCoinAmount,
+                fromCoin && fromCoin.balance
+                  ? fromCoin.symbol === 'SOL'
+                    ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                    : fromCoin.balance.fixed()
+                  : '0'
+              )
+            "
+          >
             Insufficient {{ fromCoin.symbol }} balance
           </template>
           <template
@@ -307,6 +328,17 @@
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
+        <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
+          <span class="caution-text">Caution: Your SOL balance is low</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title">
+              SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions.
+            </template>
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
       </div>
     </div>
 
@@ -392,6 +424,9 @@ export default Vue.extend({
   data() {
     return {
       TOKENS,
+
+      // should check if user have enough SOL to have a swap
+      solBalance: null as TokenAmount | null,
 
       autoRefreshTime: 60,
       countdown: 0,
@@ -494,6 +529,7 @@ export default Vue.extend({
         if (this.market) {
           this.fetchUnsettledByMarket()
         }
+        this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
       },
       deep: true
     },
@@ -1385,6 +1421,21 @@ export default Vue.extend({
 </script>
 
 <style lang="less" sxcoped>
+.warning-style {
+  font-weight: bold;
+  color: #f0b90b;
+}
+.swap-btn.warning-style {
+  font-weight: normal;
+}
+.error-style {
+  font-weight: bold;
+  color: #ed4b9e;
+}
+.swap-btn.error-style {
+  font-weight: normal;
+}
+
 .container {
   max-width: 450px;
 
@@ -1396,6 +1447,7 @@ export default Vue.extend({
     padding: 0 12px;
     font-size: 12px;
     line-height: 20px;
+    margin-bottom: 6px;
     .anticon-swap {
       margin-left: 10px;
       padding: 5px;
@@ -1410,21 +1462,15 @@ export default Vue.extend({
         opacity: 0.75;
       }
     }
+  }
 
-    .price-impact.\>5 {
-      font-weight: bold;
-      color: #f0b90b;
-    }
-    .price-impact.\>10 {
-      font-weight: bold;
-      color: #ed4b9e;
-    }
-  }
-  .swap-btn.\>5 {
-    border-color: #f0b90b;
-  }
-  .swap-btn.\>10 {
-    border-color: #ed4b9e;
+  .not-enough-sol-alert {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -18px;
+    margin-top: 4px;
   }
 
   .change-side {

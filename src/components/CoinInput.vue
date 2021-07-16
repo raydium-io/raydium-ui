@@ -95,6 +95,10 @@ export default Vue.extend({
       type: Object,
       default: null
     },
+    balanceOffset: {
+      type: Number,
+      default: 0
+    },
     showMax: {
       type: Boolean,
       default: true
@@ -115,8 +119,15 @@ export default Vue.extend({
       input.focus()
     },
     inputBalanceByPercent(percent: number) {
+      // error balance
       if (!this.balance || this.balance.wei.isNaN()) return
-      const inputValue = String(this.balance.toEther() * percent)
+
+      const availableBalance = Number(this.balance.toEther()) + (this.balanceOffset ?? 0)
+
+      // can't send negative balance
+      if (availableBalance < 0) return
+
+      const inputValue = (availableBalance * percent).toFixed(this.balance.decimals)
       this.focusInput()
       this.$emit('onInput', inputValue)
     }
