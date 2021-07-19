@@ -191,9 +191,8 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li class="link">Meet Raydium</li>
-            <li class="link">Ray Token</li>
-            <li class="link">Media Assets</li>
+            <li><a class="link" href="https://raydium.gitbook.io/raydium/">Documentation</a></li>
+            <a class="link">Media Assets</a>
           </ul>
         </div>
 
@@ -203,10 +202,25 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li class="link">Apply for Fusion Pool</li>
-            <li class="link">Apply for AcceleRaytor</li>
-            <li class="link">Permissionless Pool</li>
-            <li class="link">API</li>
+            <li>
+              <a
+                class="link"
+                href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
+                >Apply for Fusion Pool</a
+              >
+            </li>
+            <li>
+              <a
+                class="link"
+                href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
+                >Apply for AcceleRaytor</a
+              >
+            </li>
+            <li>
+              <a class="link" href="https://raydium.gitbook.io/raydium/permissionless/creating-a-pool"
+                >Permissionless Pool</a
+              >
+            </li>
           </ul>
         </div>
 
@@ -216,9 +230,14 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li class="link">Getting Started on Solana</li>
-            <li class="link">Getting Started on Raydium</li>
-            <li class="link">FAQ</li>
+            <li>
+              <a class="link" href="https://raydium.gitbook.io/raydium/trading-on-serum/spl-wallets"
+                >Getting Started on Raydium</a
+              >
+            </li>
+            <li>
+              <a class="link" href="https://raydium.gitbook.io/raydium/">FAQ</a>
+            </li>
           </ul>
         </div>
 
@@ -256,10 +275,12 @@
               <Popover v-model="isPopupOpen" trigger="click" placement="right">
                 <template slot="content">
                   <ul class="pop-links">
-                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
-                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
-                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
-                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
+                    <a class="link" href="https://t.me/raydiumprotocol">Telegram (EN)</a>
+                    <a class="link" href="https://t.me/raydiumkorea">Telegram (KR)</a>
+                    <a class="link" href="https://t.me/raydiumjapan">Telegram (JP)</a>
+                    <a class="link" href="https://t.me/RaydiumSpanish">Telegram (ES)</a>
+                    <a class="link" href="https://t.me/RaydiumTurkey">Telegram (TK)</a>
+                    <a class="link" href="https://t.me/RaydiumVietnam">Telegram (VN)</a>
                   </ul>
                 </template>
 
