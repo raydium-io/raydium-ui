@@ -191,9 +191,9 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li>Meet Raydium</li>
-            <li>Ray Token</li>
-            <li>Media Assets</li>
+            <li class="link">Meet Raydium</li>
+            <li class="link">Ray Token</li>
+            <li class="link">Media Assets</li>
           </ul>
         </div>
 
@@ -203,10 +203,10 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li>Apply for Fusion Pool</li>
-            <li>Apply for AcceleRaytor</li>
-            <li>Permissionless Pool</li>
-            <li>API</li>
+            <li class="link">Apply for Fusion Pool</li>
+            <li class="link">Apply for AcceleRaytor</li>
+            <li class="link">Permissionless Pool</li>
+            <li class="link">API</li>
           </ul>
         </div>
 
@@ -216,9 +216,9 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li>Getting Started on Solana</li>
-            <li>Getting Started on Raydium</li>
-            <li>FAQ</li>
+            <li class="link">Getting Started on Solana</li>
+            <li class="link">Getting Started on Raydium</li>
+            <li class="link">FAQ</li>
           </ul>
         </div>
 
@@ -229,7 +229,7 @@
           </div>
           <ul class="links">
             <li>
-              <a href="https://twitter.com/RaydiumProtocol">
+              <a href="https://twitter.com/RaydiumProtocol" class="link">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-twitter.svg" width="20" height="20" />
                 </div>
@@ -237,7 +237,7 @@
               </a>
             </li>
             <li>
-              <a href="https://raydium.medium.com/">
+              <a href="https://raydium.medium.com/" class="link">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-medium.svg" width="18" height="18" />
                 </div>
@@ -245,20 +245,32 @@
               </a>
             </li>
             <li>
-              <a href="https://discord.com/invite/6EvFwvCfpx">
+              <a href="https://discord.com/invite/6EvFwvCfpx" class="link">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-discord.svg" width="20" height="20" />
                 </div>
                 <div class="media-name">Discord</div>
               </a>
             </li>
-            <li>
-              <a href="https://t.me/raydiumprotocol">
-                <div class="card icon-like forsted-glass teal">
-                  <img src="../assets/icons/home-icon-telegram.svg" width="24" height="24" />
+            <li style="width: max-content">
+              <Popover v-model="isPopupOpen" trigger="click" placement="right">
+                <template slot="content">
+                  <ul class="pop-links">
+                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
+                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
+                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
+                    <a class="link" href="https://discord.com/invite/6EvFwvCfpx">Telegram (EN)</a>
+                  </ul>
+                </template>
+
+                <div class="link">
+                  <div class="card icon-like forsted-glass teal">
+                    <img src="../assets/icons/home-icon-telegram.svg" width="24" height="24" />
+                  </div>
+                  <div class="media-name">Telegram</div>
+                  <Icon type="down" style="transform: translateY(2px) scaleX(0.7) scaleY(0.6); margin: -12px" />
                 </div>
-                <div class="media-name">Telegram</div>
-              </a>
+              </Popover>
             </li>
           </ul>
         </div>
@@ -271,8 +283,13 @@
 
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
+import { Icon, Popover } from 'ant-design-vue'
 
 @Component({
+  components: {
+    Icon,
+    Popover
+  },
   layout: 'home',
 
   async asyncData({ $accessor, $api }) {
@@ -285,6 +302,7 @@ import { Vue, Component } from 'nuxt-property-decorator'
   }
 })
 export default class Index extends Vue {
+  isPopupOpen = false
   tvl = 0
   volume24h = 0
   timer: number | undefined = undefined
@@ -324,6 +342,13 @@ export default class Index extends Vue {
   font-family: 'Space Grotesk';
   src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
   font-weight: 700;
+}
+
+.ant-popover-arrow {
+  border-color: #0c0926 !important;
+}
+.ant-popover-inner-content {
+  background-color: #0c0926 !important;
 }
 </style>
 <style scoped>
@@ -547,6 +572,37 @@ export default class Index extends Vue {
   letter-spacing: 2px;
 }
 
+.pop-links {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.pop-links .link {
+  padding: 8px;
+  color: #c4d6ff;
+}
+.pop-links .link:not(:last-child) {
+  box-shadow: 0 1px 0 rgba(196, 214, 255, 0.1);
+}
+.pop-links .link:hover {
+  color: white;
+}
+
+.section-partners {
+  margin-bottom: 100px;
+}
+.section-partners .boards {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 228px;
+}
+.section-partners .boards > * {
+  flex-grow: 0;
+}
+
 .page-footer {
   position: relative;
   background-image: url('../assets/background/index_footer_background.webp'),
@@ -578,18 +634,16 @@ export default class Index extends Vue {
   list-style: none;
   color: var(--text-secondary-light);
 }
-.page-footer .group .links a {
+.page-footer .group .links .link {
+  font-size: 16px;
+  margin-bottom: 26px;
   display: flex;
   gap: 12px;
   align-items: center;
   color: var(--text-secondary-light);
 }
-.page-footer .group .links a:hover {
-  color: var(--text-secondary);
-}
-.page-footer .group .links > li {
-  font-size: 16px;
-  margin-bottom: 26px;
+.page-footer .group .links .link:hover {
+  color: white;
 }
 .page-footer .group .links .icon-like {
   padding: 0;
@@ -611,6 +665,7 @@ export default class Index extends Vue {
   margin-bottom: 8px;
 }
 .section-features .feature-description {
+  font-weight: 300;
   font-size: 14px;
   line-height: 16px;
   color: var(--text-secondary-light);
@@ -637,19 +692,6 @@ export default class Index extends Vue {
 .section-features .boards > .card > .feature-title {
   font-weight: 600;
   margin-bottom: 8px;
-}
-
-.section-partners {
-  margin-bottom: 100px;
-}
-.section-partners .boards {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  padding: 0 228px;
-}
-.section-partners .boards > * {
-  flex-grow: 0;
 }
 
 .section-features.\-1 {
@@ -770,6 +812,9 @@ export default class Index extends Vue {
   .page-footer .links-group .group.community .links .media-name {
     display: none;
   }
+  .page-footer .group .links .link {
+    justify-content: center;
+  }
 
   .section-features.\-1 {
     margin: 0 24px;
@@ -793,14 +838,19 @@ export default class Index extends Vue {
 
 @media (max-width: 768px) {
   /* is phone */
+  .card {
+    padding: 10px 20px;
+  }
+  .title-text .text {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
   .home-navbar {
     justify-content: center;
   }
   .home-navbar > *:nth-child(2n) {
     display: none;
-  }
-  .card {
-    padding: 10px 20px;
   }
   .section-app-face {
     margin-top: 116px;
@@ -818,6 +868,7 @@ export default class Index extends Vue {
     font-size: 16px;
     line-height: 20px;
     white-space: pre-line;
+    margin-top: -22px; /* to counteract the impact of white-space: pre-line */
   }
   .section-app-face .row-box-1 {
     gap: 20px;
@@ -865,11 +916,22 @@ export default class Index extends Vue {
     flex-direction: column;
     gap: 40px;
   }
+
+  .section-features .feature-title {
+    font-size: 18px;
+    line-height: 23px;
+  }
+  .section-features .feature-description {
+    font-size: 14px;
+    line-height: 16px;
+  }
+
   .section-features.\-1 {
     border-radius: 40px;
     background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
       url('../assets/background/index_background2_lights_mobile.webp'), #1b1659;
     background-size: 100% 100%;
+    padding: 56px 20px;
   }
   .section-features.\-1 .boards {
     grid-template-columns: 1fr;
@@ -883,11 +945,18 @@ export default class Index extends Vue {
   .section-features.\-2 .image-3 {
     background-image: url('../assets/background/index_background3_mobile.webp');
   }
+  .section-features.\-2 .feature-description {
+    font-size: 14px;
+    line-height: 20px;
+  }
   .section-features .boards > .card {
     padding: 44px 20px;
   }
   .page-footer .links-group .group {
     flex-basis: 100vw;
+  }
+  .page-footer .group .links .link {
+    justify-content: center;
   }
 }
 </style>
