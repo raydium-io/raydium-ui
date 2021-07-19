@@ -1,3 +1,4 @@
+import { getBigNumber } from './layouts'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
 
@@ -57,7 +58,7 @@ export async function unstakeAll(
         new PublicKey(farmInfo.poolLpTokenAccount),
         userRewardTokenAccount,
         new PublicKey(farmInfo.poolRewardTokenAccount),
-        amount.wei.toNumber()
+        getBigNumber(amount.wei)
       )
     )
   })

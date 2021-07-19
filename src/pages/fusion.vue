@@ -53,9 +53,8 @@
             <CollapsePanel
               v-for="farm in farms"
               v-show="
-                !farm.farmInfo.legacy &&
-                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
-                  (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType))
+                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType)
               "
               :key="farm.farmInfo.poolId"
             >
@@ -169,63 +168,6 @@
           </Collapse>
         </div>
       </div>
-
-      <div class="page-head fs-container">
-        <span class="title">Legacy</span>
-        <div class="buttons"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <template v-for="farm in farms">
-            <Row
-              v-if="farm.farmInfo.legacy"
-              :key="farm.farmInfo.poolId"
-              class="farm-head"
-              :class="isMobile ? 'is-mobile' : ''"
-              :gutter="0"
-            >
-              <Col class="lp-icons" :span="isMobile ? 12 : 8">
-                <div class="icons">
-                  <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
-                  <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
-                </div>
-                {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                <div class="value">
-                  <div>{{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}</div>
-                  <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
-                </div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Staked</div>
-                <div class="value">
-                  {{ farm.userInfo.depositBalance.format() }}
-                </div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
-                <div class="value">
-                  <div>{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
-                  <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
-                </div>
-              </Col>
-              <Col class="fc-container" :span="isMobile ? 12 : 4">
-                <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
-                <Button
-                  v-else
-                  ghost
-                  @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                >
-                  Unstake & Harvest
-                </Button>
-              </Col>
-            </Row>
-          </template>
-        </div>
-      </div>
     </div>
 
     <div v-else class="fc-container">
@@ -246,6 +188,7 @@ import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
 import { depositV4, withdrawV4 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
+import { getBigNumber } from '@/utils/layouts'
 
 const CollapsePanel = Collapse.Panel
 
@@ -339,12 +282,12 @@ export default Vue.extend({
           const newFarmInfo = cloneDeep(farmInfo)
 
           if (reward && rewardB && lp) {
-            const rewardPerBlockAmount = new TokenAmount(perBlock.toNumber(), reward.decimals)
-            const rewardBPerBlockAmount = new TokenAmount(perBlockB.toNumber(), rewardB.decimals)
+            const rewardPerBlockAmount = new TokenAmount(getBigNumber(perBlock), reward.decimals)
+            const rewardBPerBlockAmount = new TokenAmount(getBigNumber(perBlockB), rewardB.decimals)
             const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
 
             const rewardPerBlockAmountTotalValue =
-              rewardPerBlockAmount.toEther().toNumber() *
+              getBigNumber(rewardPerBlockAmount.toEther()) *
               2 *
               60 *
               60 *
@@ -352,7 +295,7 @@ export default Vue.extend({
               365 *
               this.price.prices[reward.symbol as string]
             const rewardBPerBlockAmountTotalValue =
-              rewardBPerBlockAmount.toEther().toNumber() *
+              getBigNumber(rewardBPerBlockAmount.toEther()) *
               2 *
               60 *
               60 *
@@ -361,17 +304,17 @@ export default Vue.extend({
               this.price.prices[rewardB.symbol as string]
 
             const liquidityCoinValue =
-              (liquidityItem?.coin.balance as TokenAmount).toEther().toNumber() *
+              getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
               this.price.prices[liquidityItem?.coin.symbol as string]
             const liquidityPcValue =
-              (liquidityItem?.pc.balance as TokenAmount).toEther().toNumber() *
+              getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
               this.price.prices[liquidityItem?.pc.symbol as string]
 
             const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
-            const liquidityTotalSupply = (liquidityItem?.lp.totalSupply as TokenAmount).toEther().toNumber()
+            const liquidityTotalSupply = getBigNumber((liquidityItem?.lp.totalSupply as TokenAmount).toEther())
             const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
 
-            const liquidityUsdValue = lp.balance.toEther().toNumber() * liquidityItemValue
+            const liquidityUsdValue = getBigNumber(lp.balance.toEther()) * liquidityItemValue
             const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
             const aprB = ((rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
             const aprTotal = (
@@ -408,11 +351,11 @@ export default Vue.extend({
               d = 1e9
             }
             const pendingReward = depositBalance.wei
-              .multipliedBy(perShare.toNumber())
+              .multipliedBy(getBigNumber(perShare))
               .dividedBy(d)
               .minus(rewardDebt.wei)
             const pendingRewardB = depositBalance.wei
-              .multipliedBy(parseInt(perShareB.toString()))
+              .multipliedBy(getBigNumber(perShareB))
               .dividedBy(d)
               .minus(rewardDebtB.wei)
 

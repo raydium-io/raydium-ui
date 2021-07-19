@@ -31,7 +31,7 @@
             <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
           </RadioGroup>
         </div>
-        <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
+        <Table :columns="columns" :data-source="poolsShow" :pagination="pagination" row-key="lp_mint">
           <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
@@ -142,6 +142,15 @@ export default class Pools extends Vue {
   timer: any = null
   loading: boolean = false
 
+  pagination = {
+    pageSize: 20,
+    current: 1,
+    onChange: (page: number, size: number) => {
+      this.pagination.current = page
+      this.pagination.pageSize = size
+    }
+  }
+
   get liquidity() {
     return this.$accessor.liquidity
   }
@@ -159,6 +168,7 @@ export default class Pools extends Vue {
 
   @Watch('poolType')
   onPoolTypeChanged() {
+    this.pagination.current = 1
     this.showPool()
   }
 

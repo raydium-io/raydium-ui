@@ -9,6 +9,8 @@ export {
   LinkOutline,
   // notify
   CheckCircleOutline,
+  // swap-alert
+  QuestionCircleOutline,
   ExclamationCircleOutline,
   CloseCircleOutline,
   // wallet
@@ -37,5 +39,7 @@ export {
   // search
   SearchOutline,
   // home-ui
-  DownOutline
+  DownOutline,
+  // pools
+  LeftOutline
 } from '@ant-design/icons'

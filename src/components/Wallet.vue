@@ -28,6 +28,31 @@
         <p class="address">{{ wallet.address }}</p>
 
         <Button ghost @click="disconnect"> DISCONNECT </Button>
+
+        <div v-if="historyList.length" class="tx-history-panel">
+          <h2>Recent Transactions</h2>
+          <div v-for="txInfo in historyList" :key="txInfo.txid" class="tx-item">
+            <div class="extra-info">
+              <Icon
+                v-if="txInfo.status === 'Success' || txInfo.s === 's' /* old data polyfill*/"
+                class="icon"
+                type="check-circle"
+                :style="{ color: '#52c41a' }"
+              />
+              <Icon
+                v-else-if="txInfo.status === 'Fail' || txInfo.s === 'f' /* old data polyfill*/"
+                class="icon"
+                type="close-circle"
+                :style="{ color: '#f5222d' }"
+              />
+              <Icon v-else class="icon" type="loading" :style="{ color: '#1890ff' }" />
+              <a :href="`${$accessor.url.explorer}/tx/${txInfo.txid}`" target="_blank">{{
+                txInfo.description || txInfo.d /* old data polyfill*/
+              }}</a>
+            </div>
+            <div class="extra-info time">{{ $dayjs(txInfo.time || txInfo.t /* old data polyfill*/) }}</div>
+          </div>
+        </div>
       </div>
     </Modal>
   </div>
@@ -49,7 +74,8 @@ import {
   MathWalletAdapter,
   PhantomWalletAdapter,
   BloctoWalletAdapter,
-  LedgerWalletAdapter
+  LedgerWalletAdapter,
+  Coin98WalletAdapter
 } from '@/wallets'
 
 // fix: Failed to resolve directive: ant-portal
@@ -76,11 +102,11 @@ export default class Wallet extends Vue {
     MathWallet: '',
     Phantom: '',
     Blocto: '',
+    Coin98: '',
     Sollet: 'https://www.sollet.io',
     Solflare: 'https://solflare.com/access-wallet',
     Bonfida: 'https://bonfida.com/wallet'
     // https://docs.coin98.app/coin98-extension/developer-guide
-    // Coin98: ''
     // ezDeFi: '',
   } as Wallets
 
@@ -112,6 +138,17 @@ export default class Wallet extends Vue {
 
   get ido() {
     return this.$accessor.ido
+  }
+
+  // history
+  get historyList() {
+    const rawList = Object.entries(this.$accessor.transaction.history).map(([txid, txInfo]) => ({
+      ...(txInfo as any),
+      txid
+    }))
+    return rawList.sort((a, b) => {
+      return (b.time || b.t) - (a.time || a.t)
+    })
   }
 
   /* ========== LIFECYCLE ========== */
@@ -209,6 +246,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new BloctoWalletAdapter()
+        break
+      }
+      case 'Coin98': {
+        if ((window as any).coin98 === undefined) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and open Coin98 app first'
+          })
+          return
+        }
+
+        wallet = new Coin98WalletAdapter()
         break
       }
       default: {
@@ -401,6 +450,36 @@ export default class Wallet extends Vue {
 
   .address {
     font-size: 17px;
+  }
+}
+.tx-history-panel {
+  h2 {
+    margin-top: 32px;
+    text-align: left;
+  }
+  .tx-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .extra-info {
+      font-size: 0.9em;
+      opacity: 0.8;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      a {
+        font-size: 1.2em;
+      }
+
+      .icon {
+        margin-right: 8px;
+      }
+    }
+    .extra-info.time {
+      flex-shrink: 0;
+    }
   }
 }
 </style>

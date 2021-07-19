@@ -7,7 +7,7 @@ const notifyPlugin: Plugin = (ctx, inject) => {
   notify.config({
     placement: 'bottomLeft',
     bottom: '10px',
-    duration: 3
+    duration: 8
   })
 
   ctx.$notify = notify

@@ -11,6 +11,7 @@ import { TOKENS, TokenInfo } from './tokens'
 import { TokenAmount } from './safe-math'
 import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
 
+import { getBigNumber } from './layouts'
 // @ts-ignore
 import { u8, nu64, struct, seq } from 'buffer-layout'
 import { publicKey, u64 } from '@project-serum/borsh'
@@ -412,7 +413,7 @@ export async function purchase({
       ? purchaseInstruction<'private'>(
           {
             programId: new PublicKey(poolInfo.programId),
-            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+            amount: getBigNumber(new TokenAmount(amount, poolInfo.quote.decimals, false).wei)
           },
           {
             idoId: new PublicKey(poolInfo.idoId),
@@ -427,7 +428,7 @@ export async function purchase({
       : purchaseInstruction(
           {
             programId: new PublicKey(poolInfo.programId),
-            amount: new TokenAmount(amount, poolInfo.quote.decimals, false).wei.toNumber()
+            amount: getBigNumber(new TokenAmount(amount, poolInfo.quote.decimals, false).wei)
           },
           {
             idoId: new PublicKey(poolInfo.idoId),

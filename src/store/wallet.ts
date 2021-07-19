@@ -7,6 +7,7 @@ import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount, lt } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
+import { getBigNumber } from '@/utils/layouts'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -113,7 +114,7 @@ export const actions = actionTree(
                 const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
 
                 if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
-                  if (lt(tokenAccounts[mintAddress].balance.wei.toNumber(), balance.wei.toNumber())) {
+                  if (lt(getBigNumber(tokenAccounts[mintAddress].balance.wei), getBigNumber(balance.wei))) {
                     tokenAccounts[mintAddress] = {
                       tokenAccountAddress,
                       balance

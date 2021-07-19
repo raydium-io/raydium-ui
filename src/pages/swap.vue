@@ -121,9 +121,11 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
+          :balance-offset="fromCoin.symbol === 'SOL' ? -0.05 : 0"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
+          :show-half="true"
           @onInput="(amount) => (fromCoinAmount = amount)"
           @onFocus="
             () => {
@@ -205,11 +207,14 @@
             <span class="name"> Minimum Received </span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
-          <div v-if="endpoint" class="fs-container">
-            <span class="name"> Price Impact </span>
-            <span :style="`color: ${priceImpact > 10 ? '#ed4b9e' : priceImpact > 5 ? '#f0b90b' : '#31d0aa'}`">
-              {{ priceImpact.toFixed(2) }}%
-            </span>
+          <div
+            v-if="endpoint"
+            :class="`fs-container price-impact ${
+              priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''
+            }`"
+          >
+            <span class="name"> Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}</span>
+            <span :style="`color: ${priceImpact <= 5 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
 
@@ -258,7 +263,6 @@
         >
           Create {{ toCoin.symbol }} account
         </Button>
-
         <Button
           v-else
           size="large"
@@ -270,7 +274,14 @@
             (!marketAddress && !lpMintAddress && !isWrap) ||
             !initialized ||
             loading ||
-            gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(
+              fromCoinAmount,
+              fromCoin && fromCoin.balance
+                ? fromCoin.symbol === 'SOL'
+                  ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                  : fromCoin.balance.fixed()
+                : '0'
+            ) || // not enough SOL to swap SOL to another coin
             (get(liquidity.infos, `${lpMintAddress}.status`) &&
               get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
             swaping ||
@@ -278,6 +289,8 @@
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
           "
           :loading="swaping"
+          style="width: 100%"
+          :class="`swap-btn ${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
           @click="placeOrder"
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
@@ -286,7 +299,18 @@
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin && fromCoin.balance ? fromCoin.balance.fixed() : '0')">
+          <template
+            v-else-if="
+              gt(
+                fromCoinAmount,
+                fromCoin && fromCoin.balance
+                  ? fromCoin.symbol === 'SOL'
+                    ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                    : fromCoin.balance.fixed()
+                  : '0'
+              )
+            "
+          >
             Insufficient {{ fromCoin.symbol }} balance
           </template>
           <template
@@ -302,8 +326,19 @@
           <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
             xCOPE amount must greater than 5
           </template>
-          <template v-else>{{ isWrap ? 'Unwrap' : 'Swap' }}</template>
+          <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
+        <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
+          <span class="caution-text">Caution: Your SOL balance is low</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title">
+              SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions.
+            </template>
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
       </div>
     </div>
 
@@ -389,6 +424,9 @@ export default Vue.extend({
   data() {
     return {
       TOKENS,
+
+      // should check if user have enough SOL to have a swap
+      solBalance: null as TokenAmount | null,
 
       autoRefreshTime: 60,
       countdown: 0,
@@ -491,6 +529,7 @@ export default Vue.extend({
         if (this.market) {
           this.fetchUnsettledByMarket()
         }
+        this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
       },
       deep: true
     },
@@ -1382,6 +1421,21 @@ export default Vue.extend({
 </script>
 
 <style lang="less" sxcoped>
+.warning-style {
+  font-weight: bold;
+  color: #f0b90b;
+}
+.swap-btn.warning-style {
+  font-weight: normal;
+}
+.error-style {
+  font-weight: bold;
+  color: #ed4b9e;
+}
+.swap-btn.error-style {
+  font-weight: normal;
+}
+
 .container {
   max-width: 450px;
 
@@ -1393,6 +1447,7 @@ export default Vue.extend({
     padding: 0 12px;
     font-size: 12px;
     line-height: 20px;
+    margin-bottom: 6px;
     .anticon-swap {
       margin-left: 10px;
       padding: 5px;
@@ -1407,6 +1462,15 @@ export default Vue.extend({
         opacity: 0.75;
       }
     }
+  }
+
+  .not-enough-sol-alert {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -18px;
+    margin-top: 4px;
   }
 
   .change-side {

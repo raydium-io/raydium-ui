@@ -75,11 +75,12 @@
             (pool.version === 3
               ? (pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100
               : parseInt(
-                  info.quoteTokenDeposited
-                    .toEther()
-                    .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
-                    .multipliedBy(100)
-                    .toNumber()
+                  getBigNumber(
+                    info.quoteTokenDeposited
+                      .toEther()
+                      .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
+                      .multipliedBy(100)
+                  )
                 )) + '%'
           }}
         </span>
@@ -99,6 +100,7 @@ import { filter } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
 import { IdoPool } from '@/utils/ido'
+import { getBigNumber } from '@/utils/layouts'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
@@ -209,6 +211,7 @@ export default class AcceleRaytor extends Vue {
   ]
 
   getUnixTs = getUnixTs
+  getBigNumber = getBigNumber
 }
 </script>
 
