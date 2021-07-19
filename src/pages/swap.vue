@@ -196,24 +196,64 @@
             </span>
           </div>
           <div class="fs-container">
-            <span class="name"> Slippage Tolerance </span>
+            <span class="name">
+              Slippage Tolerance
+              <Tooltip placement="right">
+                <template slot="title">
+                  The maximum difference between your estimated price and execution price.
+                </template>
+                <Icon type="question-circle" /> </Tooltip
+            ></span>
             <span> {{ $accessor.setting.slippage }}% </span>
           </div>
           <div v-if="endpoint" class="fs-container">
-            <span class="name"> Swapping Through</span>
+            <span class="name">
+              Swapping Through
+              <Tooltip placement="right">
+                <template slot="title"> This venue gave the best price for your trade </template>
+                <Icon type="question-circle" /> </Tooltip
+            ></span>
             <span style="text-transform: capitalize"> {{ endpoint }} </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
-            <span class="name"> Minimum Received </span>
+            <span class="name">
+              Minimum Received
+              <Tooltip placement="right">
+                <template slot="title"> The least amount of tokens you will recieve on this trade </template>
+                <Icon type="question-circle" /> </Tooltip
+            ></span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
+          <!-- <div
+            v-if="
+              endpoint && endpoint.toLowerCase().includes('raydium') && fromCoin && fromCoin.symbol && fromCoinAmount
+            "
+            class="fs-container"
+          >
+            <span class="name">
+              Liquidity Provider Fee
+              <Tooltip placement="right">
+                <template slot="title">
+                  A portion of each trade (0.x%) goes to liquidity providers as a protocol incentive
+                </template>
+                <Icon type="question-circle" /> </Tooltip
+            ></span>
+            <span> {{ Number(fromCoinAmount * x).toFixed(fromCoin.decimals) }} {{ fromCoin.symbol }} </span>
+          </div>  Temporary-->
           <div
             v-if="endpoint"
             :class="`fs-container price-impact ${
               priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''
             }`"
           >
-            <span class="name"> Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}</span>
+            <span class="name">
+              Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}
+              <Tooltip placement="right">
+                <template slot="title">
+                  The difference between the market price and estimated price due to trade size
+                </template>
+                <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
+            ></span>
             <span :style="`color: ${priceImpact <= 5 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
