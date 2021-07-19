@@ -192,7 +192,6 @@
           </div>
           <ul class="links">
             <li><a class="link" href="https://raydium.gitbook.io/raydium/">Documentation</a></li>
-            <a class="link">Media Assets</a>
           </ul>
         </div>
 
