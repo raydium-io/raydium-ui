@@ -643,6 +643,7 @@ export default class Index extends Vue {
   background-image: url('../assets/background/index_footer_background.webp'),
     linear-gradient(transparent 30%, #141041 30%, #141041);
   background-size: 100% 600px, 100% 100%;
+  display: flow-root;
 }
 .page-footer .links-group {
   width: 100%;
