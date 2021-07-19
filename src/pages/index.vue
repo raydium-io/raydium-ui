@@ -51,12 +51,12 @@
           </div>
 
           <div class="card forsted-glass smoke">
-            <div class="card-title">24 HOUR VOLUME</div>
+            <div class="card-title">TOTAL TRADING VOLUME</div>
             <div class="value">
               <span class="value-sign">$</span>
               <span class="value-number">
                 {{
-                  Math.round(volume24h)
+                  Math.round(totalvolume)
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                 }}
@@ -318,14 +318,14 @@ import { Icon, Popover } from 'ant-design-vue'
       await $accessor.price.requestPrices()
     }
 
-    const { tvl, volume24h } = await $api.getInfo()
-    return { tvl, volume24h }
+    const { tvl, totalvolume } = await $api.getInfo()
+    return { tvl, totalvolume }
   }
 })
 export default class Index extends Vue {
   isPopupOpen = false
   tvl = 0
-  volume24h = 0
+  totalvolume = 0
   timer: number | undefined = undefined
 
   mounted() {
@@ -337,9 +337,9 @@ export default class Index extends Vue {
   }
 
   async getInfo() {
-    const { tvl, volume24h } = await this.$api.getInfo()
+    const { tvl, totalvolume } = await this.$api.getInfo()
     this.tvl = tvl
-    this.volume24h = volume24h
+    this.totalvolume = totalvolume
   }
 }
 </script>
@@ -570,7 +570,7 @@ export default class Index extends Vue {
   margin-bottom: 36px;
 }
 .section-app-face .row-box-2 .card {
-  width: 228px;
+  width: 260px;
   padding: 24px;
 }
 .section-app-face .row-box-2 .card .card-title {
@@ -899,7 +899,7 @@ export default class Index extends Vue {
     gap: 20px;
   }
   .section-app-face .row-box-2 .card {
-    width: 150px;
+    width: 165px;
     padding: 16px;
 
     --border-radius: 11.27px;

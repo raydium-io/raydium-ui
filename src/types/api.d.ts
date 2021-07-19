@@ -5,6 +5,7 @@ export interface PricesData {
 export interface InfoData {
   tvl: number
   volume24h: number
+  totalvolume: number
 }
 
 export interface PairData {}
