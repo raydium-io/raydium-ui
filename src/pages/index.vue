@@ -17,7 +17,9 @@
           An avenue for <br />
           the evolution of <span class="defi-text">DeFi</span>
         </div>
-        <div class="subtitle">Light-speed <b>swaps</b>. Next-level <b>liquidity</b>. Friction-less <b>yield</b>.</div>
+        <div class="subtitle">
+          Light-speed <b>swaps</b>. Next-level <b>liquidity</b>. {{ '\n' }} Friction-less <b>yield</b>.
+        </div>
 
         <div class="row-box-1">
           <NuxtLink to="/swap/">
@@ -181,9 +183,8 @@
       </div>
     </section>
 
-    <footer class="page-footer grid-cover-container">
-      <img src="../assets/background/index_footer_background.webp" style="width: 100%" />
-      <div class="content">
+    <footer class="page-footer">
+      <div class="links-group">
         <div class="group about">
           <div class="title-text">
             <div class="text">ABOUT</div>
@@ -306,7 +307,23 @@ export default class Index extends Vue {
 <style>
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk-VariableFont_wght.woff2') format('woff2');
+  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
+  font-weight: 700;
 }
 </style>
 <style scoped>
@@ -452,9 +469,11 @@ export default class Index extends Vue {
   margin-top: 80px;
   margin-bottom: 72px;
   height: 800px;
+  position: relative;
 }
 .section-app-face .image-1 {
   background-image: url('../assets/background/index_background.webp');
+  background-repeat: no-repeat;
   height: 100%;
   width: 744px;
 }
@@ -475,7 +494,7 @@ export default class Index extends Vue {
   margin-bottom: 24px;
 }
 .section-app-face .defi-text {
-  font-weight: 600;
+  font-weight: 700;
   color: transparent;
   background: radial-gradient(circle at top right, #39d0d8, #2b6aff);
   background-clip: text;
@@ -483,7 +502,7 @@ export default class Index extends Vue {
 .section-app-face .row-box-1 {
   display: flex;
   gap: 32px;
-  margin-bottom: 67px;
+  margin-bottom: 68px;
 }
 .section-app-face .row-box-1 .card-1 {
   border-radius: 12px;
@@ -530,16 +549,20 @@ export default class Index extends Vue {
 
 .page-footer {
   position: relative;
+  background-image: url('../assets/background/index_footer_background.webp'),
+    linear-gradient(transparent 30%, #141041 30%, #141041);
+  background-size: 100% 600px, 100% 100%;
 }
-.page-footer img {
+.page-footer .links-group {
   width: 100%;
-}
-.page-footer .content {
-  width: 100%;
-  padding: 4%;
+  padding: 200px 4% 0;
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
+}
+.page-footer .links-group > * {
+  flex-basis: 220px;
 }
 .page-footer .group .title-text .text {
   font-size: 14px;
@@ -577,8 +600,8 @@ export default class Index extends Vue {
   place-content: center;
 }
 .page-footer .foot-logo {
-  position: absolute;
-  bottom: 8%;
+  margin: 16px auto 64px;
+  display: block;
 }
 
 .section-features .feature-title {
@@ -625,6 +648,9 @@ export default class Index extends Vue {
   justify-content: space-around;
   padding: 0 228px;
 }
+.section-partners .boards > * {
+  flex-grow: 0;
+}
 
 .section-features.\-1 {
   position: relative;
@@ -638,6 +664,7 @@ export default class Index extends Vue {
     url('../assets/background/index_background2_lights.webp'), #1b1659;
   box-shadow: 8px 8px 10px rgba(20, 16, 65, 0.05), -8px -8px 10px rgba(197, 191, 255, 0.05),
     inset 0 6px 20px rgba(197, 191, 255, 0.2), inset 0 -1px 25px rgba(197, 191, 255, 0.1);
+  background-size: 100% 100%;
 }
 
 .section-features.\-1 .boards {
@@ -649,7 +676,7 @@ export default class Index extends Vue {
   position: absolute;
   inset: 0;
   background-image: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
-  mask-image: url('../assets/background/index_background2.svg');
+  mask-image: url('../assets/background/index_background2.webp');
 }
 
 .section-features.\-2 .image-3 {
@@ -665,6 +692,7 @@ export default class Index extends Vue {
 .section-features.\-2 .boards {
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+  justify-items: center;
 }
 
 .section-features.\-2 .feature-description {
@@ -681,6 +709,7 @@ export default class Index extends Vue {
   .home-navbar {
     padding: 50px 58px;
   }
+
   .section-app-face {
     margin-top: 116px;
     height: 720px;
@@ -697,29 +726,168 @@ export default class Index extends Vue {
     font-size: 20px;
     line-height: 26px;
   }
+  .section-app-face .row-box-1 {
+    gap: 24px;
+    margin-bottom: 84px;
+  }
+  .section-app-face .row-box-2 {
+    gap: 24px;
+  }
   .section-app-face .row-box-2 .card .card-title {
+    font-weight: 300;
     font-size: 12px;
     line-height: 15px;
   }
   .section-app-face .row-box-2 .card .value-sign {
+    font-weight: 300;
     font-size: 12px;
   }
   .section-app-face .row-box-2 .card .value-number {
+    font-weight: 300;
     font-size: 18px;
   }
 
+  .page-footer {
+    background-size: 200vw 600px, 100% 100%;
+    text-align: center;
+  }
+  .page-footer .links-group .group.community {
+    flex-basis: 100vw;
+  }
+  .page-footer .links-group .title-text .line {
+    margin: 0 auto;
+  }
+  .page-footer .links-group .group.community .title-text {
+    display: none;
+  }
+  .page-footer .links-group .group.community .links {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+  .page-footer .links-group .group.community .links .media-name {
+    display: none;
+  }
+
   .section-features.\-1 {
-    border-radius: 60px;
     margin: 0 24px;
     padding: 64px 40px;
+    border-radius: 60px;
+    background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
+      url('../assets/background/index_background2_lights_tablet.webp'), #1b1659;
+    background-size: 100% 100%;
   }
   .section-features.\-1 .boards {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
   }
+  .section-features.\-2 .boards {
+    grid-template-columns: 1fr;
+  }
+  .section-features.\-2 .image-3 {
+    background-image: url('../assets/background/index_background3_tablet.webp');
+  }
 }
 
 @media (max-width: 768px) {
   /* is phone */
+  .home-navbar {
+    justify-content: center;
+  }
+  .home-navbar > *:nth-child(2n) {
+    display: none;
+  }
+  .card {
+    padding: 10px 20px;
+  }
+  .section-app-face {
+    margin-top: 116px;
+    height: unset;
+  }
+  .section-app-face .image-1 {
+    width: 394px;
+    height: 430px;
+  }
+  .section-app-face .title {
+    font-size: 32px;
+    line-height: 32px;
+  }
+  .section-app-face .subtitle {
+    font-size: 16px;
+    line-height: 20px;
+    white-space: pre-line;
+  }
+  .section-app-face .row-box-1 {
+    gap: 20px;
+    margin-bottom: 56px;
+  }
+  .section-app-face .row-box-2 {
+    gap: 20px;
+  }
+  .section-app-face .row-box-2 .card {
+    width: 150px;
+    padding: 16px;
+
+    --border-radius: 11.27px;
+  }
+  .section-app-face .row-box-2 .card .card-title {
+    font-size: 8px;
+    line-height: 10px;
+  }
+  .section-app-face .row-box-2 .card .value {
+    line-height: 0;
+  }
+  .section-app-face .row-box-2 .card .value-sign {
+    font-size: 8px;
+    line-height: 10px;
+  }
+  .section-app-face .row-box-2 .card .value-number {
+    font-size: 12px;
+    line-height: 15px;
+  }
+  .section-app-face .solana-logo {
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%) scale(0.8);
+    bottom: -32px;
+  }
+
+  .page-footer .links-group {
+    gap: 56px;
+  }
+  .section-partners .boards {
+    width: unset;
+    justify-content: unset;
+    padding: unset;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .section-features.\-1 {
+    border-radius: 40px;
+    background: radial-gradient(at center top, transparent 20%, hsl(245, 60%, 16%, 0.2)),
+      url('../assets/background/index_background2_lights_mobile.webp'), #1b1659;
+    background-size: 100% 100%;
+  }
+  .section-features.\-1 .boards {
+    grid-template-columns: 1fr;
+  }
+  .section-features.\-2 .boards {
+    grid-template-columns: 1fr;
+  }
+  .section-features.\-2 .content {
+    padding: 0 20px;
+  }
+  .section-features.\-2 .image-3 {
+    background-image: url('../assets/background/index_background3_mobile.webp');
+  }
+  .section-features .boards > .card {
+    padding: 44px 20px;
+  }
+  .page-footer .links-group .group {
+    flex-basis: 100vw;
+  }
 }
 </style>
