@@ -173,7 +173,7 @@
     <section class="section-partners children-center">
       <div class="title-text">
         <div class="line" />
-        <div class="text">Parnters</div>
+        <div class="text">Partners</div>
       </div>
 
       <div class="boards">
@@ -288,7 +288,10 @@
                     <img src="../assets/icons/home-icon-telegram.svg" width="24" height="24" />
                   </div>
                   <div class="media-name" style="cursor: pointer">Telegram</div>
-                  <Icon type="down" style="transform: translateY(2px) scaleX(0.7) scaleY(0.6); margin: -12px" />
+                  <Icon
+                    type="down"
+                    style="transform: translateY(2px) scaleX(0.7) scaleY(0.6); margin: -12px; cursor: pointer"
+                  />
                 </div>
               </Popover>
             </li>
@@ -517,7 +520,7 @@ export default class Index extends Vue {
 .section-app-face {
   margin-top: 80px;
   margin-bottom: 72px;
-  height: 800px;
+  height: 804px;
   position: relative;
 }
 .section-app-face .image-1 {
@@ -746,6 +749,9 @@ export default class Index extends Vue {
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
 }
+.section-features.\-1 .boards > .card {
+  grid-template-rows: auto auto 1fr auto;
+}
 
 .section-features.\-1 .image-2 {
   position: absolute;
@@ -777,6 +783,8 @@ export default class Index extends Vue {
 
 .section-features.\-2 .boards > .card {
   max-width: 360px;
+  grid-template-rows: auto auto 1fr;
+  align-items: initial;
 }
 
 @media (max-width: 1128px) {
@@ -871,6 +879,10 @@ export default class Index extends Vue {
 
 @media (max-width: 768px) {
   /* is phone */
+  .button-like {
+    font-size: 12px;
+    line-height: 15px;
+  }
   .card {
     padding: 10px 20px;
   }
@@ -906,6 +918,10 @@ export default class Index extends Vue {
   .section-app-face .row-box-1 {
     gap: 20px;
     margin-bottom: 56px;
+  }
+  .section-app-face .row-box-1 .card-1 {
+    font-size: 12px;
+    line-height: 15px;
   }
   .section-app-face .row-box-2 {
     gap: 20px;
