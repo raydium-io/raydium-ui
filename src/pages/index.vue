@@ -173,7 +173,7 @@
     <section class="section-partners children-center">
       <div class="title-text">
         <div class="line" />
-        <div class="text">Patterns</div>
+        <div class="text">Parnters</div>
       </div>
 
       <div class="boards">
@@ -287,7 +287,7 @@
                   <div class="card icon-like forsted-glass teal">
                     <img src="../assets/icons/home-icon-telegram.svg" width="24" height="24" />
                   </div>
-                  <div class="media-name">Telegram</div>
+                  <div class="media-name" style="cursor: pointer">Telegram</div>
                   <Icon type="down" style="transform: translateY(2px) scaleX(0.7) scaleY(0.6); margin: -12px" />
                 </div>
               </Popover>
@@ -390,10 +390,13 @@ export default class Index extends Vue {
   transform: scale(0.95);
 }
 .button-like:hover {
-  filter: brightness(0.95);
+  filter: brightness(0.85);
 }
 .button-like .font {
   display: inline-block;
+}
+.clickable {
+  cursor: pointer;
 }
 
 .icon {
@@ -508,6 +511,7 @@ export default class Index extends Vue {
   right: 0;
   padding: 50px 165px;
   justify-content: space-between;
+  z-index: 1;
 }
 
 .section-app-face {
@@ -552,6 +556,15 @@ export default class Index extends Vue {
 .section-app-face .row-box-1 .card-1 {
   border-radius: 12px;
   color: white;
+  background: linear-gradient(245.22deg, #da2eef 35%, #2b6aff 65.17%, #39d0d8 92.1%);
+  background-position: 1% 50%;
+  background-size: 150% 150%;
+  transition: 500ms;
+}
+.section-app-face .row-box-1 .card-1:hover {
+  border-radius: 12px;
+  color: white;
+  background-position: 99% 50%;
 }
 .section-app-face .row-box-1 .card-1 .icon {
   width: 4px;
