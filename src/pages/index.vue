@@ -417,6 +417,7 @@ export default class Index extends Vue {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   opacity: 0.7;
   background: transparent;
   border-radius: inherit;
