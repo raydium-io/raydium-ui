@@ -521,7 +521,7 @@ export default class Index extends Vue {
   position: relative;
 }
 .section-app-face .image-1 {
-  background-image: url('../assets/background/index_background.webp');
+  background-image: url('../assets/background/index_background.svg');
   background-repeat: no-repeat;
   height: 100%;
   width: 744px;
@@ -751,7 +751,7 @@ export default class Index extends Vue {
   position: absolute;
   inset: 0;
   background-image: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
-  mask-image: url('../assets/background/index_background2.webp');
+  mask-image: url('../assets/background/index_background2.svg');
 }
 
 .section-features.\-2 .image-3 {
