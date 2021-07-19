@@ -84,9 +84,7 @@
             </div>
             <div class="feature-title">Trade</div>
             <div class="feature-description">Swap or Trade quickly and cheaply.</div>
-            <a class="card button-like forsted-glass teal" href="https://dex.raydium.io" target="_blank"
-              >Enter Exchange</a
-            >
+            <NuxtLink to="/swap/"><div class="card button-like forsted-glass teal">Enter Exchange</div></NuxtLink>
           </div>
 
           <div class="card children-center forsted-glass lightsmoke">
