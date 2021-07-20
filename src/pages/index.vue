@@ -268,11 +268,20 @@
                 <div class="media-name">Discord</div>
               </a>
             </li>
+            <li>
+              <a href="https://weibo.com/u/7573315825" class="link">
+                <div class="card icon-like forsted-glass teal">
+                  <img src="../assets/icons/home-icon-weibo.svg" width="20" height="20" />
+                </div>
+                <div class="media-name">Weibo</div>
+              </a>
+            </li>
             <li style="width: max-content">
               <Popover v-model="isPopupOpen" trigger="click" placement="right">
                 <template slot="content">
                   <ul class="pop-links">
                     <a class="link" href="https://t.me/raydiumprotocol">Telegram (EN)</a>
+                    <a class="link" href="https://t.me/RaydiumChina">Telegram (CN)</a>
                     <a class="link" href="https://t.me/raydiumkorea">Telegram (KR)</a>
                     <a class="link" href="https://t.me/raydiumjapan">Telegram (JP)</a>
                     <a class="link" href="https://t.me/RaydiumSpanish">Telegram (ES)</a>
