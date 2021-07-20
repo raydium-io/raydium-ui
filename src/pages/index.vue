@@ -115,7 +115,7 @@
             </div>
             <div class="feature-title">AcceleRaytor</div>
             <div class="feature-description">Launchpad for new Solana projects.</div>
-            <NuxtLink to="/acceleRaytor/">
+            <NuxtLink to="/acceleraytor/">
               <div class="card button-like forsted-glass teal">View Projects</div>
             </NuxtLink>
           </div>
@@ -189,7 +189,7 @@
             <div class="line" />
           </div>
           <ul class="links">
-            <li><a class="link" href="https://raydium.gitbook.io/raydium/">Documentation</a></li>
+            <li><a class="link" href="https://raydium.gitbook.io/raydium/" target="_blank">Documentation</a></li>
           </ul>
         </div>
 
@@ -203,6 +203,7 @@
               <a
                 class="link"
                 href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
+                target="_blank"
                 >Apply for Fusion Pool</a
               >
             </li>
@@ -210,11 +211,12 @@
               <a
                 class="link"
                 href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
+                target="_blank"
                 >Apply for AcceleRaytor</a
               >
             </li>
             <li>
-              <a class="link" href="https://raydium.gitbook.io/raydium/permissionless/creating-a-pool"
+              <a class="link" href="https://raydium.gitbook.io/raydium/permissionless/creating-a-pool" target="_blank"
                 >Permissionless Pool</a
               >
             </li>
@@ -228,12 +230,12 @@
           </div>
           <ul class="links">
             <li>
-              <a class="link" href="https://raydium.gitbook.io/raydium/trading-on-serum/spl-wallets"
+              <a class="link" href="https://raydium.gitbook.io/raydium/trading-on-serum/spl-wallets" target="_blank"
                 >Getting Started on Raydium</a
               >
             </li>
             <li>
-              <a class="link" href="https://raydium.gitbook.io/raydium/">FAQ</a>
+              <a class="link" href="https://raydium.gitbook.io/raydium/" target="_blank">FAQ</a>
             </li>
           </ul>
         </div>
@@ -245,7 +247,7 @@
           </div>
           <ul class="links">
             <li>
-              <a href="https://twitter.com/RaydiumProtocol" class="link">
+              <a href="https://twitter.com/RaydiumProtocol" class="link" target="_blank">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-twitter.svg" width="20" height="20" />
                 </div>
@@ -253,7 +255,7 @@
               </a>
             </li>
             <li>
-              <a href="https://raydium.medium.com/" class="link">
+              <a href="https://raydium.medium.com/" class="link" target="_blank">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-medium.svg" width="18" height="18" />
                 </div>
@@ -261,7 +263,7 @@
               </a>
             </li>
             <li>
-              <a href="https://discord.com/invite/6EvFwvCfpx" class="link">
+              <a href="https://discord.com/invite/6EvFwvCfpx" class="link" target="_blank">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-discord.svg" width="20" height="20" />
                 </div>
@@ -269,7 +271,7 @@
               </a>
             </li>
             <li>
-              <a href="https://weibo.com/u/7573315825" class="link">
+              <a href="https://weibo.com/u/7573315825" class="link" target="_blank">
                 <div class="card icon-like forsted-glass teal">
                   <img src="../assets/icons/home-icon-weibo.svg" width="20" height="20" />
                 </div>
@@ -280,13 +282,13 @@
               <Popover v-model="isPopupOpen" trigger="click" placement="right">
                 <template slot="content">
                   <ul class="pop-links">
-                    <a class="link" href="https://t.me/raydiumprotocol">Telegram (EN)</a>
-                    <a class="link" href="https://t.me/RaydiumChina">Telegram (CN)</a>
-                    <a class="link" href="https://t.me/raydiumkorea">Telegram (KR)</a>
-                    <a class="link" href="https://t.me/raydiumjapan">Telegram (JP)</a>
-                    <a class="link" href="https://t.me/RaydiumSpanish">Telegram (ES)</a>
-                    <a class="link" href="https://t.me/RaydiumTurkey">Telegram (TK)</a>
-                    <a class="link" href="https://t.me/RaydiumVietnam">Telegram (VN)</a>
+                    <a class="link" href="https://t.me/raydiumprotocol" target="_blank">Telegram (EN)</a>
+                    <a class="link" href="https://t.me/RaydiumChina" target="_blank">Telegram (CN)</a>
+                    <a class="link" href="https://t.me/raydiumkorea" target="_blank">Telegram (KR)</a>
+                    <a class="link" href="https://t.me/raydiumjapan" target="_blank">Telegram (JP)</a>
+                    <a class="link" href="https://t.me/RaydiumSpanish" target="_blank">Telegram (ES)</a>
+                    <a class="link" href="https://t.me/RaydiumTurkey" target="_blank">Telegram (TK)</a>
+                    <a class="link" href="https://t.me/RaydiumVietnam" target="_blank">Telegram (VN)</a>
                   </ul>
                 </template>
 
