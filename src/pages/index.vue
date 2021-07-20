@@ -255,7 +255,7 @@
             <li>
               <a
                 class="link"
-                href="https://raydium.gitbook.io/raydium/"
+                href="https://raydium.gitbook.io/raydium/trading-on-serum/faq"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 >FAQ</a
