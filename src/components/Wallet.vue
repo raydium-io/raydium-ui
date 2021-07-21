@@ -95,17 +95,17 @@ interface Wallets {
 export default class Wallet extends Vue {
   /* ========== DATA ========== */
   wallets = {
-    Ledger: '',
-    'Sollet Extension': '',
-    Solong: '',
-    // TrustWallet: '',
-    MathWallet: '',
     Phantom: '',
-    Blocto: '',
-    Coin98: '',
     Sollet: 'https://www.sollet.io',
+    'Sollet Extension': '',
+    Ledger: '',
+    MathWallet: '',
     Solflare: 'https://solflare.com/access-wallet',
+    Solong: '',
+    Coin98: '',
+    Blocto: '',
     Bonfida: 'https://bonfida.com/wallet'
+    // TrustWallet: '',
     // https://docs.coin98.app/coin98-extension/developer-guide
     // ezDeFi: '',
   } as Wallets
