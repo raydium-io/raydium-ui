@@ -257,8 +257,8 @@ export default Vue.extend({
     },
     showCollapse: {
       handler() {
-        if (!this.poolType) {
-          this.showCollapse = []
+        if (!this.poolType && this.showCollapse.length > 0) {
+          this.showCollapse.splice(0, this.showCollapse.length)
         }
       },
       deep: true
