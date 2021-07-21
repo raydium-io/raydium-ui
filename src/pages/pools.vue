@@ -3,6 +3,22 @@
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
       <div class="buttons">
+        <Button v-if="searchButton" shape="circle" icon="search" @click="searchButton = !searchButton" />
+        <InputSearch
+          v-else
+          v-model="searchName"
+          placeholder="input token symbol"
+          size="large"
+          class="input-search"
+          @search="
+            () => {
+              searchButton = !searchButton
+              searchName = ''
+            }
+          "
+        >
+          <Button slot="enterButton"> X </Button>
+        </InputSearch>
         <Tooltip placement="bottomRight">
           <template slot="title">
             <span>
@@ -31,7 +47,7 @@
             <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
           </RadioGroup>
         </div>
-        <Table :columns="columns" :data-source="poolsShow" :pagination="pagination" row-key="lp_mint">
+        <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
           <span slot="name" slot-scope="text, row" class="lp-icons">
             {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
@@ -62,13 +78,14 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Table, Radio, Progress, Tooltip } from 'ant-design-vue'
+import { Table, Radio, Progress, Tooltip, Button, Input } from 'ant-design-vue'
 
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
+const InputSearch = Input.Search
 @Component({
   head: {
     title: 'Raydium Pools'
@@ -79,7 +96,9 @@ const RadioButton = Radio.Button
     RadioGroup,
     RadioButton,
     Progress,
-    Tooltip
+    Tooltip,
+    Button,
+    InputSearch
   },
 
   async asyncData({ $api }) {
@@ -142,14 +161,8 @@ export default class Pools extends Vue {
   timer: any = null
   loading: boolean = false
 
-  pagination = {
-    pageSize: 20,
-    current: 1,
-    onChange: (page: number, size: number) => {
-      this.pagination.current = page
-      this.pagination.pageSize = size
-    }
-  }
+  searchButton = true
+  searchName = ''
 
   get liquidity() {
     return this.$accessor.liquidity
@@ -168,7 +181,11 @@ export default class Pools extends Vue {
 
   @Watch('poolType')
   onPoolTypeChanged() {
-    this.pagination.current = 1
+    this.showPool()
+  }
+
+  @Watch('searchName')
+  onSearchNameChanged() {
     this.showPool()
   }
 
@@ -179,7 +196,10 @@ export default class Pools extends Vue {
         (this.poolType === 'RaydiumPools' && (item.official === undefined || item.official)) ||
         (this.poolType !== 'RaydiumPools' && item.official !== undefined && !item.official)
       ) {
-        if (!item.name.includes('unknown')) {
+        if (
+          !item.name.includes('unknown') &&
+          (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
+        ) {
           pool.push(item)
         }
       }
