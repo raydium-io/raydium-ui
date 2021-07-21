@@ -75,7 +75,8 @@ import {
   PhantomWalletAdapter,
   BloctoWalletAdapter,
   LedgerWalletAdapter,
-  Coin98WalletAdapter
+  Coin98WalletAdapter,
+  SafePalWalletAdapter
 } from '@/wallets'
 
 // fix: Failed to resolve directive: ant-portal
@@ -105,7 +106,8 @@ export default class Wallet extends Vue {
     Coin98: '',
     Sollet: 'https://www.sollet.io',
     Solflare: 'https://solflare.com/access-wallet',
-    Bonfida: 'https://bonfida.com/wallet'
+    Bonfida: 'https://bonfida.com/wallet',
+    SafePalWallet: 'https://safepal.io/download',
     // https://docs.coin98.app/coin98-extension/developer-guide
     // ezDeFi: '',
   } as Wallets
@@ -258,6 +260,18 @@ export default class Wallet extends Vue {
         }
 
         wallet = new Coin98WalletAdapter()
+        break
+      }
+      case 'SafePalWallet': {
+        if ((window as any).solana === undefined || !(window as any).solana.isSafePalWallet) {
+          this.$notify.error({
+            message: 'Connect wallet failed',
+            description: 'Please install and initialize SafePal Wallet first'
+          })
+          return
+        }
+
+        wallet = new SafePalWalletAdapter()
         break
       }
       default: {
