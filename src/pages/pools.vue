@@ -3,7 +3,13 @@
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
       <div class="buttons">
-        <Button v-if="searchButton" shape="circle" icon="search" @click="searchButton = !searchButton" />
+        <Button
+          v-if="searchButton"
+          shape="circle"
+          icon="search"
+          class="search-btn"
+          @click="searchButton = !searchButton"
+        />
         <InputSearch
           v-else
           v-model="searchName"
@@ -17,7 +23,7 @@
             }
           "
         >
-          <Button slot="enterButton"> X </Button>
+          <Button slot="enterButton" class="search-btn"> X </Button>
         </InputSearch>
         <Tooltip placement="bottomRight">
           <template slot="title">
@@ -299,5 +305,9 @@ export default class Pools extends Vue {
 }
 .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
   border: 1px solid #d9d9d9;
+}
+.search-btn {
+  background: transparent !important;
+  border: none !important;
 }
 </style>
