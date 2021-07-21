@@ -3,6 +3,12 @@
     <div class="page-head fs-container">
       <span class="title">Farms</span>
       <div class="buttons">
+        <span>
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
+            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+          </RadioGroup>
+        </span>
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
@@ -46,7 +52,10 @@
           <Collapse expand-icon-position="right">
             <CollapsePanel
               v-for="farm in farms"
-              v-show="farm.farmInfo.version === 3 && !farm.farmInfo.legacy"
+              v-show="
+                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
+              "
               :key="farm.farmInfo.poolId"
             >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
@@ -71,7 +80,7 @@
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col v-if="!isMobile" class="state" :span="4">
+                <Col v-if="!isMobile && poolType" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">
                     ${{
@@ -80,6 +89,10 @@
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                     }}
                   </div>
+                </Col>
+                <Col v-if="!isMobile && !poolType" class="fc-container" :span="isMobile ? 12 : 4">
+                  <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
+                  <Button v-else ghost @click="$router.replace({ path: '/migrate/' })"> Unstake & Migrate </Button>
                 </Col>
               </Row>
 
@@ -140,51 +153,6 @@
           </Collapse>
         </div>
       </div>
-
-      <div class="page-head fs-container">
-        <span class="title">Legacy Farms</span>
-        <div class="buttons"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <template v-for="farm in farms">
-            <Row
-              v-if="[2, 3].includes(farm.farmInfo.version) && farm.farmInfo.legacy"
-              :key="farm.farmInfo.poolId"
-              class="farm-head"
-              :class="isMobile ? 'is-mobile' : ''"
-              :gutter="0"
-            >
-              <Col class="lp-icons" :span="isMobile ? 12 : 8">
-                <div class="icons">
-                  <CoinIcon :mint-address="farm.farmInfo.lp.coin.mintAddress" />
-                  <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
-                </div>
-                {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Staked</div>
-                <div class="value">
-                  {{ farm.userInfo.depositBalance.format() }}
-                </div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Apr</div>
-                <div class="value">{{ farm.farmInfo.apr }}%</div>
-              </Col>
-              <Col class="fc-container" :span="isMobile ? 12 : 4">
-                <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
-                <Button v-else ghost @click="$router.replace({ path: '/migrate/' })"> Unstake & Migrate </Button>
-              </Col>
-            </Row>
-          </template>
-        </div>
-      </div>
     </div>
 
     <div v-else class="fc-container">
@@ -198,7 +166,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button } from 'ant-design-vue'
+import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Radio } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
@@ -208,6 +176,9 @@ import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
 const CollapsePanel = Collapse.Panel
+
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 
 export default Vue.extend({
   components: {
@@ -219,7 +190,9 @@ export default Vue.extend({
     Icon,
     Row,
     Col,
-    Button
+    Button,
+    RadioGroup,
+    RadioButton
   },
 
   data() {
@@ -234,7 +207,9 @@ export default Vue.extend({
       stakeModalOpening: false,
       staking: false,
       unstakeModalOpening: false,
-      unstaking: false
+      unstaking: false,
+      poolType: true,
+      endedFarmsPoolId: [] as string[]
     }
   },
 
@@ -278,6 +253,7 @@ export default Vue.extend({
 
     updateFarms() {
       const farms: any = []
+      const endedFarmsPoolId: string[] = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         // @ts-ignore
@@ -321,6 +297,10 @@ export default Vue.extend({
             newFarmInfo.apr = apr
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+
+            if (rewardPerBlockAmount.toEther().toString() === '0') {
+              endedFarmsPoolId.push(poolId)
+            }
           }
 
           if (userInfo) {
@@ -351,6 +331,7 @@ export default Vue.extend({
       }
 
       this.farms = farms
+      this.endedFarmsPoolId = endedFarmsPoolId
     },
 
     updateCurrentLp(newTokenAccounts: any) {
@@ -656,6 +637,10 @@ export default Vue.extend({
     margin-bottom: 0;
   }
 }
+.radioButtonStyle {
+  width: 50%;
+  text-align: center;
+}
 </style>
 
 <style lang="less">
@@ -686,5 +671,28 @@ export default Vue.extend({
   .anticon-close {
     color: #fff;
   }
+}
+
+.ant-table-thead > tr > th.ant-table-column-sort {
+  background: transparent;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff;
+  background: #1c274f;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+  border-left-width: 0;
+}
+.ant-radio-button-wrapper {
+  color: #aaa;
+  background: transparent;
+  // border: 1px solid #d9d9d9;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
+  border: 1px solid #d9d9d9;
 }
 </style>

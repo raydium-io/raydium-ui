@@ -3,28 +3,6 @@
     <div class="page-head fs-container">
       <span class="title">Top Pools</span>
       <div class="buttons">
-        <Button
-          v-if="searchButton"
-          shape="circle"
-          icon="search"
-          class="search-btn"
-          @click="searchButton = !searchButton"
-        />
-        <InputSearch
-          v-else
-          v-model="searchName"
-          placeholder="input token symbol"
-          size="large"
-          class="input-search"
-          @search="
-            () => {
-              searchButton = !searchButton
-              searchName = ''
-            }
-          "
-        >
-          <Button slot="enterButton" class="search-btn"> X </Button>
-        </InputSearch>
         <Tooltip placement="bottomRight">
           <template slot="title">
             <span>
@@ -47,11 +25,18 @@
 
     <div class="card">
       <div class="card-body">
-        <div style="text-align: center">
-          <RadioGroup v-model="poolType" style="display: inline-block; width: 70%; margin: 0 auto">
-            <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
-            <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
-          </RadioGroup>
+        <div style="text-align: center; width: 100%">
+          <div style="width: 45%; display: inline-block">
+            <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
+              <Icon slot="prefix" type="search" />
+            </Input>
+          </div>
+          <div style="width: 45%; display: inline-block">
+            <RadioGroup v-model="poolType" style="display: inline-block; width: 100%; margin: 0 auto">
+              <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
+              <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
+            </RadioGroup>
+          </div>
         </div>
         <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
           <span slot="name" slot-scope="text, row" class="lp-icons">
@@ -84,14 +69,13 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Table, Radio, Progress, Tooltip, Button, Input } from 'ant-design-vue'
+import { Table, Radio, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
 import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
-const InputSearch = Input.Search
 @Component({
   head: {
     title: 'Raydium Pools'
@@ -104,7 +88,8 @@ const InputSearch = Input.Search
     Progress,
     Tooltip,
     Button,
-    InputSearch
+    Input,
+    Icon
   },
 
   async asyncData({ $api }) {
@@ -309,5 +294,8 @@ export default class Pools extends Vue {
 .search-btn {
   background: transparent !important;
   border: none !important;
+}
+.ant-input {
+  height: 32px !important;
 }
 </style>

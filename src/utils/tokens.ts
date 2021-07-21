@@ -554,7 +554,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-USDC': {
     symbol: 'RAY-USDC',
-    name: 'RAY-USDC LP',
+    name: 'RAY-USDC V2 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.USDC },
 
@@ -563,7 +563,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-SRM': {
     symbol: 'RAY-SRM',
-    name: 'RAY-SRM LP',
+    name: 'RAY-SRM V2 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.SRM },
 
