@@ -92,7 +92,7 @@
                   </div>
                 </Col>
                 <Col v-if="!isMobile && !poolType" class="state" :span="4">
-                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+                  <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
                     Connect Wallet
                   </Button>
                   <div v-else class="fs-container">
@@ -100,7 +100,7 @@
                       :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
                       size="large"
                       ghost
-                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                      @click.stop="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
                     >
                       Harvest & Unstake
                     </Button>
