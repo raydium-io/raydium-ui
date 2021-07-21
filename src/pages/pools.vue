@@ -26,12 +26,13 @@
     <div class="card">
       <div class="card-body">
         <div style="text-align: center; width: 100%">
-          <div style="width: 45%; display: inline-block">
+          <div style="width: 40%; display: inline-block">
             <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
               <Icon slot="prefix" type="search" />
             </Input>
           </div>
-          <div style="width: 45%; display: inline-block">
+          <div style="width: 5%; display: inline-block"></div>
+          <div style="width: 40%; display: inline-block">
             <RadioGroup v-model="poolType" style="display: inline-block; width: 100%; margin: 0 auto">
               <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
               <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
@@ -295,7 +296,7 @@ export default class Pools extends Vue {
   background: transparent !important;
   border: none !important;
 }
-.ant-input {
-  height: 32px !important;
+.input-search .ant-input {
+  height: 32.01px !important;
 }
 </style>

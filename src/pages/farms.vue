@@ -49,7 +49,7 @@
     <div v-if="farm.initialized">
       <div class="card">
         <div class="card-body">
-          <Collapse expand-icon-position="right">
+          <Collapse v-model="showCollapse" expand-icon-position="right">
             <CollapsePanel
               v-for="farm in farms"
               v-show="
@@ -57,6 +57,7 @@
                 ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
               "
               :key="farm.farmInfo.poolId"
+              :show-arrow="poolType"
             >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="isMobile ? 12 : 8">
@@ -80,7 +81,7 @@
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col v-if="!isMobile" class="state" :span="4">
+                <Col v-if="!isMobile && poolType" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">
                     ${{
@@ -88,6 +89,21 @@
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                     }}
+                  </div>
+                </Col>
+                <Col v-if="!isMobile && !poolType" class="state" :span="4">
+                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+                    Connect Wallet
+                  </Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
+                      size="large"
+                      ghost
+                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                    >
+                      Harvest & Unstake
+                    </Button>
                   </div>
                 </Col>
               </Row>
@@ -142,33 +158,6 @@
                         Stake LP
                       </Button>
                     </div>
-                  </div>
-                </Col>
-              </Row>
-
-              <Row v-else :class="isMobile ? 'is-mobile' : ''" :gutter="48">
-                <Col :span="isMobile ? 24 : 4">
-                  <p>Add liquidity:</p>
-                  <NuxtLink
-                    :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
-                  >
-                    {{ farm.farmInfo.lp.name }}
-                  </NuxtLink>
-                </Col>
-
-                <Col :span="isMobile ? 48 : 10">
-                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-                    Connect Wallet
-                  </Button>
-                  <div v-else class="fs-container">
-                    <Button
-                      :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
-                      size="large"
-                      ghost
-                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                    >
-                      Unstake
-                    </Button>
                   </div>
                 </Col>
               </Row>
@@ -232,7 +221,8 @@ export default Vue.extend({
       unstakeModalOpening: false,
       unstaking: false,
       poolType: true,
-      endedFarmsPoolId: [] as string[]
+      endedFarmsPoolId: [] as string[],
+      showCollapse: [] as any[]
     }
   },
 
@@ -262,6 +252,14 @@ export default Vue.extend({
     'farm.stakeAccounts': {
       handler() {
         this.updateFarms()
+      },
+      deep: true
+    },
+    showCollapse: {
+      handler() {
+        if (!this.poolType) {
+          this.showCollapse = []
+        }
       },
       deep: true
     }
