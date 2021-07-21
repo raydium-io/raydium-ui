@@ -80,7 +80,7 @@
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col v-if="!isMobile && poolType" class="state" :span="4">
+                <Col v-if="!isMobile" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">
                     ${{
@@ -90,13 +90,9 @@
                     }}
                   </div>
                 </Col>
-                <Col v-if="!isMobile && !poolType" class="fc-container" :span="isMobile ? 12 : 4">
-                  <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect Wallet </Button>
-                  <Button v-else ghost @click="$router.replace({ path: '/migrate/' })"> Unstake & Migrate </Button>
-                </Col>
               </Row>
 
-              <Row :class="isMobile ? 'is-mobile' : ''" :gutter="48">
+              <Row v-if="poolType" :class="isMobile ? 'is-mobile' : ''" :gutter="48">
                 <Col :span="isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
                   <NuxtLink
@@ -146,6 +142,33 @@
                         Stake LP
                       </Button>
                     </div>
+                  </div>
+                </Col>
+              </Row>
+
+              <Row v-else :class="isMobile ? 'is-mobile' : ''" :gutter="48">
+                <Col :span="isMobile ? 24 : 4">
+                  <p>Add liquidity:</p>
+                  <NuxtLink
+                    :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
+                  >
+                    {{ farm.farmInfo.lp.name }}
+                  </NuxtLink>
+                </Col>
+
+                <Col :span="isMobile ? 48 : 10">
+                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+                    Connect Wallet
+                  </Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
+                      size="large"
+                      ghost
+                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                    >
+                      Unstake
+                    </Button>
                   </div>
                 </Col>
               </Row>
