@@ -512,6 +512,28 @@ export const TOKENS: Tokens = {
     decimals: 8,
     referrer: 'J5g7uvJRGnpRyLnRQjFs1MqMkiTVgjxVJCXocu4B4BcZ',
     tags: ['raydium']
+  },
+  LIKE: {
+    symbol: 'LIKE',
+    name: 'LIKE',
+    mintAddress: '3bRTivrVsitbmCTGtqwp7hxXPsybkjn4XLNtPsHqa3zR',
+    decimals: 9,
+    referrer: '2rnVeVGfM88XqyNyBzGWEb7JViYKqncFzjWq5h1ujS9A',
+
+    detailLink: 'https://raydium.medium.com/only1-is-launching-on-acceleraytor-41ecb89dcc4e',
+    details:
+      'Only1 is the first NFT-powered social platform built on the Solana blockchain. Mixing social media, an NFT marketplace, a scalable blockchain, and the native token — $LIKE, Only1 offers fans a unique way of connecting with the creators they love.\n\nBy using the Only1 platform, fans will have the ability to invest, access, and earn from the limited edition contents created by the world’s largest influencers/celebrities, all powered by NFTs.',
+    docs: {
+      website: 'https://only1.io/',
+      whitepaper: 'https://only1.io/pitch-deck.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/only1nft',
+      Telegram: 'https://t.me/only1nft',
+      Medium: 'https://medium.com/@only1nft',
+      Discord: 'https://discord.gg/sUu7KZwNCB'
+    },
+    tags: ['raydium']
   }
 }
 
