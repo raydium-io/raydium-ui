@@ -107,15 +107,10 @@
                   </Button>
                   <div v-else class="fs-container">
                     <Button
+                      :disabled="farm.userInfo.depositBalance.isNullOrZero()"
                       size="large"
                       ghost
-                      :disabled="
-                        !wallet.connected ||
-                        harvesting ||
-                        (farm.userInfo.pendingReward.isNullOrZero() && farm.userInfo.pendingRewardB.isNullOrZero())
-                      "
-                      :loading="harvesting"
-                      @click="harvest(farm.farmInfo)"
+                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
                     >
                       Harvest & Unstake
                     </Button>
