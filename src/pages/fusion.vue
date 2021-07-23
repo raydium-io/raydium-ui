@@ -49,7 +49,7 @@
     <div v-if="farm.initialized">
       <div class="card">
         <div class="card-body" style="background: #000829">
-          <Collapse expand-icon-position="right">
+          <Collapse v-model="showCollapse" expand-icon-position="right">
             <CollapsePanel
               v-for="farm in farms"
               v-show="
@@ -57,6 +57,7 @@
                 (endedFarmsPoolId.includes(farm.farmInfo.poolId) && !poolType)
               "
               :key="farm.farmInfo.poolId"
+              :show-arrow="poolType"
             >
               <Row slot="header" class="farm-head" :class="isMobile ? 'is-mobile' : ''" :gutter="0">
                 <Col class="lp-icons" :span="isMobile ? 12 : 8">
@@ -90,7 +91,7 @@
                     <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
                   </div>
                 </Col>
-                <Col v-if="!isMobile" class="state" :span="4">
+                <Col v-if="!isMobile && poolType" class="state" :span="4">
                   <div class="title">Liquidity</div>
                   <div class="value">
                     ${{
@@ -98,6 +99,26 @@
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                     }}
+                  </div>
+                </Col>
+                <Col v-if="!isMobile && !poolType" class="state" :span="4">
+                  <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
+                    Connect Wallet
+                  </Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      size="large"
+                      ghost
+                      :disabled="
+                        !wallet.connected ||
+                        harvesting ||
+                        (farm.userInfo.pendingReward.isNullOrZero() && farm.userInfo.pendingRewardB.isNullOrZero())
+                      "
+                      :loading="harvesting"
+                      @click="harvest(farm.farmInfo)"
+                    >
+                      Harvest & Unstake
+                    </Button>
                   </div>
                 </Col>
               </Row>
@@ -224,7 +245,8 @@ export default Vue.extend({
       unstakeModalOpening: false,
       unstaking: false,
       poolType: true,
-      endedFarmsPoolId: [] as string[]
+      endedFarmsPoolId: [] as string[],
+      showCollapse: [] as any[]
     }
   },
 
@@ -254,6 +276,15 @@ export default Vue.extend({
     'farm.stakeAccounts': {
       handler() {
         this.updateFarms()
+      },
+      deep: true
+    },
+
+    showCollapse: {
+      handler() {
+        if (!this.poolType && this.showCollapse.length > 0) {
+          this.showCollapse.splice(0, this.showCollapse.length)
+        }
       },
       deep: true
     }
