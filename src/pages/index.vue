@@ -574,6 +574,7 @@ export default class Index extends Vue {
 
   font-family: 'Space Grotesk', sans-serif;
   font-feature-settings: 'ss04', 'tnum' 0;
+  overflow: hidden;
 }
 
 .home-navbar {
@@ -622,7 +623,8 @@ export default class Index extends Vue {
   background-clip: text;
 }
 .section-app-face .row-box-1 {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   gap: 32px;
   margin-bottom: 68px;
 }
@@ -650,7 +652,8 @@ export default class Index extends Vue {
   margin-left: 8px;
 }
 .section-app-face .row-box-2 {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   gap: 32px;
   margin-bottom: 36px;
 }
@@ -744,7 +747,9 @@ export default class Index extends Vue {
 .page-footer .group .links .link {
   font-size: 16px;
   margin-bottom: 26px;
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
   gap: 12px;
   align-items: center;
   color: var(--text-secondary-light);
