@@ -64,8 +64,8 @@ const web3Plugin: Plugin = async (ctx, inject) => {
     config = {
       strategy: 'weight',
       rpcs: [
-        { url: 'https://solana-api.projectserum.com', weight: 100 },
-        { url: 'https://api.mainnet-beta.solana.com', weight: 10 }
+        // { url: 'https://solana-api.projectserum.com', weight: 100 },
+        { url: 'https://api.mainnet-beta.solana.com', weight: 100 }
       ]
     } // need delete this temporary patch for raydiumrpc
     configFrom = 'remote'

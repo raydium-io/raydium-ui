@@ -414,28 +414,8 @@ export default class Index extends Vue {
   }
 }
 </script>
-<style>
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 300;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 500;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 700;
-}
 
+<style>
 .ant-popover-arrow {
   border-color: #0c0926 !important;
 }
@@ -572,8 +552,6 @@ export default class Index extends Vue {
   --text-secondary: hsl(222deg, 100%, 84%);
   --text-secondary-light: #c4d6ff;
 
-  font-family: 'Space Grotesk', sans-serif;
-  font-feature-settings: 'ss04', 'tnum' 0;
   overflow: hidden;
 }
 
