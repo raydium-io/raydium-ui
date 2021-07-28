@@ -1052,6 +1052,42 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Hb8KnZNKvRxu7pgMRWJgoMSMcepfvNiBFFDDrdf9o3wA',
     decimals: TOKENS.renDOGE.decimals
+  },
+  'RAY-USDC-V4': {
+    symbol: 'RAY-USDC',
+    name: 'RAY-USDC LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FbC6K13MzHvN42bXrtGaWsvZY9fxrackRSZcBGfjPc7m',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-SRM-V4': {
+    symbol: 'RAY-SRM',
+    name: 'RAY-SRM LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: '7P5Thr9Egi2rvMmEuQkLn8x8e8Qro7u2U7yLD2tU2Hbe',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-ETH-V4': {
+    symbol: 'RAY-ETH',
+    name: 'RAY-ETH LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.ETH },
+
+    mintAddress: 'mjQH33MqZv5aKAbKHi8dG3g3qXeRQqq1GFcXceZkNSr',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-SOL-V4': {
+    symbol: 'RAY-SOL',
+    name: 'RAY-SOL LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SOL },
+
+    mintAddress: '89ZKE4aoyfLBe2RuV6jM3JGNhaV18Nxh8eNtjRcndBip',
+    decimals: TOKENS.RAY.decimals
   }
 }
 

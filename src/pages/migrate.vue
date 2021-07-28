@@ -1,6 +1,79 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
+      <span class="title">AMM-v3 to AMM-v4 Migration</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <p>
+          Raydium is upgrading remaining V3 pools to the newer V4 AMM contract. The affected pools are RAY-SOL, RAY-SRM,
+          RAY-USDC and RAY-ETH. As part of the upgrade, liquidity in legacy V3 pools must migrate to new pools. This
+          tool simplifies the process. For more info click
+          <a href="https://raydium.gitbook.io/raydium/updates/v4-migration" target="_blank">here</a>.
+        </p>
+
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+          Connect Wallet
+        </Button>
+        <div v-else>
+          <Steps direction="vertical" progress-dot :current="3">
+            <Step>
+              <div slot="title">Unstake</div>
+              <div slot="description" class="action">
+                All staked LP tokens will be unstaked from legacy pools
+
+                <template v-for="farm in farms">
+                  <h6 v-if="farm.farmInfo.version === 3" :key="farm.farmInfo.poolId">
+                    {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
+                  </h6>
+                </template>
+
+                <Button
+                  ghost
+                  :loading="unstaking"
+                  :disabled="farms.filter((f) => f.farmInfo.version === 3).length === 0"
+                  @click="unstake"
+                >
+                  Unstake all
+                </Button>
+              </div>
+            </Step>
+            <Step>
+              <div slot="title">Remove liquidity</div>
+              <div slot="description" class="action">
+                Remove liquidity for all legacy LP tokens
+
+                <template v-for="liquid in liquids">
+                  <h6 v-if="liquid.poolInfo.version === 3" :key="liquid.poolInfo.name" class="fs-container">
+                    <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
+
+                    <Button
+                      ghost
+                      :loading="removing"
+                      :disabled="liquids.filter((l) => l.poolInfo.version === 3).length === 0"
+                      @click="remove(liquid.poolInfo, liquid.userLpBalance)"
+                    >
+                      Remove liquidity
+                    </Button>
+                  </h6>
+                </template>
+              </div>
+            </Step>
+            <Step>
+              <div slot="title">Add liquidity to new pools</div>
+              <div slot="description" class="action">
+                Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
+
+                <Button ghost @click="$router.push({ path: '/liquidity/' })">Go to AMM-v4 liquidity</Button>
+              </div>
+            </Step>
+          </Steps>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-head fs-container">
       <span class="title">WUSDT Migration</span>
     </div>
 
