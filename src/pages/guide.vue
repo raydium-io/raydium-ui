@@ -11,16 +11,25 @@
         <button class="primary">GET STARTED</button>
         <button>REWARD DETAILS</button>
       </div>
+      <svg class="p-1" viewBox="0 0 532 132">
+        <polyline points="126,0 126,66 266,65 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
+      </svg>
       <div class="step-box">
         <div class="step-label">Step 1</div>
         <div class="step-title">Watch how to create a wallet on Solana and make your first Swap on Raydium.</div>
         <video />
       </div>
+      <svg class="p-2" viewBox="0 0 532 132">
+        <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
+      </svg>
       <div class="step-box">
         <div class="step-label">Step 2</div>
         <div class="step-title">Swap on Raydium</div>
         <button>GO TO SWAP</button>
       </div>
+      <svg class="p-3" viewBox="0 0 532 132">
+        <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
+      </svg>
       <div class="step-box">
         <div class="step-label">Step 3</div>
         <div class="step-title">Fill out the form to enter</div>
@@ -42,12 +51,12 @@
           <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />GO TO TWITTER</button>
         </div>
         <div class="box">
-          <div class="box-title">Compete in the RAY Trading Competition on Binance</div>
+          <div class="box-title">Join the Raydium Discord</div>
           <div class="point-label">+10 POINTS</div>
           <button><img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD</button>
         </div>
         <div class="box">
-          <div class="box-title">Compete in the RAY Trading Competition on Binance</div>
+          <div class="box-title">Retweet Raydium</div>
           <div class="point-label">+5 POINTS</div>
           <button><img class="icon" src="../assets/icons/guide-retweet-icon.svg" />RETWEET</button>
         </div>
@@ -311,6 +320,13 @@ button.primary {
       width: 100%;
     }
   }
+  .p-1,
+  .p-2,
+  .p-3 {
+    width: 532px;
+    height: 132px;
+    stroke: var(--secondary);
+  }
 }
 .box {
   max-width: 552px;
@@ -334,6 +350,7 @@ button.primary {
   }
   button {
     grid-area: button;
+    align-self: flex-end;
   }
 }
 
@@ -345,6 +362,18 @@ button.primary {
     line-height: 31px;
     color: var(--primary-text);
     margin-bottom: 72px;
+    position: relative;
+    max-width: 400px;
+    text-align: center;
+    &::after {
+      position: absolute;
+      content: '';
+      bottom: -8px;
+      right: 48px;
+      width: 60%;
+      height: 2px;
+      background-color: var(--secondary);
+    }
   }
   .box-grid {
     display: grid;
@@ -361,6 +390,18 @@ button.primary {
     line-height: 31px;
     color: var(--primary-text);
     margin-bottom: 72px;
+    position: relative;
+    max-width: 420px;
+    text-align: center;
+    &::after {
+      position: absolute;
+      content: '';
+      bottom: -8px;
+      right: -32px;
+      width: 60%;
+      height: 2px;
+      background-color: var(--secondary);
+    }
   }
   .box .point-label {
     max-width: 116px;
