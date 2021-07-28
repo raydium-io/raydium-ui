@@ -1917,7 +1917,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
   {
     name: 'RAY-SOL',
     coin: { ...TOKENS.RAY },
-    pc: { ...TOKENS.SOL },
+    pc: { ...NATIVE_SOL },
     lp: { ...LP_TOKENS['RAY-SOL-V4'] },
 
     version: 4,
