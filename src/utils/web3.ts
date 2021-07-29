@@ -9,6 +9,7 @@ import {
   TransactionSignature,
   TransactionInstruction
 } from '@solana/web3.js'
+import { Token } from '@solana/spl-token'
 
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
@@ -94,6 +95,37 @@ export async function createTokenAccountIfNotExist(
   }
 
   return publicKey
+}
+
+export async function createAssociatedTokenAccountIfNotExist(
+  account: string | undefined | null,
+  owner: PublicKey,
+  mintAddress: string,
+
+  transaction: Transaction
+) {
+  let publicKey
+  if (account) {
+    publicKey = new PublicKey(account)
+  }
+
+  const mint = new PublicKey(mintAddress)
+  const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner)
+
+  if (!publicKey || ata.equals(publicKey)) {
+    transaction.add(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        mint,
+        ata,
+        owner,
+        owner
+      )
+    )
+  }
+
+  return ata
 }
 
 export async function createProgramAccountIfNotExist(

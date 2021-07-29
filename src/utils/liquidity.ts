@@ -9,7 +9,13 @@ import {
   LIQUIDITY_POOLS
 } from '@/utils/pools'
 import { NATIVE_SOL, TOKENS, TokenInfo, LP_TOKENS } from '@/utils/tokens'
-import { createTokenAccountIfNotExist, sendTransaction, commitment, getMultipleAccounts } from '@/utils/web3'
+import {
+  createTokenAccountIfNotExist,
+  sendTransaction,
+  commitment,
+  getMultipleAccounts,
+  createAssociatedTokenAccountIfNotExist
+} from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8 } from 'buffer-layout'
 import { publicKey, u64, u128 } from '@project-serum/borsh'
@@ -135,14 +141,11 @@ export async function addLiquidity(
     )
   }
 
-  let userLpTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  let userLpTokenAccount = await createAssociatedTokenAccountIfNotExist(
     lpAccount,
     owner,
     poolInfo.lp.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   transaction.add(
