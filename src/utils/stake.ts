@@ -156,13 +156,20 @@ export async function withdraw(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+  if (!infoAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
   const signers: any = []
 
   const owner = wallet.publicKey
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction
+  )
 
   // if no account, create new one
   const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
@@ -182,7 +189,7 @@ export async function withdraw(
       new PublicKey(farmInfo.poolAuthority),
       new PublicKey(infoAccount),
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
@@ -206,7 +213,7 @@ export async function withdrawV4(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+  if (!infoAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -214,6 +221,12 @@ export async function withdrawV4(
 
   const owner = wallet.publicKey
 
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction
+  )
   // if no account, create new one
   const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
@@ -241,7 +254,7 @@ export async function withdrawV4(
       new PublicKey(farmInfo.poolAuthority),
       new PublicKey(infoAccount),
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
