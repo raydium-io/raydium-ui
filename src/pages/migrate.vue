@@ -23,19 +23,19 @@
               <div slot="description" class="action">
                 All staked LP tokens will be unstaked from legacy pools
                 <template v-for="farm in farms">
-                  <div v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
+                  <div
+                    v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy && !farm.depositBalance.isNullOrZero()"
+                    :key="farm.farmInfo.poolId"
+                  >
                     <h6 style="display: inline-block">
                       {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
                     </h6>
 
-                    <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
-                      Connect Wallet
-                    </Button>
                     <Button
-                      v-else
-                      :disabled="!wallet.connected || farm.depositBalance.isNullOrZero()"
                       ghost
-                      @click.stop="unstakeV3(farm.farmInfo, farm.depositBalance.format())"
+                      size="small"
+                      :loading="unstaking"
+                      @click="unstakeV3(farm.farmInfo, farm.depositBalance.toEther())"
                     >
                       Harvest & Unstake
                     </Button>
@@ -54,6 +54,7 @@
 
                     <Button
                       ghost
+                      size="small"
                       :loading="removing"
                       :disabled="liquids.filter((l) => l.poolInfo.version === 3).length === 0"
                       @click="remove(liquid.poolInfo, liquid.userLpBalance)"
@@ -357,6 +358,8 @@ export default Vue.extend({
     get,
 
     unstakeV3(farmInfo: any, amount: string) {
+      this.unstaking = true
+
       const conn = this.$web3
       const wallet = (this as any).$wallet
 
@@ -393,6 +396,9 @@ export default Vue.extend({
             message: 'Stake failed',
             description: error.message
           })
+        })
+        .finally(() => {
+          this.unstaking = false
         })
     },
 
