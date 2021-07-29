@@ -164,11 +164,14 @@ export async function withdraw(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
   const userLpAccount = await createAssociatedTokenAccountIfNotExist(
     lpAccount,
     owner,
     farmInfo.lp.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   // if no account, create new one
@@ -176,7 +179,8 @@ export async function withdraw(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   const programId = new PublicKey(farmInfo.programId)
@@ -221,18 +225,22 @@ export async function withdrawV4(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
   const userLpAccount = await createAssociatedTokenAccountIfNotExist(
     lpAccount,
     owner,
     farmInfo.lp.mintAddress,
-    transaction
+    transaction,
+    atas
   )
   // if no account, create new one
   const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   // if no account, create new one
@@ -241,7 +249,8 @@ export async function withdrawV4(
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   const programId = new PublicKey(farmInfo.programId)

@@ -93,19 +93,29 @@ export async function unstakeAll(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
   farms.forEach(async (farm) => {
     const { farmInfo, lpAccount, rewardAccount, infoAccount, amount } = farm
 
     if (!farmInfo) throw new Error('Miss pool infomations')
-    if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+    if (!infoAccount) throw new Error('Miss account infomations')
     if (!amount) throw new Error('Miss amount infomations')
 
+    const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+      lpAccount,
+      owner,
+      farmInfo.lp.mintAddress,
+      transaction,
+      atas
+    )
     // if no reward account, create new one
     const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
       rewardAccount,
       owner,
       farmInfo.reward.mintAddress,
-      transaction
+      transaction,
+      atas
     )
 
     const programId = new PublicKey(farmInfo.programId)
@@ -117,7 +127,7 @@ export async function unstakeAll(
         new PublicKey(farmInfo.poolAuthority),
         new PublicKey(infoAccount),
         wallet.publicKey,
-        new PublicKey(lpAccount),
+        userLpAccount,
         new PublicKey(farmInfo.poolLpTokenAccount),
         userRewardTokenAccount,
         new PublicKey(farmInfo.poolRewardTokenAccount),
