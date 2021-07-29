@@ -4,7 +4,7 @@
     <Setting />
 
     <Content>
-      <div v-if="['swap', 'liquidity', 'farms'].includes(pageName)" class="fc-container">
+      <div v-if="['swap', 'liquidity', 'farms'].includes(pageName) && showFlag" class="fc-container">
         <Alert type="warning" message="IMPORTANT" show-icon closable>
           <div slot="description">
             RAY-SOL, RAY-SRM, RAY-USDC and RAY-ETH pools are upgrading from the V3 AMM contract to V4. As a result,
@@ -31,6 +31,7 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { Layout, Alert } from 'ant-design-vue'
+import { get, cloneDeep } from 'lodash-es'
 import Setting from '@/components/Setting.vue'
 
 const { Content } = Layout
@@ -45,14 +46,59 @@ const { Content } = Layout
 })
 export default class Default extends Vue {
   pageName: string = ''
+  showFlag: boolean = false
+  farms = [] as any
 
   @Watch('$route')
   onRouteChanged() {
-    this.pageName = this.$route.name ?? ''
+    this.updateShow()
+  }
+
+  get farm() {
+    return this.$accessor.farm
   }
 
   mounted() {
+    this.updateShow()
+  }
+
+  updateShow() {
     this.pageName = this.$route.name ?? ''
+    this.updateFarms()
+
+    let showFlag: boolean = false
+    for (const farm of this.farms) {
+      if (farm.farmInfo.version === 3 && farm.farmInfo.legacy) {
+        showFlag = true
+      }
+    }
+    this.showFlag = showFlag
+  }
+
+  updateFarms() {
+    const farms: any = []
+
+    for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
+      // @ts-ignore
+      if (!farmInfo.isStake) {
+        let userInfo = get(this.farm.stakeAccounts, poolId)
+
+        if (userInfo) {
+          userInfo = cloneDeep(userInfo)
+
+          const { depositBalance } = userInfo
+
+          if (!depositBalance.isNullOrZero()) {
+            farms.push({
+              farmInfo,
+              depositBalance
+            })
+          }
+        }
+      }
+    }
+
+    this.farms = farms
   }
 }
 </script>
