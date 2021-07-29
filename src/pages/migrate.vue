@@ -23,8 +23,8 @@
               <div slot="description" class="action">
                 All staked LP tokens will be unstaked from legacy pools
                 <template v-for="farm in farms">
-                  <div :key="farm.farmInfo.poolId">
-                    <h6 v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" style="display: inline-block">
+                  <div v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
+                    <h6 style="display: inline-block">
                       {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
                     </h6>
 
