@@ -7,12 +7,13 @@
     <div class="card">
       <div class="card-body">
         <p>
-          Your token accounts below need to be migrated to associated token accounts (ATA). This tool makes the process
-          straightforward. Click the "Migrate Token Accounts" button below to complete this process and migrate your
-          balances. To learn more about ATAs,
+          If you have token accounts that need to be migrated to associated token accounts (ATA), they will show below.
+          To learn more about ATAs,
           <a href="https://raydium.gitbook.io/raydium/updates/associated-token-account-migration" target="_blank"
             >click here</a
-          >.
+          >. <br /><br />
+          Click the "Migrate Token Accounts" button below to migrate your balances. If there are several tokens below,
+          you may need to do this more than once.
         </p>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
