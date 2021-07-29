@@ -7,8 +7,8 @@
       <div v-if="['swap', 'liquidity', 'farms'].includes(pageName) && showFlag" class="fc-container">
         <Alert type="warning" message="IMPORTANT" show-icon closable>
           <div slot="description">
-            You have liquidity in an expiring pool. RAY-SOL, RAY-SRM, RAY-USDC and RAY-ETH pools are upgrading from the
-            V3 AMM contract to V4. As a result, liquidity in legacy V3 pools must migrate to new pools.
+            You have liquidity in a legacy pool. RAY-SOL, RAY-SRM, RAY-USDC and RAY-ETH pools are upgrading from the V3
+            AMM contract to V4. As a result, liquidity in legacy V3 pools must migrate to new pools.
             <NuxtLink to="/migrate/">This migration tool</NuxtLink>
             simplifies the process. For full info,
             <a href="https://raydium.gitbook.io/raydium/updates/v4-migration" target="_blank">click here</a>.
