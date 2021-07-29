@@ -27,45 +27,51 @@ export async function mergeTokens(
   if (!auxiliaryTokenAccounts || auxiliaryTokenAccounts.length === 0)
     throw new Error('Miss auxiliary accounts infomations')
 
-  const transaction = new Transaction()
-  const signers: any = []
-
   const owner = wallet.publicKey
 
-  let size = 0
+  const { blockhash } = await connection.getRecentBlockhash()
+  const transaction = new Transaction({ recentBlockhash: blockhash, feePayer: owner })
+  const signers: any = []
 
   for (let index = 0; index < auxiliaryTokenAccounts.length; index++) {
-    if (size < 300) {
-      const auxiliaryTokenAccount = auxiliaryTokenAccounts[index]
-
-      const { pubkey: from, account: accountInfo } = auxiliaryTokenAccount
-      const { info } = accountInfo.data.parsed
-      const { mint, tokenAmount } = info
-
-      const mintPubkey = new PublicKey(mint)
-
-      const ata = await findAssociatedTokenAddress(owner, mintPubkey)
-      const ataAccountInfo = get(tokenAccounts, mint)
-
-      if (!ataAccountInfo) {
-        transaction.add(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID,
-            TOKEN_PROGRAM_ID,
-            mintPubkey,
-            ata,
-            owner,
-            owner
-          )
-        )
-
-        size += 7
+    if (index > 0) {
+      try {
+        const data = transaction.compileMessage().serialize()
+        // 1280 - 40 - 8 - 64 - 1 - 256
+        if (data.length > 911) {
+          break
+        }
+      } catch {
+        break
       }
-
-      const { amount } = tokenAmount
-      transaction.add(Token.createTransferInstruction(TOKEN_PROGRAM_ID, from, ata, owner, [], new U64(amount)))
-      size += 3
     }
+
+    const auxiliaryTokenAccount = auxiliaryTokenAccounts[index]
+
+    const { pubkey: from, account: accountInfo } = auxiliaryTokenAccount
+    const { info } = accountInfo.data.parsed
+    const { mint, tokenAmount } = info
+
+    const mintPubkey = new PublicKey(mint)
+
+    const ata = await findAssociatedTokenAddress(owner, mintPubkey)
+    const ataAccountInfo = get(tokenAccounts, mint)
+
+    if (!ataAccountInfo) {
+      transaction.add(
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          mintPubkey,
+          ata,
+          owner,
+          owner
+        )
+      )
+    }
+
+    const { amount } = tokenAmount
+    transaction.add(Token.createTransferInstruction(TOKEN_PROGRAM_ID, from, ata, owner, [], new U64(amount)))
   }
 
   return await sendTransaction(connection, wallet, transaction, signers)
