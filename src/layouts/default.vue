@@ -31,7 +31,7 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { Layout, Alert } from 'ant-design-vue'
-import { get, cloneDeep } from 'lodash-es'
+import { get } from 'lodash-es'
 import Setting from '@/components/Setting.vue'
 
 const { Content } = Layout
@@ -47,20 +47,15 @@ const { Content } = Layout
 export default class Default extends Vue {
   pageName: string = ''
   showFlag: boolean = false
-  farms = [] as any
 
   @Watch('$route', { immediate: true, deep: true })
   onRouteChanged() {
     this.updateShow()
   }
 
-  @Watch('farm.farmInfo', { immediate: true, deep: true })
+  @Watch('$accessor.farm.infos', { immediate: true, deep: true })
   onFarmChanged() {
     this.updateShow()
-  }
-
-  get farm() {
-    return this.$accessor.farm
   }
 
   mounted() {
@@ -69,41 +64,21 @@ export default class Default extends Vue {
 
   updateShow() {
     this.pageName = this.$route.name ?? ''
-    this.updateFarms()
 
-    let showFlag: boolean = false
-    for (const farm of this.farms) {
-      if (farm.farmInfo.version === 3 && farm.farmInfo.legacy) {
-        showFlag = true
-      }
-    }
-    this.showFlag = showFlag
-  }
-
-  updateFarms() {
-    const farms: any = []
-
-    for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
+    for (const [poolId, farmInfo] of Object.entries(this.$accessor.farm.infos)) {
       // @ts-ignore
-      if (!farmInfo.isStake) {
-        let userInfo = get(this.farm.stakeAccounts, poolId)
+      if (farmInfo.version === 3 && farmInfo.legacy) {
+        const userInfo = get(this.$accessor.farm.stakeAccounts, poolId)
 
         if (userInfo) {
-          userInfo = cloneDeep(userInfo)
-
           const { depositBalance } = userInfo
-
           if (!depositBalance.isNullOrZero()) {
-            farms.push({
-              farmInfo,
-              depositBalance
-            })
+            this.showFlag = true
+            return
           }
         }
       }
     }
-
-    this.farms = farms
   }
 }
 </script>
