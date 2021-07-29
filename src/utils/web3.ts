@@ -98,6 +98,7 @@ export async function createTokenAccountIfNotExist(
 }
 
 export async function createAssociatedTokenAccountIfNotExist(
+  connection: Connection,
   account: string | undefined | null,
   owner: PublicKey,
   mintAddress: string,
@@ -111,8 +112,9 @@ export async function createAssociatedTokenAccountIfNotExist(
 
   const mint = new PublicKey(mintAddress)
   const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner)
+  const ataInfo = await connection.getAccountInfo(ata)
 
-  if (!publicKey || ata.equals(publicKey)) {
+  if (!publicKey || ata.equals(publicKey) || !ataInfo) {
     transaction.add(
       Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
