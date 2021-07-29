@@ -1,13 +1,13 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
-import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
+import { PublicKey, AccountInfo, ParsedAccountData } from '@solana/web3.js'
 
 import { NATIVE_SOL } from '@/utils/tokens'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { TokenAmount, lt } from '@/utils/safe-math'
+import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
-import { getBigNumber } from '@/utils/layouts'
+import { findAssociatedTokenAddress } from '@/utils/web3'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -23,7 +23,8 @@ export const state = () => ({
   connected: false,
   address: '',
 
-  tokenAccounts: {}
+  tokenAccounts: {},
+  auxiliaryTokenAccounts: [] as Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }>
 })
 
 export const getters = getterTree(state, {})
@@ -61,6 +62,13 @@ export const mutations = mutationTree(state, {
 
   setTokenAccounts(state, tokenAccounts: any) {
     state.tokenAccounts = cloneDeep(tokenAccounts)
+  },
+
+  setAuxiliaryTokenAccounts(
+    state,
+    auxiliaryTokenAccounts: Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }>
+  ) {
+    state.auxiliaryTokenAccounts = cloneDeep(auxiliaryTokenAccounts)
   },
 
   setCountdown(state, countdown: number) {
@@ -103,31 +111,28 @@ export const actions = actionTree(
             },
             'confirmed'
           )
-          .then(async (parsedTokenAccounts: any) => {
+          .then(async (parsedTokenAccounts) => {
             const tokenAccounts: any = {}
+            const auxiliaryTokenAccounts: Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }> = []
 
-            parsedTokenAccounts.value.forEach(
-              (tokenAccountInfo: { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }) => {
-                const tokenAccountAddress = tokenAccountInfo.pubkey.toBase58()
-                const parsedInfo = tokenAccountInfo.account.data.parsed.info
-                const mintAddress = parsedInfo.mint
-                const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
+            parsedTokenAccounts.value.forEach(async (tokenAccountInfo) => {
+              const tokenAccountPubkey = tokenAccountInfo.pubkey
+              const tokenAccountAddress = tokenAccountPubkey.toBase58()
+              const parsedInfo = tokenAccountInfo.account.data.parsed.info
+              const mintAddress = parsedInfo.mint
+              const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
 
-                if (Object.prototype.hasOwnProperty.call(tokenAccounts, mintAddress)) {
-                  if (lt(getBigNumber(tokenAccounts[mintAddress].balance.wei), getBigNumber(balance.wei))) {
-                    tokenAccounts[mintAddress] = {
-                      tokenAccountAddress,
-                      balance
-                    }
-                  }
-                } else {
-                  tokenAccounts[mintAddress] = {
-                    tokenAccountAddress,
-                    balance
-                  }
+              const ata = await findAssociatedTokenAddress(wallet.publicKey, new PublicKey(mintAddress))
+
+              if (ata.equals(tokenAccountPubkey)) {
+                tokenAccounts[mintAddress] = {
+                  tokenAccountAddress,
+                  balance
                 }
+              } else if (parsedInfo.tokenAmount.uiAmount > 0) {
+                auxiliaryTokenAccounts.push(tokenAccountInfo)
               }
-            )
+            })
 
             const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
             tokenAccounts[NATIVE_SOL.mintAddress] = {
@@ -135,6 +140,7 @@ export const actions = actionTree(
               balance: new TokenAmount(solBalance, NATIVE_SOL.decimals)
             }
 
+            commit('setAuxiliaryTokenAccounts', auxiliaryTokenAccounts)
             commit('setTokenAccounts', tokenAccounts)
             logger('Wallet TokenAccounts updated')
           })

@@ -1,6 +1,6 @@
 import { getBigNumber } from './layouts'
 import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
-import { createProgramAccountIfNotExist, createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
+import { createProgramAccountIfNotExist, sendTransaction, createAssociatedTokenAccountIfNotExist } from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8, blob } from 'buffer-layout'
 import { publicKey, u128, u64 } from '@project-serum/borsh'
@@ -30,14 +30,11 @@ export async function deposit(
   const owner = wallet.publicKey
 
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   // if no userinfo account, create new one
@@ -95,26 +92,20 @@ export async function depositV4(
   const owner = wallet.publicKey
 
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   // if no account, create new one
-  const userRewardTokenAccountB = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccountB = await createAssociatedTokenAccountIfNotExist(
     rewardAccountB,
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   // if no userinfo account, create new one
@@ -174,14 +165,11 @@ export async function withdraw(
   const owner = wallet.publicKey
 
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   const programId = new PublicKey(farmInfo.programId)
@@ -227,26 +215,20 @@ export async function withdrawV4(
   const owner = wallet.publicKey
 
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   // if no account, create new one
-  const userRewardTokenAccountB = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccountB = await createAssociatedTokenAccountIfNotExist(
     rewardAccountB,
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    null,
-    transaction,
-    signers
+    transaction
   )
 
   const programId = new PublicKey(farmInfo.programId)

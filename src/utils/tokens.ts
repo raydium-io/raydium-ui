@@ -56,6 +56,19 @@ export function getTokenByMintAddress(mintAddress: string): TokenInfo | null {
   return token ? cloneDeep(token) : null
 }
 
+export function getTokenSymbolByMint(mint: string) {
+  if (mint === NATIVE_SOL.mintAddress) {
+    return NATIVE_SOL.symbol
+  }
+
+  const token = Object.values({ ...TOKENS, ...LP_TOKENS }).find((item) => item.mintAddress === mint)
+
+  if (token) {
+    return token.symbol
+  }
+  return 'UNKNOWN'
+}
+
 export interface Tokens {
   [key: string]: any
   [index: number]: any

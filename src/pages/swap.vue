@@ -286,23 +286,6 @@
         >
           Confirm Risk Warning
         </Button>
-
-        <Button
-          v-else-if="initialized && fromCoin && !get(wallet.tokenAccounts, fromCoin.mintAddress)"
-          size="large"
-          ghost
-          @click="createAssociatedTokenAccount(fromCoin.symbol, fromCoin.mintAddress)"
-        >
-          Create {{ fromCoin.symbol }} account
-        </Button>
-        <Button
-          v-else-if="initialized && toCoin && !get(wallet.tokenAccounts, toCoin.mintAddress)"
-          size="large"
-          ghost
-          @click="createAssociatedTokenAccount(toCoin.symbol, toCoin.mintAddress)"
-        >
-          Create {{ toCoin.symbol }} account
-        </Button>
         <Button
           v-else
           size="large"
@@ -436,7 +419,7 @@ import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
 import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { getMultipleAccounts, commitment, createTokenAccount } from '@/utils/web3'
+import { getMultipleAccounts, commitment } from '@/utils/web3'
 import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, settleFund } from '@/utils/swap'
@@ -1415,45 +1398,6 @@ export default Vue.extend({
           })
           this.isSettlingQuote = false
           this.isSettlingBase = false
-        })
-    },
-
-    createAssociatedTokenAccount(symbol: string, mint: string) {
-      this.swaping = true
-
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
-
-      const description = `Create ${symbol} token account`
-
-      createTokenAccount(this.$web3, this.$wallet, mint)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
-
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Swap failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.swaping = false
         })
     }
   }

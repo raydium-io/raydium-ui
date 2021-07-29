@@ -16,7 +16,6 @@ import {
   LIQUIDITY_POOL_PROGRAM_ID_V4,
   SERUM_PROGRAM_ID_V3,
   TOKEN_PROGRAM_ID,
-  RENT_PROGRAM_ID,
   SYSTEM_PROGRAM_ID,
   AMM_ASSOCIATED_SEED,
   TARGET_ASSOCIATED_SEED,
@@ -39,7 +38,6 @@ import {
 } from '@/utils/web3'
 // @ts-ignore
 import { struct, u8 } from 'buffer-layout'
-import { publicKey } from '@project-serum/borsh'
 
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { Market as MarketSerum } from '@project-serum/serum'
@@ -117,87 +115,6 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     }
   }
 }
-
-// async function createTokenAccount(
-//   conn: Connection,
-//   transaction: Transaction,
-//   mintPublic: PublicKey,
-//   ammAuthority: PublicKey,
-//   owner: PublicKey,
-//   signers: any
-// ) {
-//   const splAccount = new Account()
-//   transaction.add(
-//     SystemProgram.createAccount({
-//       fromPubkey: owner,
-//       newAccountPubkey: splAccount.publicKey,
-//       lamports: await conn.getMinimumBalanceForRentExemption(ACCOUNT_LAYOUT.span),
-//       space: ACCOUNT_LAYOUT.span,
-//       programId: TOKEN_PROGRAM_ID
-//     })
-//   )
-//   transaction.add(
-//     initializeAccount({
-//       account: splAccount.publicKey,
-//       mint: mintPublic,
-//       owner: ammAuthority
-//     })
-//   )
-//   signers.push(splAccount)
-//   return splAccount
-// }
-
-export function initializeMint(mint: PublicKey, decimals: number, mintAuthority: PublicKey): TransactionInstruction {
-  const dataLayout = struct([
-    u8('instruction'),
-    u8('decimals'),
-    publicKey('mintAuthority'),
-    u8('freezeOption'),
-    publicKey('freezeAuthority')
-  ])
-  const keys = [
-    { pubkey: mint, isSigner: false, isWritable: true },
-    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true }
-  ]
-  const data = Buffer.alloc(dataLayout.span)
-
-  data.writeUInt8(0)
-  data.writeUInt8(decimals, 1)
-  mintAuthority.toBuffer().copy(data, 2, 0, 32)
-  data.writeUInt8(0, 34)
-
-  return new TransactionInstruction({
-    keys,
-    programId: TOKEN_PROGRAM_ID,
-    data
-  })
-}
-
-// async function createAndInitMint(
-//   conn: any,
-//   transaction: Transaction,
-//   owner: PublicKey,
-//   mint: Account,
-//   ownerPubkey: PublicKey,
-//   decimals: number,
-//   signers: any
-// ) {
-//   transaction.add(
-//     SystemProgram.createAccount({
-//       fromPubkey: owner,
-//       newAccountPubkey: mint.publicKey,
-//       lamports: await conn.getMinimumBalanceForRentExemption(MINT_LAYOUT.span),
-//       space: MINT_LAYOUT.span,
-//       programId: TOKEN_PROGRAM_ID
-//     })
-//   )
-//   transaction.add(initializeMint(mint.publicKey, decimals, ownerPubkey))
-//   signers.push(mint)
-// }
-
-// function strToAccount(str: string) {
-//   return new Account(new Uint8Array(JSON.parse('[' + str + ']')))
-// }
 
 export async function createAmm(
   conn: any,

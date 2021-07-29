@@ -1,6 +1,72 @@
 <template>
   <div class="container">
     <div class="page-head fs-container">
+      <span class="title">Associated Token Account Migrator</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <p>
+          Your token accounts below need to be migrated to associated token accounts (ATA). This tool makes the process
+          straightforward. Click the "Migrate Token Accounts" button below to complete this process and migrate your
+          balances. To learn more about ATAs,
+          <a href="https://raydium.gitbook.io/raydium/updates/associated-token-account-migration" target="_blank"
+            >click here</a
+          >.
+        </p>
+
+        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+          Connect Wallet
+        </Button>
+        <div v-else>
+          <table class="ata-table">
+            <thead>
+              <tr>
+                <th class="address">Address</th>
+                <th class="balance">Balance</th>
+                <th style="text-align: right">Token</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="accountInfo in wallet.auxiliaryTokenAccounts" :key="accountInfo.pubkey.toBase58()">
+                {{
+                  void ((address = accountInfo.pubkey.toBase58()), (info = accountInfo.account.data.parsed.info))
+                }}
+                <td class="flex">
+                  <span>{{ address.substr(0, 4) }}...{{ address.substr(address.length - 4, 4) }}</span>
+                  <div class="actions">
+                    <a :href="`${url.explorer}/account/${address}`" target="_blank">
+                      <Icon type="link" />
+                    </a>
+                  </div>
+                </td>
+                <td class="balance">{{ info.tokenAmount.uiAmount }}</td>
+                <td class="token flex">
+                  <span>{{ getTokenSymbolByMint(info.mint) }}</span>
+                  <div class="actions">
+                    <a :href="`${url.explorer}/token/${info.mint}`" target="_blank">
+                      <Icon type="link" />
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <Button
+            class="migrate-token-button"
+            ghost
+            :loading="migrating"
+            :disabled="wallet.auxiliaryTokenAccounts.length === 0 || migrating"
+            @click="migrateTokens"
+          >
+            Migrate Token Accounts
+          </Button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-head fs-container">
       <span class="title">AMM-v3 to AMM-v4 Migration</span>
     </div>
 
@@ -291,13 +357,13 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Button, Steps } from 'ant-design-vue'
+import { Button, Steps, Icon } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import { unstakeAll } from '@/utils/migrate'
-import { createTokenAccount, wrap } from '@/utils/swap'
+import { unstakeAll, mergeTokens } from '@/utils/migrate'
+import { wrap } from '@/utils/swap'
 import { withdraw } from '@/utils/stake'
-import { TOKENS } from '@/utils/tokens'
+import { TOKENS, getTokenSymbolByMint } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
@@ -308,7 +374,8 @@ export default Vue.extend({
   components: {
     Button,
     Steps,
-    Step
+    Step,
+    Icon
   },
 
   data() {
@@ -317,6 +384,7 @@ export default Vue.extend({
       farms: [] as any,
       liquids: [] as any,
 
+      migrating: false,
       creating: false,
       unstaking: false,
       removing: false,
@@ -356,6 +424,48 @@ export default Vue.extend({
   methods: {
     getBigNumber,
     get,
+    getTokenSymbolByMint,
+
+    migrateTokens() {
+      this.migrating = true
+
+      const conn = this.$web3
+      const wallet = (this as any).$wallet
+
+      const key = getUnixTs().toString()
+      this.$notify.info({
+        key,
+        message: 'Making transaction...',
+        description: '',
+        duration: 0
+      })
+
+      mergeTokens(conn, wallet, this.$accessor.wallet.auxiliaryTokenAccounts, this.$accessor.wallet.tokenAccounts)
+        .then((txid) => {
+          this.$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Merge token accounts`
+          this.$accessor.transaction.sub({ txid, description })
+        })
+        .catch((error) => {
+          this.$notify.error({
+            key,
+            message: 'Merge token accounts failed',
+            description: error.message
+          })
+        })
+        .finally(() => {
+          this.migrating = false
+        })
+    },
 
     unstakeV3(farmInfo: any, amount: string) {
       this.unstaking = true
@@ -428,91 +538,91 @@ export default Vue.extend({
       this.farms = farms
     },
 
-    createUsdtAccount() {
-      this.creating = true
+    // createUsdtAccount() {
+    //   this.creating = true
 
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
+    //   const conn = this.$web3
+    //   const wallet = (this as any).$wallet
 
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
+    //   const key = getUnixTs().toString()
+    //   this.$notify.info({
+    //     key,
+    //     message: 'Making transaction...',
+    //     description: '',
+    //     duration: 0
+    //   })
 
-      createTokenAccount(conn, wallet, TOKENS.USDT.mintAddress)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
+    //   createTokenAccount(conn, wallet, TOKENS.USDT.mintAddress)
+    //     .then((txid) => {
+    //       this.$notify.info({
+    //         key,
+    //         message: 'Transaction has been sent',
+    //         description: (h: any) =>
+    //           h('div', [
+    //             'Confirmation is in progress.  Check your transaction on ',
+    //             h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+    //           ])
+    //       })
 
-          const description = `Create USDT account`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Create USDT account failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.creating = false
-        })
-    },
+    //       const description = `Create USDT account`
+    //       this.$accessor.transaction.sub({ txid, description })
+    //     })
+    //     .catch((error) => {
+    //       this.$notify.error({
+    //         key,
+    //         message: 'Create USDT account failed',
+    //         description: error.message
+    //       })
+    //     })
+    //     .finally(() => {
+    //       this.creating = false
+    //     })
+    // },
 
-    unstakeWUSDT(farmInfo: any, amount: string) {
-      this.unstaking = true
+    // unstakeWUSDT(farmInfo: any, amount: string) {
+    //   this.unstaking = true
 
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
+    //   const conn = this.$web3
+    //   const wallet = (this as any).$wallet
 
-      const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
-      const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+    //   const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
+    //   const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
+    //   const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
 
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
+    //   const key = getUnixTs().toString()
+    //   this.$notify.info({
+    //     key,
+    //     message: 'Making transaction...',
+    //     description: '',
+    //     duration: 0
+    //   })
 
-      withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
+    //   withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+    //     .then((txid) => {
+    //       this.$notify.info({
+    //         key,
+    //         message: 'Transaction has been sent',
+    //         description: (h: any) =>
+    //           h('div', [
+    //             'Confirmation is in progress.  Check your transaction on ',
+    //             h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+    //           ])
+    //       })
 
-          const description = `Unstake ${amount} ${farmInfo.lp.name}`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Stake failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.unstaking = false
-        })
-    },
+    //       const description = `Unstake ${amount} ${farmInfo.lp.name}`
+    //       this.$accessor.transaction.sub({ txid, description })
+    //     })
+    //     .catch((error) => {
+    //       this.$notify.error({
+    //         key,
+    //         message: 'Stake failed',
+    //         description: error.message
+    //       })
+    //     })
+    //     .finally(() => {
+    //       this.unstaking = false
+    //     })
+    // },
 
     unwrapWUSDT(amount: string) {
       this.unwraping = true
@@ -706,6 +816,39 @@ export default Vue.extend({
     display: grid;
     grid-gap: 4px;
   }
+}
+
+.ata-table {
+  width: 100%;
+
+  .balance {
+    text-align: center;
+  }
+
+  .token {
+    justify-content: flex-end;
+  }
+
+  .actions {
+    margin-left: 4px;
+
+    i {
+      cursor: pointer;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+
+    a {
+      color: @text-color;
+    }
+  }
+}
+
+.migrate-token-button {
+  margin-top: 10px;
+  width: 100%;
 }
 </style>
 

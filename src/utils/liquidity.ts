@@ -142,7 +142,6 @@ export async function addLiquidity(
   }
 
   let userLpTokenAccount = await createAssociatedTokenAccountIfNotExist(
-    connection,
     lpAccount,
     owner,
     poolInfo.lp.mintAddress,

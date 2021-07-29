@@ -5,13 +5,26 @@
 
     <Content>
       <div v-if="['swap', 'liquidity', 'farms'].includes(pageName) && showFlag" class="fc-container">
-        <Alert type="warning" message="IMPORTANT" show-icon closable>
+        <Alert type="warning" message="IMPORTANT" show-icon>
           <div slot="description">
             You have liquidity in a legacy pool. RAY-SOL, RAY-SRM, RAY-USDC and RAY-ETH pools are upgrading from the V3
             AMM contract to V4. As a result, liquidity in legacy V3 pools must migrate to new pools.
             <NuxtLink to="/migrate/">This migration tool</NuxtLink>
             simplifies the process. For full info,
             <a href="https://raydium.gitbook.io/raydium/updates/v4-migration" target="_blank">click here</a>.
+          </div>
+        </Alert>
+      </div>
+
+      <div v-if="!['migrate'].includes(pageName) && auxiliaryTokenAccounts.length > 0" class="fc-container">
+        <Alert type="warning" message="IMPORTANT" show-icon>
+          <div slot="description">
+            You have token accounts in your wallet that need to be migrated to associated token accounts. To learn more
+            <a href="https://raydium.gitbook.io/raydium/updates/associated-token-account-migration" target="_blank">
+              click here</a
+            >
+            or use this <NuxtLink to="/migrate/">migration tool</NuxtLink> to simplify the process of migrating your
+            balances.
           </div>
         </Alert>
       </div>
@@ -60,6 +73,10 @@ export default class Default extends Vue {
 
   mounted() {
     this.updateShow()
+  }
+
+  get auxiliaryTokenAccounts() {
+    return this.$accessor.wallet.auxiliaryTokenAccounts
   }
 
   updateShow() {
