@@ -33,6 +33,8 @@ export async function mergeTokens(
   const transaction = new Transaction({ recentBlockhash: blockhash, feePayer: owner })
   const signers: any = []
 
+  const atas: string[] = []
+
   for (let index = 0; index < auxiliaryTokenAccounts.length; index++) {
     if (index > 0) {
       try {
@@ -57,7 +59,7 @@ export async function mergeTokens(
     const ata = await findAssociatedTokenAddress(owner, mintPubkey)
     const ataAccountInfo = get(tokenAccounts, mint)
 
-    if (!ataAccountInfo) {
+    if (!ataAccountInfo && !atas.includes(ata.toBase58())) {
       transaction.add(
         Token.createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -68,6 +70,7 @@ export async function mergeTokens(
           owner
         )
       )
+      atas.push(ata.toBase58())
     }
 
     const { amount } = tokenAmount

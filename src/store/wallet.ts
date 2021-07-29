@@ -99,6 +99,11 @@ export const actions = actionTree(
     getTokenAccounts({ commit }) {
       const conn = this.$web3
       const wallet = (this as any)._vm.$wallet
+      // mock wallet
+      // const wallet = {
+      //   connected: true,
+      //   publicKey: new PublicKey('')
+      // }
 
       if (wallet && wallet.connected) {
         commit('setLoading', true)
