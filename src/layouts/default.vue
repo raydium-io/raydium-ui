@@ -54,7 +54,7 @@ export default class Default extends Vue {
     this.updateShow()
   }
 
-  @Watch('$accessor.farm.farmInfo', { immediate: true, deep: true })
+  @Watch('farm.farmInfo', { immediate: true, deep: true })
   onFarmChanged() {
     this.updateShow()
   }
