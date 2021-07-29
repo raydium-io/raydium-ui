@@ -17,6 +17,7 @@ import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
+import { TOKENS } from '@/utils/tokens'
 
 export const web3Config = {
   strategy: 'speed',
@@ -112,7 +113,7 @@ export async function createAssociatedTokenAccountIfNotExist(
   const mint = new PublicKey(mintAddress)
   const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner)
 
-  if (!publicKey || !ata.equals(publicKey)) {
+  if ((!publicKey || !ata.equals(publicKey)) && mintAddress !== TOKENS.WSOL.mintAddress) {
     transaction.add(
       Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
