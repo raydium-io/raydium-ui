@@ -22,21 +22,25 @@
               <div slot="title">Unstake</div>
               <div slot="description" class="action">
                 All staked LP tokens will be unstaked from legacy pools
-
                 <template v-for="farm in farms">
-                  <h6 v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
-                    {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
-                  </h6>
-                </template>
+                  <div :key="farm.farmInfo.poolId">
+                    <h6 v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" style="display: inline-block">
+                      {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
+                    </h6>
 
-                <Button
-                  ghost
-                  :loading="unstaking"
-                  :disabled="farms.filter((f) => f.farmInfo.version === 3 && f.farmInfo.legacy).length === 0"
-                  @click="unstake"
-                >
-                  Unstake all
-                </Button>
+                    <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
+                      Connect Wallet
+                    </Button>
+                    <Button
+                      v-else
+                      :disabled="!wallet.connected || farm.depositBalance.isNullOrZero()"
+                      ghost
+                      @click.stop="unstakeV3(farm.farmInfo, farm.depositBalance.format())"
+                    >
+                      Harvest & Unstake
+                    </Button>
+                  </div>
+                </template>
               </div>
             </Step>
             <Step>
@@ -351,6 +355,46 @@ export default Vue.extend({
   methods: {
     getBigNumber,
     get,
+
+    unstakeV3(farmInfo: any, amount: string) {
+      const conn = this.$web3
+      const wallet = (this as any).$wallet
+
+      const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
+      const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+
+      const key = getUnixTs().toString()
+      this.$notify.info({
+        key,
+        message: 'Making transaction...',
+        description: '',
+        duration: 0
+      })
+
+      withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+        .then((txid) => {
+          this.$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Unstake ${amount} ${farmInfo.lp.name}`
+          this.$accessor.transaction.sub({ txid, description })
+        })
+        .catch((error) => {
+          this.$notify.error({
+            key,
+            message: 'Stake failed',
+            description: error.message
+          })
+        })
+    },
 
     updateFarms() {
       const farms: any = []
