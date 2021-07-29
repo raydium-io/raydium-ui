@@ -93,7 +93,7 @@
         </Button>
         <div v-else>
           <Steps direction="vertical" progress-dot :current="4">
-            <Step>
+            <!-- <Step>
               <div slot="title">Create USDT account</div>
               <div slot="description" class="action">
                 <Button
@@ -150,7 +150,7 @@
                   </Button>
                 </h6>
               </div>
-            </Step>
+            </Step> -->
             <Step>
               <div slot="title">Unwrap</div>
               <div slot="description" class="action">
@@ -187,7 +187,7 @@
                 </Button>
               </div>
             </Step>
-            <Step>
+            <!-- <Step>
               <div slot="title">Add liquidity to new RAY-USDT pool</div>
               <div slot="description" class="action">
                 Continue earning RAY by adding liquidity to new pools, then staking LP tokens
@@ -207,7 +207,7 @@
                   Add liquidity
                 </Button>
               </div>
-            </Step>
+            </Step> -->
           </Steps>
         </div>
       </div>
