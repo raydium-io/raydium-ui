@@ -24,7 +24,7 @@
                 All staked LP tokens will be unstaked from legacy pools
 
                 <template v-for="farm in farms">
-                  <h6 v-if="farm.farmInfo.version === 3" :key="farm.farmInfo.poolId">
+                  <h6 v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy" :key="farm.farmInfo.poolId">
                     {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
                   </h6>
                 </template>
@@ -32,7 +32,7 @@
                 <Button
                   ghost
                   :loading="unstaking"
-                  :disabled="farms.filter((f) => f.farmInfo.version === 3).length === 0"
+                  :disabled="farms.filter((f) => f.farmInfo.version === 3 && f.farmInfo.legacy).length === 0"
                   @click="unstake"
                 >
                   Unstake all
