@@ -320,7 +320,18 @@ export default Vue.extend({
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
 
             if (rewardPerBlockAmount.toEther().toString() === '0') {
-              endedFarmsPoolId.push(poolId)
+              if (
+                [
+                  'HUDr9BDaAGqi37xbQHzxCyXvfMCKPTPNF8g9c9bPu1Fu',
+                  'CHYrUBX2RKX8iBg7gYTkccoGNBzP44LdaazMHCLcdEgS',
+                  'B6fbnZZ7sbKHR18ffEDD5Nncgp54iKN1GbCgjTRdqhS1',
+                  '5DFbcYNLLy5SJiBpCCDzNSs7cWCsUbYnCkLXzcPQiKnR'
+                ].includes(poolId)
+              ) {
+                console.log('temp')
+              } else {
+                endedFarmsPoolId.push(poolId)
+              }
             }
           }
 

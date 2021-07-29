@@ -175,7 +175,7 @@ export const FARMS: FarmInfo[] = [
     isStake: false,
 
     fusion: false,
-    legacy: false,
+    legacy: true,
     dual: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
@@ -192,7 +192,7 @@ export const FARMS: FarmInfo[] = [
     isStake: false,
 
     fusion: false,
-    legacy: false,
+    legacy: true,
     dual: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
@@ -209,7 +209,7 @@ export const FARMS: FarmInfo[] = [
     isStake: false,
 
     fusion: false,
-    legacy: false,
+    legacy: true,
     dual: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
@@ -226,7 +226,7 @@ export const FARMS: FarmInfo[] = [
     isStake: false,
 
     fusion: false,
-    legacy: false,
+    legacy: true,
     dual: false,
     version: 3,
     programId: STAKE_PROGRAM_ID,
@@ -578,6 +578,74 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'GUVKfYMiGEyp41CUw2j2NsoQJ5zDQ3Q6uSdApM8W46Ba', // lp vault
     poolRewardTokenAccount: 'J99YW5wnfgBJcG17BgSbp1S8RNJ39JAb7kg9RGHyb3Hq', // reward vault A
     poolRewardTokenAccountB: 'GhctEMRSwvdZF7aFeCLdK9X1sAAeGVPjr12iVLjQNvhy' // reward vault B
+  },
+  {
+    name: 'RAY-SOL',
+    lp: { ...LP_TOKENS['RAY-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    fusion: false,
+    legacy: false,
+    dual: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: 'HUDr9BDaAGqi37xbQHzxCyXvfMCKPTPNF8g9c9bPu1Fu',
+    poolAuthority: '9VbmvaaPeNAke2MAL3h2Fw82VubH1tBCzwBzaWybGKiG',
+    poolLpTokenAccount: 'A4xQv2BQPB1WxsjiCC7tcMH7zUq255uCBkevFj8qSCyJ', // lp vault
+    poolRewardTokenAccount: '6zA5RAQYgazm4dniS8AigjGFtRi4xneqjL7ehrSqCmhr' // reward vault A
+  },
+  {
+    name: 'RAY-USDC',
+    lp: { ...LP_TOKENS['RAY-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    fusion: false,
+    legacy: false,
+    dual: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: 'CHYrUBX2RKX8iBg7gYTkccoGNBzP44LdaazMHCLcdEgS',
+    poolAuthority: '5KQFnDd33J5NaMC9hQ64P5XzaaSz8Pt7NBCkZFYn1po',
+    poolLpTokenAccount: 'BNnXLFGva3K8ACruAc1gaP49NCbLkyE6xWhGV4G2HLrs', // lp vault
+    poolRewardTokenAccount: 'DpRueBHHhrQNvrjZX7CwGitJDJ8eZc3AHcyFMG4LqCQR' // reward vault A
+  },
+  {
+    name: 'RAY-ETH',
+    lp: { ...LP_TOKENS['RAY-ETH-V4'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    fusion: false,
+    legacy: false,
+    dual: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: 'B6fbnZZ7sbKHR18ffEDD5Nncgp54iKN1GbCgjTRdqhS1',
+    poolAuthority: '6amoZ7YBbsz3uUUbkeEH4vDTNwjvgjxTiu6nGi9z1JGe',
+    poolLpTokenAccount: 'BjAfXpHTHz2kipraNddS6WwQvGGtbvyobn7MxLEEYfrH', // lp vault
+    poolRewardTokenAccount: '7YfTgYQFGEJ4kb8jCF8cBrrUwEFskLin3EbvE1crqiQh' // reward vault A
+  },
+  {
+    name: 'RAY-SRM',
+    lp: { ...LP_TOKENS['RAY-SRM-V4'] },
+    reward: { ...TOKENS.RAY },
+    isStake: false,
+
+    fusion: false,
+    legacy: false,
+    dual: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+
+    poolId: '5DFbcYNLLy5SJiBpCCDzNSs7cWCsUbYnCkLXzcPQiKnR',
+    poolAuthority: 'DdFXxCbn5vpxPRaGmurmefCTTSUa5XZ9Kh6Noc4bvrU9',
+    poolLpTokenAccount: '792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb', // lp vault
+    poolRewardTokenAccount: '5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt' // reward vault A
   }
 ]
 
