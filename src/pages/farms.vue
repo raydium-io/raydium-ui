@@ -53,7 +53,7 @@
             <CollapsePanel
               v-for="farm in farms"
               v-show="
-                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && poolType) ||
+                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && !farm.farmInfo.legacy && poolType) ||
                 ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
               "
               :key="farm.farmInfo.poolId"
