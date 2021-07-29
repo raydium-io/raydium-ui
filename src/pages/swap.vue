@@ -121,7 +121,7 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
-          :balance-offset="fromCoin.symbol === 'SOL' ? -0.05 : 0"
+          :balance-offset="fromCoin && fromCoin.symbol === 'SOL' ? -0.05 : 0"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
