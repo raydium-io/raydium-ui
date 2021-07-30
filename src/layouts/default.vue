@@ -16,11 +16,15 @@
         </Alert>
       </div>
 
-      <div v-if="!['migrate'].includes(pageName) && auxiliaryTokenAccounts.length > 0" class="fc-container">
+      <div
+        v-if="!['migrate'].includes(pageName) && $accessor.wallet.auxiliaryTokenAccounts.length > 0"
+        class="fc-container"
+      >
         <Alert type="warning" message="IMPORTANT" show-icon>
           <div slot="description">
-            You have <span style="color: red; font-weight: bold">{{ auxiliaryTokenAccounts.length }}</span> token
-            accounts in your wallet that need to be migrated to associated token accounts. To learn more
+            You have
+            <span style="color: red; font-weight: bold">{{ $accessor.wallet.auxiliaryTokenAccounts.length }}</span>
+            token accounts in your wallet that need to be migrated to associated token accounts. To learn more
             <a href="https://raydium.gitbook.io/raydium/updates/associated-token-account-migration" target="_blank">
               click here</a
             >
@@ -74,10 +78,6 @@ export default class Default extends Vue {
 
   mounted() {
     this.updateShow()
-  }
-
-  get auxiliaryTokenAccounts() {
-    return this.$accessor.wallet.auxiliaryTokenAccounts
   }
 
   updateShow() {
