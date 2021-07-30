@@ -178,7 +178,7 @@ export async function createAmm(
   let accountAllSuccessFlag = false
 
   const multipleInfo = await getMultipleAccounts(conn, [lpMintAddress], commitment)
-  if (multipleInfo.length > 0) {
+  if (multipleInfo.length > 0 && multipleInfo[0] !== null) {
     const tempLpMint = MINT_LAYOUT.decode(multipleInfo[0]?.account.data)
     if (getBigNumber(tempLpMint.supply) === 0) {
       accountSuccessFlag = true
