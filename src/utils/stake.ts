@@ -21,7 +21,6 @@ export async function deposit(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -29,12 +28,23 @@ export async function deposit(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
+
   // if no account, create new one
   const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   // if no userinfo account, create new one
@@ -59,7 +69,7 @@ export async function deposit(
       new PublicKey(farmInfo.poolAuthority),
       userInfoAccount,
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
@@ -83,7 +93,6 @@ export async function depositV4(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -91,12 +100,23 @@ export async function depositV4(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
+
   // if no account, create new one
   const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   // if no account, create new one
@@ -105,7 +125,8 @@ export async function depositV4(
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    transaction
+    transaction,
+    atas
   )
 
   // if no userinfo account, create new one
@@ -130,7 +151,7 @@ export async function depositV4(
       new PublicKey(farmInfo.poolAuthority),
       userInfoAccount,
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),

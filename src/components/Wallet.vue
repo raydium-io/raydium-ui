@@ -61,7 +61,11 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Button, Modal, Icon } from 'ant-design-vue'
-import { AccountInfo, Context } from '@solana/web3.js'
+import {
+  AccountInfo,
+  Context
+  // PublicKey
+} from '@solana/web3.js'
 // @ts-ignore
 import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
@@ -300,6 +304,17 @@ export default class Wallet extends Vue {
     adapter.on('connect', () => {
       this.$accessor.wallet.closeModal().then(() => {
         if (adapter.publicKey) {
+          // mock wallet
+          // const address = new PublicKey('')
+          // Vue.prototype.$wallet = {
+          //   connected: true,
+          //   publicKey: address,
+          //   signTransaction: (transaction: any) => {
+          //     console.log(transaction)
+          //   }
+          // }
+          // this.$accessor.wallet.setConnected(address.toBase58())
+
           Vue.prototype.$wallet = adapter
           this.$accessor.wallet.setConnected(adapter.publicKey.toBase58())
 
