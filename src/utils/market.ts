@@ -1,4 +1,4 @@
-import { ACCOUNT_LAYOUT, getBigNumber } from './layouts'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
 import { transfer } from './swap'
 import { throwIfNull } from './errors'
 import { LIQUIDITY_POOLS } from './pools'
@@ -135,41 +135,32 @@ export async function createAmm(
     AMM_ASSOCIATED_SEED
   )
 
-  // 获取历史数据
-  const localPoolCoinTokenAccount = localStorage.getItem('poolCoinTokenAccount')
-  const localPoolPcTokenAccount = localStorage.getItem('poolPcTokenAccount')
-  const localLpMintAddress = localStorage.getItem('lpMintAddress')
-  const localPoolTempLpTokenAccount = localStorage.getItem('poolTempLpTokenAccount')
-  const localAmmTargetOrders = localStorage.getItem('ammTargetOrders')
-  const localPoolWithdrawQueue = localStorage.getItem('poolWithdrawQueue')
-  const localDestLpToken = localStorage.getItem('destLpToken')
-
-  let poolCoinTokenAccount: PublicKey = await createAssociatedId(
+  const poolCoinTokenAccount: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     COIN_VAULT_ASSOCIATED_SEED
   )
-  let poolPcTokenAccount: PublicKey = await createAssociatedId(
+  const poolPcTokenAccount: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     PC_VAULT_ASSOCIATED_SEED
   )
-  let lpMintAddress: PublicKey = await createAssociatedId(
+  const lpMintAddress: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     LP_MINT_ASSOCIATED_SEED
   )
-  let poolTempLpTokenAccount: PublicKey = await createAssociatedId(
+  const poolTempLpTokenAccount: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     TEMP_LP_TOKEN_ASSOCIATED_SEED
   )
-  let ammTargetOrders: PublicKey = await createAssociatedId(
+  const ammTargetOrders: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     TARGET_ASSOCIATED_SEED
   )
-  let poolWithdrawQueue: PublicKey = await createAssociatedId(
+  const poolWithdrawQueue: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
     WITHDRAW_ASSOCIATED_SEED
@@ -184,26 +175,20 @@ export async function createAmm(
   )
 
   let accountSuccessFlag = false
-  if (
-    localPoolCoinTokenAccount !== null &&
-    localPoolPcTokenAccount !== null &&
-    localLpMintAddress !== null &&
-    localPoolTempLpTokenAccount !== null &&
-    localAmmTargetOrders !== null &&
-    localPoolWithdrawQueue !== null &&
-    localDestLpToken !== null
-  ) {
-    try {
-      poolCoinTokenAccount = new PublicKey(localPoolCoinTokenAccount)
-      poolPcTokenAccount = new PublicKey(localPoolPcTokenAccount)
-      lpMintAddress = new PublicKey(localLpMintAddress)
-      poolTempLpTokenAccount = new PublicKey(localPoolTempLpTokenAccount)
-      ammTargetOrders = new PublicKey(localAmmTargetOrders)
-      poolWithdrawQueue = new PublicKey(localPoolWithdrawQueue)
-      destLpToken = new PublicKey(localDestLpToken)
+  let accountAllSuccessFlag = false
+
+  const multipleInfo = await getMultipleAccounts(conn, [lpMintAddress], commitment)
+  if (multipleInfo.length > 0) {
+    const tempLpMint = MINT_LAYOUT.decode(multipleInfo[0]?.account.data)
+    if (getBigNumber(tempLpMint.supply) === 0) {
       accountSuccessFlag = true
-    } catch {}
+    } else {
+      accountAllSuccessFlag = true
+    }
+  } else {
+    accountSuccessFlag = false
   }
+  console.log('init flag: ', accountSuccessFlag, accountAllSuccessFlag)
 
   if (!accountSuccessFlag) {
     transaction.add(
@@ -276,19 +261,21 @@ export async function createAmm(
     nonce
   }
 
-  await initAmm(
-    conn,
-    wallet,
-    market,
-    new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
-    new PublicKey(SERUM_PROGRAM_ID_V3),
-    // ammId,
-    ammKeys,
-    userInputBaseValue,
-    userInputQuoteValue,
-    poolCoinTokenAccount,
-    poolPcTokenAccount
-  )
+  if (!accountAllSuccessFlag) {
+    await initAmm(
+      conn,
+      wallet,
+      market,
+      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+      new PublicKey(SERUM_PROGRAM_ID_V3),
+      // ammId,
+      ammKeys,
+      userInputBaseValue,
+      userInputQuoteValue,
+      poolCoinTokenAccount,
+      poolPcTokenAccount
+    )
+  }
 
   return ammId.toBase58()
 }
