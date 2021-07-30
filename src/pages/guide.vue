@@ -42,6 +42,10 @@
       </div>
     </section>
 
+    <section class="nav-btns">
+      <button @click="to('details')">REWARD DETAILS</button>
+    </section>
+
     <section class="media-entries">
       <div class="task-level">Task 1</div>
       <div class="title">Join Forces With Raydium</div>
@@ -68,15 +72,8 @@
       <div class="task-level">Task 2</div>
       <div class="title">Try Raydium’s Light Speed Swaps</div>
       <div class="subtitle">Total Points +7</div>
-      <!-- <div class="btns">
-        <button class="primary" @click="to('step-1')">GET STARTED</button>
-        <button @click="to('details')">REWARD DETAILS</button>
-      </div> -->
-      <!-- <svg class="p-1" viewBox="0 0 532 132">
-        <polyline points="126,0 126,66 266,65 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
-      </svg> -->
+
       <div ref="step-1" class="box watch-video">
-        <!-- <div class="step-label">Step 1</div> -->
         <div class="box-title has-step">
           Watch how to create a wallet on Solana and make your first Swap on Raydium.
         </div>
@@ -113,7 +110,6 @@
       </svg>
 
       <div class="box wallet">
-        <!-- <div class="step-label">Step 2</div> -->
         <div class="box-title has-step">Connect your Wallet</div>
         <Wallet />
       </div>
@@ -123,7 +119,6 @@
       </svg>
 
       <div class="box">
-        <!-- <div class="step-label">Step 2</div> -->
         <div class="box-title has-step">
           Swap on Raydium
           <div class="point-label">+7 POINTS</div>
@@ -319,6 +314,14 @@ import { Input, Icon, Table, Checkbox } from 'ant-design-vue'
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
     }
+  },
+
+  mounted() {
+    window.addEventListener('beforeunload', function (ev) {
+      ev.preventDefault()
+      ev.returnValue = 'hello' // not work
+      return 'world' // not work
+    })
   }
 })
 export default class Guide extends Vue {
@@ -351,17 +354,20 @@ export default class Guide extends Vue {
   --point-label-bg: #da2eef;
   --reward-card-bg: #191542;
 
-  margin-left: 80px;
-  margin-right: 80px;
+  margin-left: 20vw;
+  margin-right: 20vw;
   min-height: 100vh;
 }
 
 section {
   padding-top: 32px;
-  padding-bottom: 120px;
+  padding-bottom: 104px;
   display: grid;
   justify-items: center;
   position: relative;
+}
+section.nav-btns {
+  margin-top: -100px;
 }
 
 button {
@@ -420,6 +426,11 @@ button {
   position: relative;
   max-width: 800px;
   text-align: center;
+}
+.TLDR .title {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 24px;
 }
 
 .subtitle {
@@ -577,11 +588,11 @@ button {
 }
 
 .TLDR {
-  margin: 64px auto 120px;
+  margin: 24px auto 120px;
   max-width: 880px;
   border-radius: 20px;
   border: 2px solid var(--secondary);
-  padding: 24px 48px;
+  padding: 32px 48px;
 
   table.TLDR-table {
     width: 60%;
@@ -611,7 +622,6 @@ button {
 }
 
 .referrals {
-  margin-bottom: 120px;
   .box {
     max-width: 432px;
   }
