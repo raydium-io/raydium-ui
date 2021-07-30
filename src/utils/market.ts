@@ -166,8 +166,6 @@ export async function createAmm(
     WITHDRAW_ASSOCIATED_SEED
   )
 
-  let destLpToken: PublicKey | undefined
-
   const ammOpenOrders: PublicKey = await createAssociatedId(
     new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
     market.address,
@@ -190,27 +188,27 @@ export async function createAmm(
   }
   console.log('init flag: ', accountSuccessFlag, accountAllSuccessFlag)
 
-  if (!accountSuccessFlag) {
-    transaction.add(
-      preInitialize(
-        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
-        ammTargetOrders,
-        poolWithdrawQueue,
-        ammAuthority,
-        lpMintAddress,
-        market.baseMintAddress,
-        market.quoteMintAddress,
-        poolCoinTokenAccount,
-        poolPcTokenAccount,
-        poolTempLpTokenAccount,
-        market.address,
-        owner,
-        nonce
-      )
+  transaction.add(
+    preInitialize(
+      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+      ammTargetOrders,
+      poolWithdrawQueue,
+      ammAuthority,
+      lpMintAddress,
+      market.baseMintAddress,
+      market.quoteMintAddress,
+      poolCoinTokenAccount,
+      poolPcTokenAccount,
+      poolTempLpTokenAccount,
+      market.address,
+      owner,
+      nonce
     )
+  )
 
-    destLpToken = await createAssociatedTokenAccount(lpMintAddress, owner, transaction)
+  const destLpToken = await createAssociatedTokenAccount(lpMintAddress, owner, transaction)
 
+  if (!accountSuccessFlag) {
     const txid = await sendTransaction(conn, wallet, transaction, signers)
     console.log('txid', txid)
     let txidSuccessFlag = 0
@@ -234,17 +232,6 @@ export async function createAmm(
     if (txidSuccessFlag !== 1) {
       throw new Error('create tx1 error')
     }
-
-    // 成功 存储本地
-    localStorage.setItem('poolCoinTokenAccount', poolCoinTokenAccount.toString())
-    localStorage.setItem('poolPcTokenAccount', poolPcTokenAccount.toString())
-    localStorage.setItem('lpMintAddress', lpMintAddress.toString())
-    localStorage.setItem('poolTempLpTokenAccount', poolTempLpTokenAccount.toString())
-    localStorage.setItem('ammTargetOrders', ammTargetOrders.toString())
-    localStorage.setItem('poolWithdrawQueue', poolWithdrawQueue.toString())
-    localStorage.setItem('destLpToken', destLpToken.toString())
-
-    localStorage.setItem('createMarket', market.address.toBase58())
   }
 
   const ammKeys = {
