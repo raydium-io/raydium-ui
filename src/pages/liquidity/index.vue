@@ -17,7 +17,12 @@
             :percent="(100 / liquidity.autoRefreshTime) * liquidity.countdown"
             :show-info="false"
             :class="lpMintAddress && liquidity.loading ? 'disabled' : ''"
-            @click="$accessor.liquidity.requestInfos"
+            @click="
+              () => {
+                $accessor.liquidity.requestInfos()
+                $accessor.wallet.getTokenAccounts()
+              }
+            "
           />
         </Tooltip>
         <Tooltip placement="bottomRight">

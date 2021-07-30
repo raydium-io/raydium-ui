@@ -17,7 +17,12 @@
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
             :class="marketAddress && loading ? 'disabled' : ''"
-            @click="getOrderBooks"
+            @click="
+              () => {
+                getOrderBooks()
+                $accessor.wallet.getTokenAccounts()
+              }
+            "
           />
         </Tooltip>
         <Tooltip placement="bottomRight">
