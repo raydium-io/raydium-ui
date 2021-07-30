@@ -547,6 +547,14 @@ export const TOKENS: Tokens = {
       Discord: 'https://discord.gg/sUu7KZwNCB'
     },
     tags: ['raydium']
+  },
+  DXL: {
+    symbol: 'DXL',
+    name: 'DXL',
+    mintAddress: 'GsNzxJfFn6zQdJGeYsupJWzUAm57Ba7335mfhWvFiE9Z',
+    decimals: 6,
+    referrer: 'HF7mhT9YgD5CULAFDYQmhnUMi1FnNbKeBFCy9SZDh2XE',
+    tags: ['raydium']
   }
 }
 
@@ -1101,6 +1109,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '89ZKE4aoyfLBe2RuV6jM3JGNhaV18Nxh8eNtjRcndBip',
     decimals: TOKENS.RAY.decimals
+  },
+  'DXL-USDC-V4': {
+    symbol: 'DXL-USDC',
+    name: 'DXL-USDC LP',
+    coin: { ...TOKENS.DXL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '765hrUSZNusSQgXuc77kwg611fdtkUxpqN2zQatpeZMq',
+    decimals: TOKENS.DXL.decimals
   }
 }
 
