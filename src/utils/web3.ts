@@ -9,6 +9,7 @@ import {
   TransactionSignature,
   TransactionInstruction
 } from '@solana/web3.js'
+// @ts-ignore without ts ignore, yarn build will failed
 import { Token } from '@solana/spl-token'
 
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
@@ -112,6 +113,7 @@ export async function createAssociatedTokenAccountIfNotExist(
   }
 
   const mint = new PublicKey(mintAddress)
+  // @ts-ignore without ts ignore, yarn build will failed
   const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner, true)
 
   if (
