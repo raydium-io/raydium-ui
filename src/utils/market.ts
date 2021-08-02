@@ -34,7 +34,8 @@ import {
   getMintDecimals,
   getFilteredTokenAccountsByOwner,
   createAssociatedId,
-  createAssociatedTokenAccount
+  findAssociatedTokenAddress,
+  createAssociatedTokenAccountIfNotExist
 } from '@/utils/web3'
 // @ts-ignore
 import { struct, u8 } from 'buffer-layout'
@@ -206,7 +207,8 @@ export async function createAmm(
     )
   )
 
-  const destLpToken = await createAssociatedTokenAccount(lpMintAddress, owner, transaction)
+  const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
+  createAssociatedTokenAccountIfNotExist(destLpToken.toString(), owner, lpMintAddress.toString(), transaction, [])
 
   if (!accountSuccessFlag) {
     const txid = await sendTransaction(conn, wallet, transaction, signers)
