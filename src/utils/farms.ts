@@ -653,11 +653,11 @@ export const FARMS: FarmInfo[] = [
     reward: { ...TOKENS.LIKE },
     isStake: false,
 
-    fusion: false,
+    fusion: true,
     legacy: false,
     dual: false,
-    version: 3,
-    programId: STAKE_PROGRAM_ID,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
     poolId: 'BRM5bdX2mjmFGg2RAent1Whd61o9asQD16BXsC6QvEni',
     poolAuthority: '9rThpjxEgNR5xi2z2QgXenS2RwRrrN1GqrudegT32Ygy',
     poolLpTokenAccount: 'FzVu8n4UCf3o1KH4X8khM9KgKA96dJQdQMPtLvmbHyNi', // lp vault
