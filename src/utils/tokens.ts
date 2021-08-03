@@ -1116,7 +1116,7 @@ export const LP_TOKENS: Tokens = {
     coin: { ...TOKENS.DXL },
     pc: { ...TOKENS.USDC },
 
-    mintAddress: '765hrUSZNusSQgXuc77kwg611fdtkUxpqN2zQatpeZMq',
+    mintAddress: '4HFaSvfgskipvrzT1exoVKsUZ174JyExEsA8bDfsAdY5',
     decimals: TOKENS.DXL.decimals
   }
 }
