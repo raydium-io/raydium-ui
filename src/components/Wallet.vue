@@ -33,14 +33,9 @@
           <h2>Recent Transactions</h2>
           <div v-for="txInfo in historyList" :key="txInfo.txid" class="tx-item">
             <div class="extra-info">
+              <Icon v-if="txInfo.status === 'success'" class="icon" type="check-circle" :style="{ color: '#52c41a' }" />
               <Icon
-                v-if="txInfo.status === 'Success' || txInfo.s === 's' /* old data polyfill*/"
-                class="icon"
-                type="check-circle"
-                :style="{ color: '#52c41a' }"
-              />
-              <Icon
-                v-else-if="txInfo.status === 'Fail' || txInfo.s === 'f' /* old data polyfill*/"
+                v-else-if="txInfo.status === 'fail'"
                 class="icon"
                 type="close-circle"
                 :style="{ color: '#f5222d' }"
@@ -237,10 +232,12 @@ export default class Wallet extends Vue {
 
   // history
   get historyList() {
-    const rawList = Object.entries(this.$accessor.transaction.history).map(([txid, txInfo]) => ({
-      ...(txInfo as any),
-      txid
-    }))
+    const rawList = Object.entries(this.$accessor.transaction.history[this.$accessor.wallet.address] ?? {}).map(
+      ([txid, txInfo]) => ({
+        ...(txInfo as any),
+        txid
+      })
+    )
     return rawList.sort((a, b) => {
       return (b.time || b.t) - (a.time || a.t)
     })
