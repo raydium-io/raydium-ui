@@ -970,7 +970,6 @@ export default Vue.extend({
           // const lpPool = LIQUIDITY_POOLS.find((item) => item.serumMarket === marketAddress)
           if (this.marketAddress !== marketAddress) {
             this.marketAddress = marketAddress
-            this.lpMintAddress = ''
             this.isWrap = false
             Market.load(this.$web3, new PublicKey(marketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
               (market) => {
