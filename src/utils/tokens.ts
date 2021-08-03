@@ -1118,6 +1118,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4HFaSvfgskipvrzT1exoVKsUZ174JyExEsA8bDfsAdY5',
     decimals: TOKENS.DXL.decimals
+  },
+  'LIKE-USDC-V4': {
+    symbol: 'LIKE-USDC',
+    name: 'LIKE-USDC LP',
+    coin: { ...TOKENS.LIKE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'cjZmbt8sJgaoyWYUttomAu5LJYU44ZrcKTbzTSEPDVw',
+    decimals: TOKENS.LIKE.decimals
   }
 }
 

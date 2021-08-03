@@ -646,6 +646,23 @@ export const FARMS: FarmInfo[] = [
     poolAuthority: 'DdFXxCbn5vpxPRaGmurmefCTTSUa5XZ9Kh6Noc4bvrU9',
     poolLpTokenAccount: '792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb', // lp vault
     poolRewardTokenAccount: '5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt' // reward vault A
+  },
+  {
+    name: 'LIKE-USDC',
+    lp: { ...LP_TOKENS['LIKE-USDC-V4'] },
+    reward: { ...TOKENS.LIKE },
+    isStake: false,
+
+    fusion: false,
+    legacy: false,
+    dual: false,
+    version: 3,
+    programId: STAKE_PROGRAM_ID,
+    poolId: 'BRM5bdX2mjmFGg2RAent1Whd61o9asQD16BXsC6QvEni',
+    poolAuthority: '9rThpjxEgNR5xi2z2QgXenS2RwRrrN1GqrudegT32Ygy',
+    poolLpTokenAccount: 'FzVu8n4UCf3o1KH4X8khM9KgKA96dJQdQMPtLvmbHyNi', // lp vault
+    poolRewardTokenAccount: '3G1cbktUU79CT3zskP16VYmEhwVQq2RYxVWV7fcjmkTX', // reward vault A
+    poolRewardTokenAccountB: '2Ks41qfN2GZffbd1cqrNGuXJYJbShHhz6aHQvq8SaYYr' // reward vault B
   }
 ]
 
