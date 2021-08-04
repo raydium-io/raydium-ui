@@ -34,11 +34,11 @@ import {
   getMintDecimals,
   getFilteredTokenAccountsByOwner,
   createAssociatedId,
-  findAssociatedTokenAddress,
-  createAssociatedTokenAccountIfNotExist
+  findAssociatedTokenAddress
 } from '@/utils/web3'
 // @ts-ignore
 import { struct, u8 } from 'buffer-layout'
+import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { Market as MarketSerum } from '@project-serum/serum'
@@ -208,7 +208,19 @@ export async function createAmm(
   )
 
   const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
-  createAssociatedTokenAccountIfNotExist(destLpToken.toString(), owner, lpMintAddress.toString(), transaction, [])
+  const destLpTokenInfo = await conn.getAccountInfo(destLpToken)
+  if (!destLpTokenInfo) {
+    transaction.add(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        lpMintAddress,
+        destLpToken,
+        owner,
+        owner
+      )
+    )
+  }
 
   if (!accountSuccessFlag) {
     const txid = await sendTransaction(conn, wallet, transaction, signers)
