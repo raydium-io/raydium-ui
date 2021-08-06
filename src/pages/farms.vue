@@ -2,9 +2,25 @@
   <div class="farm container">
     <div class="page-head fs-container">
       <span class="title">Farms</span>
-      <div class="buttons">
+    </div>
+    <Row class="controls" :gutter="16">
+      <Col :span="isMobile ? 24 : 18">
+        <RadioGroup v-model="tab" :class="`radio-button-group ${isMobile ? 'is-mobile' : ''}`">
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="All Farms">
+            All
+          </RadioButton>
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="Raydium Farms">
+            Raydium
+          </RadioButton>
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="Fusion Farms">
+            Fusion
+          </RadioButton>
+        </RadioGroup>
+      </Col>
+
+      <Col :class="`end-refresh ${isMobile ? 'is-mobile' : ''}`" :span="isMobile ? 12 : 6">
         <span>
-          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 8px auto; padding-right: 30px">
             <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
             <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
           </RadioGroup>
@@ -31,8 +47,8 @@
             "
           />
         </Tooltip>
-      </div>
-    </div>
+      </Col>
+    </Row>
 
     <CoinModal
       v-if="stakeModalOpening"
@@ -54,9 +70,32 @@
     <div v-if="farm.initialized">
       <div class="card">
         <div class="card-body">
+          <div class="title-part">
+            <div v-if="tab === 'All Farms'" class="title-text">
+              <h2 class="main-title">All Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn token rewards</div>
+            </div>
+            <div v-else-if="tab === 'Raydium Farms'" class="title-text">
+              <h2 class="main-title">Raydium Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn RAY token rewards</div>
+            </div>
+            <div v-else-if="tab === 'Fusion Farms'" class="title-text">
+              <h2 class="main-title">Fusion Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn project token rewards</div>
+            </div>
+
+            <div class="toggle">
+              <label class="label">Staked Only</label>
+              <Toggle v-model="onlyStaked" />
+            </div>
+
+            <Input v-model="searchText" class="search-input" placeholder="Search farms and assets">
+              <Icon slot="prefix" type="search" />
+            </Input>
+          </div>
           <Collapse v-model="showCollapse" expand-icon-position="right">
             <CollapsePanel
-              v-for="farm in farms"
+              v-for="farm in farms.filter(isInSearch).filter(isInTab).filter(canShowByStaked)"
               v-show="
                 (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && !farm.farmInfo.legacy && poolType) ||
                 ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
@@ -71,10 +110,19 @@
                     <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
+                  <span v-if="farm.farmInfo.dual" class="dual-tag">DUAL YIELD</span>
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 4">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                  <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+                  <div v-if="farm.farmInfo.fusion" class="value">
+                    <div v-if="farm.farmInfo.dual">
+                      {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                    </div>
+                    <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
+                  </div>
+                  <div v-else class="value">
+                    {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                  </div>
                 </Col>
                 <Col v-if="!isMobile" class="state" :span="4">
                   <div class="title">Staked</div>
@@ -82,12 +130,19 @@
                     {{ farm.userInfo.depositBalance.format() }}
                   </div>
                 </Col>
-                <Col class="state" :span="isMobile ? 6 : 4">
+                <Col v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 4">
+                  <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
+                  <div class="value">
+                    <div v-if="farm.farmInfo.dual">{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
+                    <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                  </div>
+                </Col>
+                <Col v-else class="state" :span="isMobile ? 6 : 4">
                   <div class="title">Apr</div>
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
                 <Col v-if="!isMobile && poolType" class="state" :span="4">
-                  <div class="title">Liquidity</div>
+                  <div class="title">TVL</div>
                   <div class="value">
                     ${{
                       Math.round(farm.farmInfo.liquidityUsdValue)
@@ -117,7 +172,7 @@
                 <Col :span="isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
                   <NuxtLink
-                    :to="`/liquidity?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
+                    :to="`/liquidity/?from=${farm.farmInfo.lp.coin.mintAddress}&to=${farm.farmInfo.lp.pc.mintAddress}`"
                   >
                     {{ farm.farmInfo.lp.name }}
                   </NuxtLink>
@@ -125,15 +180,29 @@
 
                 <Col :span="isMobile ? 24 : 10">
                   <div class="harvest">
-                    <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
+                    <div class="title">Pending Rewards</div>
                     <div class="pending fs-container">
-                      <div class="reward">
+                      <div v-if="farm.farmInfo.fusion" class="reward">
+                        <div v-if="farm.farmInfo.dual" class="token">
+                          {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                        </div>
+                        <div class="token">
+                          {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
+                        </div>
+                      </div>
+                      <div v-else class="reward">
                         <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
                       </div>
                       <Button
                         size="large"
                         ghost
-                        :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
+                        :disabled="
+                          !wallet.connected ||
+                          harvesting ||
+                          (farm.farmInfo.fusion
+                            ? farm.userInfo.pendingReward.isNullOrZero() && farm.userInfo.pendingRewardB.isNullOrZero()
+                            : farm.userInfo.pendingReward.isNullOrZero())
+                        "
                         :loading="harvesting"
                         @click="harvest(farm.farmInfo)"
                       >
@@ -183,12 +252,24 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Radio } from 'ant-design-vue'
+import {
+  Tooltip,
+  Progress,
+  Collapse,
+  Spin,
+  Icon,
+  Row,
+  Col,
+  Button,
+  Radio,
+  Input,
+  Switch as Toggle
+} from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { deposit, withdraw } from '@/utils/stake'
+import { depositV4, withdrawV4, deposit, withdraw } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -209,12 +290,16 @@ export default Vue.extend({
     Col,
     Button,
     RadioGroup,
-    RadioButton
+    RadioButton,
+    Input,
+    Toggle
   },
 
   data() {
     return {
-      isMobile: false,
+      tab: 'All Farms' as 'All Farms' | 'Raydium Farms' | 'Fusion Farms',
+      searchText: '',
+      onlyStaked: false,
 
       farms: [] as any,
 
@@ -236,7 +321,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
+    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity', 'isMobile'])
   },
 
   watch: {
@@ -278,21 +363,78 @@ export default Vue.extend({
     TokenAmount,
 
     updateFarms() {
-      const farms: any = []
+      const farms: any[] = []
       const endedFarmsPoolId: string[] = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
+        const isFusion = Boolean((farmInfo as any).fusion)
         // @ts-ignore
-        if (!farmInfo.isStake && ![4, 5].includes(farmInfo.version)) {
+        if (!farmInfo.isStake) {
           let userInfo = get(this.farm.stakeAccounts, poolId)
           // @ts-ignore
-          const { rewardPerShareNet, rewardPerBlock } = farmInfo.poolInfo
+          const { rewardPerShareNet, rewardPerBlock, perShare, perBlock, perShareB, perBlockB } = farmInfo.poolInfo
           // @ts-ignore
-          const { reward, lp } = farmInfo
+          const { reward, rewardB, lp } = farmInfo
 
           const newFarmInfo = cloneDeep(farmInfo)
 
-          if (reward && lp) {
+          // for fusion
+          if (isFusion && reward && rewardB && lp) {
+            const rewardPerBlockAmount = new TokenAmount(getBigNumber(perBlock), reward.decimals)
+            const rewardBPerBlockAmount = new TokenAmount(getBigNumber(perBlockB), rewardB.decimals)
+            const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
+
+            const rewardPerBlockAmountTotalValue =
+              getBigNumber(rewardPerBlockAmount.toEther()) *
+              2 *
+              60 *
+              60 *
+              24 *
+              365 *
+              this.price.prices[reward.symbol as string]
+            const rewardBPerBlockAmountTotalValue =
+              getBigNumber(rewardBPerBlockAmount.toEther()) *
+              2 *
+              60 *
+              60 *
+              24 *
+              365 *
+              this.price.prices[rewardB.symbol as string]
+
+            const liquidityCoinValue =
+              getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
+              this.price.prices[liquidityItem?.coin.symbol as string]
+            const liquidityPcValue =
+              getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
+              this.price.prices[liquidityItem?.pc.symbol as string]
+
+            const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
+            const liquidityTotalSupply = getBigNumber((liquidityItem?.lp.totalSupply as TokenAmount).toEther())
+            const liquidityItemValue = liquidityTotalValue / liquidityTotalSupply
+
+            const liquidityUsdValue = getBigNumber(lp.balance.toEther()) * liquidityItemValue
+            const apr = ((rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
+            const aprB = ((rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100).toFixed(2)
+            const aprTotal = (
+              (rewardPerBlockAmountTotalValue / liquidityUsdValue) * 100 +
+              (rewardBPerBlockAmountTotalValue / liquidityUsdValue) * 100
+            ).toFixed(2)
+
+            // @ts-ignore
+            newFarmInfo.apr = apr
+            // @ts-ignore
+            newFarmInfo.aprB = aprB
+            // @ts-ignore
+            newFarmInfo.aprTotal = aprTotal
+            // @ts-ignore
+            newFarmInfo.liquidityUsdValue = liquidityUsdValue
+            if (
+              rewardPerBlockAmount.toEther().toString() === '0' &&
+              rewardBPerBlockAmount.toEther().toString() === '0'
+            ) {
+              endedFarmsPoolId.push(poolId)
+            }
+          } else if (!isFusion && reward && lp) {
             const rewardPerBlockAmount = new TokenAmount(getBigNumber(rewardPerBlock), reward.decimals)
             const liquidityItem = get(this.liquidity.infos, lp.mintAddress)
 
@@ -328,24 +470,60 @@ export default Vue.extend({
               endedFarmsPoolId.push(poolId)
             }
           }
+          if (isFusion) {
+            if (userInfo) {
+              userInfo = cloneDeep(userInfo)
 
-          if (userInfo) {
-            userInfo = cloneDeep(userInfo)
+              const { rewardDebt, rewardDebtB, depositBalance } = userInfo
 
-            const { rewardDebt, depositBalance } = userInfo
-
-            const pendingReward = depositBalance.wei
-              .multipliedBy(getBigNumber(rewardPerShareNet))
-              .dividedBy(1e9)
-              .minus(rewardDebt.wei)
-
-            userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
-          } else {
-            userInfo = {
+              let d = 0
               // @ts-ignore
-              depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
-              // @ts-ignore
-              pendingReward: new TokenAmount(0, farmInfo.reward.decimals)
+              if (newFarmInfo.version === 5) {
+                d = 1e15
+              } else {
+                d = 1e9
+              }
+              const pendingReward = depositBalance.wei
+                .multipliedBy(getBigNumber(perShare))
+                .dividedBy(d)
+                .minus(rewardDebt.wei)
+              const pendingRewardB = depositBalance.wei
+                .multipliedBy(getBigNumber(perShareB))
+                .dividedBy(d)
+                .minus(rewardDebtB.wei)
+
+              userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
+              userInfo.pendingRewardB = new TokenAmount(pendingRewardB, rewardDebtB.decimals)
+            } else {
+              userInfo = {
+                // @ts-ignore
+                depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
+                // @ts-ignore
+                pendingReward: new TokenAmount(0, farmInfo.reward.decimals),
+                // @ts-ignore
+                pendingRewardB: new TokenAmount(0, farmInfo.rewardB.decimals)
+              }
+            }
+          }
+          if (!isFusion) {
+            if (userInfo) {
+              userInfo = cloneDeep(userInfo)
+
+              const { rewardDebt, depositBalance } = userInfo
+
+              const pendingReward = depositBalance.wei
+                .multipliedBy(getBigNumber(rewardPerShareNet))
+                .dividedBy(1e9)
+                .minus(rewardDebt.wei)
+
+              userInfo.pendingReward = new TokenAmount(pendingReward, rewardDebt.decimals)
+            } else {
+              userInfo = {
+                // @ts-ignore
+                depositBalance: new TokenAmount(0, farmInfo.lp.decimals),
+                // @ts-ignore
+                pendingReward: new TokenAmount(0, farmInfo.reward.decimals)
+              }
             }
           }
 
@@ -390,7 +568,9 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+      const isFusion = Boolean(this.farmInfo.fusion)
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -399,8 +579,11 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
+      const depositPromise = isFusion
+        ? depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+        : deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
 
-      deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+      depositPromise
         .then((txid) => {
           this.$notify.info({
             key,
@@ -451,7 +634,9 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+      const isFusion = Boolean(this.farmInfo.fusion)
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -460,8 +645,11 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
+      const withdrawPromise = isFusion
+        ? withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+        : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
 
-      withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+      withdrawPromise
         .then((txid) => {
           this.$notify.info({
             key,
@@ -503,7 +691,10 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
+      // @ts-ignore
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+      const isFusion = Boolean(farmInfo.fusion)
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -513,7 +704,11 @@ export default Vue.extend({
         duration: 0
       })
 
-      deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+      const depositPromise = isFusion
+        ? depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+        : deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+
+      depositPromise
         .then((txid) => {
           this.$notify.info({
             key,
@@ -524,8 +719,10 @@ export default Vue.extend({
                 h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
               ])
           })
-
-          const description = `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
+          // @ts-ignore
+          const description = isFusion
+            ? `Harvest ${farmInfo.reward.symbol} and ${(farmInfo.rewardB ?? {}).symbol} from ${farmInfo.lp.name}`
+            : `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
           this.$accessor.transaction.sub({ txid, description })
         })
         .catch((error) => {
@@ -538,6 +735,22 @@ export default Vue.extend({
         .finally(() => {
           this.harvesting = false
         })
+    },
+    isInSearch({ farmInfo: { name } }: { farmInfo: FarmInfo }) {
+      if (!this.searchText) return true
+      const loweredSearchText = this.searchText.toLowerCase()
+      const loweredFarmName = name.toLowerCase()
+      return [...loweredSearchText].every((char) => loweredFarmName.includes(char))
+    },
+    isInTab({ farmInfo: { fusion } }: { farmInfo: FarmInfo }) {
+      if (this.tab === 'All Farms') return true
+      if (this.tab === 'Raydium Farms' && !fusion) return true
+      if (this.tab === 'Fusion Farms' && fusion) return true
+      return false
+    },
+    canShowByStaked({ userInfo: { depositBalance } }: { userInfo: { depositBalance: any } }) {
+      if (!this.onlyStaked) return true
+      return !depositBalance.isNullOrZero()
     }
   }
 })
@@ -554,12 +767,61 @@ export default Vue.extend({
 .farm.container {
   max-width: 1200px;
 
+  .controls {
+    .end-refresh {
+      justify-content: flex-end;
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      &.is-mobile {
+        justify-content: flex-start;
+      }
+    }
+    .radio-button-group {
+      width: 480px;
+      margin-right: auto;
+      margin-bottom: 16px;
+      &.is-mobile {
+        width: 420px;
+      }
+    }
+  }
+
   .card {
     .card-body {
       padding: 0;
       overflow-x: scroll;
       scrollbar-width: none;
       -ms-overflow-style: none;
+
+      .title-part {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 8px;
+        align-items: center;
+        padding: 16px 24px;
+
+        .title-text {
+          margin-right: auto;
+          .main-description {
+            opacity: 0.8;
+          }
+        }
+
+        .toggle {
+          display: flex;
+          align-items: center;
+          margin-right: 14px;
+          .label {
+            white-space: nowrap;
+            margin-right: 8px;
+          }
+        }
+
+        .search-input {
+          width: 248px;
+        }
+      }
 
       .ant-collapse {
         border: 0;
@@ -629,6 +891,14 @@ export default Vue.extend({
       .icons {
         margin-right: 8px;
       }
+      .dual-tag {
+        margin-left: 8px;
+        padding: 0 7px;
+        font-size: 10px;
+        color: #c200fb;
+        border: 1px solid #c200fb;
+        border-radius: 4px;
+      }
     }
 
     .state {
@@ -663,9 +933,22 @@ export default Vue.extend({
     margin-bottom: 0;
   }
 }
+
 .radioButtonStyle {
   width: 50%;
   text-align: center;
+
+  &.bigger {
+    height: 42px;
+    line-height: 40px;
+    width: 33.3333%;
+    font-size: 1.2em;
+    &.is-mobile {
+      font-size: 1.1em;
+      height: 34px;
+      line-height: 32px;
+    }
+  }
 }
 </style>
 
