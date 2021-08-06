@@ -19,12 +19,6 @@
       </Col>
 
       <Col :class="`end-refresh ${isMobile ? 'is-mobile' : ''}`" :span="isMobile ? 12 : 6">
-        <span>
-          <RadioGroup v-model="poolType" style="display: inline-block; margin: 8px auto; padding-right: 30px">
-            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
-            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
-          </RadioGroup>
-        </span>
         <Tooltip v-if="farm.initialized" placement="bottomRight">
           <template slot="title">
             <span>
@@ -89,9 +83,16 @@
               <Toggle v-model="onlyStaked" />
             </div>
 
-            <Input v-model="searchText" class="search-input" placeholder="Search farms and assets">
+            <Input v-model="searchText" class="search-input" placeholder="Search by token symbol">
               <Icon slot="prefix" type="search" />
             </Input>
+
+            <span>
+              <RadioGroup v-model="poolType" style="display: inline-block; margin: 8px auto">
+                <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+                <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+              </RadioGroup>
+            </span>
           </div>
           <Collapse v-model="showCollapse" expand-icon-position="right">
             <CollapsePanel
@@ -813,9 +814,6 @@ export default Vue.extend({
 
         .title-text {
           margin-right: auto;
-          .main-description {
-            opacity: 0.8;
-          }
         }
 
         .toggle {
@@ -825,11 +823,13 @@ export default Vue.extend({
           .label {
             white-space: nowrap;
             margin-right: 8px;
+            opacity: 0.8;
           }
         }
 
         .search-input {
           width: 248px;
+          margin-right: 16px;
         }
       }
 
