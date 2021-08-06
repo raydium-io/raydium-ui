@@ -313,26 +313,6 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '3UWGpEe2NLD9oWPW1zdXGZRCvJxkNSC2puUWooNEugdS' // reward vault B
   },
   {
-    // legacy
-    name: 'KIN-RAY',
-    lp: { ...LP_TOKENS['KIN-RAY-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.KIN },
-    isStake: false,
-
-    fusion: true,
-    legacy: true,
-    dual: true,
-    version: 4,
-    programId: STAKE_PROGRAM_ID_V4,
-
-    poolId: '7RFY9eMaD3nsV7EBTzVzuKBr4X4cLuDh3JaoWZTcGiJK',
-    poolAuthority: 'q42hNDzfBDQ1WzKjxkueEtBzX1VPJ2hnikJXFjSYC91',
-    poolLpTokenAccount: 'DgCSAJiicdEggHJxM7Vs2j59yM5wMJMCGzUHALiVDhtX', // lp vault
-    poolRewardTokenAccount: '3BGPPWYJMSFaWmq21x8Feqvgsii1fVmJiivRuPJSgXe1', // reward vault A
-    poolRewardTokenAccountB: '5uX6ceRRxDRrcARddFkypCZV5MXz5KUQDr7Zf9ZnSSLf' // reward vault B
-  },
-  {
     name: 'KIN-RAY',
     lp: { ...LP_TOKENS['KIN-RAY-V4'] },
     reward: { ...TOKENS.RAY },
