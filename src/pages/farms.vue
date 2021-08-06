@@ -215,7 +215,7 @@
                         Connect Wallet
                       </Button>
                     </template>
-                    <template v-else-if="(farm.userInfo.depositBalance.isNullOrZero(), true)">
+                    <template v-else-if="farm.userInfo.depositBalance.isNullOrZero()">
                       <div class="title">Start farming</div>
                       <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
                         Stake LP
