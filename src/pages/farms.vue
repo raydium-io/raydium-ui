@@ -512,7 +512,7 @@ export default Vue.extend({
                 // @ts-ignore
                 pendingReward: new TokenAmount(0, farmInfo.reward.decimals),
                 // @ts-ignore
-                pendingRewardB: new TokenAmount(0, farmInfo.rewardB.decimals)
+                pendingRewardB: new TokenAmount(0, farmInfo.rewardB?.decimals)
               }
             }
           }
@@ -579,7 +579,7 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
       const isFusion = Boolean(this.farmInfo.fusion)
 
@@ -645,7 +645,7 @@ export default Vue.extend({
 
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
       const isFusion = Boolean(this.farmInfo.fusion)
 
@@ -703,7 +703,7 @@ export default Vue.extend({
       const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
       // @ts-ignore
-      const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB.mintAddress}.tokenAccountAddress`)
+      const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
       const isFusion = Boolean(farmInfo.fusion)
 
@@ -732,7 +732,9 @@ export default Vue.extend({
           })
           // @ts-ignore
           const description = isFusion
-            ? `Harvest ${farmInfo.reward.symbol} and ${(farmInfo.rewardB ?? {}).symbol} from ${farmInfo.lp.name}`
+            ? `Harvest ${farmInfo.reward.symbol} and ${farmInfo.rewardB ? farmInfo.rewardB.symbol : ''} from ${
+                farmInfo.lp.name
+              }`
             : `Harvest ${farmInfo.reward.symbol} from ${farmInfo.lp.name}`
           this.$accessor.transaction.sub({ txid, description })
         })
