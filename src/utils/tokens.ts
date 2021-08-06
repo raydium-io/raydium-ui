@@ -555,6 +555,13 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: 'HF7mhT9YgD5CULAFDYQmhnUMi1FnNbKeBFCy9SZDh2XE',
     tags: ['raydium']
+  },
+  mSOL: {
+    symbol: 'mSOL',
+    name: 'Marinade staked SOL (mSOL)',
+    mintAddress: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1127,6 +1134,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'cjZmbt8sJgaoyWYUttomAu5LJYU44ZrcKTbzTSEPDVw',
     decimals: TOKENS.LIKE.decimals
+  },
+  'mSOL-USDC-V4': {
+    symbol: 'mSOL-USDC',
+    name: 'mSOL-USDC LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4xTpJ4p76bAeggXoYywpCCNKfJspbuRzZ79R7pRhbqSf',
+    decimals: TOKENS.mSOL.decimals
+  },
+  'mSOL-SOL-V4': {
+    symbol: 'mSOL-SOL',
+    name: 'mSOL-SOL LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.SOL },
+
+    mintAddress: '5ijRoAHVgd5T5CNtK5KDRUBZ7Bffb69nktMj5n6ks6m4',
+    decimals: TOKENS.mSOL.decimals
   }
 }
 
