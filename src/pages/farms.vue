@@ -2,36 +2,44 @@
   <div class="farm container">
     <div class="page-head fs-container">
       <span class="title">Farms</span>
-      <div class="buttons">
-        <span>
-          <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
-            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
-            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
-          </RadioGroup>
-        </span>
-        <Tooltip v-if="farm.initialized" placement="bottomRight">
-          <template slot="title">
-            <span>
-              Displayed data will auto-refresh after
-              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
-            </span>
-          </template>
-          <Progress
-            type="circle"
-            :width="20"
-            :stroke-width="10"
-            :percent="(100 / farm.autoRefreshTime) * farm.countdown"
-            :show-info="false"
-            :class="farm.loading ? 'disabled' : ''"
-            @click="
-              () => {
-                $accessor.farm.requestInfos()
-                $accessor.wallet.getTokenAccounts()
-              }
-            "
-          />
-        </Tooltip>
-      </div>
+    </div>
+
+    <div class="controls">
+      <RadioGroup v-model="tab" class="radio-button-group">
+        <RadioButton class="radioButtonStyle bigger" value="All Farms"> All Farms </RadioButton>
+        <RadioButton class="radioButtonStyle bigger" value="Raydium Farms"> Raydium Farms </RadioButton>
+        <RadioButton class="radioButtonStyle bigger" value="Fusion Farms"> Fusion Farms </RadioButton>
+      </RadioGroup>
+
+      <span>
+        <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
+          <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+          <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+        </RadioGroup>
+      </span>
+
+      <Tooltip v-if="farm.initialized" placement="bottomRight">
+        <template slot="title">
+          <span>
+            Displayed data will auto-refresh after
+            {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
+          </span>
+        </template>
+        <Progress
+          type="circle"
+          :width="20"
+          :stroke-width="10"
+          :percent="(100 / farm.autoRefreshTime) * farm.countdown"
+          :show-info="false"
+          :class="farm.loading ? 'disabled' : ''"
+          @click="
+            () => {
+              $accessor.farm.requestInfos()
+              $accessor.wallet.getTokenAccounts()
+            }
+          "
+        />
+      </Tooltip>
     </div>
 
     <CoinModal
@@ -54,9 +62,32 @@
     <div v-if="farm.initialized">
       <div class="card">
         <div class="card-body">
+          <div class="title-part">
+            <div v-if="tab === 'All Farms'" class="title-text">
+              <h2 class="main-title">All Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn token rewards</div>
+            </div>
+            <div v-else-if="tab === 'Raydium Farms'" class="title-text">
+              <h2 class="main-title">Raydium Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn RAY token rewards</div>
+            </div>
+            <div v-else-if="tab === 'Fusion Farms'" class="title-text">
+              <h2 class="main-title">Fusion Farms</h2>
+              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn project token rewards</div>
+            </div>
+
+            <div class="toggle">
+              <label class="label">Staked Only</label>
+              <Toggle v-model="onlyStaked" />
+            </div>
+
+            <Input v-model="searchText" class="search-input" size="large" placeholder="Search farms and assets">
+              <Icon slot="prefix" type="search" />
+            </Input>
+          </div>
           <Collapse v-model="showCollapse" expand-icon-position="right">
             <CollapsePanel
-              v-for="farm in farms"
+              v-for="farm in farms.filter(isInSearch).filter(isInTab).filter(canShowByStaked)"
               v-show="
                 (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && !farm.farmInfo.legacy && poolType) ||
                 ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
@@ -81,7 +112,9 @@
                     </div>
                     <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
                   </div>
-                  <div v-else class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+                  <div v-else class="value">
+                    {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                  </div>
                 </Col>
                 <Col v-if="!isMobile" class="state" :span="4">
                   <div class="title">Staked</div>
@@ -101,7 +134,7 @@
                   <div class="value">{{ farm.farmInfo.apr }}%</div>
                 </Col>
                 <Col v-if="!isMobile && poolType" class="state" :span="4">
-                  <div class="title">Liquidity</div>
+                  <div class="title">TVL</div>
                   <div class="value">
                     ${{
                       Math.round(farm.farmInfo.liquidityUsdValue)
@@ -139,9 +172,7 @@
 
                 <Col :span="isMobile ? 24 : 10">
                   <div class="harvest">
-                    <div class="title">
-                      Pending {{ farm.farmInfo.fusion ? farm.farmInfo.reward.symbol : 'Ray' }} Rewards
-                    </div>
+                    <div class="title">Pending Rewards</div>
                     <div class="pending fs-container">
                       <div v-if="farm.farmInfo.fusion" class="reward">
                         <div v-if="farm.farmInfo.dual" class="token">
@@ -213,7 +244,19 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Tooltip, Progress, Collapse, Spin, Icon, Row, Col, Button, Radio } from 'ant-design-vue'
+import {
+  Tooltip,
+  Progress,
+  Collapse,
+  Spin,
+  Icon,
+  Row,
+  Col,
+  Button,
+  Radio,
+  Input,
+  Switch as Toggle
+} from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
@@ -239,12 +282,17 @@ export default Vue.extend({
     Col,
     Button,
     RadioGroup,
-    RadioButton
+    RadioButton,
+    Input,
+    Toggle
   },
 
   data() {
     return {
+      tab: 'All Farms' as 'All Farms' | 'Raydium Farms' | 'Fusion Farms',
+      searchText: '',
       isMobile: false,
+      onlyStaked: false,
 
       farms: [] as any,
 
@@ -308,7 +356,7 @@ export default Vue.extend({
     TokenAmount,
 
     updateFarms() {
-      const farms: any = []
+      const farms: any[] = []
       const endedFarmsPoolId: string[] = []
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
@@ -680,6 +728,22 @@ export default Vue.extend({
         .finally(() => {
           this.harvesting = false
         })
+    },
+    isInSearch({ farmInfo: { name } }: { farmInfo: FarmInfo }) {
+      if (!this.searchText) return true
+      const loweredSearchText = this.searchText.toLowerCase()
+      const loweredFarmName = name.toLowerCase()
+      return [...loweredSearchText].every((char) => loweredFarmName.includes(char))
+    },
+    isInTab({ farmInfo: { fusion } }: { farmInfo: FarmInfo }) {
+      if (this.tab === 'All Farms') return true
+      if (this.tab === 'Raydium Farms' && !fusion) return true
+      if (this.tab === 'Fusion Farms' && fusion) return true
+      return false
+    },
+    canShowByStaked({ userInfo: { depositBalance } }: { userInfo: { depositBalance: any } }) {
+      if (!this.onlyStaked) return true
+      return !depositBalance.isNullOrZero()
     }
   }
 })
@@ -696,12 +760,50 @@ export default Vue.extend({
 .farm.container {
   max-width: 1200px;
 
+  .controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 48px;
+
+    .radio-button-group {
+      width: 600px;
+      margin-right: auto;
+    }
+  }
+
   .card {
     .card-body {
       padding: 0;
       overflow-x: scroll;
       scrollbar-width: none;
       -ms-overflow-style: none;
+
+      .title-part {
+        display: flex;
+        align-items: center;
+        padding: 16px 24px;
+
+        .title-text {
+          margin-right: auto;
+          .main-description {
+            opacity: 0.8;
+          }
+        }
+
+        .toggle {
+          display: flex;
+          align-items: center;
+          margin-right: 14px;
+          .label {
+            white-space: nowrap;
+            margin-right: 8px;
+          }
+        }
+
+        .search-input {
+          width: 200px;
+        }
+      }
 
       .ant-collapse {
         border: 0;
@@ -813,9 +915,17 @@ export default Vue.extend({
     margin-bottom: 0;
   }
 }
+
 .radioButtonStyle {
   width: 50%;
   text-align: center;
+
+  &.bigger {
+    height: 48px;
+    line-height: 48px;
+    width: 33.3333%;
+    font-size: 1.3em;
+  }
 }
 </style>
 
