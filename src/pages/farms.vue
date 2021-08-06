@@ -3,44 +3,52 @@
     <div class="page-head fs-container">
       <span class="title">Farms</span>
     </div>
-
-    <div class="controls">
-      <RadioGroup v-model="tab" class="radio-button-group">
-        <RadioButton class="radioButtonStyle bigger" value="All Farms"> All Farms </RadioButton>
-        <RadioButton class="radioButtonStyle bigger" value="Raydium Farms"> Raydium Farms </RadioButton>
-        <RadioButton class="radioButtonStyle bigger" value="Fusion Farms"> Fusion Farms </RadioButton>
-      </RadioGroup>
-
-      <span>
-        <RadioGroup v-model="poolType" style="display: inline-block; margin: 0 auto; padding-right: 30px">
-          <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
-          <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+    <Row class="controls" :gutter="16">
+      <Col :span="isMobile ? 24 : 18">
+        <RadioGroup v-model="tab" :class="`radio-button-group ${isMobile ? 'is-mobile' : ''}`">
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="All Farms">
+            All
+          </RadioButton>
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="Raydium Farms">
+            Raydium
+          </RadioButton>
+          <RadioButton :class="`radioButtonStyle bigger ${isMobile ? 'is-mobile' : ''}`" value="Fusion Farms">
+            Fusion
+          </RadioButton>
         </RadioGroup>
-      </span>
+      </Col>
 
-      <Tooltip v-if="farm.initialized" placement="bottomRight">
-        <template slot="title">
-          <span>
-            Displayed data will auto-refresh after
-            {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
-          </span>
-        </template>
-        <Progress
-          type="circle"
-          :width="20"
-          :stroke-width="10"
-          :percent="(100 / farm.autoRefreshTime) * farm.countdown"
-          :show-info="false"
-          :class="farm.loading ? 'disabled' : ''"
-          @click="
-            () => {
-              $accessor.farm.requestInfos()
-              $accessor.wallet.getTokenAccounts()
-            }
-          "
-        />
-      </Tooltip>
-    </div>
+      <Col :class="`end-refresh ${isMobile ? 'is-mobile' : ''}`" :span="isMobile ? 12 : 6">
+        <span>
+          <RadioGroup v-model="poolType" style="display: inline-block; margin: 8px auto; padding-right: 30px">
+            <RadioButton class="radioButtonStyle" :value="true"> Active </RadioButton>
+            <RadioButton class="radioButtonStyle" :value="false"> Ended </RadioButton>
+          </RadioGroup>
+        </span>
+        <Tooltip v-if="farm.initialized" placement="bottomRight">
+          <template slot="title">
+            <span>
+              Displayed data will auto-refresh after
+              {{ farm.autoRefreshTime - farm.countdown }} seconds. Click this circle to update manually.
+            </span>
+          </template>
+          <Progress
+            type="circle"
+            :width="20"
+            :stroke-width="10"
+            :percent="(100 / farm.autoRefreshTime) * farm.countdown"
+            :show-info="false"
+            :class="farm.loading ? 'disabled' : ''"
+            @click="
+              () => {
+                $accessor.farm.requestInfos()
+                $accessor.wallet.getTokenAccounts()
+              }
+            "
+          />
+        </Tooltip>
+      </Col>
+    </Row>
 
     <CoinModal
       v-if="stakeModalOpening"
@@ -81,7 +89,7 @@
               <Toggle v-model="onlyStaked" />
             </div>
 
-            <Input v-model="searchText" class="search-input" size="large" placeholder="Search farms and assets">
+            <Input v-model="searchText" class="search-input" placeholder="Search farms and assets">
               <Icon slot="prefix" type="search" />
             </Input>
           </div>
@@ -291,7 +299,6 @@ export default Vue.extend({
     return {
       tab: 'All Farms' as 'All Farms' | 'Raydium Farms' | 'Fusion Farms',
       searchText: '',
-      isMobile: false,
       onlyStaked: false,
 
       farms: [] as any,
@@ -314,7 +321,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
+    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity', 'isMobile'])
   },
 
   watch: {
@@ -761,13 +768,22 @@ export default Vue.extend({
   max-width: 1200px;
 
   .controls {
-    display: flex;
-    align-items: center;
-    margin-bottom: 48px;
-
+    .end-refresh {
+      justify-content: flex-end;
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      &.is-mobile {
+        justify-content: flex-start;
+      }
+    }
     .radio-button-group {
-      width: 600px;
+      width: 480px;
       margin-right: auto;
+      margin-bottom: 16px;
+      &.is-mobile {
+        width: 420px;
+      }
     }
   }
 
@@ -780,6 +796,8 @@ export default Vue.extend({
 
       .title-part {
         display: flex;
+        flex-wrap: wrap;
+        row-gap: 8px;
         align-items: center;
         padding: 16px 24px;
 
@@ -801,7 +819,7 @@ export default Vue.extend({
         }
 
         .search-input {
-          width: 200px;
+          width: 248px;
         }
       }
 
@@ -921,10 +939,15 @@ export default Vue.extend({
   text-align: center;
 
   &.bigger {
-    height: 48px;
-    line-height: 48px;
+    height: 42px;
+    line-height: 40px;
     width: 33.3333%;
-    font-size: 1.3em;
+    font-size: 1.2em;
+    &.is-mobile {
+      font-size: 1.1em;
+      height: 34px;
+      line-height: 32px;
+    }
   }
 }
 </style>
