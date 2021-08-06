@@ -73,15 +73,15 @@
           <div class="title-part">
             <div v-if="tab === 'All Farms'" class="title-text">
               <h2 class="main-title">All Farms</h2>
-              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn token rewards</div>
+              <div class="main-description">Stake your LP tokens and earn token rewards</div>
             </div>
             <div v-else-if="tab === 'Raydium Farms'" class="title-text">
               <h2 class="main-title">Raydium Farms</h2>
-              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn RAY token rewards</div>
+              <div class="main-description">Stake your LP tokens and earn RAY token rewards</div>
             </div>
             <div v-else-if="tab === 'Fusion Farms'" class="title-text">
               <h2 class="main-title">Fusion Farms</h2>
-              <div class="main-description">Stake your Liquidity Pool (LP) tokens and earn project token rewards</div>
+              <div class="main-description">Stake your LP tokens and earn project token rewards</div>
             </div>
 
             <div class="toggle">
@@ -778,7 +778,7 @@ export default Vue.extend({
       }
     }
     .radio-button-group {
-      width: 480px;
+      width: 440px;
       margin-right: auto;
       margin-bottom: 16px;
       &.is-mobile {
