@@ -112,7 +112,7 @@
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                   <span v-if="farm.farmInfo.dual" class="dual-tag">DUAL YIELD</span>
                 </Col>
-                <Col class="state" :span="isMobile ? 6 : 4">
+                <Col class="state" :span="isMobile ? 6 : 5">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div v-if="farm.farmInfo.fusion" class="value">
                     <div v-if="farm.farmInfo.dual">
@@ -124,24 +124,18 @@
                     {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                   </div>
                 </Col>
-                <Col v-if="!isMobile" class="state" :span="4">
-                  <div class="title">Staked</div>
-                  <div class="value">
-                    {{ farm.userInfo.depositBalance.format() }}
-                  </div>
-                </Col>
-                <Col v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 4">
-                  <div class="title">Total Apr {{ farm.farmInfo.aprTotal }}%</div>
+                <Col v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
+                  <div class="title">{{ farm.farmInfo.dual ? `Total Apr ${farm.farmInfo.aprTotal}%` : 'Apr' }}</div>
                   <div class="value">
                     <div v-if="farm.farmInfo.dual">{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
                     <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
                   </div>
                 </Col>
-                <Col v-else class="state" :span="isMobile ? 6 : 4">
+                <Col v-else class="state" :span="isMobile ? 6 : 5">
                   <div class="title">Apr</div>
-                  <div class="value">{{ farm.farmInfo.apr }}%</div>
+                  <div class="value">RAY {{ farm.farmInfo.apr }}%</div>
                 </Col>
-                <Col v-if="!isMobile && poolType" class="state" :span="4">
+                <Col v-if="!isMobile && poolType" class="state" :span="6">
                   <div class="title">TVL</div>
                   <div class="value">
                     ${{
@@ -214,24 +208,40 @@
 
                 <Col :span="isMobile ? 24 : 10">
                   <div class="start">
-                    <div class="title">Start farming</div>
-                    <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-                      Connect Wallet
-                    </Button>
-                    <div v-else class="fs-container">
-                      <Button
-                        v-if="!farm.userInfo.depositBalance.isNullOrZero()"
-                        class="unstake"
-                        size="large"
-                        ghost
-                        @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                      >
-                        <Icon type="minus" />
+                    <template v-if="!wallet.connected">
+                      <div class="title">Start farming</div>
+                      <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+                        Connect Wallet
                       </Button>
+                    </template>
+                    <template v-else-if="(farm.userInfo.depositBalance.isNullOrZero(), true)">
+                      <div class="title">Start farming</div>
                       <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
                         Stake LP
                       </Button>
-                    </div>
+                    </template>
+                    <template v-else>
+                      <div class="title">Your Staked LP</div>
+                      <div class="fs-container">
+                        <span style="margin-right: auto"> {{ farm.userInfo.depositBalance.format() }}</span>
+                        <Button
+                          class="unstake"
+                          size="large"
+                          ghost
+                          @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                        >
+                          <Icon type="minus" />
+                        </Button>
+                        <Button
+                          size="large"
+                          style="width: 180px"
+                          ghost
+                          @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)"
+                        >
+                          Stake LP
+                        </Button>
+                      </div>
+                    </template>
                   </div>
                 </Col>
               </Row>
@@ -778,7 +788,7 @@ export default Vue.extend({
       }
     }
     .radio-button-group {
-      width: 440px;
+      width: 480px;
       margin-right: auto;
       margin-bottom: 16px;
       &.is-mobile {
