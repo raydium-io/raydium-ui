@@ -115,7 +115,7 @@ export const actions = actionTree(
             const tokenAccounts: any = {}
             const auxiliaryTokenAccounts: Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }> = []
 
-            parsedTokenAccounts.value.forEach(async (tokenAccountInfo) => {
+            for (const tokenAccountInfo of parsedTokenAccounts.value) {
               const tokenAccountPubkey = tokenAccountInfo.pubkey
               const tokenAccountAddress = tokenAccountPubkey.toBase58()
               const parsedInfo = tokenAccountInfo.account.data.parsed.info
@@ -132,7 +132,7 @@ export const actions = actionTree(
               } else if (parsedInfo.tokenAmount.uiAmount > 0) {
                 auxiliaryTokenAccounts.push(tokenAccountInfo)
               }
-            })
+            }
 
             const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
             tokenAccounts[NATIVE_SOL.mintAddress] = {
