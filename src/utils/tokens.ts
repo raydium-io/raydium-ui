@@ -561,6 +561,7 @@ export const TOKENS: Tokens = {
     name: 'Marinade staked SOL (mSOL)',
     mintAddress: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
     decimals: 9,
+    referrer: '7h5bckf8P29RdviNoKjDyH3Ky3uwdrBiPgYuSCD4asV5',
     tags: ['raydium']
   }
 }
