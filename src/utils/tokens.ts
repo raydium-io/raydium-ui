@@ -563,6 +563,14 @@ export const TOKENS: Tokens = {
     decimals: 9,
     referrer: '7h5bckf8P29RdviNoKjDyH3Ky3uwdrBiPgYuSCD4asV5',
     tags: ['raydium']
+  },
+  PAI: {
+    symbol: 'PAI',
+    name: 'PAI (Parrot)',
+    mintAddress: 'Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS',
+    decimals: 6,
+    referrer: '54X98LAxRR2j1KMBBXkbYyUaAWi1iKW9G1Y4TnTJVY2e',
+    tags: ['raydium']
   }
 }
 
