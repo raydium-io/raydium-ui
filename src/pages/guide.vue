@@ -101,20 +101,30 @@
               Follow & Retweet Raydium
               <div class="point-label">+1 POINTS</div>
             </div>
-            <a
-              href="https://twitter.com/RaydiumProtocol"
-              class="link"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <button @click="showLinkInput = true">
-                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />GO TO TWITTER
-              </button>
-            </a>
+            <div class="btn-row">
+              <a
+                :href="`https://twitter.com/RaydiumProtocol`"
+                class="link"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FELLOW</button>
+              </a>
+              <a
+                :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
+                class="link"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                <button @click="showLinkInput = true">
+                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />RETWEET
+                </button>
+              </a>
+            </div>
           </div>
 
-          <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 360 88">
-            <polyline points="180,0 180,88" fill="none" stroke-width="2" stroke-dasharray="12" />
+          <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 440 88">
+            <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
           </svg>
 
           <div v-if="showLinkInput" class="box form">
@@ -156,10 +166,14 @@
           <div class="point-label">+1 POINTS / REFERRAL</div>
         </div>
 
-        <div class="box-text">your referral link: {{ initBackendResponse.user.referral }}</div>
+        <div class="box-text">
+          your referral link:
+          <br />
+          {{ referralLink }}
+        </div>
 
         <div class="icon-btns">
-          <button class="icon-btn" @click="copyTextFromParagraph(initBackendResponse.user.referral)">
+          <button class="icon-btn" title="click here to copy it" @click="copyTextFromParagraph(referralLink)">
             <img class="icon" src="../assets/icons/guide-share-icon.svg" />
           </button>
         </div>
@@ -169,20 +183,30 @@
     <section ref="details" class="reward-details">
       <div class="title">REWARD DETAILS</div>
       <ol>
-        <li>The first 4,000 users to be verified as completing all 4 tasks will win $20 in RAY tokens each.</li>
         <li>
-          All users that are verified as completing a minimum of 2 out of 4 tasks will be entered into a random draw to
-          win $10 of RAY tokens of which there will be 6,000 winners.
+          Qualified users are defined as having connected a wallet, completing a swap, and completing twitter
+          verification by sharing their customized referral code and @RaydiumProtocol. Qualified users will receive a
+          minimum of 3 entries in the lucky airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY
+          tokens.
         </li>
         <li>
-          All users that are verified as completing a minimum of 3 out of 4 tasks will be entered into a random draw to
-          win $100 of RAY tokens of which there will be 100 winners.
+          The first 4,000 users to be verified as completing wallet connecting, swapping, twitter verification, and
+          successfully referring at least 1 friend are guaranteed to win $10 in RAY tokens each. The aforementioned
+          steps are worth 5 entries in the lucky draw airdrop pool where verified users will also be eligible to receive
+          an airdrop of up to $1,000 in RAY tokens.
         </li>
         <li>
-          All users that are verified as completing 4 out of 4 tasks will be entered into a random draw to win $1,000 of
-          RAY tokens of which there will be 40 winners.
+          Qualified users can earn extra entries for the lucky airdrop pool by completing the bonus tasks; 1) Following
+          Raydium, 2) Retweeting Raydium’s Binance Announcement, and 3) Joining the Raydium Discord worth 1 entry each.
         </li>
-        <li>The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each.</li>
+        <li>
+          The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as
+          extra entries for the lucky draw pool.
+        </li>
+        <li>
+          Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100
+          winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool.
+        </li>
       </ol>
       <hr />
       <table class="detail-panel">
@@ -191,50 +215,52 @@
           <th>Number of Winners</th>
           <th>Airdrop Amounts</th>
           <th>Airdrop Eligibility</th>
-          <th>Total in USD</th>
         </tr>
         <tr>
-          <td>First 1,000 to complete all 4 tasks</td>
-          <td>1,000</td>
-          <td>$20 of RAY tokens</td>
-          <td>Guaranteed $20 airdrop</td>
-          <td>$20 000</td>
-        </tr>
-        <tr>
-          <td>Completed 2/4 tasks</td>
-          <td>6,000</td>
-          <td>$5 of RAY tokens</td>
-          <td>Random draw for $5</td>
-          <td>$30 000</td>
-        </tr>
-        <tr>
-          <td>Completed 3/4 tasks</td>
-          <td>2,000</td>
-          <td>$40 of RAY tokens</td>
           <td>
-            Random draw for $5 <br />
-            + Random draw for $40
+            <strong>First 5,000</strong> to Swap on Raydium, Complete Twitter Verification, Successfully Refer at least
+            1 Friend
           </td>
-          <td>$80 000</td>
+          <td>5,000 Winners</td>
+          <td>$10 of RAY tokens</td>
+          <td>Guaranteed $5 airdrop + Lucky Draw Pool</td>
         </tr>
         <tr>
-          <td>Completed all 4 tasks</td>
-          <td>1,000</td>
-          <td>$50 of RAY tokens</td>
           <td>
-            Random draw for $5 <br />
-            + Random draw for $40 <br />
-            + Random draw for $50 <br />
-            + Guaranteed $20 airdrop <br />(if within first 4,000)
+            <strong>Lucky Draw Pool</strong> Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)
+            <br />
+            <strong>Earn Bonus Entries!</strong> Follow Raydium, Retweet Raydium’s Binance Announcement, and Join us on
+            Discord
           </td>
-          <td>$60 000</td>
+          <td>
+            3 Winners
+            <div class="ghost-line" />
+            15 Winners
+            <div class="ghost-line" />
+            100 Winners
+            <div class="ghost-line" />
+            250 Winners
+            <div class="ghost-line" />
+            4000 Winners
+          </td>
+          <td>
+            $1,000 of RAY tokens
+            <div class="ghost-line" />
+            $300 of RAY tokens
+            <div class="ghost-line" />
+            $100 of RAY tokens
+            <div class="ghost-line" />
+            $50 of RAY tokens
+            <div class="ghost-line" />
+            $20 of RAY tokens
+          </td>
+          <td></td>
         </tr>
         <tr>
-          <td>Top 5 on the referral leaderboard</td>
-          <td>5</td>
+          <td><strong>Top 5 on the referral leaderboard</strong></td>
+          <td>5 Winners</td>
           <td>$2,000 of RAY tokens</td>
-          <td>Random draw for $5</td>
-          <td>$10 000</td>
+          <td>Guaranteed $2,000 airdrop</td>
         </tr>
       </table>
     </section>
@@ -276,7 +302,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { Input, Icon, Table, Checkbox } from 'ant-design-vue'
 import { CampaignInfo } from '@/types/api'
@@ -293,11 +319,17 @@ import { CampaignInfo } from '@/types/api'
     Checkbox
   },
 
-  async asyncData({ $accessor, $api }) {
+  async asyncData({ $accessor, $api, route }) {
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
     }
-    return { initBackendResponse: await $api.getCompaign({ address: '111111111' }) }
+    const initBackendResponse = await $api.getCompaign({
+      address: '111111111',
+      referral: (route.query.referral as string) || undefined
+    })
+    return {
+      initBackendResponse
+    }
   }
 })
 export default class Guide extends Vue {
@@ -309,8 +341,15 @@ export default class Guide extends Vue {
   videoHasCachedComplete = false
   retweetLink = ''
   discordLink = ''
+  referralLink = ''
+
+  @Watch('initBackendResponse', { immediate: true, deep: true })
+  getReferralLink(res: CampaignInfo) {
+    this.referralLink = `${window.location.href}${res.user.referral ? `referral=${res.user?.referral}` : ''}`
+  }
 
   to(anchor: 'step-1' | 'details') {
+    // const reu = this.$route.path
     const el = this.$refs[anchor] as Element | undefined
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth' })
@@ -330,6 +369,13 @@ export default class Guide extends Vue {
 
   copyTextFromParagraph(text = '') {
     navigator.clipboard?.writeText(text).then(() => alert(`copied!\n\n${text}`))
+  }
+
+  getDefaultText() {
+    console.log({ ...this.$route })
+    const defaultText = 'hello 😳\rit is a $test'
+    const encoded = encodeURIComponent(defaultText)
+    return encoded
   }
 }
 </script>
@@ -497,11 +543,18 @@ button {
       margin-right: 144px;
     }
   }
-
+  .btn-row,
   button:not(.icon-btn) {
     width: 100%;
     grid-area: button;
     align-self: flex-end;
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    > button {
+      width: unset;
+    }
   }
 
   .step-label {
@@ -587,7 +640,7 @@ button {
   height: 132px;
   stroke: var(--secondary);
   &.social-media {
-    width: 360px;
+    width: 440px;
     height: 88px;
   }
 }
