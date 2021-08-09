@@ -571,6 +571,13 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: '54X98LAxRR2j1KMBBXkbYyUaAWi1iKW9G1Y4TnTJVY2e',
     tags: ['raydium']
+  },
+  PORT: {
+    symbol: 'PORT',
+    name: 'PORT',
+    mintAddress: 'PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1161,6 +1168,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5ijRoAHVgd5T5CNtK5KDRUBZ7Bffb69nktMj5n6ks6m4',
     decimals: TOKENS.mSOL.decimals
+  },
+  'MER-PAI-V4': {
+    symbol: 'MER-PAI',
+    name: 'MER-PAI LP',
+    coin: { ...TOKENS.MER },
+    pc: { ...TOKENS.PAI },
+
+    mintAddress: 'DU5RT2D9EviaSmX6Ta8MZwMm85HwSEqGMRdqUiuCGfmD',
+    decimals: TOKENS.MER.decimals
+  },
+  'PORT-USDC-V4': {
+    symbol: 'PORT-USDC',
+    name: 'PORT-USDC LP',
+    coin: { ...TOKENS.PORT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y',
+    decimals: TOKENS.PORT.decimals
   }
 }
 
