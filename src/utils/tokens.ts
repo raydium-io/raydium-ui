@@ -577,6 +577,7 @@ export const TOKENS: Tokens = {
     name: 'PORT',
     mintAddress: 'PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y',
     decimals: 6,
+    referrer: '5Ve8q9fb7R2DhdqGV4o1RVy7xxo4D6ifQfbxGiASdxEH',
     tags: ['raydium']
   }
 }
