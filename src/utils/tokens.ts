@@ -1185,7 +1185,7 @@ export const LP_TOKENS: Tokens = {
     coin: { ...TOKENS.PORT },
     pc: { ...TOKENS.USDC },
 
-    mintAddress: 'PoRTjZMPXb9T7dyU7tpLEZRQj7e6ssfAE62j2oQuc6y',
+    mintAddress: '9tmNtbUCrLS15qC4tEfr5NNeqcqpZ4uiGgi2vS5CLQBS',
     decimals: TOKENS.PORT.decimals
   }
 }
