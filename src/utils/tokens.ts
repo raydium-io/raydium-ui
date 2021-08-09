@@ -1149,7 +1149,7 @@ export const LP_TOKENS: Tokens = {
     symbol: 'mSOL-SOL',
     name: 'mSOL-SOL LP',
     coin: { ...TOKENS.mSOL },
-    pc: { ...TOKENS.SOL },
+    pc: { ...NATIVE_SOL },
 
     mintAddress: '5ijRoAHVgd5T5CNtK5KDRUBZ7Bffb69nktMj5n6ks6m4',
     decimals: TOKENS.mSOL.decimals
