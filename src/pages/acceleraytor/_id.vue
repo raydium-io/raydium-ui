@@ -60,7 +60,9 @@
           :percent="(pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100"
           status="active"
         >
-          <span slot="format"> {{ (pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100 }}% </span>
+          <span slot="format">
+            {{ ((pool.info.currentLotteryNumber / pool.info.totalWinLotteryLimit) * 100).toFixed(2) }}%
+          </span>
         </Progress>
         <Progress
           v-else

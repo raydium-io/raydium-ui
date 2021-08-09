@@ -8,6 +8,7 @@ import { NATIVE_SOL, TOKENS, getTokenByMintAddress } from './tokens'
 import {
   createProgramAccountIfNotExist,
   createTokenAccountIfNotExist,
+  createAssociatedTokenAccountIfNotExist,
   mergeTransactions,
   sendTransaction
 } from '@/utils/web3'
@@ -212,17 +213,6 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
   }
 }
 
-export async function createTokenAccount(connection: Connection, wallet: any, mintAddress: string) {
-  const transaction = new Transaction()
-  const signers: Account[] = []
-
-  const owner = wallet.publicKey
-
-  await createTokenAccountIfNotExist(connection, '', owner, mintAddress, null, transaction, signers)
-
-  return await sendTransaction(connection, wallet, transaction, signers)
-}
-
 export async function wrap(
   axios: any,
   connection: Connection,
@@ -241,24 +231,13 @@ export async function wrap(
   const fromCoin = getTokenByMintAddress(fromCoinMint)
   const amountOut = new TokenAmount(amount, fromCoin?.decimals, false)
 
-  const newFromTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
     fromTokenAccount,
     owner,
     fromCoinMint,
-    null,
-    transaction,
-    signers
+    transaction
   )
-  const newToTokenAccount = await createTokenAccountIfNotExist(
-    connection,
-    toTokenAccount,
-    owner,
-    toCoinMint,
-    null,
-    transaction,
-    signers
-  )
+  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toCoinMint, transaction)
 
   const solletRes = await axios.post('https://swap.sollet.io/api/swap_to', {
     address: newToTokenAccount.toString(),
@@ -344,24 +323,13 @@ export async function swap(
     )
   }
 
-  const newFromTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
     fromTokenAccount,
     owner,
     fromMint,
-    null,
-    transaction,
-    signers
+    transaction
   )
-  const newToTokenAccount = await createTokenAccountIfNotExist(
-    connection,
-    toTokenAccount,
-    owner,
-    toMint,
-    null,
-    transaction,
-    signers
-  )
+  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
 
   transaction.add(
     swapInstruction(
@@ -510,24 +478,13 @@ export async function place(
     toMint = TOKENS.WSOL.mintAddress
   }
 
-  const newFromTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
     fromTokenAccount,
     owner,
     fromMint,
-    null,
-    transaction,
-    signers
+    transaction
   )
-  const newToTokenAccount = await createTokenAccountIfNotExist(
-    connection,
-    toTokenAccount,
-    owner,
-    toMint,
-    null,
-    transaction,
-    signers
-  )
+  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
 
   const userAccounts = [newFromTokenAccount, newToTokenAccount]
   if (market.baseMintAddress.toBase58() === toMint && market.quoteMintAddress.toBase58() === fromMint) {

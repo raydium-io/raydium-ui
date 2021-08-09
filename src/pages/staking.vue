@@ -17,7 +17,12 @@
             :percent="(100 / farm.autoRefreshTime) * farm.countdown"
             :show-info="false"
             :class="farm.loading ? 'disabled' : ''"
-            @click="$accessor.farm.requestInfos"
+            @click="
+              () => {
+                $accessor.farm.requestInfos()
+                $accessor.wallet.getTokenAccounts()
+              }
+            "
           />
         </Tooltip>
       </div>

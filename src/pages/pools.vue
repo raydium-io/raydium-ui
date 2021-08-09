@@ -17,7 +17,12 @@
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
             :class="loading ? 'disabled' : ''"
-            @click="flush"
+            @click="
+              () => {
+                flush()
+                $accessor.wallet.getTokenAccounts()
+              }
+            "
           />
         </Tooltip>
       </div>

@@ -17,41 +17,55 @@ export const state = () => {
 export const getters = getterTree(state, {})
 
 export const mutations = mutationTree(state, {
-  pushTx(state: any, [txid, description]: [txid: string, description: string]) {
-    const history = { ...state.history }
+  pushTx(
+    state: any,
+    { txid, description, walletAddress }: { txid: string; description: string; walletAddress: string }
+  ) {
+    const wholeHistory = { ...state.history }
+    const targetHistory = wholeHistory[walletAddress] ?? {}
 
-    if (Object.keys(history).length >= 20) {
-      const earliestTime = Math.min(...Object.values(history).map((o: any) => o.time))
-      const [earliestTxid] = Object.entries<TxHistoryInfo>(history).find(([, { time }]) => time === earliestTime) ?? []
-      delete history[earliestTxid ?? '']
+    if (Object.keys(targetHistory).length >= 20) {
+      const earliestTime = Math.min(...Object.values(targetHistory).map((o: any) => o.time))
+      const [earliestTxid] =
+        Object.entries<TxHistoryInfo>(targetHistory).find(([, { time }]) => time === earliestTime) ?? []
+      delete targetHistory[earliestTxid ?? '']
     }
-    history[txid] = {
-      status: 'Pending',
+
+    targetHistory[txid] = {
+      status: 'pending',
       description,
       time: getUnixTs()
     }
 
-    state.history = { ...history }
-    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+    state.history = { ...wholeHistory, [walletAddress]: targetHistory }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(state.history))
   },
 
-  setListenerId(state: any, [txid, listenerId]: [txid: string, listenerId: number]) {
-    const history = { ...state.history }
+  setListenerId(
+    state: any,
+    { txid, listenerId, walletAddress }: { txid: string; listenerId: number; walletAddress: string }
+  ) {
+    const wholeHistory = { ...state.history }
+    const targetHistory = wholeHistory[walletAddress] ?? {}
 
     // listenerId
-    history[txid] = { ...history[txid], ...{ listenerId } }
+    targetHistory[txid] = { ...targetHistory[txid], ...{ listenerId } }
 
-    state.history = { ...history }
-    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+    state.history = { ...wholeHistory, [walletAddress]: targetHistory }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(state.history))
   },
 
-  setTxStatus(state: any, [txid, status, block]: [txid: string, status: string, block: number]) {
-    const history = { ...state.history }
+  setTxStatus(
+    state: any,
+    { txid, status, block, walletAddress }: { txid: string; status: string; block: number; walletAddress: string }
+  ) {
+    const wholeHistory = { ...state.history }
+    const targetHistory = wholeHistory[walletAddress] ?? {}
 
-    history[txid] = { ...history[txid], ...{ status, block } }
+    targetHistory[txid] = { ...targetHistory[txid], ...{ status, block } }
 
-    state.history = { ...history }
-    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(history))
+    state.history = { ...wholeHistory, [walletAddress]: targetHistory }
+    LocalStorage.set('RAY_TX_HISTORY', JSON.stringify(state.history))
   }
 })
 
@@ -59,7 +73,8 @@ export const actions = actionTree(
   { state, getters, mutations },
   {
     sub({ commit }, { txid, description }: { txid: string; description: string }) {
-      commit('pushTx', [txid, description])
+      const walletAddress = this.$accessor.wallet?.address
+      commit('pushTx', { txid, description, walletAddress })
       logger('Sub', txid)
 
       const conn = this.$web3
@@ -72,7 +87,7 @@ export const actions = actionTree(
 
           if (!signatureResult.err) {
             // success
-            commit('setTxStatus', [txid, 'Success', slot])
+            commit('setTxStatus', { txid, status: 'success', block: slot, walletAddress })
 
             notify.success({
               key: txid,
@@ -81,7 +96,7 @@ export const actions = actionTree(
             })
           } else {
             // fail
-            commit('setTxStatus', [txid, 'Fail', slot])
+            commit('setTxStatus', { txid, status: 'fail', block: slot, walletAddress })
 
             notify.error({
               key: txid,
@@ -93,7 +108,7 @@ export const actions = actionTree(
         'single'
       )
 
-      commit('setListenerId', [txid, listenerId + 1])
+      commit('setListenerId', { txid, listenerId: listenerId + 1, walletAddress })
     }
   }
 )

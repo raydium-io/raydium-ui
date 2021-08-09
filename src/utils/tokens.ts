@@ -56,6 +56,19 @@ export function getTokenByMintAddress(mintAddress: string): TokenInfo | null {
   return token ? cloneDeep(token) : null
 }
 
+export function getTokenSymbolByMint(mint: string) {
+  if (mint === NATIVE_SOL.mintAddress) {
+    return NATIVE_SOL.symbol
+  }
+
+  const token = Object.values({ ...TOKENS, ...LP_TOKENS }).find((item) => item.mintAddress === mint)
+
+  if (token) {
+    return token.symbol
+  }
+  return 'UNKNOWN'
+}
+
 export interface Tokens {
   [key: string]: any
   [index: number]: any
@@ -534,6 +547,22 @@ export const TOKENS: Tokens = {
       Discord: 'https://discord.gg/sUu7KZwNCB'
     },
     tags: ['raydium']
+  },
+  DXL: {
+    symbol: 'DXL',
+    name: 'DXL',
+    mintAddress: 'GsNzxJfFn6zQdJGeYsupJWzUAm57Ba7335mfhWvFiE9Z',
+    decimals: 6,
+    referrer: 'HF7mhT9YgD5CULAFDYQmhnUMi1FnNbKeBFCy9SZDh2XE',
+    tags: ['raydium']
+  },
+  mSOL: {
+    symbol: 'mSOL',
+    name: 'Marinade staked SOL (mSOL)',
+    mintAddress: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
+    decimals: 9,
+    referrer: '7h5bckf8P29RdviNoKjDyH3Ky3uwdrBiPgYuSCD4asV5',
+    tags: ['raydium']
   }
 }
 
@@ -604,7 +633,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-USDC-V3': {
     symbol: 'RAY-USDC',
-    name: 'RAY-USDC LP',
+    name: 'RAY-USDC V3 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.USDC },
 
@@ -613,7 +642,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-SRM-V3': {
     symbol: 'RAY-SRM',
-    name: 'RAY-SRM LP',
+    name: 'RAY-SRM V3 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.SRM },
 
@@ -622,7 +651,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-SOL-V3': {
     symbol: 'RAY-SOL',
-    name: 'RAY-SOL LP',
+    name: 'RAY-SOL V3 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...NATIVE_SOL },
 
@@ -631,7 +660,7 @@ export const LP_TOKENS: Tokens = {
   },
   'RAY-ETH-V3': {
     symbol: 'RAY-ETH',
-    name: 'RAY-ETH LP',
+    name: 'RAY-ETH V3 LP',
     coin: { ...TOKENS.RAY },
     pc: { ...TOKENS.ETH },
 
@@ -1052,6 +1081,78 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Hb8KnZNKvRxu7pgMRWJgoMSMcepfvNiBFFDDrdf9o3wA',
     decimals: TOKENS.renDOGE.decimals
+  },
+  'RAY-USDC-V4': {
+    symbol: 'RAY-USDC',
+    name: 'RAY-USDC LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FbC6K13MzHvN42bXrtGaWsvZY9fxrackRSZcBGfjPc7m',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-SRM-V4': {
+    symbol: 'RAY-SRM',
+    name: 'RAY-SRM LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SRM },
+
+    mintAddress: '7P5Thr9Egi2rvMmEuQkLn8x8e8Qro7u2U7yLD2tU2Hbe',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-ETH-V4': {
+    symbol: 'RAY-ETH',
+    name: 'RAY-ETH LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.ETH },
+
+    mintAddress: 'mjQH33MqZv5aKAbKHi8dG3g3qXeRQqq1GFcXceZkNSr',
+    decimals: TOKENS.RAY.decimals
+  },
+  'RAY-SOL-V4': {
+    symbol: 'RAY-SOL',
+    name: 'RAY-SOL LP',
+    coin: { ...TOKENS.RAY },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '89ZKE4aoyfLBe2RuV6jM3JGNhaV18Nxh8eNtjRcndBip',
+    decimals: TOKENS.RAY.decimals
+  },
+  'DXL-USDC-V4': {
+    symbol: 'DXL-USDC',
+    name: 'DXL-USDC LP',
+    coin: { ...TOKENS.DXL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4HFaSvfgskipvrzT1exoVKsUZ174JyExEsA8bDfsAdY5',
+    decimals: TOKENS.DXL.decimals
+  },
+  'LIKE-USDC-V4': {
+    symbol: 'LIKE-USDC',
+    name: 'LIKE-USDC LP',
+    coin: { ...TOKENS.LIKE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'cjZmbt8sJgaoyWYUttomAu5LJYU44ZrcKTbzTSEPDVw',
+    decimals: TOKENS.LIKE.decimals
+  },
+  'mSOL-USDC-V4': {
+    symbol: 'mSOL-USDC',
+    name: 'mSOL-USDC LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4xTpJ4p76bAeggXoYywpCCNKfJspbuRzZ79R7pRhbqSf',
+    decimals: TOKENS.mSOL.decimals
+  },
+  'mSOL-SOL-V4': {
+    symbol: 'mSOL-SOL',
+    name: 'mSOL-SOL LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '5ijRoAHVgd5T5CNtK5KDRUBZ7Bffb69nktMj5n6ks6m4',
+    decimals: TOKENS.mSOL.decimals
   }
 }
 

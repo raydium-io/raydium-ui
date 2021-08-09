@@ -132,7 +132,7 @@ export function getLpListByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
   ammIdOrMarket: string | undefined,
-  version = [3, 4]
+  version = [4]
 ): LiquidityPoolInfo[] {
   const pool = LIQUIDITY_POOLS.filter((pool) => {
     if (coinMintAddress && pcMintAddress) {
@@ -1825,6 +1825,238 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: '5UbUbaVLXnZq1eibQSUxdsk6Lp38bgdTjbjQPssXGgwW',
     serumPcVaultAccount: '4KMsmK7gPdKMAKmEcHqtBB5EhNnWVRd71v3a5uBwhQ2T',
     serumVaultSigner: 'Gwe1pE3rV4LLviNZqrEFPAeLchwvHrftBUQsnJtEkpSa',
+    official: true
+  },
+  {
+    name: 'RAY-USDC',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['RAY-USDC-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'J8u8nTHYtvudyqwLrXZboziN95LpaHFHpd97Jm5vtbkW',
+    ammTargetOrders: '3cji8XW5uhtsA757vELVFAeJpskyHwbnTSceMFY5GjVT',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'FdmKUE4UMiJYFK5ogCngHzShuVKrFXBamPWcewDr31th',
+    poolPcTokenAccount: 'Eqrhxd7bDUCH3MepKmdVkgwazXRzY6iHhEoBpY7yAohk',
+    poolWithdrawQueue: 'ERiPLHrxvjsoMuaWDWSTLdCMzRkQSo8SkLBLYEmSokyr',
+    poolTempLpTokenAccount: 'D1V5GMf3N26owUFcbz2qR5N4G81qPKQvS2Vc4SM73XGB',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '2xiv8A5xrJ7RnGdxXB42uFEkYHJjszEhaJyKKt4WaLep',
+    serumBids: 'Hf84mYadE1VqSvVWAvCWc9wqLXak4RwXiPb4A91EAUn5',
+    serumAsks: 'DC1HsWWRCXVg3wk2NndS5LTbce3axwUwUZH1RgnV4oDN',
+    serumEventQueue: 'H9dZt8kvz1Fe5FyRisb77KcYTaN8LEbuVAfJSnAaEABz',
+    serumCoinVaultAccount: 'GGcdamvNDYFhAXr93DWyJ8QmwawUHLCyRqWL3KngtLRa',
+    serumPcVaultAccount: '22jHt5WmosAykp3LPGSAKgY45p7VGh4DFWSwp21SWBVe',
+    serumVaultSigner: 'FmhXe9uG6zun49p222xt3nG1rBAkWvzVz7dxERQ6ouGw',
+    official: true
+  },
+  {
+    name: 'RAY-SRM',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.SRM },
+    lp: { ...LP_TOKENS['RAY-SRM-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'GaqgfieVmnmY4ZsZHHA6L5RSVzCGL3sKx4UgHBaYNy8m',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '7XWbMpdyGM5Aesaedh6V653wPYpEswA864sBvodGgWDp',
+    ammTargetOrders: '9u8bbHv7DnEbVRXmptz3LxrJsryY1xHqGvXLpgm9s5Ng',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '3FqQ8p72N85USJStyttaohu1EBsTsEZQ9tVqwcPWcuSz',
+    poolPcTokenAccount: '384kWWf2Km56EReGvmtCKVo1BBmmt2SwiEizjhwpCmrN',
+    poolWithdrawQueue: '58z15NsT3JJyfywFbdYzn2GVeDDC444WHyUrssZ5tCm7',
+    poolTempLpTokenAccount: '8jqpuijsM2ne5dkwLyjQxa9oCbYEjM6bE1uBaFXmC3TE',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'Cm4MmknScg7qbKqytb1mM92xgDxv3TNXos4tKbBqTDy7',
+    serumBids: 'G65a5G6xHpc9zV8tGhVSKJtz7AcAJ8Q3hbMqnDJQgMkz',
+    serumAsks: '7bKEjcZEqVAWsiRGDnxXvTnNwhZLt2SH6cHi5hpcg5de',
+    serumEventQueue: '4afBYfMNsNpLQxFFt72atZsSF4erfU28XvugpX6ugvr1',
+    serumCoinVaultAccount: '5QDTh4Bpz4wruWMfayMSjUxRgDvMzvS2ifkarhYtjS1B',
+    serumPcVaultAccount: '76CofnHCvo5wEKtxNWfLa2jLDz4quwwSHFMne6BWWqx',
+    serumVaultSigner: 'AorjCaSV1L6NGcaFZXEyUrmbSqY3GdB3YXbQnrh85v6F',
+    official: true
+  },
+  {
+    name: 'RAY-ETH',
+    coin: { ...TOKENS.RAY },
+    pc: { ...TOKENS.ETH },
+    lp: { ...LP_TOKENS['RAY-ETH-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '8iQFhWyceGREsWnLM8NkG9GC8DvZunGZyMzuyUScgkMK',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '7iztHknuo7FAXVrrpAjsHBEEjRTaNH4b3hecVApQnSwN',
+    ammTargetOrders: 'JChSqhn6yyEWqD95t8UR5DaZZtEZ1RGGjdwgMc8S6UUt',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'G3Szi8fUqxfZjZoNx17kQbxeMTyXt2ieRvju4f3eJt9j',
+    poolPcTokenAccount: '7MgaPPNa7ySdu5XV7ik29Xoav4qcDk4wznXZ2Muq9MnT',
+    poolWithdrawQueue: 'C9aijsE3tLbVyYaXXHi45qneDL5jfyN8befuJh8zzpou',
+    poolTempLpTokenAccount: '3CDnyBsNnexdvfvo6ASde5Q4e72jzMQFHRRkSQr49vEG',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '6jx6aoNFbmorwyncVP5V5ESKfuFc9oUYebob1iF6tgN4',
+    serumBids: 'Hdvh4ZGL9MkiQApNqfZtdmd4jM6Sz8e9akCUuxxkYhb8',
+    serumAsks: '7vWmTv9Mh8XbAxcduEqed2dLtro4N7hFroqch6mMxYKM',
+    serumEventQueue: 'EgcugBBSwM2FxqLQx5S6zAiU9x9qRS8qMVRMDFFU4Zty',
+    serumCoinVaultAccount: 'EVVtYo4AeCbmn2dYS1UnhtfjpzCXCcN26G1HmuHwMo7w',
+    serumPcVaultAccount: '6ZT6KwvjLnJLpFdVfiRD9ifVUo4gv4MUie7VvPTuk69v',
+    serumVaultSigner: 'HXbRDLcX2FyqWJY95apnsTgBoRHyp7SWYXcMYod6EBrQ',
+    official: true
+  },
+  {
+    name: 'RAY-SOL',
+    coin: { ...TOKENS.RAY },
+    pc: { ...NATIVE_SOL },
+    lp: { ...LP_TOKENS['RAY-SOL-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'AVs9TA4nWDzfPJE9gGVNJMVhcQy3V9PGazuz33BfG2RA',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '6Su6Ea97dBxecd5W92KcVvv6SzCurE2BXGgFe9LNGMpE',
+    ammTargetOrders: '5hATcCfvhVwAjNExvrg8rRkXmYyksHhVajWLa46iRsmE',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'Em6rHi68trYgBFyJ5261A2nhwuQWfLcirgzZZYoRcrkX',
+    poolPcTokenAccount: '3mEFzHsJyu2Cpjrz6zPmTzP7uoLFj9SbbecGVzzkL1mJ',
+    poolWithdrawQueue: 'FSHqX232PHE4ev9Dpdzrg9h2Tn1byChnX4tuoPUyjjdV',
+    poolTempLpTokenAccount: '87CCkBfthmyqwPuCDwFmyqKWJfjYqPFhm5btkNyoALYZ',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'C6tp2RVZnxBPFbnAsfTjis8BN9tycESAT4SgDQgbbrsA',
+    serumBids: 'C1nEbACFaHMUiKAUsXVYPWZsuxunJeBkqXHPFr8QgSj9',
+    serumAsks: '4DNBdnTw6wmrK4NmdSTTxs1kEz47yjqLGuoqsMeHvkMF',
+    serumEventQueue: '4HGvdannxvmAhszVVig9auH6HsqVH17qoavDiNcnm9nj',
+    serumCoinVaultAccount: '6U6U59zmFWrPSzm9sLX7kVkaK78Kz7XJYkrhP1DjF3uF',
+    serumPcVaultAccount: '4YEx21yeUAZxUL9Fs7YU9Gm3u45GWoPFs8vcJiHga2eQ',
+    serumVaultSigner: '7SdieGqwPJo5rMmSQM9JmntSEMoimM4dQn7NkGbNFcrd',
+    official: true
+  },
+  {
+    name: 'DXL-USDC',
+    coin: { ...TOKENS.DXL },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['DXL-USDC-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'asdEJnE7osjgnSyQkSZJ3e5YezbmXuDQPiyeyiBxoUm',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '4zuyAKT81y9mSSrjq8sN872zwgcD5ncQGyCXwRJDn6tC',
+    ammTargetOrders: 'H2GMj87upPeBQT3ywzqudJodwyTFpPmwuwtiZ7DQB8Md',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'FHAqAqqdyZFaxUTCg19hH9pRfKKChwNekFrY428NVPtT',
+    poolPcTokenAccount: '7jzwUCSq1R1QX72PKRDjZ4xgUm6Q6iiLW9BY8tnj8wkc',
+    poolWithdrawQueue: '3WBnh4HbddG6sMvv6s1GALVLPq6xfwVat3WqufZKKFXa',
+    poolTempLpTokenAccount: '9DRSmvcrXC7AtNrhf9tgfBuwT4q5hXyWaAybe5yfRU7q',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'DYfigimKWc5VhavR4moPBibx9sMcWYVSjVdWvPztBPTa',
+    serumBids: '2Z6Do29oGtze6dnVMXAVw8mkRxFpLGc8uS2RjfrWoCyy',
+    serumAsks: 'FosLnuNKUKqfqYviAPdp1doC3dKpXQXvAeRGM5xAoUCJ',
+    serumEventQueue: 'EW5QgqGUZ7dSmXLXiuWB8AAsjSjpb8kaaoxAUqK1DWyg',
+    serumCoinVaultAccount: '9ZaKDVrjCaPRZTqnuteGc8iBmJhdaGVf8JV2HBT67wbX',
+    serumPcVaultAccount: '5Y65XyuJemmRU7G1AQQTvWKSge8WDVYhb2knd7htJHoh',
+    serumVaultSigner: 'y6FHXgMwWvvpoiox6Ut6mUAUHgbJMXNJnXQm7MQkEdE',
+    official: true
+  },
+  {
+    name: 'LIKE-USDC',
+    coin: { ...TOKENS.LIKE },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['LIKE-USDC-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'GmaDNMWsTYWjaXVBjJTHNmCWAKU6cn5hhtWWYEZt4odo',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'Crn5beRFeyj4Xw13E2wdJ9YkkLLEZzKYmtTV4LFDx3MN',
+    ammTargetOrders: '7XjS6MrvBRi9JeFWBMAYPaKhKgR3b7xnVdYDBkFb4CXR',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '8LoHX6f6bMdQVs4mThoH2KwX2dQDSkqVFADi4ZjDQv9T',
+    poolPcTokenAccount: '2Fwm8M8vuPXEXxvKz98VdawDxsK9W8uRuJyJhvtRdhid',
+    poolWithdrawQueue: 'CW9zJ2JbBekkdd5SdvPapPcbziR8d1UHBzW7nNn1W3ga',
+    poolTempLpTokenAccount: 'FVHsnC1nhwMcrAzFwcK4dgUtDdYFM1VrTJ8Rp8Mb1LkY',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '3WptgZZu34aiDrLMUiPntTYZGNZ72yT1yxHYxSdbTArX',
+    serumBids: 'GzHpnQSfS7KdqLKgiEEP7pkYnwEBz9zaE7De2CjmCrNV',
+    serumAsks: 'FpEBAT9qP1so4ASUTiEWxyXH2SJvgoBYUiZ1AbPimcS7',
+    serumEventQueue: 'CUMDMV9KtE22RUZECUNHxiq7FmUiRusyKa1rHUJfRptq',
+    serumCoinVaultAccount: 'Dd9F1fugQj2xtduyNvFS5TtxP9vKnuxVMcrPsHFnLyqp',
+    serumPcVaultAccount: 'BnXXu8kLUXrwg3MpcVRVPLZw9bpX2mLd95qtCMnSUtu7',
+    serumVaultSigner: 'MKCHeoqNGWU8TJBkdF1M76nMUteJCwuBRUJfCtR3iV7',
+    official: true
+  },
+  {
+    name: 'mSOL-USDC',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['mSOL-USDC-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'ZfvDXXUhZDzDVsapffUyXHj9ByCoPjP4thL6YXcZ9ix',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '4zoatXFjMSirW2niUNhekxqeEZujjC1oioKCEJQMLeWF',
+    ammTargetOrders: 'Kq9Vgb8ntBzZy5doEER2p4Zpt8SqW2GqJgY5BgWRjDn',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '8JUjWjAyXTMB4ZXcV7nk3p6Gg1fWAAoSck7xekuyADKL',
+    poolPcTokenAccount: 'DaXyxj42ZDrp3mjrL9pYjPNyBp5P8A2f37am4Kd4EyrK',
+    poolWithdrawQueue: 'CfjpUvQAoU4hadb9nReTCAqBFFP7MpJyBW97ezbiWgsQ',
+    poolTempLpTokenAccount: '3EdqPYv3hLJFXC3U9LH7yA7HX6Z7gRxT7vGQQJrxScDH',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '6oGsL2puUgySccKzn9XA9afqF217LfxP5ocq4B3LWsjy',
+    serumBids: '8qyWhEcpuvEsdCmY1kvEnkTfgGeWHmi73Mta5jgWDTuT',
+    serumAsks: 'PPnJy6No31U45SVSjWTr45R8Q73X6bNHfxdFqr2vMq3',
+    serumEventQueue: 'BC8Tdzz7rwvuYkJWKnPnyguva27PQP5DTxosHVQrEzg9',
+    serumCoinVaultAccount: '2y3BtF5oRBpLwdoaGjLkfmT3FY3YbZCKPbA9zvvx8Pz7',
+    serumPcVaultAccount: '6w5hF2hceQRZbaxjPJutiWSPAFWDkp3YbY2Aq3RpCSKe',
+    serumVaultSigner: '9dEVMESKXcMQNndoPc5ji9iTeDJ9GfToboy8prkZeT96',
+    official: true
+  },
+  {
+    name: 'mSOL-SOL',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...NATIVE_SOL },
+    lp: { ...LP_TOKENS['mSOL-SOL-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'EGyhb2uLAsRUbRx9dNFBjMVYnFaASWMvD6RE1aEf2LxL',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '6c1u1cNEELKPmuH352WPNNEPdfTyVPHsei39DUPemC42',
+    ammTargetOrders: 'CLuMpSesLPqdxewQTxfiLdifQfDfRsxkFhPgiChmdGfk',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '85SxT7AdDQvJg6pZLoDf7vPiuXLj5UYZLVVNWD1NjnFK',
+    poolPcTokenAccount: 'BtGUR6y7uwJ6UGXNMcY3gCLm7dM3WaBdmgtKVgGnE1TJ',
+    poolWithdrawQueue: '7vvoHxA6di9EvzJKL6bmojbZnH3YaRXu2LitufrQhM21',
+    poolTempLpTokenAccount: 'ACn8TZ27fQ85kgdPKUfkETB4dS5JPFoq53z7uCgtHDai',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '5cLrMai1DsLRYc1Nio9qMTicsWtvzjzZfJPXyAoF4t1Z',
+    serumBids: 'JAABQk3n6S8W85LC6RpqTvGgP9wJFb8kfqir6kUhBXkQ',
+    serumAsks: 'psFs3Dm7quZZn3BhvrT1LdWCVtbMqxXanU7ZYdHULj6',
+    serumEventQueue: '4bmSJJCrx3dehFQ8kXAE1c4L9kfP8DyHow4tFw6aRJZe',
+    serumCoinVaultAccount: '2qmHPJn3URkrboLiJkQ5tBB4bmYWdb6MyhQzZ6ms7wf9',
+    serumPcVaultAccount: 'A6eEM36Vpyti2PoHK8h8Dqk5zu7YTaSRTQb7XXL8tcrV',
+    serumVaultSigner: 'EHMK3DdPiPBd9aBjeRU4aZjD7z568rmwHCSAAxRooPq6',
     official: true
   }
 ]

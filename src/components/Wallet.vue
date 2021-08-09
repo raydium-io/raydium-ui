@@ -19,9 +19,9 @@
       @cancel="$accessor.wallet.closeModal"
     >
       <div v-if="!wallet.connected" class="select-wallet">
-        <Button v-for="(providerUrl, name) in wallets" :key="name" ghost @click="connect(name)">
-          <span>{{ name }}</span>
-          <img :src="importIcon(`/wallets/${name.replace(' ', '-').toLowerCase()}.png`)" />
+        <Button v-for="info in wallets" :key="info.name" ghost @click="connect(info)">
+          <span>{{ info.name }}</span>
+          <img :src="importIcon(`/wallets/${info.name.replace(' ', '-').toLowerCase()}.png`)" />
         </Button>
       </div>
       <div v-else class="wallet-info">
@@ -33,14 +33,9 @@
           <h2>Recent Transactions</h2>
           <div v-for="txInfo in historyList" :key="txInfo.txid" class="tx-item">
             <div class="extra-info">
+              <Icon v-if="txInfo.status === 'success'" class="icon" type="check-circle" :style="{ color: '#52c41a' }" />
               <Icon
-                v-if="txInfo.status === 'Success' || txInfo.s === 's' /* old data polyfill*/"
-                class="icon"
-                type="check-circle"
-                :style="{ color: '#52c41a' }"
-              />
-              <Icon
-                v-else-if="txInfo.status === 'Fail' || txInfo.s === 'f' /* old data polyfill*/"
+                v-else-if="txInfo.status === 'fail'"
                 class="icon"
                 type="close-circle"
                 :style="{ color: '#f5222d' }"
@@ -61,7 +56,11 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Button, Modal, Icon } from 'ant-design-vue'
-import { AccountInfo, Context } from '@solana/web3.js'
+import {
+  AccountInfo,
+  Context
+  // PublicKey
+} from '@solana/web3.js'
 // @ts-ignore
 import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter'
 
@@ -81,8 +80,12 @@ import {
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
 
-interface Wallets {
-  [key: string]: string
+interface WalletInfo {
+  name: string
+  url: string
+  installUrl?: string
+  // isExtension: boolean
+  getAdapter: ({ providerUrl, endpoint }: { providerUrl: any; endpoint: string }) => WalletAdapter | undefined
 }
 
 @Component({
@@ -94,21 +97,108 @@ interface Wallets {
 })
 export default class Wallet extends Vue {
   /* ========== DATA ========== */
-  wallets = {
-    Phantom: '',
-    Sollet: 'https://www.sollet.io',
-    'Sollet Extension': '',
-    Ledger: '',
-    MathWallet: '',
-    Solflare: 'https://solflare.com/access-wallet',
-    Solong: '',
-    Coin98: '',
-    Blocto: '',
-    Bonfida: 'https://bonfida.com/wallet'
-    // TrustWallet: '',
-    // https://docs.coin98.app/coin98-extension/developer-guide
-    // ezDeFi: '',
-  } as Wallets
+  // TrustWallet ezDeFi
+  wallets: WalletInfo[] = [
+    {
+      name: 'Phantom',
+      url: 'https://phantom.app',
+      installUrl: 'https://chrome.google.com/webstore/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+      getAdapter() {
+        if ((window as any).solana === undefined || !(window as any).solana.isPhantom) {
+          return
+        }
+
+        return new PhantomWalletAdapter()
+      }
+    },
+    {
+      name: 'Sollet Web',
+      url: 'https://www.sollet.io',
+      getAdapter({ providerUrl, endpoint }: { providerUrl: string; endpoint: string }) {
+        return new SolanaWalletAdapter(providerUrl, endpoint)
+      }
+    },
+    {
+      name: 'Sollet Extension',
+      url: 'https://www.sollet.io',
+      installUrl: 'https://chrome.google.com/webstore/detail/sollet/fhmfendgdocmcbmfikdcogofphimnkno',
+      getAdapter({ endpoint }: { endpoint: string }) {
+        if ((window as any).sollet === undefined) {
+          return
+        }
+
+        return new SolanaWalletAdapter((window as any).sollet, endpoint)
+      }
+    },
+    {
+      name: 'Ledger',
+      url: 'https://www.ledger.com',
+      getAdapter() {
+        return new LedgerWalletAdapter()
+      }
+    },
+    {
+      name: 'MathWallet',
+      url: 'https://mathwallet.org',
+      installUrl: 'https://chrome.google.com/webstore/detail/math-wallet/afbcbjpbpfadlkmhmclhkeeodmamcflc',
+      getAdapter() {
+        if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
+          return
+        }
+
+        return new MathWalletAdapter()
+      }
+    },
+    {
+      name: 'Solong',
+      url: 'https://solongwallet.com',
+      installUrl: 'https://chrome.google.com/webstore/detail/solong/memijejgibaodndkimcclfapfladdchj',
+      getAdapter() {
+        if ((window as any).solong === undefined) {
+          return
+        }
+
+        return new SolongWalletAdapter()
+      }
+    },
+    {
+      name: 'Coin98',
+      url: 'https://www.coin98.com',
+      installUrl: 'https://chrome.google.com/webstore/detail/coin98-wallet/aeachknmefphepccionboohckonoeemg',
+      getAdapter() {
+        if ((window as any).coin98 === undefined) {
+          return
+        }
+
+        return new Coin98WalletAdapter()
+      }
+    },
+    {
+      name: 'Blocto',
+      url: 'https://blocto.portto.io',
+      getAdapter() {
+        if ((window as any).solana === undefined || !(window as any).solana.isBlocto) {
+          return
+        }
+
+        return new BloctoWalletAdapter()
+      }
+    },
+    {
+      name: 'Solflare',
+      url: 'https://solflare.com/access-wallet',
+      getAdapter({ providerUrl, endpoint }: { providerUrl: string; endpoint: string }) {
+        return new SolanaWalletAdapter(providerUrl, endpoint)
+      }
+    },
+    {
+      name: 'Bonfida',
+      url: 'https://bonfida.com/wallet',
+      getAdapter({ providerUrl, endpoint }: { providerUrl: string; endpoint: string }) {
+        return new SolanaWalletAdapter(providerUrl, endpoint)
+      }
+    }
+  ]
 
   // auto refresh
   walletTimer: number | undefined = undefined
@@ -142,10 +232,12 @@ export default class Wallet extends Vue {
 
   // history
   get historyList() {
-    const rawList = Object.entries(this.$accessor.transaction.history).map(([txid, txInfo]) => ({
-      ...(txInfo as any),
-      txid
-    }))
+    const rawList = Object.entries(this.$accessor.transaction.history[this.$accessor.wallet.address] ?? {}).map(
+      ([txid, txInfo]) => ({
+        ...(txInfo as any),
+        txid
+      })
+    )
     return rawList.sort((a, b) => {
       return (b.time || b.t) - (a.time || a.t)
     })
@@ -178,99 +270,50 @@ export default class Wallet extends Vue {
   /* ========== METHODS ========== */
   importIcon = importIcon
 
-  connect(walletName: string) {
-    let wallet: WalletAdapter
+  connect(wallet: WalletInfo) {
     const { rpcs } = web3Config
-    const endpoint = rpcs[0]
+    const endpoint = rpcs[0].url
 
-    switch (walletName) {
-      case 'Ledger': {
-        wallet = new LedgerWalletAdapter()
-        break
-      }
-      case 'Sollet Extension': {
-        if ((window as any).sollet === undefined) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and initialize Sollet wallet extension first'
-          })
-          return
+    const { name, url, installUrl } = wallet
+    const adapter = wallet.getAdapter({ providerUrl: url, endpoint })
+
+    if (!adapter) {
+      // is extension and not installed
+      this.$notify.error({
+        message: 'Connect wallet failed',
+        description: (h: any) => {
+          const msg = [
+            `Please install and initialize ${name} wallet extension first, `,
+            h('a', { attrs: { href: url, target: '_blank' } }, 'click here to visit official website')
+          ]
+
+          if (installUrl) {
+            msg.push(' or ')
+            msg.push(h('a', { attrs: { href: installUrl, target: '_blank' } }, 'click here to install extension'))
+          }
+
+          return h('div', msg)
         }
-
-        wallet = new SolanaWalletAdapter((window as any).sollet, endpoint)
-        break
-      }
-      case 'Solong': {
-        if ((window as any).solong === undefined) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and initialize Solong wallet extension first'
-          })
-          return
-        }
-
-        wallet = new SolongWalletAdapter()
-        break
-      }
-      case 'MathWallet': {
-        if ((window as any).solana === undefined || !(window as any).solana.isMathWallet) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and initialize Math wallet extension first'
-          })
-          return
-        }
-
-        wallet = new MathWalletAdapter()
-        break
-      }
-      case 'Phantom': {
-        if ((window as any).solana === undefined || !(window as any).solana.isPhantom) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and initialize Phantom wallet extension first'
-          })
-          return
-        }
-
-        wallet = new PhantomWalletAdapter()
-        break
-      }
-      case 'Blocto': {
-        if ((window as any).solana === undefined || !(window as any).solana.isBlocto) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and open Blocto app first'
-          })
-          return
-        }
-
-        wallet = new BloctoWalletAdapter()
-        break
-      }
-      case 'Coin98': {
-        if ((window as any).coin98 === undefined) {
-          this.$notify.error({
-            message: 'Connect wallet failed',
-            description: 'Please install and open Coin98 app first'
-          })
-          return
-        }
-
-        wallet = new Coin98WalletAdapter()
-        break
-      }
-      default: {
-        wallet = new SolanaWalletAdapter(this.wallets[walletName], endpoint)
-        break
-      }
+      })
+      return
     }
 
-    wallet.on('connect', () => {
+    adapter.on('connect', () => {
       this.$accessor.wallet.closeModal().then(() => {
-        if (wallet.publicKey) {
-          Vue.prototype.$wallet = wallet
-          this.$accessor.wallet.setConnected(wallet.publicKey.toBase58())
+        if (adapter.publicKey) {
+          // mock wallet
+          // const address = new PublicKey('')
+          // Vue.prototype.$wallet = {
+          //   connected: true,
+          //   publicKey: address,
+          //   signTransaction: (transaction: any) => {
+          //     console.log(transaction)
+          //   }
+          // }
+          // this.$accessor.wallet.setConnected(address.toBase58())
+
+          Vue.prototype.$wallet = adapter
+          this.$accessor.wallet.setConnected(adapter.publicKey.toBase58())
 
           this.subWallet()
           this.$notify.success({
@@ -281,12 +324,12 @@ export default class Wallet extends Vue {
       })
     })
 
-    wallet.on('disconnect', () => {
+    adapter.on('disconnect', () => {
       this.disconnect()
     })
 
     try {
-      wallet.connect()
+      adapter.connect()
     } catch (error) {
       this.$notify.error({
         message: 'Connect wallet failed',

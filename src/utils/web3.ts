@@ -9,6 +9,8 @@ import {
   TransactionSignature,
   TransactionInstruction
 } from '@solana/web3.js'
+// @ts-ignore without ts ignore, yarn build will failed
+import { Token } from '@solana/spl-token'
 
 import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
@@ -16,6 +18,7 @@ import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_
 import assert from 'assert'
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import { struct } from 'superstruct'
+import { TOKENS } from '@/utils/tokens'
 
 export const web3Config = {
   strategy: 'speed',
@@ -94,6 +97,44 @@ export async function createTokenAccountIfNotExist(
   }
 
   return publicKey
+}
+
+export async function createAssociatedTokenAccountIfNotExist(
+  account: string | undefined | null,
+  owner: PublicKey,
+  mintAddress: string,
+
+  transaction: Transaction,
+  atas: string[] = []
+) {
+  let publicKey
+  if (account) {
+    publicKey = new PublicKey(account)
+  }
+
+  const mint = new PublicKey(mintAddress)
+  // @ts-ignore without ts ignore, yarn build will failed
+  const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner, true)
+
+  if (
+    (!publicKey || !ata.equals(publicKey)) &&
+    mintAddress !== TOKENS.WSOL.mintAddress &&
+    !atas.includes(ata.toBase58())
+  ) {
+    transaction.add(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        mint,
+        ata,
+        owner,
+        owner
+      )
+    )
+    atas.push(ata.toBase58())
+  }
+
+  return ata
 }
 
 export async function createProgramAccountIfNotExist(
@@ -185,17 +226,6 @@ export async function createAssociatedTokenAccount(
   )
 
   return associatedTokenAddress
-}
-
-export async function createTokenAccount(connection: Connection, wallet: any, mint: string) {
-  const transaction = new Transaction()
-  const signers: Account[] = []
-
-  const owner = wallet.publicKey
-
-  await createAssociatedTokenAccount(new PublicKey(mint), owner, transaction)
-
-  return await sendTransaction(connection, wallet, transaction, signers)
 }
 
 export async function getFilteredProgramAccounts(

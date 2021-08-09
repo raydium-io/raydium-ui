@@ -1,6 +1,6 @@
 import { getBigNumber } from './layouts'
 import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
-import { createProgramAccountIfNotExist, createTokenAccountIfNotExist, sendTransaction } from '@/utils/web3'
+import { createProgramAccountIfNotExist, sendTransaction, createAssociatedTokenAccountIfNotExist } from '@/utils/web3'
 // @ts-ignore
 import { nu64, struct, u8, blob } from 'buffer-layout'
 import { publicKey, u128, u64 } from '@project-serum/borsh'
@@ -21,7 +21,6 @@ export async function deposit(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -29,15 +28,23 @@ export async function deposit(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
+
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
     transaction,
-    signers
+    atas
   )
 
   // if no userinfo account, create new one
@@ -62,7 +69,7 @@ export async function deposit(
       new PublicKey(farmInfo.poolAuthority),
       userInfoAccount,
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
@@ -86,7 +93,6 @@ export async function depositV4(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -94,27 +100,33 @@ export async function depositV4(
 
   const owner = wallet.publicKey
 
-  // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
-    rewardAccount,
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
     owner,
-    farmInfo.reward.mintAddress,
-    null,
+    farmInfo.lp.mintAddress,
     transaction,
-    signers
+    atas
   )
 
   // if no account, create new one
-  const userRewardTokenAccountB = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
+    rewardAccount,
+    owner,
+    farmInfo.reward.mintAddress,
+    transaction,
+    atas
+  )
+
+  // if no account, create new one
+  const userRewardTokenAccountB = await createAssociatedTokenAccountIfNotExist(
     rewardAccountB,
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    null,
     transaction,
-    signers
+    atas
   )
 
   // if no userinfo account, create new one
@@ -139,7 +151,7 @@ export async function depositV4(
       new PublicKey(farmInfo.poolAuthority),
       userInfoAccount,
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
@@ -165,7 +177,7 @@ export async function withdraw(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+  if (!infoAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -173,15 +185,23 @@ export async function withdraw(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
+
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
     transaction,
-    signers
+    atas
   )
 
   const programId = new PublicKey(farmInfo.programId)
@@ -194,7 +214,7 @@ export async function withdraw(
       new PublicKey(farmInfo.poolAuthority),
       new PublicKey(infoAccount),
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
@@ -218,7 +238,7 @@ export async function withdrawV4(
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!farmInfo) throw new Error('Miss pool infomations')
-  if (!lpAccount || !infoAccount) throw new Error('Miss account infomations')
+  if (!infoAccount) throw new Error('Miss account infomations')
   if (!amount) throw new Error('Miss amount infomations')
 
   const transaction = new Transaction()
@@ -226,27 +246,32 @@ export async function withdrawV4(
 
   const owner = wallet.publicKey
 
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
   // if no account, create new one
-  const userRewardTokenAccount = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccount = await createAssociatedTokenAccountIfNotExist(
     rewardAccount,
     owner,
     farmInfo.reward.mintAddress,
-    null,
     transaction,
-    signers
+    atas
   )
 
   // if no account, create new one
-  const userRewardTokenAccountB = await createTokenAccountIfNotExist(
-    connection,
+  const userRewardTokenAccountB = await createAssociatedTokenAccountIfNotExist(
     rewardAccountB,
     owner,
     // @ts-ignore
     farmInfo.rewardB.mintAddress,
-    null,
     transaction,
-    signers
+    atas
   )
 
   const programId = new PublicKey(farmInfo.programId)
@@ -259,7 +284,7 @@ export async function withdrawV4(
       new PublicKey(farmInfo.poolAuthority),
       new PublicKey(infoAccount),
       wallet.publicKey,
-      new PublicKey(lpAccount),
+      userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
       userRewardTokenAccount,
       new PublicKey(farmInfo.poolRewardTokenAccount),
