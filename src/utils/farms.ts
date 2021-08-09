@@ -646,7 +646,7 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb', // lp vault
     poolRewardTokenAccount: '5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt' // reward vault A
   }
-]
+].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
 // for solana.tokenlist.json
 // for (const [key, value] of Object.entries(LP_TOKENS)) {
