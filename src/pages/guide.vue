@@ -38,7 +38,7 @@
         </tr>
       </table>
       <div class="footnote">
-        *** Binance UID is required to receive airdrop. Don’t forget to enter your Binance account below.
+        * Binance UID is required to receive airdrop. Don’t forget to enter your Binance account below.
       </div>
     </section>
 
@@ -46,31 +46,9 @@
       <button @click="to('details')">REWARD DETAILS</button>
     </section>
 
-    <section class="media-entries">
-      <div class="task-level">Task 1</div>
-      <div class="title">Join Forces With Raydium</div>
-      <div class="subtitle">Total Points +2</div>
-      <div class="box-grid">
-        <div class="box social-media">
-          <div class="box-title">
-            Follow & Retweet Raydium
-            <div class="point-label">+1 POINTS</div>
-          </div>
-          <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />GO TO TWITTER</button>
-        </div>
-        <div class="box social-media">
-          <div class="box-title">
-            Join the Raydium Discord
-            <div class="point-label">+1 POINTS</div>
-          </div>
-          <button><img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD</button>
-        </div>
-      </div>
-    </section>
-
     <section class="step-game">
-      <div class="task-level">Task 2</div>
-      <div class="title">Try Raydium’s Light Speed Swaps</div>
+      <div class="task-level">Task 1</div>
+      <div class="title">Watch video</div>
       <div class="subtitle">Total Points +7</div>
 
       <div ref="step-1" class="box watch-video">
@@ -78,30 +56,15 @@
           Watch how to create a wallet on Solana and make your first Swap on Raydium.
         </div>
         <div class="video-box">
-          <div
-            v-if="!isVideoPlaying"
-            class="play-icon"
-            @click="
-              () => {
-                $refs.video.play()
-                $refs.video.controls = true
-              }
-            "
-          >
-            <svg viewBox="0 0 80 80" fill="none">
-              <circle cx="40" cy="40" r="38" stroke-width="2" stroke="var(--secondary)" />
-              <path
-                d="M56.6667 37.6906C58.4445 38.717 58.4445 41.283 56.6667 42.3094L32.6667 56.1658C30.8889 57.1922 28.6667 55.9092 28.6667 53.8564L28.6667 26.1436C28.6667 24.0908 30.8889 22.8078 32.6667 23.8342L56.6667 37.6906Z"
-                fill="var(--secondary)"
-              />
-            </svg>
-          </div>
-          <video
-            ref="video"
-            src="http://media.w3.org/2010/05/sintel/trailer.mp4"
-            @pause="isVideoPlaying = false"
-            @play="isVideoPlaying = true"
-          />
+          <iframe
+            width="100%"
+            height="480"
+            src="https://www.youtube.com/embed/gFd12SBXcJs"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
         </div>
       </div>
 
@@ -110,77 +73,96 @@
       </svg>
 
       <div class="box wallet">
-        <div class="box-title has-step">Connect your Wallet</div>
+        <div class="box-title has-step">Connect wallet so we can recognize you</div>
         <Wallet />
       </div>
+    </section>
 
-      <svg class="step-gap-line" viewBox="0 0 532 132">
-        <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
-      </svg>
-
+    <section class="connect-wallet">
+      <div class="task-level">Task 2</div>
+      <div class="title">Try Raydium’s Light Speed Swaps</div>
       <div class="box">
         <div class="box-title has-step">
           Swap on Raydium
           <div class="point-label">+7 POINTS</div>
         </div>
-        <NuxtLink to="/swap/">
-          <button>GO TO SWAP</button>
-        </NuxtLink>
+        <a href="/swap/" target="_blank"><button>GO TO SWAP</button></a>
+      </div>
+    </section>
+
+    <section class="media-entries">
+      <div class="task-level">Task 3</div>
+      <div class="title">Join Forces With Raydium</div>
+      <div class="subtitle">Total Points +2</div>
+      <div class="box-grid">
+        <div class="twitter">
+          <div class="box social-media">
+            <div class="box-title">
+              Follow & Retweet Raydium
+              <div class="point-label">+1 POINTS</div>
+            </div>
+            <a
+              href="https://twitter.com/RaydiumProtocol"
+              class="link"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <button @click="showLinkInput = true">
+                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />GO TO TWITTER
+              </button>
+            </a>
+          </div>
+
+          <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 360 88">
+            <polyline points="180,0 180,88" fill="none" stroke-width="2" stroke-dasharray="12" />
+          </svg>
+
+          <div v-if="showLinkInput" class="box form">
+            <div class="box-title">Paste Retweet Link</div>
+            <div class="input-box">
+              <label>Retweet Link</label>
+              <input v-model="retweetLink" />
+            </div>
+            <button @click="() => submit({ task: 'twitter', result: retweetLink })">SUBMIT</button>
+          </div>
+        </div>
+        <div class="discord">
+          <div class="box social-media">
+            <div class="box-title">
+              Join the Raydium Discord
+              <div class="point-label">+1 POINTS</div>
+            </div>
+            <a
+              href="https://discord.com/invite/6EvFwvCfpx"
+              class="link"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <button @click="() => submit({ task: 'twitter', result: '' })">
+                <img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="referrals">
-      <div class="task-level">Task 3</div>
-      <div class="title">Maximize Points By Referring Friends</div>
-      <div class="subtitle">Referral Board Top 10 Earn $2,000 in RAY, each!</div>
+      <div class="title">Tell your Friends about us</div>
+      <div class="subtitle">balabalabala</div>
       <div class="box">
         <div class="box-title">
           Refer now with your customized link below
           <div class="point-label">+1 POINTS / REFERRAL</div>
         </div>
+
+        <div class="box-text">your referral link: {{ initBackendResponse.user.referral }}</div>
+
         <div class="icon-btns">
-          <button class="icon-btn">
-            <a
-              href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-              ><img class="icon" src="../assets/icons/guide-facebook-icon.svg"
-            /></a>
+          <button class="icon-btn" @click="copyTextFromParagraph(initBackendResponse.user.referral)">
+            <img class="icon" src="../assets/icons/guide-share-icon.svg" />
           </button>
-          <button class="icon-btn"><img class="icon" src="../assets/icons/guide-twitter-icon-2.svg" /></button>
-          <button class="icon-btn"><img class="icon" src="../assets/icons/guide-share-icon.svg" /></button>
         </div>
-      </div>
-    </section>
-
-    <section class="binance-id-form">
-      <div class="task-level">Task 4</div>
-      <div class="title">Trade on Binance</div>
-      <div class="box form">
-        <div class="box-title">Binance UID is Required to Receive Airdrop</div>
-        <div class="input-box">
-          <label>Binance User ID</label><a rel="nofollow noopener noreferrer">Where do I find it?</a>
-          <input v-model="inputContent" />
-        </div>
-        <div class="check-box">
-          <Checkbox v-model="inputChecked" class="checkbox" />
-          <div class="text">I am the owner of this Binance account</div>
-        </div>
-        <button>SUBMIT</button>
-      </div>
-
-      <svg class="step-gap-line" viewBox="0 0 532 132">
-        <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
-      </svg>
-
-      <div class="box">
-        <div class="box-title">
-          Trade 250 RAY on Binance
-          <div class="point-label">+3 POINTS</div>
-        </div>
-        <button :style="{ '--secondary': '#f3ba2f' }">
-          <img class="icon" src="../assets/icons/guide-binance-icon.svg" />GO TO BINANCE
-        </button>
       </div>
     </section>
 
@@ -297,6 +279,7 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import { Input, Icon, Table, Checkbox } from 'ant-design-vue'
+import { CampaignInfo } from '@/types/api'
 
 @Component({
   head: {
@@ -310,29 +293,43 @@ import { Input, Icon, Table, Checkbox } from 'ant-design-vue'
     Checkbox
   },
 
-  async asyncData({ $accessor }) {
+  async asyncData({ $accessor, $api }) {
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
     }
-  },
-
-  mounted() {
-    window.addEventListener('beforeunload', function (ev) {
-      ev.preventDefault()
-      ev.returnValue = 'hello' // not work
-      return 'world' // not work
-    })
+    return { initBackendResponse: await $api.getCompaign({ address: '111111111' }) }
   }
 })
 export default class Guide extends Vue {
-  isVideoPlaying = false
   inputContent = ''
   inputChecked = false
+  initBackendResponse = {} as CampaignInfo // info from backend
+  showLinkInput = false
+  videoHasFinished = false
+  videoHasCachedComplete = false
+  retweetLink = ''
+  discordLink = ''
 
   to(anchor: 'step-1' | 'details') {
     const el = this.$refs[anchor] as Element | undefined
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  submit({
+    task,
+    result,
+    sign
+  }: {
+    task: 'video' | 'twitter' | 'discord' | 'swap' | 'referral'
+    result?: string
+    sign?: string
+  }) {
+    this.$api.postCompaign({ address: this.initBackendResponse.user.address, task, result, sign })
+  }
+
+  copyTextFromParagraph(text = '') {
+    navigator.clipboard?.writeText(text).then(() => alert(`copied!\n\n${text}`))
   }
 }
 </script>
@@ -520,8 +517,12 @@ button {
     color: var(--primary);
   }
 
+  .box-text {
+    margin-bottom: 1rem;
+  }
+
   &.watch-video {
-    max-width: 800px;
+    max-width: 1200px;
     .video-box {
       position: relative;
       .play-icon {
@@ -585,6 +586,10 @@ button {
   width: 532px;
   height: 132px;
   stroke: var(--secondary);
+  &.social-media {
+    width: 360px;
+    height: 88px;
+  }
 }
 
 .TLDR {
