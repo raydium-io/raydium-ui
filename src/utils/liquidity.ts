@@ -239,43 +239,49 @@ export async function removeLiquidity(
 
   const owner = wallet.publicKey
 
-  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
-    fromCoinAccount,
-    owner,
-    poolInfo.coin.mintAddress,
-    transaction
-  )
-  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(
-    toCoinAccount,
-    owner,
-    poolInfo.pc.mintAddress,
-    transaction
-  )
-
   const lpAmount = getBigNumber(new TokenAmount(amount, poolInfo.lp.decimals, false).wei)
 
-  let wrappedCoinSolAccount
+  let needCloseFromTokenAccount = false
+  let newFromTokenAccount
   if (poolInfo.coin.mintAddress === NATIVE_SOL.mintAddress) {
-    wrappedCoinSolAccount = await createTokenAccountIfNotExist(
+    newFromTokenAccount = await createTokenAccountIfNotExist(
       connection,
-      wrappedCoinSolAccount,
+      newFromTokenAccount,
       owner,
       TOKENS.WSOL.mintAddress,
       null,
       transaction,
       signers
     )
+    needCloseFromTokenAccount = true
+  } else {
+    newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
+      fromCoinAccount,
+      owner,
+      poolInfo.coin.mintAddress,
+      transaction
+    )
   }
-  let wrappedSolAccount
+
+  let needCloseToTokenAccount = false
+  let newToTokenAccount
   if (poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress) {
-    wrappedSolAccount = await createTokenAccountIfNotExist(
+    newToTokenAccount = await createTokenAccountIfNotExist(
       connection,
-      wrappedSolAccount,
+      newToTokenAccount,
       owner,
       TOKENS.WSOL.mintAddress,
       null,
       transaction,
       signers
+    )
+    needCloseToTokenAccount = true
+  } else {
+    newToTokenAccount = await createAssociatedTokenAccountIfNotExist(
+      toCoinAccount,
+      owner,
+      poolInfo.pc.mintAddress === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : poolInfo.pc.mintAddress,
+      transaction
     )
   }
 
@@ -301,8 +307,8 @@ export async function removeLiquidity(
           new PublicKey(poolInfo.serumVaultSigner),
 
           new PublicKey(lpAccount),
-          wrappedCoinSolAccount ? wrappedCoinSolAccount : newFromTokenAccount,
-          wrappedSolAccount ? wrappedSolAccount : newToTokenAccount,
+          newFromTokenAccount,
+          newToTokenAccount,
           owner,
 
           lpAmount
@@ -328,26 +334,26 @@ export async function removeLiquidity(
 
           new PublicKey(lpAccount),
           newFromTokenAccount,
-          wrappedSolAccount ? wrappedSolAccount : newToTokenAccount,
+          newToTokenAccount,
           owner,
 
           lpAmount
         )
   )
 
-  if (wrappedCoinSolAccount) {
+  if (needCloseFromTokenAccount) {
     transaction.add(
       closeAccount({
-        source: wrappedCoinSolAccount,
+        source: newFromTokenAccount,
         destination: owner,
         owner: owner
       })
     )
   }
-  if (wrappedSolAccount) {
+  if (needCloseToTokenAccount) {
     transaction.add(
       closeAccount({
-        source: wrappedSolAccount,
+        source: newToTokenAccount,
         destination: owner,
         owner: owner
       })
