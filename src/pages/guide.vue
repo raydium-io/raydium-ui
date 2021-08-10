@@ -132,7 +132,7 @@
         <div class="twitter">
           <div class="box social-media">
             <div class="box-title">
-              Follow & Retweet Raydium
+              Follow Raydium
               <div>
                 <img :class="`icon ${haveFollow ? '' : 'muted'}`" src="../assets/icons/reward.svg" />
                 <div class="point-label">+1 POINTS</div>
@@ -280,7 +280,7 @@
         </li>
         <li>
           Qualified users can earn extra points for the lucky airdrop pool by completing bonus tasks; 1) Following
-          Raydium, 2) Retweeting Raydium’s Airdrop Announcement, and 3) Joining the Raydium Discord, worth 1 entry each.
+          Raydium and 2) Joining the Raydium Discord, worth 1 entry each.
         </li>
         <li>
           The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as
@@ -312,8 +312,7 @@
           <td style="white-space: pre-line">
             <strong>Lucky Draw Pool</strong> Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)
             <br />
-            <strong>Earn Bonus Entries!</strong> Follow Raydium, Retweet Raydium’s Binance Announcement, and Join us on
-            Discord
+            <strong>Earn Bonus Entries!</strong> Follow Raydium and Join us on Discord
           </td>
           <td>
             3 Winners
