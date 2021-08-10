@@ -230,7 +230,7 @@ export async function removeLiquidity(
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo) throw new Error('Miss pool infomations')
 
-  if (!lpAccount || !fromCoinAccount || !toCoinAccount) throw new Error('Miss account infomations')
+  if (!lpAccount) throw new Error('Miss account infomations')
 
   if (!amount) throw new Error('Miss amount infomations')
 
@@ -238,6 +238,19 @@ export async function removeLiquidity(
   const signers: any = []
 
   const owner = wallet.publicKey
+
+  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
+    fromCoinAccount,
+    owner,
+    poolInfo.coin.mintAddress,
+    transaction
+  )
+  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(
+    toCoinAccount,
+    owner,
+    poolInfo.pc.mintAddress,
+    transaction
+  )
 
   const lpAmount = getBigNumber(new TokenAmount(amount, poolInfo.lp.decimals, false).wei)
 
@@ -288,8 +301,8 @@ export async function removeLiquidity(
           new PublicKey(poolInfo.serumVaultSigner),
 
           new PublicKey(lpAccount),
-          wrappedCoinSolAccount ? wrappedCoinSolAccount : new PublicKey(fromCoinAccount),
-          wrappedSolAccount ? wrappedSolAccount : new PublicKey(toCoinAccount),
+          wrappedCoinSolAccount ? wrappedCoinSolAccount : newFromTokenAccount,
+          wrappedSolAccount ? wrappedSolAccount : newToTokenAccount,
           owner,
 
           lpAmount
@@ -314,8 +327,8 @@ export async function removeLiquidity(
           new PublicKey(poolInfo.serumVaultSigner),
 
           new PublicKey(lpAccount),
-          new PublicKey(fromCoinAccount),
-          wrappedSolAccount ? wrappedSolAccount : new PublicKey(toCoinAccount),
+          newFromTokenAccount,
+          wrappedSolAccount ? wrappedSolAccount : newToTokenAccount,
           owner,
 
           lpAmount
