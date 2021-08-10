@@ -3,13 +3,10 @@
     <section class="page-title">
       <div class="page-sub-leading">Learn, Trade, Follow, Refer and Earn RAY</div>
       <div class="page-main-title">Raydium Bounty Airdrop</div>
-      <div class="page-additional-description">
-        in partnership with <img src="../assets/icons/binance-test-logo.svg" />
-      </div>
     </section>
 
     <section class="TLDR">
-      <div class="title">Earn up to $2,000 in RAY in 4 easy steps</div>
+      <div class="title">Earn up to $2,000 in RAY in 3 easy steps</div>
       <table class="TLDR-table">
         <tr>
           <th class="th"></th>
@@ -18,28 +15,20 @@
         </tr>
         <tr>
           <td class="td order">1</td>
-          <td class="td">Follow Socials</td>
-          <td class="td"><div class="point-label">+2 POINTS</div></td>
+          <td class="td">Swap & Confirm Referral</td>
+          <td class="td"><div class="point-label">+5 POINTS</div></td>
         </tr>
         <tr>
           <td class="td order">2</td>
-          <td class="td">Swap on Raydium</td>
-          <td class="td"><div class="point-label">+7 POINTS</div></td>
+          <td class="td">Earn Bonus Entries</td>
+          <td class="td"><div class="point-label">+3 POINTS</div></td>
         </tr>
         <tr>
           <td class="td order">3</td>
-          <td class="td">Refer Friends</td>
-          <td class="td"><div class="point-label">+1 POINTS / REFERRAL</div></td>
-        </tr>
-        <tr>
-          <td class="td order">4</td>
-          <td class="td">Trade 250 RAY</td>
-          <td class="td"><div class="point-label">+3 POINTS</div></td>
+          <td class="td">Refer More Friends</td>
+          <td class="td"><div class="point-label">+1 POINT / REFERRAL</div></td>
         </tr>
       </table>
-      <div class="footnote">
-        * Binance UID is required to receive airdrop. Don’t forget to enter your Binance account below.
-      </div>
     </section>
 
     <section class="nav-btns">
@@ -47,9 +36,8 @@
     </section>
 
     <section class="step-game">
-      <div class="task-level">Task 1</div>
-      <div class="title">Watch video</div>
-      <div class="subtitle">Total Points +7</div>
+      <div class="task-level">STEP 1</div>
+      <div class="title">Learn how to Swap</div>
 
       <div ref="step-1" class="box watch-video">
         <div class="box-title has-step">
@@ -59,7 +47,7 @@
           <iframe
             width="100%"
             height="480"
-            src="https://www.youtube.com/embed/gFd12SBXcJs"
+            src="https://www.youtube.com/embed/ViFSfsAqSLg"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -73,33 +61,59 @@
       </svg>
 
       <div class="box wallet">
-        <div class="box-title has-step">Connect wallet so we can recognize you</div>
+        <div class="box-title has-step">Connect wallet to recieve airdrop</div>
         <Wallet />
       </div>
     </section>
 
     <section class="connect-wallet">
-      <div class="task-level">Task 2</div>
-      <div class="title">Try Raydium’s Light Speed Swaps</div>
-      <div class="box">
-        <div class="box-title has-step">
-          Swap on Raydium
-          <div class="point-label">+7 POINTS</div>
+      <div class="task-level">STEP 2</div>
+      <div class="title">Try Raydium’s Light Speed Swaps & Confirm Referral</div>
+      <div class="subtitle">Total Points +5</div>
+      <div class="box-grid">
+        <div class="box">
+          <div class="box-title has-step">Swap on Raydium</div>
+          <a href="/swap/" target="_blank"><button>GO TO SWAP</button></a>
         </div>
-        <a href="/swap/" target="_blank"><button>GO TO SWAP</button></a>
+
+        <div class="box">
+          <div class="box-title">
+            Share to Twitter
+            <div class="point-label">BONUS +1 POINT / REFERRAL</div>
+          </div>
+          <div class="btn-row">
+            <a
+              :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <button
+                @click="
+                  () => {
+                    if (!$accessor.wallet.connected) {
+                      $accessor.wallet.openModal()
+                    }
+                  }
+                "
+              >
+                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />TWEET NOW
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="media-entries">
-      <div class="task-level">Task 3</div>
+      <div class="task-level">EARN BONUS POINTS</div>
       <div class="title">Join Forces With Raydium</div>
-      <div class="subtitle">Total Points +2</div>
+      <div class="subtitle">Total Points +3</div>
       <div class="box-grid">
         <div class="twitter">
           <div class="box social-media">
             <div class="box-title">
               Follow & Retweet Raydium
-              <div class="point-label">+1 POINTS</div>
+              <div class="point-label">+2 POINTS</div>
             </div>
             <div class="btn-row">
               <a
@@ -108,7 +122,7 @@
                 rel="nofollow noopener noreferrer"
                 target="_blank"
               >
-                <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FELLOW</button>
+                <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FOLLOW</button>
               </a>
               <a
                 :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
@@ -116,31 +130,26 @@
                 rel="nofollow noopener noreferrer"
                 target="_blank"
               >
-                <button @click="showLinkInput = true">
+                <button
+                  @click="
+                    () => {
+                      if (!$accessor.wallet.connected) {
+                        $accessor.wallet.openModal()
+                      }
+                    }
+                  "
+                >
                   <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />RETWEET
                 </button>
               </a>
             </div>
-          </div>
-
-          <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 440 88">
-            <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
-          </svg>
-
-          <div v-if="showLinkInput" class="box form">
-            <div class="box-title">Paste Retweet Link</div>
-            <div class="input-box">
-              <label>Retweet Link</label>
-              <input v-model="retweetLink" />
-            </div>
-            <button @click="() => submit({ task: 'twitter', result: retweetLink })">SUBMIT</button>
           </div>
         </div>
         <div class="discord">
           <div class="box social-media">
             <div class="box-title">
               Join the Raydium Discord
-              <div class="point-label">+1 POINTS</div>
+              <div class="point-label">+1 POINT</div>
             </div>
             <a
               href="https://discord.com/invite/6EvFwvCfpx"
@@ -148,32 +157,70 @@
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
-              <button @click="() => submit({ task: 'twitter', result: '' })">
+              <button @click="showLinkInput = true">
                 <img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
               </button>
             </a>
+          </div>
+
+          <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 440 88">
+            <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
+          </svg>
+
+          <div v-if="showLinkInput" class="box form">
+            <div class="box-title">Input Discord Username</div>
+            <div class="input-box">
+              <label>Discord Username</label>
+              <input v-model="discordUserName" />
+            </div>
+            <button
+              :disabled="$accessor.wallet.connected && !canSubmitDiscord"
+              @click="
+                () => {
+                  if (!$accessor.wallet.connected) {
+                    $accessor.wallet.openModal()
+                  } else {
+                    submit({ task: 'discord', result: discordUserName })
+                  }
+                }
+              "
+            >
+              {{ $accessor.wallet.connected ? 'SUBMIT' : 'CONNECT WALLET' }}
+            </button>
           </div>
         </div>
       </div>
     </section>
 
     <section class="referrals">
-      <div class="title">Tell your Friends about us</div>
-      <div class="subtitle">balabalabala</div>
+      <div class="title">Share With More Friends</div>
+      <div class="subtitle">To Earn $2,000 in RAY</div>
       <div class="box">
         <div class="box-title">
           Refer now with your customized link below
-          <div class="point-label">+1 POINTS / REFERRAL</div>
+          <div class="point-label">+1 POINT / REFERRAL</div>
         </div>
 
         <div class="box-text">
-          your referral link:
+          Your referral link:
           <br />
           {{ referralLink }}
         </div>
 
         <div class="icon-btns">
-          <button class="icon-btn" title="click here to copy it" @click="copyTextFromParagraph(referralLink)">
+          <button
+            class="icon-btn"
+            title="click here to copy it"
+            @click="
+              () => {
+                if (!$accessor.wallet.connected) {
+                  $accessor.wallet.openModal()
+                } else {
+                  $accessor.copy(referralLink)
+                }
+              }
+            "
+          >
             <img class="icon" src="../assets/icons/guide-share-icon.svg" />
           </button>
         </div>
@@ -212,8 +259,8 @@
       <table class="detail-panel">
         <tr>
           <th>Requirements</th>
-          <th>Number of Winners</th>
-          <th>Airdrop Amounts</th>
+          <th style="width: 200px">Number of Winners</th>
+          <th style="width: 200px">Airdrop Amounts</th>
           <th>Airdrop Eligibility</th>
         </tr>
         <tr>
@@ -267,34 +314,25 @@
 
     <section class="teams-conditions">
       <div class="title">TEAMS & CONDITIONS</div>
-      <div class="subtitle">subject to change</div>
       <ul>
-        <li>Bounty rewards will be distributed in RAY tokens, at a rate of 1 RAY token = $XX USD</li>
         <li>
-          Users that qualify for a guaranteed airdrop of the equivalent of $20 in RAY tokens are also eligible to
-          participate and win the random draws for the $10, $100 and $1,000 bounty rewards. However, participants will
-          not be able to win multiple lucky draws.
+          Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible to
+          participate and win the random draws for the $20, $50, $100, $300, and $1,000 in rewards. However,
+          participants will not be able to win multiple lucky draws.
         </li>
 
         <li>
-          Users will need to verify their completion of tasks 1-3 via the Raydium Airdrop Page in order to qualify for
-          the random draws.
-        </li>
-
-        <li>The random draws to select the winners will be made by the Raydium team.</li>
-        <li>
-          Users are limited to one entry per Binance account. Any multiple entries will result in disqualification of
-          all entries.
+          Users will need to verify their completion of tasks via the Raydium Airdrop Page in order to qualify for the
+          lucky draw. Lucky draw winners will be selected by the Raydium team.
         </li>
 
         <li>
-          Binance reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final
+          Raydium reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final
           interpretation of user task completion.
         </li>
 
         <li>
-          Rewards will be distributed to eligible participants before the time of trading. Users will be able to confirm
-          receipt of the rewards via the “Distribution History” page in the Wallet page.
+          Rewards will be distributed to eligible participants via the address linked to the account they used to swap.
         </li>
       </ul>
     </section>
@@ -319,16 +357,9 @@ import { CampaignInfo } from '@/types/api'
     Checkbox
   },
 
-  async asyncData({ $accessor, $api, route }) {
+  async asyncData({ $accessor }) {
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
-    }
-    const initBackendResponse = await $api.getCompaign({
-      address: '111111111',
-      referral: (route.query.referral as string) || undefined
-    })
-    return {
-      initBackendResponse
     }
   }
 })
@@ -340,12 +371,15 @@ export default class Guide extends Vue {
   videoHasFinished = false
   videoHasCachedComplete = false
   retweetLink = ''
-  discordLink = ''
+  discordUserName = ''
   referralLink = ''
+  canSubmitDiscord = false
 
-  @Watch('initBackendResponse', { immediate: true, deep: true })
+  @Watch('initBackendResponse', { deep: true })
   getReferralLink(res: CampaignInfo) {
-    this.referralLink = `${window.location.href}${res.user.referral ? `referral=${res.user?.referral}` : ''}`
+    this.referralLink = `${window.location.origin}${window.location.pathname}${
+      res?.user?.referral ? `referral=${res.user?.referral}` : ''
+    }`
   }
 
   to(anchor: 'step-1' | 'details') {
@@ -353,6 +387,22 @@ export default class Guide extends Vue {
     const el = this.$refs[anchor] as Element | undefined
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkCanSubmitDiscord(res: CampaignInfo) {
+    this.canSubmitDiscord = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
+  }
+
+  @Watch('$accessor.wallet.connected', { immediate: true })
+  async fetchData() {
+    if (this.$accessor.wallet.connected) {
+      this.initBackendResponse =
+        (await this.$api.getCompaign({
+          address: this.$accessor.wallet.address,
+          referral: (this.$route.query?.referral as string) || undefined
+        })) ?? {}
+    }
   }
 
   submit({
@@ -364,7 +414,7 @@ export default class Guide extends Vue {
     result?: string
     sign?: string
   }) {
-    this.$api.postCompaign({ address: this.initBackendResponse.user.address, task, result, sign })
+    this.$api.postCompaign({ address: this.initBackendResponse.user?.address, task, result, sign })
   }
 
   copyTextFromParagraph(text = '') {
@@ -372,8 +422,9 @@ export default class Guide extends Vue {
   }
 
   getDefaultText() {
-    console.log({ ...this.$route })
-    const defaultText = 'hello 😳\rit is a $test'
+    const defaultText = `🎉 Join the Raydium Airdrop Bounty & Earn $2,000 in RAY \r\r${
+      this.referralLink
+    }\r\rMy code is: //${this.initBackendResponse?.user?.referral ?? ''}`
     const encoded = encodeURIComponent(defaultText)
     return encoded
   }
@@ -397,9 +448,10 @@ export default class Guide extends Vue {
   --point-label-bg: #da2eef;
   --reward-card-bg: #191542;
 
-  margin-left: 20vw;
-  margin-right: 20vw;
   min-height: 100vh;
+  width: 90vw;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 section {
@@ -439,7 +491,14 @@ button {
     transform: translate(1px, 1px);
   }
 }
-
+button[disabled] {
+  color: gray;
+  border-color: gray;
+  cursor: not-allowed;
+}
+a.disabled {
+  pointer-events: none;
+}
 .task-level {
   font-weight: 500;
   font-size: 36px;
@@ -551,9 +610,9 @@ button {
   }
   .btn-row {
     display: flex;
-    gap: 8px;
-    > button {
-      width: unset;
+    gap: 16px;
+    > * {
+      flex-grow: 1;
     }
   }
 
@@ -671,12 +730,14 @@ button {
   }
 }
 
-.media-entries {
-  .box-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 96px;
-  }
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+.box-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
 }
 
 .referrals {
@@ -774,11 +835,11 @@ button {
     color: var(--secondary-text);
   }
   ul {
-    margin: 32px 246px 116px;
+    margin: 0 246px 116px;
     li {
       font-weight: 300;
       font-size: 14px;
-      line-height: 18px;
+      line-height: 1.8;
       color: var(--secondary-text);
       margin-bottom: 8px;
     }
