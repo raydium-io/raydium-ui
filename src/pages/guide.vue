@@ -21,7 +21,7 @@
         <tr>
           <td class="td order">2</td>
           <td class="td">Earn Bonus Entries</td>
-          <td class="td"><div class="point-label">+3 POINTS</div></td>
+          <td class="td"><div class="point-label">+2 POINTS</div></td>
         </tr>
         <tr>
           <td class="td order">3</td>
@@ -37,7 +37,7 @@
 
     <section class="step-game">
       <div class="task-level">STEP 1</div>
-      <div class="title">Learn how to Swap</div>
+      <div class="title">Get Started on Raydium</div>
 
       <div ref="step-1" class="box watch-video">
         <div class="box-title has-step">
@@ -54,6 +54,9 @@
             allowfullscreen
           ></iframe>
         </div>
+        <a :href="`https://youtu.be/XUnEQ6cy9WI`" rel="nofollow noopener noreferrer" target="_blank" class="footnote"
+          >Chinese Version</a
+        >
       </div>
 
       <svg class="step-gap-line" viewBox="0 0 532 132">
@@ -61,7 +64,7 @@
       </svg>
 
       <div class="box wallet">
-        <div class="box-title has-step">Connect wallet to recieve airdrop</div>
+        <div class="box-title has-step">Connect wallet to recieve airdrop rewards</div>
         <Wallet />
       </div>
     </section>
@@ -72,18 +75,32 @@
       <div class="subtitle">Total Points +5</div>
       <div class="box-grid">
         <div class="box">
-          <div class="box-title has-step">Swap on Raydium</div>
+          <div class="box-title has-step">
+            Swap on Raydium
+            <div>
+              <img :class="`icon ${haveSwap ? '' : 'muted'}`" src="../assets/icons/reward.svg" />
+            </div>
+          </div>
           <a href="/swap/" target="_blank"><button>GO TO SWAP</button></a>
         </div>
 
         <div class="box">
           <div class="box-title">
             Share to Twitter
-            <div class="point-label">BONUS +1 POINT / REFERRAL</div>
+            <div>
+              <img :class="`icon ${haveTweet ? '' : 'muted'}`" src="../assets/icons/reward.svg" />
+              <div class="point-label">BONUS +1 POINT / REFERRAL</div>
+            </div>
           </div>
           <div class="btn-row">
             <a
-              :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
+              v-if="$accessor.wallet.connected"
+              :href="
+                (initBackendResponse.tasks &&
+                  initBackendResponse.tasks.referral &&
+                  initBackendResponse.tasks.referral.key) ||
+                `https://twitter.com/intent/tweet?text=${getDefaultText()}`
+              "
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
@@ -92,6 +109,8 @@
                   () => {
                     if (!$accessor.wallet.connected) {
                       $accessor.wallet.openModal()
+                    } else {
+                      submit({ task: 'referral', result: '' })
                     }
                   }
                 "
@@ -99,6 +118,7 @@
                 <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />TWEET NOW
               </button>
             </a>
+            <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
         </div>
       </div>
@@ -107,25 +127,25 @@
     <section class="media-entries">
       <div class="task-level">EARN BONUS POINTS</div>
       <div class="title">Join Forces With Raydium</div>
-      <div class="subtitle">Total Points +3</div>
+      <div class="subtitle">Total Points +2</div>
       <div class="box-grid">
         <div class="twitter">
           <div class="box social-media">
             <div class="box-title">
               Follow & Retweet Raydium
-              <div class="point-label">+2 POINTS</div>
+              <div>
+                <img :class="`icon ${haveFollow ? '' : 'muted'}`" src="../assets/icons/reward.svg" />
+                <div class="point-label">+1 POINTS</div>
+              </div>
             </div>
             <div class="btn-row">
               <a
-                :href="`https://twitter.com/RaydiumProtocol`"
-                class="link"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                <button><img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FOLLOW</button>
-              </a>
-              <a
-                :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
+                :href="
+                  (initBackendResponse.tasks &&
+                    initBackendResponse.tasks.twitter &&
+                    initBackendResponse.tasks.twitter.key) ||
+                  `https://twitter.com/RaydiumProtocol`
+                "
                 class="link"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
@@ -133,13 +153,11 @@
                 <button
                   @click="
                     () => {
-                      if (!$accessor.wallet.connected) {
-                        $accessor.wallet.openModal()
-                      }
+                      submit({ task: 'twitter', result: '' })
                     }
                   "
                 >
-                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />RETWEET
+                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FOLLOW
                 </button>
               </a>
             </div>
@@ -149,18 +167,32 @@
           <div class="box social-media">
             <div class="box-title">
               Join the Raydium Discord
-              <div class="point-label">+1 POINT</div>
+              <div>
+                <img :class="`icon ${haveDiscord ? '' : 'muted'}`" src="../assets/icons/reward.svg" />
+                <div class="point-label">+1 POINT</div>
+              </div>
             </div>
             <a
+              v-if="$accessor.wallet.connected"
               href="https://discord.com/invite/6EvFwvCfpx"
-              class="link"
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
-              <button @click="showLinkInput = true">
+              <button
+                @click="
+                  () => {
+                    if (!$accessor.wallet.connected) {
+                      $accessor.wallet.openModal()
+                    } else {
+                      showLinkInput = true
+                    }
+                  }
+                "
+              >
                 <img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
               </button>
             </a>
+            <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
 
           <svg v-if="showLinkInput" class="step-gap-line social-media" viewBox="0 0 440 88">
@@ -185,7 +217,12 @@
                 }
               "
             >
-              {{ $accessor.wallet.connected ? 'SUBMIT' : 'CONNECT WALLET' }}
+              {{ $accessor.wallet.connected ? 'SUBMIT' : 'CONNECT WALLET'
+              }}<img
+                v-if="$accessor.wallet.connected"
+                :class="`icon ${haveDiscord ? 'muted' : ''}`"
+                src="../assets/icons/reward.svg"
+              />
             </button>
           </div>
         </div>
@@ -231,24 +268,23 @@
       <div class="title">REWARD DETAILS</div>
       <ol>
         <li>
-          Qualified users are defined as having connected a wallet, completing a swap, and completing twitter
-          verification by sharing their customized referral code and @RaydiumProtocol. Qualified users will receive a
-          minimum of 3 entries in the lucky airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY
-          tokens.
+          Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification
+          by tweeting their customized referral code and @RaydiumProtocol. Qualified users will receive a minimum of 5
+          points for the lucky airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY tokens.
         </li>
         <li>
-          The first 4,000 users to be verified as completing wallet connecting, swapping, twitter verification, and
+          The first 4,000 users to be verified as having connected a wallet, swapping, twitter verification, and
           successfully referring at least 1 friend are guaranteed to win $10 in RAY tokens each. The aforementioned
-          steps are worth 5 entries in the lucky draw airdrop pool where verified users will also be eligible to receive
+          steps are worth 5 points in the lucky draw airdrop pool where verified users will also be eligible to receive
           an airdrop of up to $1,000 in RAY tokens.
         </li>
         <li>
-          Qualified users can earn extra entries for the lucky airdrop pool by completing the bonus tasks; 1) Following
-          Raydium, 2) Retweeting Raydium’s Binance Announcement, and 3) Joining the Raydium Discord worth 1 entry each.
+          Qualified users can earn extra points for the lucky airdrop pool by completing bonus tasks; 1) Following
+          Raydium, 2) Retweeting Raydium’s Airdrop Announcement, and 3) Joining the Raydium Discord, worth 1 entry each.
         </li>
         <li>
           The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as
-          extra entries for the lucky draw pool.
+          extra points for the lucky draw pool.
         </li>
         <li>
           Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100
@@ -265,15 +301,15 @@
         </tr>
         <tr>
           <td>
-            <strong>First 5,000</strong> to Swap on Raydium, Complete Twitter Verification, Successfully Refer at least
+            <strong>First 4,000</strong> to Swap on Raydium, Complete Twitter Verification, Successfully Refer at least
             1 Friend
           </td>
-          <td>5,000 Winners</td>
+          <td>4,000 Winners</td>
           <td>$10 of RAY tokens</td>
-          <td>Guaranteed $5 airdrop + Lucky Draw Pool</td>
+          <td>Guaranteed $10 airdrop + Lucky Draw Pool</td>
         </tr>
         <tr>
-          <td>
+          <td style="white-space: pre-line">
             <strong>Lucky Draw Pool</strong> Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)
             <br />
             <strong>Earn Bonus Entries!</strong> Follow Raydium, Retweet Raydium’s Binance Announcement, and Join us on
@@ -301,7 +337,7 @@
             <div class="ghost-line" />
             $20 of RAY tokens
           </td>
-          <td></td>
+          <td>All users who complete a swap and share their referral code to Twitter are eligible5</td>
         </tr>
         <tr>
           <td><strong>Top 5 on the referral leaderboard</strong></td>
@@ -357,9 +393,15 @@ import { CampaignInfo } from '@/types/api'
     Checkbox
   },
 
-  async asyncData({ $accessor }) {
+  async asyncData({ $accessor, route }) {
     if (!$accessor.ido.initialized) {
       await $accessor.ido.requestInfos()
+    }
+    if (route.query?.referral) {
+      window.localStorage.setItem('guide:referral', route.query?.referral as string)
+    } else {
+      const storedItem = window.localStorage.getItem('guide:referral')
+      if (storedItem) location.href = `${window.location.origin}${window.location.pathname}?referral=${storedItem}`
     }
   }
 })
@@ -374,11 +416,20 @@ export default class Guide extends Vue {
   discordUserName = ''
   referralLink = ''
   canSubmitDiscord = false
+  haveTweet = false
+  haveFollow = false
+  haveDiscord = false
+  haveSwap = false
+  intervalTimer = 0
+
+  mounted() {
+    this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
+  }
 
   @Watch('initBackendResponse', { deep: true })
   getReferralLink(res: CampaignInfo) {
     this.referralLink = `${window.location.origin}${window.location.pathname}${
-      res?.user?.referral ? `referral=${res.user?.referral}` : ''
+      res?.user?.referral ? `?referral=${res.user?.referral}` : ''
     }`
   }
 
@@ -392,6 +443,26 @@ export default class Guide extends Vue {
   @Watch('initBackendResponse', { immediate: true })
   checkCanSubmitDiscord(res: CampaignInfo) {
     this.canSubmitDiscord = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkHaveTweet(res: CampaignInfo) {
+    this.haveTweet = res.tasks?.referral?.finished || res.tasks?.referral?.enabled
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkHaveFollow(res: CampaignInfo) {
+    this.haveFollow = res.tasks?.twitter?.finished || res.tasks?.twitter?.enabled
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkHaveDiscord(res: CampaignInfo) {
+    this.haveDiscord = res.tasks?.discord?.finished || res.tasks?.discord?.enabled
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkHaveSwap(res: CampaignInfo) {
+    this.haveSwap = res.tasks?.swap?.finished || res.tasks?.swap?.enabled
   }
 
   @Watch('$accessor.wallet.connected', { immediate: true })
@@ -557,8 +628,11 @@ a.disabled {
   line-height: 18px;
 
   .box-title & {
-    margin-left: 32px;
+    margin-left: 8px;
   }
+}
+.icon.muted {
+  filter: saturate(0.1);
 }
 
 .page-title {
@@ -722,12 +796,15 @@ a.disabled {
       padding: 4px 16px;
     }
   }
-
-  .footnote {
-    color: var(--secondary-text);
-    font-size: 14px;
-    line-height: 18px;
-  }
+}
+.footnote {
+  display: block;
+  color: var(--secondary-text);
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: underline;
+  margin: 8px auto;
 }
 
 .row {
