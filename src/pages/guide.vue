@@ -220,7 +220,7 @@
               {{ $accessor.wallet.connected ? 'SUBMIT' : 'CONNECT WALLET'
               }}<img
                 v-if="$accessor.wallet.connected"
-                :class="`icon ${haveDiscord ? 'muted' : ''}`"
+                :class="`icon ${haveDiscord ? '' : 'muted'}`"
                 src="../assets/icons/reward.svg"
               />
             </button>
