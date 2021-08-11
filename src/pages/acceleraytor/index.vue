@@ -1,7 +1,17 @@
 <template>
   <div class="accele-raytor container">
-    <div class="page-head fs-container">
-      <span class="title">Pools</span>
+    <div class="banner">
+      <div class="text-part">
+        <div class="title">AcceleRaytor</div>
+        <div class="description">
+          A launchpad for new projects to raise capital and for the community to participate in new Solana project
+          lauches.
+        </div>
+      </div>
+      <div class="image-part">
+        <div class="decorator-text">Coming Soon!</div>
+        <img src="../../assets/background/acceleraytor-placeholder.webp" />
+      </div>
     </div>
 
     <div>
@@ -314,6 +324,41 @@ export default class AcceleRaytor extends Vue {
 
 <style lang="less">
 @import '../../styles/variables';
+
+.banner {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  grid-gap: 80px;
+  gap: 80px;
+  border-radius: 28px;
+  padding: 32px 64px;
+  margin: 36px -32px 64px;
+  background-color: #1c274f;
+  .text-part {
+    .title {
+      font-weight: 600;
+      font-size: 48px;
+    }
+    .description {
+      font-weight: 300;
+      font-size: 20px;
+      color: #abc4ff;
+    }
+  }
+  .image-part {
+    .decorator-text {
+      font-size: 28px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    img {
+      width: 540px;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+  }
+}
 
 .has-error {
   input {
