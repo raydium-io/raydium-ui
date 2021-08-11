@@ -9,7 +9,15 @@ const apiPlugin: Plugin = (ctx, inject) => {
     getInfo: () => ctx.$axios.get('https://api.raydium.io/info'),
     getPairs: () => ctx.$axios.get('https://api.raydium.io/pairs'),
     getConfig: () => ctx.$axios.get('https://api.raydium.io/config', { params: { v: VERSION } }),
-    getEpochInfo: (rpc: string) => ctx.$axios.post(rpc, { jsonrpc: '2.0', id: 1, method: 'getEpochInfo' })
+    getEpochInfo: (rpc: string) => ctx.$axios.post(rpc, { jsonrpc: '2.0', id: 1, method: 'getEpochInfo' }),
+    getCompaign: ({ campaignId = 1, address, referral }) =>
+      ctx.$axios
+        .get(`https://api.raydium.io/campaign/${campaignId}`, { params: { address, referral } })
+        .then((res) => res.data),
+    postCompaign: ({ campaignId = 1, address, task, result = '', sign = '' }) =>
+      ctx.$axios
+        .post(`https://api.raydium.io/campaign/${campaignId}`, { address, task, result, sign })
+        .then((res) => res.data)
   }
 
   ctx.$api = api

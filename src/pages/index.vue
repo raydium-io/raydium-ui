@@ -1,5 +1,7 @@
 <template>
   <div class="page-container">
+    <HeadChip />
+
     <nav class="home-navbar">
       <NuxtLink to="/swap/">
         <img src="../assets/icons/logo-text.svg" width="148" height="40" />
@@ -376,11 +378,13 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Icon, Popover } from 'ant-design-vue'
+import HeadChip from '@/components/HeadChip.vue'
 
 @Component({
   components: {
     Icon,
-    Popover
+    Popover,
+    HeadChip
   },
   layout: 'home',
 
@@ -414,28 +418,8 @@ export default class Index extends Vue {
   }
 }
 </script>
-<style>
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 300;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 500;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('../assets/fonts/SpaceGrotesk[wght].woff2') format('woff2');
-  font-weight: 700;
-}
 
+<style>
 .ant-popover-arrow {
   border-color: #0c0926 !important;
 }
@@ -572,8 +556,6 @@ export default class Index extends Vue {
   --text-secondary: hsl(222deg, 100%, 84%);
   --text-secondary-light: #c4d6ff;
 
-  font-family: 'Space Grotesk', sans-serif;
-  font-feature-settings: 'ss04', 'tnum' 0;
   overflow: hidden;
 }
 
@@ -583,7 +565,7 @@ export default class Index extends Vue {
   top: 0;
   left: 0;
   right: 0;
-  padding: 50px 165px;
+  margin: 128px 165px 50px; /* banner will change space of this */
   justify-content: space-between;
   z-index: 1;
 }

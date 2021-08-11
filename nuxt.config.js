@@ -15,6 +15,9 @@ export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
+  // show
+  // publicRuntimeConfig: { baseURL: process.env.NUXT_BASE_URL },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Raydium',
