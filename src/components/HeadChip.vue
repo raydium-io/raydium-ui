@@ -1,11 +1,26 @@
 <template>
-  <div class="head-chip">
+  <div v-if="show" class="head-chip">
     <div class="chip-name">The <span class="color-board">$100,000</span> Raydium Airdrop is live!</div>
     <NuxtLink to="/airdrop/">
       <button class="button-like">JOIN AIRDROP NOW</button>
     </NuxtLink>
+    <Icon type="close" class="close" @click="show = false" />
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component } from 'nuxt-property-decorator'
+import { Icon } from 'ant-design-vue'
+
+@Component({
+  components: {
+    Icon
+  }
+})
+export default class HeadChip extends Vue {
+  show = true
+}
+</script>
 
 <style scoped>
 .head-chip {
@@ -51,5 +66,9 @@
   width: 100%;
   height: 2px;
   background: linear-gradient(245.22deg, #da2eef 7.97%, #2b6aff 49.17%, #39d0d8 92.1%);
+}
+.head-chip .close {
+  position: absolute;
+  right: 30px;
 }
 </style>
