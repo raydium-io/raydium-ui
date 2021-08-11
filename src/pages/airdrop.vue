@@ -531,10 +531,13 @@ export default class Airdrop extends Vue {
       this.$accessor.wallet.openModal()
     } else if (this.discordUserName) {
       this.isDiscording = true
-      const result = await this.submit({ task: 'discord', result: this.discordUserName })
-      if (result) {
+      try {
+        const result = await this.submit({ task: 'discord', result: this.discordUserName })
+        if (result) {
+          this.initBackendResponse = result
+        }
+      } finally {
         this.showLinkInput = false
-        this.isDiscordPending = true
         this.isDiscording = false
       }
     }
