@@ -213,7 +213,7 @@
               :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)"
               @click="submitDiscore"
             >
-              {{ $accessor.wallet.connected ? (isDiscording ? 'SUMBITING...' : 'SUBMIT') : 'CONNECT WALLET' }}
+              {{ $accessor.wallet.connected ? (isDiscording ? 'SUBMITING...' : 'SUBMIT') : 'CONNECT WALLET' }}
               <div
                 v-if="$accessor.wallet.connected"
                 :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
@@ -888,8 +888,7 @@ a.disabled {
   display: grid;
   gap: 96px;
   justify-content: center;
-  align-content: center;
-  align-items: center;
+  align-items: start;
   grid-template-columns: repeat(auto-fit, minmax(~'min(200px, 80vw)', 428px));
 }
 
