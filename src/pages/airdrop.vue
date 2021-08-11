@@ -199,11 +199,15 @@
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
 
-          <svg v-if="showLinkInput && !haveDiscord" class="step-gap-line social-media" viewBox="0 0 440 88">
+          <svg
+            v-if="showLinkInput && !(haveDiscord || isFollowPending)"
+            class="step-gap-line social-media"
+            viewBox="0 0 440 88"
+          >
             <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
           </svg>
 
-          <div v-if="showLinkInput && !haveDiscord" class="box form">
+          <div v-if="showLinkInput && !(haveDiscord || isFollowPending)" class="box form">
             <div class="box-title">Input Discord Username</div>
             <div class="input-box">
               <label>Discord Username</label>
