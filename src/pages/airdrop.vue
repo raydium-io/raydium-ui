@@ -488,6 +488,11 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('$accessor.wallet.connected', { immediate: true })
+  resetDiscord() {
+    this.isDiscording = false
+  }
+
+  @Watch('$accessor.wallet.connected', { immediate: true })
   async fetchData() {
     if (this.$accessor.wallet.connected) {
       this.initBackendResponse =
