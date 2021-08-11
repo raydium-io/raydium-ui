@@ -529,7 +529,9 @@ export default class Airdrop extends Vue {
       this.isDiscording = true
       const result = await this.submit({ task: 'discord', result: this.discordUserName })
       if (result) {
-        this.haveDiscord = true
+        this.showLinkInput = false
+        this.isDiscordPending = true
+        this.isDiscording = false
       }
     }
   }
