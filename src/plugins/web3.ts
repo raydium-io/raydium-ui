@@ -61,13 +61,6 @@ const web3Plugin: Plugin = async (ctx, inject) => {
 
   try {
     config = await $api.getConfig()
-    config = {
-      strategy: 'weight',
-      rpcs: [
-        // { url: 'https://solana-api.projectserum.com', weight: 100 },
-        { url: 'https://api.mainnet-beta.solana.com', weight: 100 }
-      ]
-    } // need delete this temporary patch for raydiumrpc
     configFrom = 'remote'
   } catch (error) {
     config = web3Config

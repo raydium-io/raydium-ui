@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "build-analyze": "nuxt build --analyze",
     "start": "nuxt start",
-    "generate": "nuxt generate",
+    "generate": "nuxt generate && node misc/twitter.js",
     "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{less,vue}\" --ignore-path .gitignore",
     "lint": "yarn lint:js && yarn lint:style",
