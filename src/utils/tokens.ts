@@ -579,6 +579,14 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: '5Ve8q9fb7R2DhdqGV4o1RVy7xxo4D6ifQfbxGiASdxEH',
     tags: ['raydium']
+  },
+  MNGO: {
+    symbol: 'MNGO',
+    name: 'Mango',
+    mintAddress: 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac',
+    decimals: 6,
+    referrer: 'CijuvE6qDpxZ5WqdEQEe7mS11fXEKiiHc7RR8wRiGzjY',
+    tags: ['raydium']
   }
 }
 
@@ -1187,6 +1195,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '9tmNtbUCrLS15qC4tEfr5NNeqcqpZ4uiGgi2vS5CLQBS',
     decimals: TOKENS.PORT.decimals
+  },
+  'MNGO-USDC-V4': {
+    symbol: 'MNGO-USDC',
+    name: 'MNGO-USDC LP',
+    coin: { ...TOKENS.MNGO },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'DkiqCQ792n743xjWQVCbBUaVtkdiuvQeYndM53ReWnCC',
+    decimals: TOKENS.MNGO.decimals
   }
 }
 
