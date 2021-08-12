@@ -5,7 +5,7 @@
         <div class="title">AcceleRaytor</div>
         <div class="description">
           A launchpad for new projects to raise capital and for the community to participate in new Solana project
-          lauches.
+          launches.
         </div>
       </div>
       <div class="image-part">
