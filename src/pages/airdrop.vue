@@ -282,7 +282,7 @@
         </li>
         <li>
           Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100
-          winners of $100, 250 winners of $50, and 1,000 winners of $10). Winners are ineligible to win multiple prizes
+          winners of $100, 250 winners of $50, and 1,000 winners of $20). Winners are ineligible to win multiple prizes
           from the lucky draw pool.
         </li>
       </ol>
