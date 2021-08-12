@@ -645,6 +645,25 @@ export const FARMS: FarmInfo[] = [
     poolAuthority: 'DdFXxCbn5vpxPRaGmurmefCTTSUa5XZ9Kh6Noc4bvrU9',
     poolLpTokenAccount: '792c58UHPPuLJcYZ6nawcD5F5NQXGbBos9ZGczTrLSdb', // lp vault
     poolRewardTokenAccount: '5ihtMmeTAx3kdf459Yt3bqos5zDe4WBBcSZSB6ooNxLt' // reward vault A
+  },
+  {
+    name: 'MNGO-USDC',
+    lp: { ...LP_TOKENS['MNGO-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNGO },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'GzEDEkHSFFfxKMu3Toww1nrEjtbQGJKRPNRK1Pfd59Zn',
+    poolAuthority: '9AMvw1TUJ9gX1kUAvcmHt2ZjokBLepXQbN8EJxBVZu2s',
+    poolLpTokenAccount: 'gjrMLKsNwXYzJnX9DT8Lc7HeC1AT52jQKtDkPiRRuEP', // lp vault
+    poolRewardTokenAccount: '4czqUC2ebdvqxPXfRniknLk7Cr2TosTabQSRnUeFia9v', // reward vault A
+    poolRewardTokenAccountB: '6K1AE1wnTNaMgcAgQPvrTbnWEHB7nW6uTtv7ZbXWgMtn' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
