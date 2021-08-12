@@ -282,7 +282,8 @@
         </li>
         <li>
           Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100
-          winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool.
+          winners of $100, 250 winners of $50, and 1,000 winners of $10). Winners are ineligible to win multiple prizes
+          from the lucky draw pool.
         </li>
       </ol>
       <hr />
@@ -317,7 +318,7 @@
             <div class="ghost-line" />
             250 Winners
             <div class="ghost-line" />
-            4000 Winners
+            1000 Winners
           </td>
           <td>
             $1,000 of RAY tokens
