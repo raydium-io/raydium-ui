@@ -46,7 +46,8 @@
               (reward = pool.reward),
               (rewardB = pool.rewardB || {}),
               (userInfo = farm.stakeAccounts[poolId] || {}),
-              (userLpAccount = wallet.tokenAccounts[lp.mintAddress] || {}))
+              (userLpAccount = wallet.tokenAccounts[lp.mintAddress] || {}),
+              (lpPrice = lp.coin && lp.pc ? prices[lp.coin.symbol] + prices[lp.pc.symbol] : prices[lp.symbol]))
             }}
             <table>
               <tbody>
@@ -66,7 +67,8 @@
                     <div>Is dual: {{ pool.dual }}</div>
                   </td>
                   <td>
-                    <div>TVL: {{ lp.balance.format() }} LP</div>
+                    <div>LP Price ≈ ${{ lpPrice }}</div>
+                    <div>LP deposited ≈ {{ lp.balance.format() }}</div>
                     <div>Reward A: {{ reward.symbol }}</div>
                     <div>Reward B: {{ rewardB.symbol }}</div>
                     <div>Your deposited: {{ userInfo.depositBalance ? userInfo.depositBalance.format() : 0 }}</div>
@@ -125,6 +127,10 @@ export default class Debug extends Vue {
 
   get url() {
     return this.$accessor.url
+  }
+
+  get prices() {
+    return this.$accessor.price.prices
   }
 
   unwrap() {

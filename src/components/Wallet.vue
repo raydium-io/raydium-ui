@@ -25,7 +25,7 @@
         </Button>
       </div>
       <div v-else class="wallet-info">
-        <p class="address">{{ wallet.address }}</p>
+        <p class="address" @click="debug">{{ wallet.address }}</p>
 
         <Button ghost @click="disconnect"> DISCONNECT </Button>
 
@@ -209,6 +209,8 @@ export default class Wallet extends Vue {
   // web3 listener
   walletListenerId = null as number | null
 
+  debugCount = 0
+
   /* ========== COMPUTED ========== */
   get wallet() {
     return this.$accessor.wallet
@@ -378,6 +380,15 @@ export default class Wallet extends Vue {
   unsubWallet() {
     if (this.walletListenerId) {
       this.$web3.removeAccountChangeListener(this.walletListenerId)
+    }
+  }
+
+  debug() {
+    if (this.debugCount < 10) {
+      this.debugCount += 1
+    } else {
+      this.$router.push({ path: '/debug/' })
+      this.debugCount = 0
     }
   }
 
