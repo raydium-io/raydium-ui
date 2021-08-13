@@ -1204,6 +1204,78 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'DkiqCQ792n743xjWQVCbBUaVtkdiuvQeYndM53ReWnCC',
     decimals: TOKENS.MNGO.decimals
+  },
+  'ALEPH-RAY-V4': {
+    symbol: 'ALEPH-RAY',
+    name: 'ALEPH-RAY LP',
+    coin: { ...TOKENS.ALEPH },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'n76skjqv4LirhdLok2zJELXNLdRpYDgVJQuQFbamscy',
+    decimals: TOKENS.ALEPH.decimals
+  },
+  'TULIP-RAY-V4': {
+    symbol: 'TULIP-RAY',
+    name: 'TULIP-RAY LP',
+    coin: { ...TOKENS.TULIP },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '3AZTviji5qduMG2s4FfWGR3SSQmNUCyx8ao6UKCPg3oJ',
+    decimals: TOKENS.TULIP.decimals
+  },
+  'SLRS-RAY-V4': {
+    symbol: 'SLRS-RAY',
+    name: 'SLRS-RAY LP',
+    coin: { ...TOKENS.SLRS },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '2pk78vsKT3jfJAcN2zbpMUnrR57SZrxHqaZYyFgp92mM',
+    decimals: TOKENS.SLRS.decimals
+  },
+  'MER-RAY-V4': {
+    symbol: 'MER-RAY',
+    name: 'MER-RAY LP',
+    coin: { ...TOKENS.MER },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '214hxy3AbKoaEKgqcg2aC1cP5R67cGGAyDEg5GDwC7Ub',
+    decimals: TOKENS.MER.decimals
+  },
+  'MEDIA-RAY-V4': {
+    symbol: 'MEDIA-RAY',
+    name: 'MEDIA-RAY LP',
+    coin: { ...TOKENS.MEDIA },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '9Aseg5A1JD1yCiFFdDaNNxCiJ7XzrpZFmcEmLjXFdPaH',
+    decimals: TOKENS.MEDIA.decimals
+  },
+  'SNY-RAY-V4': {
+    symbol: 'SNY-RAY',
+    name: 'SNY-RAY LP',
+    coin: { ...TOKENS.SNY },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '2k4quTuuLUxrSEhFH99qcoZzvgvVEc3b5sz3xz3qstfS',
+    decimals: TOKENS.SNY.decimals
+  },
+  'LIKE-RAY-V4': {
+    symbol: 'LIKE-RAY',
+    name: 'LIKE-RAY LP',
+    coin: { ...TOKENS.LIKE },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '7xqDycbFSCpUpzkYapFeyPJWPwEpV7zdWbYf2MVHTNjv',
+    decimals: TOKENS.LIKE.decimals
+  },
+  'COPE-RAY-V4': {
+    symbol: 'COPE-RAY',
+    name: 'COPE-RAY LP',
+    coin: { ...TOKENS.COPE },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'A7GCVHA8NSsbdFscHdoNU41tL1TRKNmCH4K94CgcLK9F',
+    decimals: TOKENS.COPE.decimals
   }
 }
 
