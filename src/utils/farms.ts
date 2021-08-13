@@ -664,6 +664,177 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'gjrMLKsNwXYzJnX9DT8Lc7HeC1AT52jQKtDkPiRRuEP', // lp vault
     poolRewardTokenAccount: '4czqUC2ebdvqxPXfRniknLk7Cr2TosTabQSRnUeFia9v', // reward vault A
     poolRewardTokenAccountB: '6K1AE1wnTNaMgcAgQPvrTbnWEHB7nW6uTtv7ZbXWgMtn' // reward vault B
+  },
+  {
+    name: 'COPE-RAY',
+    lp: { ...LP_TOKENS['COPE-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.COPE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'CM9XTJfXEHceGPXhmXxheR87Ng9CZ4jiBoTVQHhs9DVN',
+    poolAuthority: 'AWYeNgCErUafmBU2TtZgzNwixpKd3BxRTmvYDw7U1jgN',
+    poolLpTokenAccount: 'FLqRe3W9Lp59uNgzkACsXpEZkWUxBBstMtUyGSzqFhXD', // lp vault
+    poolRewardTokenAccount: 'Ex23TUPEarZepXdHgjm7LVy35HDWY2VgeKao5kjYRZGE', // reward vault A
+    poolRewardTokenAccountB: 'JDjSMCSK9s9dDsiiXeT3HVaX48k7WewyKBoMPax3TZxL' // reward vault B
+  },
+  {
+    name: 'LIKE-RAY',
+    lp: { ...LP_TOKENS['LIKE-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.LIKE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'AMcVWK66iexwwCHn8drxywdNr2UgH3vmRzLXQFdErGmL',
+    poolAuthority: '32yVBkvq29AmXKu1A3xUtgHrMGFnLvxF18fhd4JLKfJs',
+    poolLpTokenAccount: '6f72fpk4WDeqpTJZ4dLSvAacfwmCAfEk7RtuPQ5oyNd7', // lp vault
+    poolRewardTokenAccount: '4oPdHXXdRmjtKMLCcK8rtp3vMmq9y9LJ6W83mqrqMjCt', // reward vault A
+    poolRewardTokenAccountB: 'E49fLhK6Wv43FySZB1xybPghzK2cjr9hgfpcmcVSLeYm' // reward vault B
+  },
+  {
+    name: 'MEDIA-RAY',
+    lp: { ...LP_TOKENS['MEDIA-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MEDIA },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'DJfvL6srBht8XFMWYuuKHYGainqvwXyA5icVsDne3pwN',
+    poolAuthority: '69PxTdPaRSofBJkwT9mYW14cPUEe7fU2AYEDvt3q5Fkt',
+    poolLpTokenAccount: '3Kaibb6xYpKjFejtkgH8tBrMWShWzwBd7WfcGygZ4Vcw', // lp vault
+    poolRewardTokenAccount: '28kE8Erc2uFThiUr8RifoUEc9Kv8V54To6DJLgCuJEPp', // reward vault A
+    poolRewardTokenAccountB: '3kofbYH2hPefwHSgMburaGN5XmJx7sD94jo5CsMCXzLE' // reward vault B
+  },
+  {
+    name: 'MER-RAY',
+    lp: { ...LP_TOKENS['MER-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MER },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '21xhrT4j8QnaBvj3QjhP5kZu8sXJMCE7hzHKGtWEkdKr',
+    poolAuthority: '6GrjogDgJ56mPcNu1nFw7MVLMALoNzd6RsZiXrQAuTvh',
+    poolLpTokenAccount: 'Ee4zr6okPiyG6ia8kZfPwoNRDtNsrn4YfPc7MMmTqufR', // lp vault
+    poolRewardTokenAccount: 'FnSG5cBXyEqo3DxKrcjhj7wo8un3HrxABQrxfA5uKWsg', // reward vault A
+    poolRewardTokenAccountB: '8yL9QK96Ag3NnvqZmcaupb7c4NeP5hJXraGS3jCzMzT' // reward vault B
+  },
+  {
+    name: 'SLRS-RAY',
+    lp: { ...LP_TOKENS['SLRS-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SLRS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'J61AnYYSwjtJ4wDqEqqWSBuZbiR2SDDrtF7FFobutM6a',
+    poolAuthority: 'BHGHqkJomVD5tKNMZFajA1PZEJaZW5Yywyp6UAcvf1Wq',
+    poolLpTokenAccount: 'H8NEHvqm43DxWbMfvLMvUqoKrjG4B4EJXEYBz2DYhRHd', // lp vault
+    poolRewardTokenAccount: '5g1ox4cwcfNFsqPiGH2zhsHYpaBf6rkigL6YR5ZBQA5k', // reward vault A
+    poolRewardTokenAccountB: '95b2zMqRGsovcR69XXfRPcvLdyvLCH5M5nd4z27yC8Q1' // reward vault B
+  },
+  {
+    name: 'SNY-RAY',
+    lp: { ...LP_TOKENS['SNY-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SNY },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'JEC3P83x2GEijYDwXiksuh5H6YrQt5xW6MC2GDKkMoe',
+    poolAuthority: '9qwnkx2gRMLVoYkJVkyH2Yza5e5E7LoZEpx9jZ9r3CBY',
+    poolLpTokenAccount: '7JrCLqrhH9kb78St4dAncBYE9VhZdB4P1tFAdxwzDrH5', // lp vault
+    poolRewardTokenAccount: 'HmovkXKsso8xHwPYmMYF5bmP5CCwCtReQVb8ETTSSoyN', // reward vault A
+    poolRewardTokenAccountB: 'GXJSX1JNjjAK6jEEjujvzhCjMeVnZmpJ5fng3daynCnY' // reward vault B
+  },
+  {
+    name: 'TULIP-RAY',
+    lp: { ...LP_TOKENS['TULIP-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.TULIP },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'BmbG9hv5PazcW3rYWvatA6HpNPkozEdkWBiU64pZxuwr',
+    poolAuthority: '956MvcyRBPMZ6waK3bdD4dn3XfaganoKed1NUQ9NaFAg',
+    poolLpTokenAccount: 'HMgHKCLetHYDUJZEXKRJCiSeQs4Udwy6MNXHoLruMctH', // lp vault
+    poolRewardTokenAccount: '5ih22SsrffDjygZHF8ADyJa4TNKQZqANg7dXyBJN9V8P', // reward vault A
+    poolRewardTokenAccountB: '3zK56FmEqeH93BuH5K7JY9ZaEfFMdo3YjAasFikCmDB1' // reward vault B
+  },
+  {
+    name: 'ALEPH-RAY',
+    lp: { ...LP_TOKENS['ALEPH-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.ALEPH },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '4wvZ9SwWaHKTpshQbCSKQoPosZp9KGwUzuQdESi39qPn',
+    poolAuthority: 'G3tniqor4UrtE29UQLGcBBuk4ScvonDpXiPSDTK3RioJ',
+    poolLpTokenAccount: 'Fx32reDAB5MyJJwr8CjCM1fNgFsmnjhaxjC9pJswpUok', // lp vault
+    poolRewardTokenAccount: '34gWdzwgj1zWQG4iwSbTeUDbQkoR8DXzLFQJsSpPDXLa', // reward vault A
+    poolRewardTokenAccountB: 'Gm4v69FCZ33HZsHAgtdezAUJK6n5fQ3zHpTZxAAzeyoJ' // reward vault B
+  },
+  {
+    name: 'RAY-SRM',
+    lp: { ...LP_TOKENS['RAY-SRM-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SRM },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'BnYoq5y2MoH4TsBHeEZrEPowhwebHxQq7nJW1vTjPTWu',
+    poolAuthority: '8JMnGryLkzSYdnTUPGRgxHoAmP5soH8L8TRre91Gjgni',
+    poolLpTokenAccount: '6tuhozgcTA25fq5Lp11QX9HsG8MVspUjtcn7EgYP1cs5', // lp vault
+    poolRewardTokenAccount: 'ED6Ak5wnnegeVz6jWMzGEEnFQ7HY55uPdxR8Ha6hk7gz', // reward vault A
+    poolRewardTokenAccountB: 'G4zqVtnHSK9Sp3SVdiQ5K56m46BdAoE2uQqpgVsmRG9d' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
