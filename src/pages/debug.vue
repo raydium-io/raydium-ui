@@ -37,6 +37,50 @@
           </table>
         </div>
       </div>
+      <div class="debug-header">
+        All Farms
+        <div class="debug-card">
+          <div v-for="(pool, poolId) in farm.infos" :key="poolId" class="debug-card">
+            {{
+              void ((lp = pool.lp),
+              (reward = pool.reward),
+              (rewardB = pool.rewardB || {}),
+              (userInfo = farm.stakeAccounts[poolId] || {}),
+              (userLpAccount = wallet.tokenAccounts[lp.mintAddress] || {}))
+            }}
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <div>Pool: {{ pool.name }}</div>
+                    <div>Pool id: {{ poolId }}</div>
+                    <div>Pool version: {{ pool.version }}</div>
+                    <div>Pool program id: {{ pool.programId }}</div>
+                    <div>LP name: {{ lp.name }}</div>
+                    <div>LP Mint: {{ lp.mintAddress }}</div>
+                  </td>
+                  <td class="balance">
+                    <div>Is stake: {{ pool.isStake }}</div>
+                    <div>Is fusion: {{ pool.fusion }}</div>
+                    <div>Is legacy: {{ pool.legacy }}</div>
+                    <div>Is dual: {{ pool.dual }}</div>
+                  </td>
+                  <td>
+                    <div>TVL: {{ lp.balance.format() }} LP</div>
+                    <div>Reward A: {{ reward.symbol }}</div>
+                    <div>Reward B: {{ rewardB.symbol }}</div>
+                    <div>Your deposited: {{ userInfo.depositBalance ? userInfo.depositBalance.format() : 0 }}</div>
+                    <div>Your LP balance: {{ userLpAccount.balance ? userLpAccount.balance.format() : 0 }}</div>
+                    <Input :ref="`input-${poolId}`" size="small" />
+                    <Button size="small" ghost @click="stake(pool)">Stake</Button>
+                    <Button size="small" ghost @click="unstake(pool)">Untake</Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +88,7 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 
-import { Button } from 'ant-design-vue'
+import { Button, Input } from 'ant-design-vue'
 
 import { get as safeGet } from 'lodash-es'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
@@ -54,13 +98,15 @@ import { TOKENS } from '@/utils/tokens'
 import { sendTransaction } from '@/utils/web3'
 import { getUnixTs } from '@/utils'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { depositV4, withdrawV4, deposit, withdraw } from '@/utils/stake'
 
 @Component({
   head: {
     title: 'Raydium Debug'
   },
   components: {
-    Button
+    Button,
+    Input
   }
 })
 export default class Debug extends Vue {
@@ -71,6 +117,10 @@ export default class Debug extends Vue {
 
   get wallet() {
     return this.$accessor.wallet
+  }
+
+  get farm() {
+    return this.$accessor.farm
   }
 
   get url() {
@@ -144,6 +194,104 @@ export default class Debug extends Vue {
       })
       this.tokenAccounts = value
     }
+  }
+
+  stake(poolInfo: any) {
+    const input = this.$refs[`input-${poolInfo.poolId}`]
+    // @ts-ignore
+    const amount = input[0].$refs.input.value
+
+    const conn = this.$web3
+    const wallet = (this as any).$wallet
+
+    const lpAccount = safeGet(this.wallet.tokenAccounts, `${poolInfo.lp.mintAddress}.tokenAccountAddress`)
+    const rewardAccount = safeGet(this.wallet.tokenAccounts, `${poolInfo.reward.mintAddress}.tokenAccountAddress`)
+    const rewardAccountB = safeGet(this.wallet.tokenAccounts, `${poolInfo.rewardB?.mintAddress}.tokenAccountAddress`)
+    const infoAccount = safeGet(this.farm.stakeAccounts, `${poolInfo.poolId}.stakeAccountAddress`)
+    const isFusion = Boolean(poolInfo.fusion)
+
+    const key = getUnixTs().toString()
+    this.$notify.info({
+      key,
+      message: 'Making transaction...',
+      description: '',
+      duration: 0
+    })
+    const depositPromise = isFusion
+      ? depositV4(conn, wallet, poolInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+      : deposit(conn, wallet, poolInfo, lpAccount, rewardAccount, infoAccount, amount)
+
+    depositPromise
+      .then((txid) => {
+        this.$notify.info({
+          key,
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Stake ${amount} ${poolInfo.lp.name}`
+        this.$accessor.transaction.sub({ txid, description })
+      })
+      .catch((error) => {
+        this.$notify.error({
+          key,
+          message: 'Stake failed',
+          description: error.message
+        })
+      })
+  }
+
+  unstake(poolInfo: any) {
+    const input = this.$refs[`input-${poolInfo.poolId}`]
+    // @ts-ignore
+    const amount = input[0].$refs.input.value
+
+    const conn = this.$web3
+    const wallet = (this as any).$wallet
+
+    const lpAccount = safeGet(this.wallet.tokenAccounts, `${poolInfo.lp.mintAddress}.tokenAccountAddress`)
+    const rewardAccount = safeGet(this.wallet.tokenAccounts, `${poolInfo.reward.mintAddress}.tokenAccountAddress`)
+    const rewardAccountB = safeGet(this.wallet.tokenAccounts, `${poolInfo.rewardB?.mintAddress}.tokenAccountAddress`)
+    const infoAccount = safeGet(this.farm.stakeAccounts, `${poolInfo.poolId}.stakeAccountAddress`)
+    const isFusion = Boolean(poolInfo.fusion)
+
+    const key = getUnixTs().toString()
+    this.$notify.info({
+      key,
+      message: 'Making transaction...',
+      description: '',
+      duration: 0
+    })
+    const withdrawPromise = isFusion
+      ? withdrawV4(conn, wallet, poolInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+      : withdraw(conn, wallet, poolInfo, lpAccount, rewardAccount, infoAccount, amount)
+
+    withdrawPromise
+      .then((txid) => {
+        this.$notify.info({
+          key,
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Unstake ${amount} ${poolInfo.lp.name}`
+        this.$accessor.transaction.sub({ txid, description })
+      })
+      .catch((error) => {
+        this.$notify.error({
+          key,
+          message: 'Stake failed',
+          description: error.message
+        })
+      })
   }
 }
 </script>
