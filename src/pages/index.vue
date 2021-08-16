@@ -342,7 +342,7 @@
                       >Telegram (ES)</a
                     >
                     <a class="link" href="https://t.me/RaydiumTurkey" rel="nofollow noopener noreferrer" target="_blank"
-                      >Telegram (TK)</a
+                      >Telegram (TR)</a
                     >
                     <a
                       class="link"
