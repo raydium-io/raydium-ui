@@ -125,16 +125,39 @@
                     {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                   </div>
                 </Col>
-                <Col v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
-                  <div class="title">{{ farm.farmInfo.dual ? `Total Apr ${farm.farmInfo.aprTotal}%` : 'Apr' }}</div>
-                  <div class="value">
-                    <div v-if="farm.farmInfo.dual">{{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%</div>
-                    <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                <Col class="state" :span="isMobile ? 6 : 5">
+                  <div class="title">
+                    <span>Total Apr</span>
+                    <Tooltip placement="right">
+                      <template slot="title">
+                        <div v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
+                          <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
+                          <div class="value-s">
+                            <div v-if="farm.farmInfo.dual">
+                              {{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%
+                            </div>
+                            <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                          </div>
+                        </div>
+                        <div v-else class="state" :span="isMobile ? 6 : 5">
+                          <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
+                          <div class="value-s">RAY {{ farm.farmInfo.apr }}%</div>
+                        </div>
+                      </template>
+                      <Icon type="question-circle" />
+                    </Tooltip>
                   </div>
-                </Col>
-                <Col v-else class="state" :span="isMobile ? 6 : 5">
-                  <div class="title">Apr</div>
-                  <div class="value">RAY {{ farm.farmInfo.apr }}%</div>
+                  <div class="value">
+                    <div v-if="farm.farmInfo.fusion">
+                      {{
+                        (
+                          parseFloat(farm.farmInfo.aprTotal ? farm.farmInfo.aprTotal : 0) +
+                          parseFloat(farm.farmInfo.fees ? farm.farmInfo.fees : 0)
+                        ).toFixed(2)
+                      }}%
+                    </div>
+                    <div v-else>{{ (parseFloat(farm.farmInfo.fees) + parseFloat(farm.farmInfo.apr)).toFixed(2) }}%</div>
+                  </div>
                 </Col>
                 <Col v-if="!isMobile && poolType" class="state" :span="6">
                   <div class="title">TVL</div>
@@ -373,9 +396,10 @@ export default Vue.extend({
   methods: {
     TokenAmount,
 
-    updateFarms() {
+    async updateFarms() {
       const farms: any[] = []
       const endedFarmsPoolId: string[] = []
+      const pools = await this.$api.getPairs()
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         const isFusion = Boolean((farmInfo as any).fusion)
@@ -387,7 +411,15 @@ export default Vue.extend({
           // @ts-ignore
           const { reward, rewardB, lp } = farmInfo
 
+          // @ts-ignore
+          const poolsLp = pools.find((item) => item.lp_mint === lp.mintAddress)
+
           const newFarmInfo = cloneDeep(farmInfo)
+
+          if (poolsLp) {
+            // @ts-ignore
+            newFarmInfo.fees = poolsLp.apy
+          }
 
           // for fusion
           if (isFusion && reward && rewardB && lp) {
@@ -927,6 +959,16 @@ export default Vue.extend({
         font-size: 16px;
         line-height: 24px;
       }
+
+      .value-s {
+        font-size: 12px;
+        line-height: 24px;
+      }
+
+      .title-s {
+        font-size: 16px;
+        text-transform: uppercase;
+      }
     }
   }
 
@@ -1015,5 +1057,8 @@ export default Vue.extend({
 }
 .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child {
   border: 1px solid #d9d9d9;
+}
+.ant-collapse-content > .ant-collapse-content-box {
+  padding-left: 32px;
 }
 </style>
