@@ -127,8 +127,8 @@
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 5">
                   <div class="title">
-                    <span>Total Apr</span>
-                    <Tooltip placement="right">
+                    <div>Total Apr</div>
+                    <Tooltip>
                       <template slot="title">
                         <div v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
                           <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
@@ -827,7 +827,7 @@ export default Vue.extend({
       margin-right: auto;
       margin-bottom: 16px;
       &.is-mobile {
-        width: 420px;
+        width: 100%;
       }
     }
   }
@@ -953,6 +953,9 @@ export default Vue.extend({
       .title {
         font-size: 12px;
         text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
 
       .value {
