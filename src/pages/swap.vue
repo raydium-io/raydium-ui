@@ -229,22 +229,6 @@
             ></span>
             <span> {{ toCoinWithSlippage }} {{ toCoin.symbol }} </span>
           </div>
-          <!-- <div
-            v-if="
-              endpoint && endpoint.toLowerCase().includes('raydium') && fromCoin && fromCoin.symbol && fromCoinAmount
-            "
-            class="fs-container"
-          >
-            <span class="name">
-              Liquidity Provider Fee
-              <Tooltip placement="right">
-                <template slot="title">
-                  A portion of each trade (0.x%) goes to liquidity providers as a protocol incentive
-                </template>
-                <Icon type="question-circle" /> </Tooltip
-            ></span>
-            <span> {{ Number(fromCoinAmount * x).toFixed(fromCoin.decimals) }} {{ fromCoin.symbol }} </span>
-          </div>  Temporary-->
           <div
             v-if="endpoint"
             :class="`fs-container price-impact ${

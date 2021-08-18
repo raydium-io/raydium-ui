@@ -5,6 +5,102 @@
       <div class="page-main-title">Raydium Bounty Airdrop</div>
     </section>
 
+    <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
+      <div class="close-btn" @click="isWinningPanelOpen = false">
+        <div class="icon minimize" />
+      </div>
+      <div class="title">Airdrop Points</div>
+      <template v-if="$accessor.wallet.connected">
+        <div
+          v-if="initBackendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
+          class="subtitle"
+        >
+          Updated:
+          {{ $dayjs(initBackendResponse.user.updated_at) }}
+        </div>
+
+        <h1 class="table-caption">Yours</h1>
+        <table class="your-table">
+          <tr>
+            <th class="th" style="width: 70%"></th>
+            <th class="th" style="width: 24%"></th>
+          </tr>
+          <tr>
+            <td class="td">
+              Eligible for Lucky Draw?
+              <Tooltip placement="left">
+                <template slot="title">
+                  Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter
+                  verification by tweeting their customized referral code.
+                </template>
+                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+              </Tooltip>
+            </td>
+            <td class="td">
+              {{ initBackendResponse && initBackendResponse.user && initBackendResponse.user.valid ? 'Yes' : 'No' }}
+            </td>
+          </tr>
+          <tr>
+            <td class="td">
+              Points for Lucky Draw
+              <Tooltip placement="left">
+                <template slot="title">
+                  1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of
+                  $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes
+                  from the lucky draw pool.
+                </template>
+                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+              </Tooltip>
+            </td>
+            <td class="td">
+              <div class="point-label">
+                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.point) || 0 }}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td">
+              Qualified Referrals
+              <Tooltip placement="left">
+                <template slot="title">
+                  Referral points are earned from users who used your code to connect a wallet, complete a swap, and
+                  complete Twitter verification.
+                </template>
+                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+              </Tooltip>
+            </td>
+            <td class="td">
+              <div class="point-label">
+                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.referral_count) || 0 }}
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <h1 class="table-caption">Referral Leaderboard</h1>
+        <table class="winner-table">
+          <tbody>
+            <tr v-for="winnerInfo in winners" :key="winnerInfo.owner">
+              <td class="td address">{{ winnerInfo.owner }}</td>
+              <td class="td">
+                <div class="point-label">
+                  {{ winnerInfo.count }}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+      <template v-else>
+        <div class="subtitle">Connect wallet to view your current points</div>
+        <button @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
+      </template>
+    </section>
+
+    <div v-else class="winner-trigger" @click="isWinningPanelOpen = true">
+      <div class="icon" />
+    </div>
+
     <section class="TLDR">
       <div class="title">Earn up to $2,000 in RAY in 3 easy steps</div>
       <table class="TLDR-table">
@@ -119,7 +215,7 @@
                     if (!$accessor.wallet.connected) {
                       $accessor.wallet.openModal()
                     } else {
-                      submit({ task: 'referral', result: '' })
+                      !isActivityEnd && submit({ task: 'referral', result: '' })
                     }
                   }
                 "
@@ -157,7 +253,7 @@
                 <button
                   @click="
                     () => {
-                      submit({ task: 'twitter', result: '' })
+                      !isActivityEnd && submit({ task: 'twitter', result: '' })
                     }
                   "
                 >
@@ -199,11 +295,15 @@
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
 
-          <svg v-if="showLinkInput && !haveDiscord" class="step-gap-line social-media" viewBox="0 0 440 88">
+          <svg
+            v-if="!isActivityEnd && showLinkInput && !haveDiscord"
+            class="step-gap-line social-media"
+            viewBox="0 0 440 88"
+          >
             <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
           </svg>
 
-          <div v-if="showLinkInput && !haveDiscord" class="box form">
+          <div v-if="!isActivityEnd && showLinkInput && !haveDiscord" class="box form">
             <div class="box-title">Input Discord Username</div>
             <div class="input-box">
               <label>Discord Username</label>
@@ -375,11 +475,12 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { mapState } from 'vuex'
 
-import { Input, Icon, Table, Checkbox } from 'ant-design-vue'
-import { CampaignInfo } from '@/types/api'
+import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
+import { CampaignInfo, CampaignWinners } from '@/types/api'
 
 @Component({
   components: {
+    Tooltip,
     Input,
     Icon,
     Table,
@@ -409,7 +510,8 @@ import { CampaignInfo } from '@/types/api'
 export default class Airdrop extends Vue {
   inputContent = ''
   inputChecked = false
-  initBackendResponse = {} as CampaignInfo // info from backend
+  initBackendResponse = {} as CampaignInfo['data'] // info from backend
+  isActivityEnd = true
   showLinkInput = false
   videoHasFinished = false
   videoHasCachedComplete = false
@@ -429,12 +531,15 @@ export default class Airdrop extends Vue {
   isDiscording = false
   intervalTimer = 0
 
+  isWinningPanelOpen = true
+  winners = [] as CampaignWinners
+
   mounted() {
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
   }
 
   @Watch('initBackendResponse', { deep: true })
-  getReferralLink(res: CampaignInfo) {
+  getReferralLink(res: CampaignInfo['data']) {
     this.referralLink = `${window.location.origin}${window.location.pathname}${
       res?.user?.referral ? `?referral=${res.user?.referral}` : ''
     }`
@@ -448,47 +553,47 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkCanSubmitDiscord(res: CampaignInfo) {
+  checkCanSubmitDiscord(res: CampaignInfo['data']) {
     this.canSubmitDiscord = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveTweet(res: CampaignInfo) {
+  checkHaveTweet(res: CampaignInfo['data']) {
     this.haveTweet = res.tasks?.referral?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveFollow(res: CampaignInfo) {
+  checkHaveFollow(res: CampaignInfo['data']) {
     this.haveFollow = res.tasks?.twitter?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveDiscord(res: CampaignInfo) {
+  checkHaveDiscord(res: CampaignInfo['data']) {
     this.haveDiscord = res.tasks?.discord?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveSwap(res: CampaignInfo) {
+  checkHaveSwap(res: CampaignInfo['data']) {
     this.haveSwap = res.tasks?.swap?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsTweetPending(res: CampaignInfo) {
+  checkIsTweetPending(res: CampaignInfo['data']) {
     this.isTweetPending = res.tasks?.referral?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsFollowPending(res: CampaignInfo) {
+  checkIsFollowPending(res: CampaignInfo['data']) {
     this.isFollowPending = res.tasks?.twitter?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsDiscordPending(res: CampaignInfo) {
+  checkIsDiscordPending(res: CampaignInfo['data']) {
     this.isDiscordPending = res.tasks?.discord?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsSwapPending(res: CampaignInfo) {
+  checkIsSwapPending(res: CampaignInfo['data']) {
     this.isSwapPending = res.tasks?.swap?.enabled
   }
 
@@ -500,11 +605,17 @@ export default class Airdrop extends Vue {
   @Watch('$accessor.wallet.connected', { immediate: true })
   async fetchData() {
     if (this.$accessor.wallet.connected) {
-      this.initBackendResponse =
-        (await this.$api.getCompaign({
+      try {
+        const response = await this.$api.getCompaign({
           address: this.$accessor.wallet.address,
           referral: (this.$route.query?.referral as string) || undefined
-        })) ?? {}
+        })
+        this.initBackendResponse = response?.data ?? {}
+        this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
+
+        const winners = await this.$api.getCompaignWinners()
+        this.winners = winners
+      } catch (err) {}
     }
   }
 
@@ -523,7 +634,7 @@ export default class Airdrop extends Vue {
       result,
       sign
     })
-    if (response) this.initBackendResponse = response
+    if (response) this.initBackendResponse = response.data
     return response
   }
 
@@ -535,7 +646,7 @@ export default class Airdrop extends Vue {
       try {
         const result = await this.submit({ task: 'discord', result: this.discordUserName })
         if (result) {
-          this.initBackendResponse = result
+          this.initBackendResponse = result.data
         }
       } finally {
         this.showLinkInput = false
@@ -646,10 +757,9 @@ a.disabled {
   }
 }
 .icon-reward {
-  transform: translateY(2px); // temp method
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   background-color: gray;
   mask-image: url('../assets/icons/reward.svg');
 }
@@ -862,6 +972,93 @@ a.disabled {
   &.social-media {
     width: 440px;
     height: 88px;
+  }
+}
+
+.winner-panel {
+  position: fixed;
+  right: 4vw;
+  bottom: 4vh;
+  height: 240px;
+  width: 350px;
+  z-index: 99;
+  box-shadow: 12px 12px 0 var(--secondary), 12px 12px 32px 8px var(--secondary);
+  grid-template-rows: auto auto 1fr;
+  .close-btn {
+    position: absolute;
+    right: 4%;
+    top: 4%;
+    .icon.minimize {
+      cursor: pointer;
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-size: 100% 100%;
+      background-color: aquamarine;
+      mask-image: url('../assets/icons/minimize.svg');
+    }
+  }
+  .title {
+    margin: 24px 0;
+  }
+  .subtitle {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--secondary-text);
+  }
+
+  table {
+    width: 100%;
+  }
+  .table-caption {
+    margin-top: 32px;
+    margin-bottom: 8px;
+    font-size: 1.5em;
+    opacity: 0.4;
+    justify-self: start;
+  }
+  .winner-table {
+    display: block;
+    height: 268px;
+    overflow: auto;
+    .td.address {
+      width: 222px;
+    }
+  }
+  .td {
+    padding: 4px 24px 4px 0;
+  }
+  &.has-result {
+    height: 634px;
+  }
+}
+
+.winner-trigger {
+  position: fixed;
+  right: 4vw;
+  bottom: 4vh;
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary);
+  border: 4px solid var(--secondary);
+  border-radius: 50%;
+  z-index: 99;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  box-shadow: 0 0 32px var(--secondary);
+  .icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-size: 100% 100%;
+    background-color: aquamarine;
+    mask-image: url('../assets/icons/reward.svg');
+    &:hover {
+      width: 32px;
+      height: 32px;
+      mask-image: url('../assets/icons/maximize.svg');
+    }
   }
 }
 
