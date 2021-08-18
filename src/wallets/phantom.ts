@@ -60,7 +60,7 @@ export class PhantomWalletAdapter extends EventEmitter implements WalletAdapter 
   }
 
   async connect() {
-    if (!this._provider) {
+    if (this._provider) {
       return
     }
 
