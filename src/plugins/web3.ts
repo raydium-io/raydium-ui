@@ -1,7 +1,6 @@
 import { Connection } from '@solana/web3.js'
 import { Plugin } from '@nuxt/types'
 
-import { sleep } from '@/utils'
 import { web3Config, commitment } from '@/utils/web3'
 import logger from '@/utils/logger'
 import { NuxtApiInstance, Rpc } from '@/types/api'
@@ -12,24 +11,7 @@ const createWeb3Instance = (endpoint: string) => {
 }
 
 async function getFastEndpoint(api: NuxtApiInstance, endpoints: Rpc[]) {
-  let rpc = ''
-
-  for (const endpoint of endpoints) {
-    api.getEpochInfo(endpoint.url).then(() => {
-      if (!rpc) {
-        rpc = endpoint.url
-      }
-    })
-  }
-
-  while (true) {
-    if (rpc) {
-      break
-    }
-    await sleep(10)
-  }
-
-  return rpc
+  return await Promise.any(endpoints.map((endpoint) => api.getEpochInfo(endpoint.url).then(() => endpoint.url)))
 }
 
 export function getWeightEndpoint(endpoints: Rpc[]) {
@@ -62,6 +44,9 @@ const web3Plugin: Plugin = async (ctx, inject) => {
   try {
     config = await $api.getConfig()
     configFrom = 'remote'
+    if (!window.location.hostname.includes('raydium')) {
+      config = web3Config
+    }
   } catch (error) {
     config = web3Config
     configFrom = 'local'
