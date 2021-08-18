@@ -11,7 +11,7 @@
       </div>
       <div class="title">Airdrop Points</div>
       <template v-if="$accessor.wallet.connected">
-        <h1 class="table-caption">Yours</h1>
+        <h1 class="table-caption">Your Info</h1>
         <table class="your-table">
           <tr>
             <th class="th" style="width: 70%"></th>
