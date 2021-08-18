@@ -11,14 +11,6 @@
       </div>
       <div class="title">Airdrop Points</div>
       <template v-if="$accessor.wallet.connected">
-        <div
-          v-if="initBackendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
-          class="subtitle"
-        >
-          Updated:
-          {{ $dayjs(initBackendResponse.user.updated_at) }}
-        </div>
-
         <h1 class="table-caption">Yours</h1>
         <table class="your-table">
           <tr>
