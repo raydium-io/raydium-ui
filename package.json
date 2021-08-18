@@ -32,6 +32,7 @@
     "@project-serum/serum": "^0.13.37",
     "@project-serum/sol-wallet-adapter": "^0.1.5",
     "@solana/spl-token": "^0.1.6",
+    "@solana/wallet-base": "^0.0.1",
     "@solana/web3.js": "^0.92.2",
     "ant-design-vue": "^1.7.3",
     "bignumber.js": "^9.0.1",

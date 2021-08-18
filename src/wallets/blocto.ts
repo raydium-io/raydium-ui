@@ -1,4 +1,4 @@
-import { WalletAdapter } from './types'
+import { WalletAdapter } from '@solana/wallet-base'
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
@@ -7,7 +7,7 @@ type BloctoRequestMethod = 'connect' | 'disconnect' | 'signTransaction' | 'signA
 
 interface BloctoProvider {
   isProgramWallet: boolean
-  publicKey?: PublicKey
+  publicKey: PublicKey | null
   connected: boolean
   autoApprove: boolean
   signTransaction: (transaction: Transaction) => Promise<Transaction>
@@ -64,7 +64,11 @@ export class BloctoWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   get publicKey() {
-    return this._provider?.publicKey
+    if (!this._provider || !this._provider.publicKey) {
+      return null
+    }
+
+    return this._provider.publicKey
   }
 
   // eslint-disable-next-line

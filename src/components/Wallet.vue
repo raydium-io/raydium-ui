@@ -68,14 +68,15 @@ import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { web3Config, commitment } from '@/utils/web3'
 import {
-  WalletAdapter,
   SolongWalletAdapter,
   MathWalletAdapter,
   PhantomWalletAdapter,
   BloctoWalletAdapter,
   LedgerWalletAdapter,
-  Coin98WalletAdapter
+  Coin98WalletAdapter,
+  SafePalWalletAdapter
 } from '@/wallets'
+import { WalletAdapter } from '@solana/wallet-base'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -182,6 +183,17 @@ export default class Wallet extends Vue {
         }
 
         return new BloctoWalletAdapter()
+      }
+    },
+    {
+      name: 'SafePal',
+      url: 'https://safepal.io',
+      getAdapter() {
+        if ((window as any).solana === undefined || !(window as any).solana.isSafePalWallet) {
+          return
+        }
+
+        return new SafePalWalletAdapter()
       }
     },
     {

@@ -1,16 +1,17 @@
-import { WalletAdapter } from './types'
+import { WalletAdapter } from '@solana/wallet-base'
 
 import { PublicKey, Transaction } from '@solana/web3.js'
 import * as bs58 from 'bs58'
 import EventEmitter from 'eventemitter3'
 
 export class Coin98WalletAdapter extends EventEmitter implements WalletAdapter {
-  _publicKey?: PublicKey
+  _publicKey: PublicKey | null
   _onProcess: boolean
   _connected: boolean
 
   constructor() {
     super()
+    this._publicKey = null
     this._onProcess = false
     this._connected = false
   }
@@ -75,7 +76,7 @@ export class Coin98WalletAdapter extends EventEmitter implements WalletAdapter {
 
   disconnect(): void {
     if (this._publicKey) {
-      this._publicKey = undefined
+      this._publicKey = null
       this._connected = false
       ;(window as any).coin98?.sol.disconnect()
       this.emit('disconnect')

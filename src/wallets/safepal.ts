@@ -3,7 +3,7 @@ import { WalletAdapter } from '@solana/wallet-base'
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
-export class MathWalletAdapter extends EventEmitter implements WalletAdapter {
+export class SafePalWalletAdapter extends EventEmitter implements WalletAdapter {
   _publicKey: PublicKey | null
   _onProcess: boolean
   _connected: boolean
@@ -33,7 +33,7 @@ export class MathWalletAdapter extends EventEmitter implements WalletAdapter {
   }
 
   private get _provider() {
-    if ((window as any)?.solana?.isMathWallet) {
+    if ((window as any)?.solana?.isSafePalWallet) {
       return (window as any).solana
     }
     return undefined

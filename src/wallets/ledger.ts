@@ -1,5 +1,5 @@
 import { getPublicKey, signTransaction, getSolanaDerivationPath } from './ledger-core'
-import { WalletAdapter } from './types'
+import { WalletAdapter } from '@solana/wallet-base'
 
 import type Transport from '@ledgerhq/hw-transport'
 import type { Transaction } from '@solana/web3.js'

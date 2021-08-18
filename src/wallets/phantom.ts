@@ -1,4 +1,4 @@
-import { WalletAdapter } from './types'
+import { WalletAdapter } from '@solana/wallet-base'
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
@@ -15,28 +15,14 @@ interface PhantomProvider {
   disconnect: () => Promise<void>
   on: (event: PhantomEvent, handler: (args: any) => void) => void
   request: (method: PhantomRequestMethod, params: any) => Promise<any>
-  listeners: (event: PhantomEvent) => (() => void)[]
 }
 
 export class PhantomWalletAdapter extends EventEmitter implements WalletAdapter {
+  _provider: PhantomProvider | undefined
+  _cachedCorrectKey?: PublicKey
   constructor() {
     super()
     this.connect = this.connect.bind(this)
-  }
-
-  private get _provider(): PhantomProvider | undefined {
-    if ((window as any)?.solana?.isPhantom) {
-      return (window as any).solana
-    }
-    return undefined
-  }
-
-  private _handleConnect = (...args: any) => {
-    this.emit('connect', ...args)
-  }
-
-  private _handleDisconnect = (...args: any) => {
-    this.emit('disconnect', ...args)
   }
 
   get connected() {
@@ -57,7 +43,11 @@ export class PhantomWalletAdapter extends EventEmitter implements WalletAdapter 
   }
 
   get publicKey() {
-    return this._provider?.publicKey
+    // Due to weird phantom bug where their public key isnt quite like ours
+    if (!this._cachedCorrectKey && this._provider?.publicKey)
+      this._cachedCorrectKey = new PublicKey(this._provider.publicKey.toBase58())
+
+    return this._cachedCorrectKey || null
   }
 
   // eslint-disable-next-line
@@ -69,22 +59,31 @@ export class PhantomWalletAdapter extends EventEmitter implements WalletAdapter 
     return this._provider.signTransaction(transaction)
   }
 
-  connect() {
+  async connect() {
     if (!this._provider) {
       return
     }
-    if (!this._provider.listeners('connect').length) {
-      this._provider?.on('connect', this._handleConnect)
+
+    const provider: PhantomProvider = (window as any).solana
+
+    provider.on('connect', () => {
+      this._provider = provider
+      this.emit('connect')
+    })
+
+    if (!provider.isConnected) {
+      await provider.connect()
     }
-    if (!this._provider.listeners('disconnect').length) {
-      this._provider?.on('disconnect', this._handleDisconnect)
-    }
-    return this._provider?.connect()
+
+    this._provider = provider
+    this.emit('connect')
   }
 
   disconnect() {
     if (this._provider) {
       this._provider.disconnect()
+      this._provider = undefined
+      this.emit('disconnect')
     }
   }
 }

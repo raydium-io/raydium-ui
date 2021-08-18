@@ -1,49 +1,30 @@
-import { WalletAdapter } from './types'
+import { WalletAdapter } from '@solana/wallet-base'
 
 import EventEmitter from 'eventemitter3'
 import { PublicKey, Transaction } from '@solana/web3.js'
 
 export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
-  _publicKey?: PublicKey
+  _publicKey: PublicKey | null
   _onProcess: boolean
-  _connected: boolean
   constructor() {
     super()
+    this._publicKey = null
     this._onProcess = false
-    this._connected = false
     this.connect = this.connect.bind(this)
-  }
-
-  get connected() {
-    return this._connected
-  }
-
-  get autoApprove() {
-    return false
-  }
-
-  public async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
-    const solong = (window as any).solong
-    if (solong.signAllTransactions) {
-      return solong.signAllTransactions(transactions)
-    } else {
-      const result: Transaction[] = []
-      for (let i = 0; i < transactions.length; i++) {
-        const transaction = transactions[i]
-        const signed = await solong.signTransaction(transaction)
-        result.push(signed)
-      }
-
-      return result
-    }
   }
 
   get publicKey() {
     return this._publicKey
   }
 
-  signTransaction(transaction: Transaction) {
+  // eslint-disable-next-line
+  async signTransaction(transaction: Transaction) {
     return (window as any).solong.signTransaction(transaction)
+  }
+
+  // eslint-disable-next-line
+  async signAllTransactions(transactions: Transaction[]) {
+    return transactions
   }
 
   connect() {
@@ -56,7 +37,6 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
       .selectAccount()
       .then((account: any) => {
         this._publicKey = new PublicKey(account)
-        this._connected = true
         this.emit('connect', this._publicKey)
       })
       .catch(() => {
@@ -69,8 +49,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
 
   disconnect() {
     if (this._publicKey) {
-      this._publicKey = undefined
-      this._connected = false
+      this._publicKey = null
       this.emit('disconnect')
     }
   }
