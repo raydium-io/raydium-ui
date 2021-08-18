@@ -12,7 +12,7 @@
       <div class="title">Airdrop Points</div>
       <template v-if="$accessor.wallet.connected">
         <div
-          v-if="initBackResultendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
+          v-if="initBackendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
           class="subtitle"
         >
           update at:
