@@ -59,10 +59,13 @@ export function getSwapOutAmount(
   if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // coin2pc
     const fromAmount = new TokenAmount(amount, coin.decimals, false)
-    const denominator = coin.balance.wei.plus(fromAmount.wei)
-    const amountOut = pc.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
-    const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
+    const fromAmountWithFee = fromAmount.wei
+      .multipliedBy(swapFeeDenominator - swapFeeNumerator)
+      .dividedBy(swapFeeDenominator)
+
+    const denominator = coin.balance.wei.plus(fromAmountWithFee)
+    const amountOut = pc.balance.wei.multipliedBy(fromAmountWithFee).dividedBy(denominator)
+    const amountOutWithSlippage = amountOut.dividedBy(1 + slippage / 100)
 
     const outBalance = pc.balance.wei.minus(amountOut)
     const beforePrice = new TokenAmount(
@@ -82,17 +85,20 @@ export function getSwapOutAmount(
 
     return {
       amountIn: fromAmount,
-      amountOut: new TokenAmount(amountOutWithFee, pc.decimals),
+      amountOut: new TokenAmount(amountOut, pc.decimals),
       amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, pc.decimals),
       priceImpact
     }
   } else {
     // pc2coin
     const fromAmount = new TokenAmount(amount, pc.decimals, false)
-    const denominator = pc.balance.wei.plus(fromAmount.wei)
-    const amountOut = coin.balance.wei.multipliedBy(fromAmount.wei).dividedBy(denominator)
-    const amountOutWithFee = amountOut.dividedBy(swapFeeDenominator).multipliedBy(swapFeeDenominator - swapFeeNumerator)
-    const amountOutWithSlippage = amountOutWithFee.dividedBy(1 + slippage / 100)
+    const fromAmountWithFee = fromAmount.wei
+      .multipliedBy(swapFeeDenominator - swapFeeNumerator)
+      .dividedBy(swapFeeDenominator)
+
+    const denominator = pc.balance.wei.plus(fromAmountWithFee)
+    const amountOut = coin.balance.wei.multipliedBy(fromAmountWithFee).dividedBy(denominator)
+    const amountOutWithSlippage = amountOut.dividedBy(1 + slippage / 100)
 
     const outBalance = coin.balance.wei.minus(amountOut)
 
@@ -113,7 +119,7 @@ export function getSwapOutAmount(
 
     return {
       amountIn: fromAmount,
-      amountOut: new TokenAmount(amountOutWithFee, coin.decimals),
+      amountOut: new TokenAmount(amountOut, coin.decimals),
       amountOutWithSlippage: new TokenAmount(amountOutWithSlippage, coin.decimals),
       priceImpact
     }
