@@ -13,7 +13,8 @@ const apiPlugin: Plugin = (ctx, inject) => {
     getCompaign: ({ campaignId = 1, address, referral }) =>
       ctx.$axios.get(`https://api.raydium.io/campaign/${campaignId}`, { params: { address, referral } }),
     postCompaign: ({ campaignId = 1, address, task, result = '', sign = '' }) =>
-      ctx.$axios.post(`https://api.raydium.io/campaign/${campaignId}`, { address, task, result, sign })
+      ctx.$axios.post(`https://api.raydium.io/campaign/${campaignId}`, { address, task, result, sign }),
+    getCompaignWinners: () => ctx.$axios.get(`https://api.raydium.io/campaign`)
   }
 
   ctx.$api = api

@@ -48,6 +48,7 @@ export interface CampaignInfo {
   }
   campaign_info: { start: number; end: number }
 }
+type CampaignWinners = { owner: string; count: number }[]
 
 export interface NuxtApiInstance {
   getPrices: () => Promise<PricesData>
@@ -69,4 +70,5 @@ export interface NuxtApiInstance {
     result?: string
     sign?: string
   }) => Promise<CampaignInfo>
+  getCompaignWinners: () => Promise<CampaignWinners>
 }
