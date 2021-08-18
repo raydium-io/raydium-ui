@@ -417,6 +417,7 @@ async function initAmm(
       ammKeys.poolCoinTokenAccount,
       ammKeys.poolPcTokenAccount,
       ammKeys.poolWithdrawQueue,
+      ammKeys.ammTargetOrders,
       ammKeys.destLpToken,
       ammKeys.poolTempLpTokenAccount,
       dexProgramId,
@@ -425,26 +426,6 @@ async function initAmm(
       owner,
 
       ammKeys.nonce
-    )
-  )
-
-  transaction.add(
-    initialize2(
-      ammProgramId,
-      ammKeys.ammId,
-      ammKeys.ammAuthority,
-      ammKeys.ammOpenOrders,
-      ammKeys.poolCoinTokenAccount,
-      ammKeys.poolPcTokenAccount,
-      ammKeys.ammTargetOrders,
-      dexProgramId,
-      market.address,
-      market.baseVault,
-      market.quoteVault,
-      market.requestQueue,
-      market.eventQueue,
-      market.bids,
-      market.asks
     )
   )
 
@@ -487,6 +468,7 @@ export function initialize(
   poolCoinTokenAccount: PublicKey,
   poolPcTokenAccount: PublicKey,
   poolWithdrawQueue: PublicKey,
+  ammTargetOrders: PublicKey,
   poolLpTokenAccount: PublicKey,
   poolTempLpTokenAccount: PublicKey,
   serumProgramId: PublicKey,
@@ -509,6 +491,7 @@ export function initialize(
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolWithdrawQueue, isSigner: false, isWritable: true },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: serumProgramId, isSigner: false, isWritable: false },
@@ -528,57 +511,6 @@ export function initialize(
   return new TransactionInstruction({
     keys,
     programId: ammProgramId,
-    data
-  })
-}
-
-export function initialize2(
-  programId: PublicKey,
-  ammId: PublicKey,
-  ammAuthority: PublicKey,
-  ammOpenOrders: PublicKey,
-  poolCoinTokenAccount: PublicKey,
-  poolPcTokenAccount: PublicKey,
-  ammTargetOrders: PublicKey,
-  serumProgramId: PublicKey,
-  serumMarket: PublicKey,
-  serumCoinVaultAccount: PublicKey,
-  serumPcVaultAccount: PublicKey,
-  serumReqQ: PublicKey,
-  serumEventQ: PublicKey,
-  serumBids: PublicKey,
-  serumAsks: PublicKey
-): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), u8('nonce')])
-
-  const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: true },
-    { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
-    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
-    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
-    { pubkey: serumProgramId, isSigner: false, isWritable: true },
-    { pubkey: serumMarket, isSigner: false, isWritable: true },
-    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
-    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
-    { pubkey: serumReqQ, isSigner: false, isWritable: true },
-    { pubkey: serumEventQ, isSigner: false, isWritable: true },
-    { pubkey: serumBids, isSigner: false, isWritable: true },
-    { pubkey: serumAsks, isSigner: false, isWritable: true }
-  ]
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: 1
-    },
-    data
-  )
-  return new TransactionInstruction({
-    keys,
-    programId,
     data
   })
 }
