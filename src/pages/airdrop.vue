@@ -15,7 +15,7 @@
           v-if="initBackendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
           class="subtitle"
         >
-          update at:
+          Updated:
           {{ $dayjs(initBackendResponse.user.updated_at) }}
         </div>
 
