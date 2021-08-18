@@ -5,6 +5,58 @@
       <div class="page-main-title">Raydium Bounty Airdrop</div>
     </section>
 
+    <section v-if="isWinningPanelOpen" class="box winner-panel">
+      <div class="close-btn" @click="isWinningPanelOpen = false">
+        <div class="icon minimize" />
+      </div>
+      <div class="title">Airdrop Result</div>
+      <template v-if="$accessor.wallet.connected">
+        <div
+          v-if="initBackResultendResponse && initBackendResponse.user && initBackendResponse.user.updated_at"
+          class="subtitle"
+        >
+          update at:
+          {{ $dayjs(initBackendResponse.user.updated_at) }}
+        </div>
+        <table v-if="$accessor.wallet.connected">
+          <tr>
+            <th class="th" style="width: 50%"></th>
+            <th class="th" style="width: 34%"></th>
+          </tr>
+          <tr>
+            <td class="td">Eligible for Lucky Draw?</td>
+            <td class="td">
+              {{ initBackendResponse && initBackendResponse.user && initBackendResponse.user.valid ? 'Yes' : 'No' }}
+            </td>
+          </tr>
+          <tr>
+            <td class="td">Points for Lucky Draw</td>
+            <td class="td">
+              <div class="point-label">
+                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.point) || 0 }}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td">Qualified Referrals</td>
+            <td class="td">
+              <div class="point-label">
+                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.referral_count) || 0 }}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </template>
+      <template v-else>
+        <div class="subtitle">Please connect wallet to view the info</div>
+        <button @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
+      </template>
+    </section>
+
+    <div v-else class="winner-trigger" @click="isWinningPanelOpen = true">
+      <div class="icon" />
+    </div>
+
     <section class="TLDR">
       <div class="title">Earn up to $2,000 in RAY in 3 easy steps</div>
       <table class="TLDR-table">
@@ -119,7 +171,7 @@
                     if (!$accessor.wallet.connected) {
                       $accessor.wallet.openModal()
                     } else {
-                      submit({ task: 'referral', result: '' })
+                      !isActivityEnd && submit({ task: 'referral', result: '' })
                     }
                   }
                 "
@@ -157,7 +209,7 @@
                 <button
                   @click="
                     () => {
-                      submit({ task: 'twitter', result: '' })
+                      !isActivityEnd && submit({ task: 'twitter', result: '' })
                     }
                   "
                 >
@@ -199,11 +251,15 @@
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
 
-          <svg v-if="showLinkInput && !haveDiscord" class="step-gap-line social-media" viewBox="0 0 440 88">
+          <svg
+            v-if="!isActivityEnd && showLinkInput && !haveDiscord"
+            class="step-gap-line social-media"
+            viewBox="0 0 440 88"
+          >
             <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
           </svg>
 
-          <div v-if="showLinkInput && !haveDiscord" class="box form">
+          <div v-if="!isActivityEnd && showLinkInput && !haveDiscord" class="box form">
             <div class="box-title">Input Discord Username</div>
             <div class="input-box">
               <label>Discord Username</label>
@@ -409,7 +465,8 @@ import { CampaignInfo } from '@/types/api'
 export default class Airdrop extends Vue {
   inputContent = ''
   inputChecked = false
-  initBackendResponse = {} as CampaignInfo // info from backend
+  initBackendResponse = {} as CampaignInfo['data'] // info from backend
+  isActivityEnd = true
   showLinkInput = false
   videoHasFinished = false
   videoHasCachedComplete = false
@@ -429,12 +486,14 @@ export default class Airdrop extends Vue {
   isDiscording = false
   intervalTimer = 0
 
+  isWinningPanelOpen = true
+
   mounted() {
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
   }
 
   @Watch('initBackendResponse', { deep: true })
-  getReferralLink(res: CampaignInfo) {
+  getReferralLink(res: CampaignInfo['data']) {
     this.referralLink = `${window.location.origin}${window.location.pathname}${
       res?.user?.referral ? `?referral=${res.user?.referral}` : ''
     }`
@@ -448,47 +507,47 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkCanSubmitDiscord(res: CampaignInfo) {
+  checkCanSubmitDiscord(res: CampaignInfo['data']) {
     this.canSubmitDiscord = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveTweet(res: CampaignInfo) {
+  checkHaveTweet(res: CampaignInfo['data']) {
     this.haveTweet = res.tasks?.referral?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveFollow(res: CampaignInfo) {
+  checkHaveFollow(res: CampaignInfo['data']) {
     this.haveFollow = res.tasks?.twitter?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveDiscord(res: CampaignInfo) {
+  checkHaveDiscord(res: CampaignInfo['data']) {
     this.haveDiscord = res.tasks?.discord?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkHaveSwap(res: CampaignInfo) {
+  checkHaveSwap(res: CampaignInfo['data']) {
     this.haveSwap = res.tasks?.swap?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsTweetPending(res: CampaignInfo) {
+  checkIsTweetPending(res: CampaignInfo['data']) {
     this.isTweetPending = res.tasks?.referral?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsFollowPending(res: CampaignInfo) {
+  checkIsFollowPending(res: CampaignInfo['data']) {
     this.isFollowPending = res.tasks?.twitter?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsDiscordPending(res: CampaignInfo) {
+  checkIsDiscordPending(res: CampaignInfo['data']) {
     this.isDiscordPending = res.tasks?.discord?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkIsSwapPending(res: CampaignInfo) {
+  checkIsSwapPending(res: CampaignInfo['data']) {
     this.isSwapPending = res.tasks?.swap?.enabled
   }
 
@@ -500,11 +559,14 @@ export default class Airdrop extends Vue {
   @Watch('$accessor.wallet.connected', { immediate: true })
   async fetchData() {
     if (this.$accessor.wallet.connected) {
-      this.initBackendResponse =
-        (await this.$api.getCompaign({
+      try {
+        const response = await this.$api.getCompaign({
           address: this.$accessor.wallet.address,
           referral: (this.$route.query?.referral as string) || undefined
-        })) ?? {}
+        })
+        this.initBackendResponse = response?.data ?? {}
+        this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
+      } catch (err) {}
     }
   }
 
@@ -523,7 +585,7 @@ export default class Airdrop extends Vue {
       result,
       sign
     })
-    if (response) this.initBackendResponse = response
+    if (response) this.initBackendResponse = response.data
     return response
   }
 
@@ -535,7 +597,7 @@ export default class Airdrop extends Vue {
       try {
         const result = await this.submit({ task: 'discord', result: this.discordUserName })
         if (result) {
-          this.initBackendResponse = result
+          this.initBackendResponse = result.data
         }
       } finally {
         this.showLinkInput = false
@@ -646,10 +708,9 @@ a.disabled {
   }
 }
 .icon-reward {
-  transform: translateY(2px); // temp method
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   background-color: gray;
   mask-image: url('../assets/icons/reward.svg');
 }
@@ -862,6 +923,67 @@ a.disabled {
   &.social-media {
     width: 440px;
     height: 88px;
+  }
+}
+
+.winner-panel {
+  position: fixed;
+  right: 4vw;
+  bottom: 4vh;
+  height: 240px;
+  width: 360px;
+  z-index: 99;
+  box-shadow: 12px 12px 0 var(--secondary), 12px 12px 32px 8px var(--secondary);
+  .close-btn {
+    position: absolute;
+    right: 4%;
+    top: 4%;
+    .icon.minimize {
+      cursor: pointer;
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-size: 100% 100%;
+      background-color: aquamarine;
+      mask-image: url('../assets/icons/minimize.svg');
+    }
+  }
+  .title {
+    margin: 24px 0;
+  }
+  .subtitle {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: var(--secondary-text);
+  }
+}
+
+.winner-trigger {
+  position: fixed;
+  right: 4vw;
+  bottom: 4vh;
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary);
+  border: 4px solid var(--secondary);
+  border-radius: 50%;
+  z-index: 99;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  box-shadow: 0 0 32px var(--secondary);
+  .icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-size: 100% 100%;
+    background-color: aquamarine;
+    mask-image: url('../assets/icons/reward.svg');
+    &:hover {
+      width: 32px;
+      height: 32px;
+      mask-image: url('../assets/icons/maximize.svg');
+    }
   }
 }
 

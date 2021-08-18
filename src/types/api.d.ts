@@ -25,25 +25,28 @@ export interface ConfigData {
 export interface EpochInfo {}
 
 export interface CampaignInfo {
-  user: {
-    referral: string // correspond to address
-    address: string // wallet pubkey
-    created_at: number // timestamp for backend
-    updated_at: number // timestamp for backend
-    point: number
-    referral_by: null | string
-  }
-  tasks: {
-    // campaign 1 : 'video' | 'twitter' | 'discord' | 'swap' | 'referral'
-    [K: string]: {
-      finished: false
-      enabled: false
-      key: string
+  data: {
+    user: {
+      referral: string // correspond to address
+      address: string // wallet pubkey
       created_at: number // timestamp for backend
       updated_at: number // timestamp for backend
       point: number
+      referral_by: null | string
+    }
+    tasks: {
+      // campaign 1 : 'video' | 'twitter' | 'discord' | 'swap' | 'referral'
+      [K: string]: {
+        finished: false
+        enabled: false
+        key: string
+        created_at: number // timestamp for backend
+        updated_at: number // timestamp for backend
+        point: number
+      }
     }
   }
+  campaign_info: { start: number; end: number }
 }
 
 export interface NuxtApiInstance {
