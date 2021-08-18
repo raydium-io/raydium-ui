@@ -177,7 +177,16 @@
           <div class="box-title has-step">
             Swap on Raydium
             <div>
-              <div :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`" />
+              <div
+                :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveSwap
+                    ? 'Congratulations! You completed this task.'
+                    : isSwapPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
+              />
             </div>
           </div>
           <a href="/swap/" target="_blank" style="align-self: end"><button>GO TO SWAP</button></a>
@@ -187,7 +196,16 @@
           <div class="box-title">
             Share to Twitter
             <div>
-              <div :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`" />
+              <div
+                :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveTweet
+                    ? 'Congratulations! You completed this task.'
+                    : isTweetPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
+              />
               <div class="point-label">BONUS +1 POINT / REFERRAL</div>
             </div>
           </div>
@@ -231,7 +249,16 @@
             <div class="box-title">
               Follow Raydium
               <div>
-                <div :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`" />
+                <div
+                  :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveFollow
+                      ? 'Congratulations! You completed this task.'
+                      : isFollowPending
+                      ? 'Points pending. Please check again in 30 minutes.'
+                      : 'you have not done this task'
+                  }`"
+                />
                 <div class="point-label">+1 POINTS</div>
               </div>
             </div>
@@ -260,7 +287,16 @@
             <div class="box-title">
               Join the Raydium Discord
               <div>
-                <div :class="`icon-reward ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`" />
+                <div
+                  :class="`icon-reward ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveDiscord
+                      ? 'Congratulations! You completed this task.'
+                      : isDiscordPending
+                      ? 'Points pending. Please check again in 30 minutes.'
+                      : 'you have not done this task'
+                  }`"
+                />
                 <div class="point-label">+1 POINT</div>
               </div>
             </div>
@@ -309,6 +345,13 @@
               <div
                 v-if="$accessor.wallet.connected"
                 :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveDiscord
+                    ? 'Congratulations! You completed this task.'
+                    : isDiscordPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
               />
             </button>
           </div>
