@@ -6,15 +6,21 @@ import { PublicKey, Transaction } from '@solana/web3.js'
 export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   _publicKey: PublicKey | null
   _onProcess: boolean
+  _connected: boolean
   constructor() {
     super()
     this._publicKey = null
     this._onProcess = false
+    this._connected = false
     this.connect = this.connect.bind(this)
   }
 
   get publicKey() {
     return this._publicKey
+  }
+
+  get connected() {
+    return this._connected
   }
 
   // eslint-disable-next-line
@@ -37,6 +43,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
       .selectAccount()
       .then((account: any) => {
         this._publicKey = new PublicKey(account)
+        this._connected = true
         this.emit('connect', this._publicKey)
       })
       .catch(() => {
@@ -50,6 +57,7 @@ export class SolongWalletAdapter extends EventEmitter implements WalletAdapter {
   disconnect() {
     if (this._publicKey) {
       this._publicKey = null
+      this._connected = false
       this.emit('disconnect')
     }
   }
