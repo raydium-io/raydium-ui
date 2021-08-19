@@ -38,7 +38,6 @@
           </table>
           <div v-if="!rewardIsOut">Cacluating...</div>
         </template>
-
         <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">Total Points</h1>
         <table class="your-table">
           <tr>
