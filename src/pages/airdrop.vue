@@ -10,11 +10,12 @@
         <div class="icon minimize" />
       </div>
 
-      <!-- TEMP -->
-      <a class="download-full-list" href="/winner-list/" target="_blank"> Check Winners </a>
-      <!-- <a v-if="rewardIsOut" class="download-full-list" href="/winner-list.vue/" target="_blank"> See All </a> -->
+      <a v-if="rewardIsOut" class="download-full-list" href="/winner-list/" target="_blank"> Check Winners </a>
 
       <div class="title">Airdrop Points</div>
+
+      <div class="note">sdfasdf</div>
+
       <template v-if="$accessor.wallet.connected">
         <template v-if="isActivityEnd">
           <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
@@ -113,7 +114,7 @@
         </table>
         <table v-else-if="rewardIsOut" class="winner-table">
           <tbody>
-            <tr v-for="winnerInfo in topWinners" :key="winnerInfo.owner">
+            <tr v-for="winnerInfo in winnerList['top 5']" :key="winnerInfo.owner">
               <td class="td address">{{ winnerInfo.owner }}</td>
               <td class="td">
                 <div class="point-label">${{ winnerInfo.reward }}</div>
@@ -553,7 +554,7 @@ import { mapState } from 'vuex'
 import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
-import winnerList from '@/assets/winner-list.json'
+const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   components: {
@@ -578,6 +579,9 @@ import winnerList from '@/assets/winner-list.json'
       const storedItem = window.localStorage.getItem('airdrop:referral')
       if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
     }
+    const winnerList = await getWinnerList()
+
+    return { winnerList }
   },
 
   computed: {
@@ -585,8 +589,6 @@ import winnerList from '@/assets/winner-list.json'
   }
 })
 export default class Airdrop extends Vue {
-  winnerList = winnerList
-
   inputContent = ''
   inputChecked = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
@@ -613,7 +615,6 @@ export default class Airdrop extends Vue {
   isWinningPanelOpen = true
   winners = [] as CampaignWinners
   rewardIsOut = false
-  topWinners = winnerList['top 5']
   cachedWinnerList: Record<string, string> = {}
   // eslint-disable-next-line camelcase
   rewardInfos = undefined as
@@ -648,14 +649,6 @@ export default class Airdrop extends Vue {
     // trueData
     this.rewardIsOut = Boolean(res.user.reward)
     this.rewardInfos = res.user.reward
-
-    // // mock data
-    this.rewardIsOut = true
-    this.rewardInfos = {
-      first: 10,
-      refer: 45,
-      luck: 484
-    }
   }
 
   @Watch('initBackendResponse', { immediate: true })
@@ -717,8 +710,7 @@ export default class Airdrop extends Vue {
           referral: (this.$route.query?.referral as string) || undefined
         })
         this.initBackendResponse = response?.data ?? {}
-        this.isActivityEnd = true // TEMP
-        // this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
+        this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
         if (!this.isActivityEnd) {
           this.winners = await this.$api.getCompaignWinners()
         }

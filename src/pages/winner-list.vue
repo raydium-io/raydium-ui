@@ -1,6 +1,7 @@
 <template>
   <div class="winner-list container">
     <h2 class="tip">(Use <code>ctrl F</code> to search for your wallet)</h2>
+    <div class="note">Rewards</div>
     <div class="card">
       <div class="card-body winner-list-gird">
         <h2 class="title">First 4,000</h2>
@@ -41,7 +42,7 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Table, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
-import winnerList from '@/assets/winner-list.json'
+const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   head: {
@@ -55,11 +56,15 @@ import winnerList from '@/assets/winner-list.json'
     Button,
     Input,
     Icon
+  },
+
+  async asyncData() {
+    const winnerList = await getWinnerList()
+
+    return { winnerList }
   }
 })
-export default class WinnerList extends Vue {
-  winnerList = winnerList
-}
+export default class WinnerList extends Vue {}
 </script>
 
 <style lang="less" scoped>
@@ -67,6 +72,9 @@ export default class WinnerList extends Vue {
   margin: 48px auto;
   text-align: center;
   font-size: 36px;
+}
+.note {
+  text-align: center;
 }
 
 .container {
@@ -78,7 +86,9 @@ export default class WinnerList extends Vue {
     }
   }
 }
-
+.card {
+  margin-top: 40px;
+}
 .card-body.winner-list-gird {
   padding-top: 25px;
   display: grid;
