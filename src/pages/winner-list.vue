@@ -1,7 +1,7 @@
 <template>
   <div class="winner-list container">
     <h2 class="tip">(Use <code>ctrl F</code> to search for your wallet)</h2>
-    <div class="note">Rewards</div>
+    <div class="note">Rewards have already been sent to winning addresses</div>
     <div class="card">
       <div class="card-body winner-list-gird">
         <h2 class="title">First 4,000</h2>

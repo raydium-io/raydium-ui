@@ -14,7 +14,9 @@
 
       <div class="title">Airdrop Points</div>
 
-      <div class="note">sdfasdf</div>
+      <div v-if="rewardIsOut" class="note" style="text-align: center; margin-top: 12px">
+        Rewards have already been sent to winning addresses
+      </div>
 
       <template v-if="$accessor.wallet.connected">
         <template v-if="isActivityEnd">
