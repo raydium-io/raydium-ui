@@ -54,6 +54,8 @@ export interface CampaignInfo {
   campaign_info: { start: number; end: number }
 }
 type CampaignWinners = { owner: string; count: number }[]
+
+// deprecated
 type CampaignWinnerList = string[]
 
 export interface NuxtApiInstance {
@@ -77,5 +79,5 @@ export interface NuxtApiInstance {
     sign?: string
   }) => Promise<CampaignInfo>
   getCompaignWinners: () => Promise<CampaignWinners>
-  getCompaignWinnerList: (queryInfo: { type: 'luck' | 'valid' }) => Promise<CampaignWinnerList>
+  getCompaignWinnerList: (queryInfo: { type: 'luck' | 'valid' }) => Promise<CampaignWinnerList> // deprecated
 }
