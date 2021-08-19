@@ -33,6 +33,11 @@ export interface CampaignInfo {
       updated_at: number // timestamp for backend
       point: number
       referral_by: null | string
+      reward?: {
+        first: number
+        refer: number
+        luck: number
+      }
     }
     tasks: {
       // campaign 1 : 'video' | 'twitter' | 'discord' | 'swap' | 'referral'
@@ -49,6 +54,7 @@ export interface CampaignInfo {
   campaign_info: { start: number; end: number }
 }
 type CampaignWinners = { owner: string; count: number }[]
+type CampaignWinnerList = string[]
 
 export interface NuxtApiInstance {
   getPrices: () => Promise<PricesData>
@@ -71,4 +77,5 @@ export interface NuxtApiInstance {
     sign?: string
   }) => Promise<CampaignInfo>
   getCompaignWinners: () => Promise<CampaignWinners>
+  getCompaignWinnerList: (queryInfo: { type: 'luck' | 'valid' }) => Promise<CampaignWinnerList>
 }

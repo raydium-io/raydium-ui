@@ -9,9 +9,37 @@
       <div class="close-btn" @click="isWinningPanelOpen = false">
         <div class="icon minimize" />
       </div>
+
+      <!-- TEMP -->
+      <a class="download-full-list" href="/winner-list/" target="_blank"> Check Winners </a>
+      <!-- <a v-if="rewardIsOut" class="download-full-list" href="/winner-list.vue/" target="_blank"> See All </a> -->
+
       <div class="title">Airdrop Points</div>
       <template v-if="$accessor.wallet.connected">
-        <h1 class="table-caption">Yours</h1>
+        <template v-if="isActivityEnd">
+          <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
+            Your reward<span v-if="rewardIsOut && rewardInfos"
+              >: ${{ Object.values(rewardInfos).reduce((sum, value) => sum + value, 0) }}</span
+            >
+          </h1>
+          <table v-if="rewardIsOut" class="your-reward">
+            <tr>
+              <th class="th" style="width: 70%"></th>
+              <th class="th" style="width: 24%"></th>
+            </tr>
+            <tr v-for="(value, key) in rewardInfos" :key="key">
+              <td v-if="key === 'refer'" class="td">Top 5</td>
+              <td v-if="key === 'first'" class="td">First 4,000</td>
+              <td v-if="key === 'luck'" class="td">Lucky Draw Pool</td>
+              <td class="td">
+                <div class="point-label">${{ value }}</div>
+              </td>
+            </tr>
+          </table>
+          <div v-if="!rewardIsOut">Cacluating...</div>
+        </template>
+
+        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">Total Points</h1>
         <table class="your-table">
           <tr>
             <th class="th" style="width: 70%"></th>
@@ -69,8 +97,10 @@
           </tr>
         </table>
 
-        <h1 class="table-caption">Referral Leaderboard</h1>
-        <table class="winner-table">
+        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
+          {{ rewardIsOut ? 'Top 5: $2,000 Each' : 'Referral Leaderboard' }}
+        </h1>
+        <table v-if="!isActivityEnd" class="winner-table">
           <tbody>
             <tr v-for="winnerInfo in winners" :key="winnerInfo.owner">
               <td class="td address">{{ winnerInfo.owner }}</td>
@@ -82,6 +112,17 @@
             </tr>
           </tbody>
         </table>
+        <table v-else-if="rewardIsOut" class="winner-table">
+          <tbody>
+            <tr v-for="winnerInfo in topWinners" :key="winnerInfo.owner">
+              <td class="td address">{{ winnerInfo.owner }}</td>
+              <td class="td">
+                <div class="point-label">${{ winnerInfo.reward }}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else>Cacluating...</div>
       </template>
       <template v-else>
         <div class="subtitle">Connect wallet to view your current points</div>
@@ -177,7 +218,16 @@
           <div class="box-title has-step">
             Swap on Raydium
             <div>
-              <div :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`" />
+              <div
+                :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveSwap
+                    ? 'Congratulations! You completed this task.'
+                    : isSwapPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
+              />
             </div>
           </div>
           <a href="/swap/" target="_blank" style="align-self: end"><button>GO TO SWAP</button></a>
@@ -187,7 +237,16 @@
           <div class="box-title">
             Share to Twitter
             <div>
-              <div :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`" />
+              <div
+                :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveTweet
+                    ? 'Congratulations! You completed this task.'
+                    : isTweetPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
+              />
               <div class="point-label">BONUS +1 POINT / REFERRAL</div>
             </div>
           </div>
@@ -231,7 +290,16 @@
             <div class="box-title">
               Follow Raydium
               <div>
-                <div :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`" />
+                <div
+                  :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveFollow
+                      ? 'Congratulations! You completed this task.'
+                      : isFollowPending
+                      ? 'Points pending. Please check again in 30 minutes.'
+                      : 'you have not done this task'
+                  }`"
+                />
                 <div class="point-label">+1 POINTS</div>
               </div>
             </div>
@@ -260,7 +328,16 @@
             <div class="box-title">
               Join the Raydium Discord
               <div>
-                <div :class="`icon-reward ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`" />
+                <div
+                  :class="`icon-reward ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveDiscord
+                      ? 'Congratulations! You completed this task.'
+                      : isDiscordPending
+                      ? 'Points pending. Please check again in 30 minutes.'
+                      : 'you have not done this task'
+                  }`"
+                />
                 <div class="point-label">+1 POINT</div>
               </div>
             </div>
@@ -309,6 +386,13 @@
               <div
                 v-if="$accessor.wallet.connected"
                 :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+                :title="`${
+                  haveDiscord
+                    ? 'Congratulations! You completed this task.'
+                    : isDiscordPending
+                    ? 'Points pending. Please check again in 30 minutes.'
+                    : 'you have not done this task'
+                }`"
               />
             </button>
           </div>
@@ -470,6 +554,8 @@ import { mapState } from 'vuex'
 import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
+import winnerList from '@/assets/winner-list.json'
+
 @Component({
   components: {
     Tooltip,
@@ -500,6 +586,8 @@ import { CampaignInfo, CampaignWinners } from '@/types/api'
   }
 })
 export default class Airdrop extends Vue {
+  winnerList = winnerList
+
   inputContent = ''
   inputChecked = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
@@ -525,6 +613,17 @@ export default class Airdrop extends Vue {
 
   isWinningPanelOpen = true
   winners = [] as CampaignWinners
+  rewardIsOut = false
+  topWinners = winnerList['top 5']
+  cachedWinnerList: Record<string, string> = {}
+  // eslint-disable-next-line camelcase
+  rewardInfos = undefined as
+    | {
+        first: number
+        refer: number
+        luck: number
+      }
+    | undefined
 
   mounted() {
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
@@ -542,6 +641,22 @@ export default class Airdrop extends Vue {
     const el = this.$refs[anchor] as Element | undefined
     if (!el) return
     el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkRewardIsOut(res: CampaignInfo['data']) {
+    if (!res.user) return
+    // trueData
+    this.rewardIsOut = Boolean(res.user.reward)
+    this.rewardInfos = res.user.reward
+
+    // // mock data
+    this.rewardIsOut = true
+    this.rewardInfos = {
+      first: 10,
+      refer: 45,
+      luck: 484
+    }
   }
 
   @Watch('initBackendResponse', { immediate: true })
@@ -603,12 +718,37 @@ export default class Airdrop extends Vue {
           referral: (this.$route.query?.referral as string) || undefined
         })
         this.initBackendResponse = response?.data ?? {}
-        this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
-
-        const winners = await this.$api.getCompaignWinners()
-        this.winners = winners
+        this.isActivityEnd = true // TEMP
+        // this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
+        if (!this.isActivityEnd) {
+          this.winners = await this.$api.getCompaignWinners()
+        }
       } catch (err) {}
     }
+  }
+
+  async downloadCSV({ targetFileName, type }: { targetFileName: string; type: 'luck' | 'valid' }) {
+    // get data content
+    let data = ''
+    if (this.cachedWinnerList[targetFileName]) {
+      data = this.cachedWinnerList[targetFileName]
+    } else {
+      try {
+        const freshRawData = await this.$api.getCompaignWinnerList({ type })
+        const parsedData = freshRawData.join('\n')
+        this.cachedWinnerList[targetFileName] = parsedData
+        data = parsedData
+      } catch (err) {}
+    }
+
+    // download
+    const blob = new Blob([data], { type: 'csv' })
+    const url = URL.createObjectURL(blob)
+    const tempA = document.createElement('a')
+    tempA.href = url
+    tempA.download = `${targetFileName}.csv`
+    tempA.target = '_blank'
+    tempA.click()
   }
 
   async submit({
@@ -975,7 +1115,6 @@ a.disabled {
   width: 350px;
   z-index: 99;
   box-shadow: 12px 12px 0 var(--secondary), 12px 12px 32px 8px var(--secondary);
-  grid-template-rows: auto auto 1fr;
   .close-btn {
     position: absolute;
     right: 4%;
@@ -990,8 +1129,14 @@ a.disabled {
       mask-image: url('../assets/icons/minimize.svg');
     }
   }
+  .download-full-list {
+    color: var(--secondary);
+    padding: 2px 16px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
   .title {
-    margin: 24px 0;
+    margin: 12px 0 0;
   }
   .subtitle {
     margin: 0;
@@ -1003,22 +1148,24 @@ a.disabled {
     width: 100%;
   }
   .table-caption {
-    margin-top: 32px;
+    margin-top: 36px;
     margin-bottom: 8px;
-    font-size: 1.5em;
+    font-size: 1.4em;
     opacity: 0.4;
     justify-self: start;
+    &.have-reward {
+      margin-top: 18px;
+    }
   }
   .winner-table {
     display: block;
-    height: 268px;
     overflow: auto;
     .td.address {
       width: 222px;
     }
   }
   .td {
-    padding: 4px 24px 4px 0;
+    padding: 2px 24px 4px 0;
   }
   &.has-result {
     height: 634px;
