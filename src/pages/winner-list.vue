@@ -1,6 +1,6 @@
 <template>
   <div class="winner-list container">
-    <h2 class="tip">(Use <code>ctrl F</code> to search for your wallet)</h2>
+    <h2 class="tip">(Use <code>ctrl F</code> to search the first 6 digets of your wallet)</h2>
     <div class="note">Rewards have already been sent to winning addresses</div>
     <div class="card">
       <div class="card-body winner-list-gird">
