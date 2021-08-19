@@ -14,7 +14,7 @@
 
       <div class="title">Airdrop Points</div>
 
-      <div v-if="isActivityEnd" class="note" style="text-align: center; margin-top: 12px">
+      <div v-if="rewardIsOut" class="note" style="text-align: center; margin-top: 12px">
         Rewards have already been sent to winning addresses
       </div>
 
