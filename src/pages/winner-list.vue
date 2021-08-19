@@ -92,7 +92,7 @@ export default class WinnerList extends Vue {}
 .card-body.winner-list-gird {
   padding-top: 25px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
   .title {
     grid-column: ~'1 / -1';
