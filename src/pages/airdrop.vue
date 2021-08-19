@@ -3,6 +3,10 @@
     <section class="page-title">
       <div class="page-sub-leading">Learn, Trade, Follow, Refer and Earn RAY</div>
       <div class="page-main-title">Raydium Bounty Airdrop</div>
+      <div class="page-additional-description">
+        The Airdrop is <span class="alert">complete!</span> Rewards have been sent to winners, connect your wallet to
+        see results!
+      </div>
     </section>
 
     <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
@@ -804,7 +808,7 @@ Join now: ${window.location.origin}/airdrop/?referral=${this.initBackendResponse
 <style lang="less" scoped>
 .airdrop {
   --primary: #141040;
-  --secondary: #39d0d8;
+  --secondary: #8d9695;
   --primary-text: #fff;
   --secondary-text: #c4d6ff;
   --video-bg: hsla(0, 0%, 0%, 0.8);
@@ -963,6 +967,12 @@ a.disabled {
   .page-additional-description {
     font-size: 24px;
     line-height: 31px;
+    text-align: center;
+    .alert {
+      color: #40bf4c;
+      font-weight: 600;
+      display: inline-block;
+    }
   }
 }
 
@@ -1101,6 +1111,8 @@ a.disabled {
 }
 
 .winner-panel {
+  --secondary: #39d0d8;
+
   position: fixed;
   right: 4vw;
   bottom: 4vh;
@@ -1108,6 +1120,7 @@ a.disabled {
   width: 350px;
   z-index: 99;
   box-shadow: 12px 12px 0 var(--secondary), 12px 12px 32px 8px var(--secondary);
+
   .close-btn {
     position: absolute;
     right: 4%;
@@ -1166,6 +1179,8 @@ a.disabled {
 }
 
 .winner-trigger {
+  --secondary: #39d0d8;
+
   position: fixed;
   right: 4vw;
   bottom: 4vh;
@@ -1179,6 +1194,7 @@ a.disabled {
   display: grid;
   place-content: center;
   box-shadow: 0 0 32px var(--secondary);
+
   .icon {
     display: inline-block;
     width: 40px;
