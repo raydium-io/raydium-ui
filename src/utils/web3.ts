@@ -259,6 +259,47 @@ export async function getFilteredProgramAccounts(
   }))
 }
 
+export async function getFilteredProgramAccountsCache(
+  connection: Connection,
+  programId: PublicKey,
+  filters: any
+): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
+  try {
+    const resp = await (
+      await fetch('http://localhost:8000/cache/rpc', {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'getProgramAccounts',
+          params: [
+            programId.toBase58(),
+            {
+              commitment: connection.commitment,
+              filters,
+              encoding: 'base64'
+            }
+          ]
+        })
+      })
+    ).json()
+    if (resp.error) {
+      throw new Error(resp.error.message)
+    }
+    // @ts-ignore
+    return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
+      publicKey: new PublicKey(pubkey),
+      accountInfo: {
+        data: Buffer.from(data[0], 'base64'),
+        executable,
+        owner: new PublicKey(owner),
+        lamports
+      }
+    }))
+  } catch (e) {
+    return getFilteredProgramAccounts(connection, programId, filters)
+  }
+}
+
 // getMultipleAccounts
 export async function getMultipleAccounts(
   connection: Connection,
@@ -286,47 +327,59 @@ export async function getMultipleAccounts(
     data: Buffer
   }> = []
 
-  for (const key of keys) {
-    const args = [key, { commitment }]
+  const resArray: { [key: number]: any } = {}
+  await Promise.all(
+    keys.map(async (key, index) => {
+      const args = [key, { commitment }]
 
-    // @ts-ignore
-    const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
-    const res = GetMultipleAccountsAndContextRpcResult(unsafeRes)
-    if (res.error) {
-      throw new Error(
-        'failed to get info about accounts ' + publicKeys.map((k) => k.toBase58()).join(', ') + ': ' + res.error.message
-      )
-    }
-
-    assert(typeof res.result !== 'undefined')
-
-    for (const account of res.result.value) {
-      let value: {
-        executable: any
-        owner: PublicKey
-        lamports: any
-        data: Buffer
-      } | null = null
-      if (account === null) {
-        accounts.push(null)
-        continue
+      // @ts-ignore
+      const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
+      const res = GetMultipleAccountsAndContextRpcResult(unsafeRes)
+      if (res.error) {
+        throw new Error(
+          'failed to get info about accounts ' +
+            publicKeys.map((k) => k.toBase58()).join(', ') +
+            ': ' +
+            res.error.message
+        )
       }
-      if (res.result.value) {
-        const { executable, owner, lamports, data } = account
-        assert(data[1] === 'base64')
-        value = {
-          executable,
-          owner: new PublicKey(owner),
-          lamports,
-          data: Buffer.from(data[0], 'base64')
+
+      assert(typeof res.result !== 'undefined')
+      resArray[index] = res
+    })
+  )
+
+  Object.keys(resArray)
+    .sort((a, b) => parseInt(a) - parseInt(b))
+    .forEach((itemIndex) => {
+      const res = resArray[parseInt(itemIndex)]
+      for (const account of res.result.value) {
+        let value: {
+          executable: any
+          owner: PublicKey
+          lamports: any
+          data: Buffer
+        } | null = null
+        if (account === null) {
+          accounts.push(null)
+          continue
         }
+        if (res.result.value) {
+          const { executable, owner, lamports, data } = account
+          assert(data[1] === 'base64')
+          value = {
+            executable,
+            owner: new PublicKey(owner),
+            lamports,
+            data: Buffer.from(data[0], 'base64')
+          }
+        }
+        if (value === null) {
+          throw new Error('Invalid response')
+        }
+        accounts.push(value)
       }
-      if (value === null) {
-        throw new Error('Invalid response')
-      }
-      accounts.push(value)
-    }
-  }
+    })
 
   return accounts.map((account, idx) => {
     if (account === null) {
