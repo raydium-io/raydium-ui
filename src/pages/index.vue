@@ -351,6 +351,13 @@
                       target="_blank"
                       >Telegram (VN)</a
                     >
+                    <a
+                      class="link"
+                      href="https://t.me/RaydiumRussian"
+                      rel="nofollow noopener noreferrer"
+                      target="_blank"
+                      >Telegram (RU)</a
+                    >
                   </ul>
                 </template>
 
