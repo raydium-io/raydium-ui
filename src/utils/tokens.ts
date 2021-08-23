@@ -1309,7 +1309,7 @@ function addUserLocalCoinMint() {
 }
 
 function addTokensSolana() {
-  fetch('http://localhost:8000/cache/solana-token-list')
+  fetch('https://api.raydium.io/cache/solana-token-list')
     .then(async (response) => {
       addTokensSolanaFunc((await response.json()).tokens)
     })

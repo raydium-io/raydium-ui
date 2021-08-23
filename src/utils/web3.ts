@@ -266,7 +266,7 @@ export async function getFilteredProgramAccountsCache(
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
   try {
     const resp = await (
-      await fetch('http://localhost:8000/cache/rpc', {
+      await fetch('https://api.raydium.io/cache/rpc', {
         method: 'POST',
         body: JSON.stringify({
           jsonrpc: '2.0',
