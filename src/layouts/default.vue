@@ -1,6 +1,5 @@
 <template>
   <Layout>
-    <HeadChip />
     <Head />
     <Setting />
 
@@ -52,7 +51,6 @@ import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Layout, Alert } from 'ant-design-vue'
 import { get } from 'lodash-es'
 import Setting from '@/components/Setting.vue'
-import HeadChip from '@/components/HeadChip.vue'
 
 const { Content } = Layout
 
@@ -61,8 +59,7 @@ const { Content } = Layout
     Layout,
     Content,
     Setting,
-    Alert,
-    HeadChip
+    Alert
   }
 })
 export default class Default extends Vue {
