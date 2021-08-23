@@ -1,18 +1,21 @@
-import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+import { cloneDeep } from 'lodash-es';
+import { actionTree, getterTree, mutationTree } from 'typed-vuex';
 
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
-import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
-import { LIQUIDITY_POOLS, getAddressForWhat, LiquidityPoolInfo } from '@/utils/pools'
-import { commitment, createAmmAuthority, getFilteredProgramAccountsCache, getMultipleAccounts } from '@/utils/web3'
-
-import { OpenOrders } from '@project-serum/serum'
-import { AccountInfo, PublicKey } from '@solana/web3.js'
-import { TokenAmount } from '@/utils/safe-math'
-import { cloneDeep } from 'lodash-es'
-import logger from '@/utils/logger'
-import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
-import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens'
+import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids';
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts';
+import {
+  AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals
+} from '@/utils/liquidity';
+import logger from '@/utils/logger';
+import { getAddressForWhat, LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools';
+import { TokenAmount } from '@/utils/safe-math';
+import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens';
+import {
+  commitment, createAmmAuthority, getFilteredProgramAccountsCache, getMultipleAccounts
+} from '@/utils/web3';
+import { OpenOrders } from '@project-serum/serum';
+import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market';
+import { AccountInfo, PublicKey } from '@solana/web3.js';
 
 const AUTO_REFRESH_TIME = 60
 

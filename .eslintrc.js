@@ -13,12 +13,5 @@ module.exports = {
   ],
   plugins: ['prettier', 'import'],
   // add your custom rules here
-  rules: {
-    'import/order': [
-      'error',
-      {
-        groups: ['index', 'sibling', 'parent', 'internal', 'external', 'builtin']
-      }
-    ]
-  }
+  rules: {}
 }

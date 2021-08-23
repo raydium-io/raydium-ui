@@ -1,12 +1,12 @@
-import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+import { cloneDeep } from 'lodash-es';
+import { actionTree, getterTree, mutationTree } from 'typed-vuex';
 
-import { PublicKey } from '@solana/web3.js'
-import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
-import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market.js'
-import { cloneDeep } from 'lodash-es'
-import { startMarkets } from '@/utils/serum'
-import { getFilteredProgramAccountsCache } from '@/utils/web3'
-import logger from '@/utils/logger'
+import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids';
+import logger from '@/utils/logger';
+import { startMarkets } from '@/utils/serum';
+import { getFilteredProgramAccountsCache } from '@/utils/web3';
+import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market';
+import { PublicKey } from '@solana/web3.js';
 
 export const state = () => ({
   markets: {}

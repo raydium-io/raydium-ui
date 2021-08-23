@@ -1667,19 +1667,20 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.12.tgz#431ec342a7195622f86688bbda82e3166ce8cb28"
   integrity sha512-6RglhutqrGFMO1MNUXp95RBuYIuc8wTnMAV5MUhLmjTOy78ncwOw7RgeQ/HeymkKXRhZd0s2DNrM1rL7unk3MQ==
 
-"@project-serum/borsh@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@project-serum/borsh/-/borsh-0.1.0.tgz#cdbff90d06901f8206afb6e1998e5c45aae0aea7"
-  integrity sha512-AWZ/cjThXmb7o2/fMocc8/VaEsqH29yXEwdHnzTXzglxg1vLPZXpBHqGuPfonSfbd7WszgnGXAIHc+9artwMGg==
+"@project-serum/borsh@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@project-serum/borsh/-/borsh-0.2.2.tgz#63e558f2d6eb6ab79086bf499dea94da3182498f"
+  integrity sha512-Ms+aWmGVW6bWd3b0+MWwoaYig2QD0F90h0uhr7AzY3dpCb5e2S6RsRW02vFTfa085pY2VLB7nTZNbFECQ1liTg==
   dependencies:
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/serum@^0.13.37":
-  version "0.13.37"
-  resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.37.tgz#18cc2613a655a8e782e14c4d55a2707a79fbc625"
-  integrity sha512-Bt7D/0P0M1b+xyygCU9z1p7Pec6vontzy4Q92TgIg33/J1qiAR/899HXGlr7oho/NntGNwIlbEU22nqsWWuAiA==
+"@project-serum/serum@0.13.47":
+  version "0.13.47"
+  resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.47.tgz#eabfa49f5f9b65d0cd7610af90426a5a408bc5ac"
+  integrity sha512-8oI7DLHUvKFArL/zyOL6q0Q/TvJ3tpYhUrZeV3Rda4S7ZVgC//ZKVuoLEpZf6qjyDr0LWDldmPcrgJ/JCq5jWw==
   dependencies:
+    "@solana/spl-token" "^0.1.6"
     "@solana/web3.js" "^0.90.0"
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
@@ -1894,29 +1895,30 @@
     tweetnacl "^1.0.0"
     ws "^7.0.0"
 
-"@solana/web3.js@^0.92.2":
-  version "0.92.3"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-0.92.3.tgz#c3745f9f74ecaaee17db89f08b5317f8256cd1b0"
-  integrity sha512-OVnzDY8a4Ny1vb7PSNmNN5BMXyOWesdR6Nbmwu/UG27vQaQkK2KJ31/GhcZ9q4wf1Z1mfFzSeWJhG3jgK2Q7aQ==
+"@solana/web3.js@^1.12.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.22.0.tgz#ded439eb903aff4269a16a7fdfacc6866c6f0c13"
+  integrity sha512-7BQUiR1AIj2L8KJ8LYsI31iPRLytgF8T4hz7xLlvvBfalpUK7qD2om7frlNpXl8ROUpvruNf83QaectJdZJW1w==
   dependencies:
     "@babel/runtime" "^7.12.5"
+    "@solana/buffer-layout" "^3.0.0"
     bn.js "^5.0.0"
+    borsh "^0.4.0"
     bs58 "^4.0.1"
     buffer "6.0.1"
-    buffer-layout "^1.2.0"
     crypto-hash "^1.2.2"
     jayson "^3.4.4"
     js-sha3 "^0.8.0"
     node-fetch "^2.6.1"
     rpc-websockets "^7.4.2"
     secp256k1 "^4.0.2"
-    superstruct "^0.8.3"
+    superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.12.0":
-  version "1.22.0"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.22.0.tgz#ded439eb903aff4269a16a7fdfacc6866c6f0c13"
-  integrity sha512-7BQUiR1AIj2L8KJ8LYsI31iPRLytgF8T4hz7xLlvvBfalpUK7qD2om7frlNpXl8ROUpvruNf83QaectJdZJW1w==
+"@solana/web3.js@^1.24.1":
+  version "1.24.1"
+  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.24.1.tgz#1fb29f344454669183206f452ab3b8792567cade"
+  integrity sha512-XImMWAvjcXteMQwe1FFjoe6u72xmcu+UYobPIxLEMX29XXWVTalyYRKBXvcOXwz6DliTYnFXmncNEwUDEFFHGg==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@solana/buffer-layout" "^3.0.0"

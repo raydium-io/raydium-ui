@@ -1,55 +1,32 @@
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
-import { transfer } from './swap'
-import { throwIfNull } from './errors'
-import { LIQUIDITY_POOLS } from './pools'
-import BigNumber from 'bignumber.js'
-import {
-  Account,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction
-} from '@solana/web3.js'
-import {
-  LIQUIDITY_POOL_PROGRAM_ID_V4,
-  SERUM_PROGRAM_ID_V3,
-  TOKEN_PROGRAM_ID,
-  SYSTEM_PROGRAM_ID,
-  AMM_ASSOCIATED_SEED,
-  TARGET_ASSOCIATED_SEED,
-  WITHDRAW_ASSOCIATED_SEED,
-  COIN_VAULT_ASSOCIATED_SEED,
-  PC_VAULT_ASSOCIATED_SEED,
-  LP_MINT_ASSOCIATED_SEED,
-  TEMP_LP_TOKEN_ASSOCIATED_SEED,
-  OPEN_ORDER_ASSOCIATED_SEED
-} from '@/utils/ids'
-import {
-  commitment,
-  getMultipleAccounts,
-  sendTransaction,
-  createAmmAuthority,
-  getMintDecimals,
-  getFilteredTokenAccountsByOwner,
-  createAssociatedId,
-  findAssociatedTokenAddress
-} from '@/utils/web3'
+import BigNumber from 'bignumber.js';
 // @ts-ignore
-import { struct, u8 } from 'buffer-layout'
-import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { struct, u8 } from 'buffer-layout';
 
-// import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
-import { Market as MarketSerum } from '@project-serum/serum'
-import { Orderbook } from '@project-serum/serum/lib/market.js'
 import {
-  closeAccount,
-  initializeAccount
-  // initializeMint
-  // encodeTokenInstructionData
-} from '@project-serum/serum/lib/token-instructions'
-import { TOKENS } from '@/utils/tokens'
+  AMM_ASSOCIATED_SEED, COIN_VAULT_ASSOCIATED_SEED, LIQUIDITY_POOL_PROGRAM_ID_V4,
+  LP_MINT_ASSOCIATED_SEED, OPEN_ORDER_ASSOCIATED_SEED, PC_VAULT_ASSOCIATED_SEED,
+  SERUM_PROGRAM_ID_V3, SYSTEM_PROGRAM_ID, TARGET_ASSOCIATED_SEED, TEMP_LP_TOKEN_ASSOCIATED_SEED,
+  TOKEN_PROGRAM_ID, WITHDRAW_ASSOCIATED_SEED
+} from '@/utils/ids';
+import { TOKENS } from '@/utils/tokens';
+import {
+  commitment, createAmmAuthority, createAssociatedId, findAssociatedTokenAddress,
+  getFilteredTokenAccountsByOwner, getMintDecimals, getMultipleAccounts, sendTransaction
+} from '@/utils/web3';
+// import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
+import { Market as MarketSerum } from '@project-serum/serum';
+import { Orderbook } from '@project-serum/serum/lib/market.js';
+import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
+import {
+  Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction,
+  TransactionInstruction
+} from '@solana/web3.js';
+
+import { throwIfNull } from './errors';
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts';
+import { LIQUIDITY_POOLS } from './pools';
+import { transfer } from './swap';
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
@@ -573,6 +550,7 @@ export class Market extends MarketSerum {
   public asks: PublicKey | null = null
   public baseLotSize: number = 0
   public quoteLotSize: number = 0
+  // @ts-ignore
   public decoded: any
   public quoteMint: PublicKey | null = null
   public baseMint: PublicKey | null = null

@@ -1,32 +1,23 @@
 import {
-  Account,
-  AccountInfo,
-  Commitment,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionSignature,
-  TransactionInstruction
-} from '@solana/web3.js'
+  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
+} from '@/utils/ids';
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
+import { TOKENS } from '@/utils/tokens';
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
 // @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token'
-
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID } from '@/utils/ids'
-// eslint-disable-next-line
-import assert from 'assert'
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
-import { struct } from 'superstruct'
-import { TOKENS } from '@/utils/tokens'
+import { Token } from '@solana/spl-token';
+import {
+  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
+  TransactionInstruction, TransactionSignature
+} from '@solana/web3.js';
 
 export const web3Config = {
   strategy: 'speed',
   rpcs: [
+    { url: 'https://free.rpcpool.com', weight: 10 },
+    { url: 'https://api.rpcpool.com', weight: 10 },
     { url: 'https://solana-api.projectserum.com', weight: 10 },
     { url: 'https://raydium.rpcpool.com', weight: 50 },
-    { url: 'https://api.rpcpool.com', weight: 10 },
-    { url: 'https://free.rpcpool.com', weight: 10 },
     { url: 'https://api.mainnet-beta.solana.com', weight: 20 }
   ]
 }
@@ -306,15 +297,15 @@ export async function getMultipleAccounts(
   publicKeys: PublicKey[],
   commitment?: Commitment
 ): Promise<Array<null | { publicKey: PublicKey; account: AccountInfo<Buffer> }>> {
-  const keys: string[][] = []
-  let tempKeys: string[] = []
+  const keys: PublicKey[][] = []
+  let tempKeys: PublicKey[] = []
 
   publicKeys.forEach((k) => {
     if (tempKeys.length >= 100) {
       keys.push(tempKeys)
       tempKeys = []
     }
-    tempKeys.push(k.toBase58())
+    tempKeys.push(k)
   })
   if (tempKeys.length > 0) {
     keys.push(tempKeys)
@@ -330,21 +321,7 @@ export async function getMultipleAccounts(
   const resArray: { [key: number]: any } = {}
   await Promise.all(
     keys.map(async (key, index) => {
-      const args = [key, { commitment }]
-
-      // @ts-ignore
-      const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
-      const res = GetMultipleAccountsAndContextRpcResult(unsafeRes)
-      if (res.error) {
-        throw new Error(
-          'failed to get info about accounts ' +
-            publicKeys.map((k) => k.toBase58()).join(', ') +
-            ': ' +
-            res.error.message
-        )
-      }
-
-      assert(typeof res.result !== 'undefined')
+      const res = await connection.getMultipleAccountsInfo(key, commitment)
       resArray[index] = res
     })
   )
@@ -353,31 +330,8 @@ export async function getMultipleAccounts(
     .sort((a, b) => parseInt(a) - parseInt(b))
     .forEach((itemIndex) => {
       const res = resArray[parseInt(itemIndex)]
-      for (const account of res.result.value) {
-        let value: {
-          executable: any
-          owner: PublicKey
-          lamports: any
-          data: Buffer
-        } | null = null
-        if (account === null) {
-          accounts.push(null)
-          continue
-        }
-        if (res.result.value) {
-          const { executable, owner, lamports, data } = account
-          assert(data[1] === 'base64')
-          value = {
-            executable,
-            owner: new PublicKey(owner),
-            lamports,
-            data: Buffer.from(data[0], 'base64')
-          }
-        }
-        if (value === null) {
-          throw new Error('Invalid response')
-        }
-        accounts.push(value)
+      for (const account of res) {
+        accounts.push(account)
       }
     })
 
@@ -391,44 +345,6 @@ export async function getMultipleAccounts(
     }
   })
 }
-
-function jsonRpcResult(resultDescription: any) {
-  const jsonRpcVersion = struct.literal('2.0')
-  return struct.union([
-    struct({
-      jsonrpc: jsonRpcVersion,
-      id: 'string',
-      error: 'any'
-    }),
-    struct({
-      jsonrpc: jsonRpcVersion,
-      id: 'string',
-      error: 'null?',
-      result: resultDescription
-    })
-  ])
-}
-
-function jsonRpcResultAndContext(resultDescription: any) {
-  return jsonRpcResult({
-    context: struct({
-      slot: 'number'
-    }),
-    value: resultDescription
-  })
-}
-
-const AccountInfoResult = struct({
-  executable: 'boolean',
-  owner: 'string',
-  lamports: 'number',
-  data: 'any',
-  rentEpoch: 'number?'
-})
-
-const GetMultipleAccountsAndContextRpcResult = jsonRpcResultAndContext(
-  struct.array([struct.union(['null', AccountInfoResult])])
-)
 
 // transaction
 export async function signTransaction(
