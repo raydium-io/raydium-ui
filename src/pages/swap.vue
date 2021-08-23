@@ -307,7 +307,7 @@
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
-            Insufficient liquidity for this trade
+            Pool Not Found
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
