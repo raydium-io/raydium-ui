@@ -3,10 +3,10 @@ import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
 import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
 import { LIQUIDITY_POOLS, getAddressForWhat, LiquidityPoolInfo } from '@/utils/pools'
-import { commitment, createAmmAuthority, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
+import { commitment, createAmmAuthority, getFilteredProgramAccountsCache, getMultipleAccounts } from '@/utils/web3'
 
 import { OpenOrders } from '@project-serum/serum'
-import { PublicKey } from '@solana/web3.js'
+import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { TokenAmount } from '@/utils/safe-math'
 import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
@@ -67,16 +67,32 @@ export const actions = actionTree(
 
       const conn = this.$web3
 
-      const ammAll = await getFilteredProgramAccounts(conn, new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), [
-        {
-          dataSize: AMM_INFO_LAYOUT_V4.span
-        }
+      let ammAll: {
+        publicKey: PublicKey
+        accountInfo: AccountInfo<Buffer>
+      }[] = []
+      let marketAll: {
+        publicKey: PublicKey
+        accountInfo: AccountInfo<Buffer>
+      }[] = []
+
+      await Promise.all([
+        await (async () => {
+          ammAll = await getFilteredProgramAccountsCache(conn, new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), [
+            {
+              dataSize: AMM_INFO_LAYOUT_V4.span
+            }
+          ])
+        })(),
+        await (async () => {
+          marketAll = await getFilteredProgramAccountsCache(conn, new PublicKey(SERUM_PROGRAM_ID_V3), [
+            {
+              dataSize: _MARKET_STATE_LAYOUT_V2.span
+            }
+          ])
+        })()
       ])
-      const marketAll = await getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), [
-        {
-          dataSize: _MARKET_STATE_LAYOUT_V2.span
-        }
-      ])
+
       const marketToLayout: { [name: string]: any } = {}
       marketAll.forEach((item) => {
         marketToLayout[item.publicKey.toString()] = _MARKET_STATE_LAYOUT_V2.decode(item.accountInfo.data)

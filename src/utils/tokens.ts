@@ -1309,52 +1309,61 @@ function addUserLocalCoinMint() {
 }
 
 function addTokensSolana() {
-  fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
-    .then(function (response) {
-      return response.json()
+  fetch('https://api.raydium.io/cache/solana-token-list')
+    .then(async (response) => {
+      addTokensSolanaFunc((await response.json()).tokens)
     })
-    .then(function (myJson) {
-      const tokens = myJson.tokens
-      tokens.forEach((itemToken: any) => {
-        if (itemToken.tags && itemToken.tags.includes('lp-token')) {
-          return
-        }
-        if (!Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)) {
-          TOKENS[itemToken.symbol + itemToken.address + 'solana'] = {
-            symbol: itemToken.symbol,
-            name: itemToken.name,
-            mintAddress: itemToken.address,
-            decimals: itemToken.decimals,
-            picUrl: itemToken.logoURI,
-            tags: ['solana']
-          }
-        } else {
-          const token = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
-          if (token.symbol !== itemToken.symbol && !token.tags.includes('raydium')) {
-            token.symbol = itemToken.symbol
-            token.name = itemToken.name
-            token.decimals = itemToken.decimals
-            token.tags.push('solana')
-          }
-          const picToken = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
-          if (picToken) {
-            picToken.picUrl = itemToken.logoURI
-          }
-        }
-      })
-
-      if (window.localStorage.addSolanaCoin) {
-        window.localStorage.addSolanaCoin.split('---').forEach((itemMint: string) => {
-          if (itemMint === NATIVE_SOL.mintAddress) NATIVE_SOL.tags.push('userAdd')
-          else
-            Object.keys(TOKENS).forEach((item) => {
-              if (TOKENS[item].mintAddress === itemMint) {
-                TOKENS[item].tags.push('userAdd')
-              }
-            })
+    .catch(() => {
+      fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
+        .then(function (response) {
+          return response.json()
         })
-      }
+        .then(function (myJson) {
+          addTokensSolanaFunc(myJson.tokens)
+        })
     })
+}
+
+function addTokensSolanaFunc(tokens: any[]) {
+  tokens.forEach((itemToken: any) => {
+    if (itemToken.tags && itemToken.tags.includes('lp-token')) {
+      return
+    }
+    if (!Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)) {
+      TOKENS[itemToken.symbol + itemToken.address + 'solana'] = {
+        symbol: itemToken.symbol,
+        name: itemToken.name,
+        mintAddress: itemToken.address,
+        decimals: itemToken.decimals,
+        picUrl: itemToken.logoURI,
+        tags: ['solana']
+      }
+    } else {
+      const token = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
+      if (token.symbol !== itemToken.symbol && !token.tags.includes('raydium')) {
+        token.symbol = itemToken.symbol
+        token.name = itemToken.name
+        token.decimals = itemToken.decimals
+        token.tags.push('solana')
+      }
+      const picToken = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
+      if (picToken) {
+        picToken.picUrl = itemToken.logoURI
+      }
+    }
+  })
+
+  if (window.localStorage.addSolanaCoin) {
+    window.localStorage.addSolanaCoin.split('---').forEach((itemMint: string) => {
+      if (itemMint === NATIVE_SOL.mintAddress) NATIVE_SOL.tags.push('userAdd')
+      else
+        Object.keys(TOKENS).forEach((item) => {
+          if (TOKENS[item].mintAddress === itemMint) {
+            TOKENS[item].tags.push('userAdd')
+          }
+        })
+    })
+  }
 }
 
 function updateTokenTagsChange() {

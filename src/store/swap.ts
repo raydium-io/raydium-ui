@@ -5,7 +5,7 @@ import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market.js'
 import { cloneDeep } from 'lodash-es'
 import { startMarkets } from '@/utils/serum'
-import { getFilteredProgramAccounts } from '@/utils/web3'
+import { getFilteredProgramAccountsCache } from '@/utils/web3'
 import logger from '@/utils/logger'
 
 export const state = () => ({
@@ -34,7 +34,7 @@ export const actions = actionTree(
 
       startMarkets()
 
-      getFilteredProgramAccounts(conn, new PublicKey(SERUM_PROGRAM_ID_V3), filters)
+      getFilteredProgramAccountsCache(conn, new PublicKey(SERUM_PROGRAM_ID_V3), filters)
         .then((marketInfos) => {
           const markets: any = {}
 

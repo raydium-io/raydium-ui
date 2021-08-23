@@ -7,7 +7,7 @@ import {
   USER_STAKE_INFO_ACCOUNT_LAYOUT,
   USER_STAKE_INFO_ACCOUNT_LAYOUT_V4
 } from '@/utils/stake'
-import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
+import { commitment, getFilteredProgramAccountsCache, getMultipleAccounts } from '@/utils/web3'
 
 import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
@@ -135,7 +135,7 @@ export const actions = actionTree(
       commit('setLoading', false)
     },
 
-    getStakeAccounts({ commit }) {
+    async getStakeAccounts({ commit }) {
       const conn = this.$web3
       const wallet = (this as any)._vm.$wallet
 
@@ -153,152 +153,108 @@ export const actions = actionTree(
           }
         ]
 
+        // stake user info account v4
+        const stakeFiltersV4 = [
+          {
+            memcmp: {
+              offset: 40,
+              bytes: wallet.publicKey.toBase58()
+            }
+          },
+          {
+            dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
+          }
+        ]
+
         const stakeAccounts: any = {}
 
-        getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
-          .then((stakeAccountInfos) => {
-            stakeAccountInfos.forEach((stakeAccountInfo) => {
-              const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-              const { data } = stakeAccountInfo.accountInfo
+        await Promise.all([
+          await stakeProgramIdAccount(stakeAccounts, conn, stakeFilters),
+          await stakeProgramIdAccountV4AndV5(STAKE_PROGRAM_ID_V4, stakeAccounts, conn, stakeFiltersV4),
+          await stakeProgramIdAccountV4AndV5(STAKE_PROGRAM_ID_V5, stakeAccounts, conn, stakeFiltersV4)
+        ])
 
-              const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
-
-              const poolId = userStakeInfo.poolId.toBase58()
-
-              const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
-
-              const farm = getFarmByPoolId(poolId)
-
-              if (farm) {
-                const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
-
-                if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                  if (lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))) {
-                    stakeAccounts[poolId] = {
-                      depositBalance,
-                      rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                      stakeAccountAddress
-                    }
-                  }
-                } else {
-                  stakeAccounts[poolId] = {
-                    depositBalance,
-                    rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                    stakeAccountAddress
-                  }
-                }
-              }
-            })
-
-            // stake user info account v4
-            const stakeFiltersV4 = [
-              {
-                memcmp: {
-                  offset: 40,
-                  bytes: wallet.publicKey.toBase58()
-                }
-              },
-              {
-                dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.span
-              }
-            ]
-
-            getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V4), stakeFiltersV4)
-              .then((stakeAccountInfos) => {
-                stakeAccountInfos.forEach((stakeAccountInfo) => {
-                  const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-                  const { data } = stakeAccountInfo.accountInfo
-
-                  const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
-
-                  const poolId = userStakeInfo.poolId.toBase58()
-
-                  const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
-                  const rewardDebtB = getBigNumber(userStakeInfo.rewardDebtB)
-
-                  const farm = getFarmByPoolId(poolId)
-
-                  if (farm) {
-                    const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
-
-                    if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                      if (
-                        lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))
-                      ) {
-                        stakeAccounts[poolId] = {
-                          depositBalance,
-                          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                          // @ts-ignore
-                          rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                          stakeAccountAddress
-                        }
-                      }
-                    } else {
-                      stakeAccounts[poolId] = {
-                        depositBalance,
-                        rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                        // @ts-ignore
-                        rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                        stakeAccountAddress
-                      }
-                    }
-                  }
-                })
-
-                getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID_V5), stakeFiltersV4)
-                  .then((stakeAccountInfos) => {
-                    stakeAccountInfos.forEach((stakeAccountInfo) => {
-                      const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
-                      const { data } = stakeAccountInfo.accountInfo
-
-                      const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
-
-                      const poolId = userStakeInfo.poolId.toBase58()
-
-                      const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
-                      const rewardDebtB = getBigNumber(userStakeInfo.rewardDebtB)
-
-                      const farm = getFarmByPoolId(poolId)
-
-                      if (farm) {
-                        const depositBalance = new TokenAmount(
-                          getBigNumber(userStakeInfo.depositBalance),
-                          farm.lp.decimals
-                        )
-
-                        if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
-                          if (
-                            lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))
-                          ) {
-                            stakeAccounts[poolId] = {
-                              depositBalance,
-                              rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                              // @ts-ignore
-                              rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                              stakeAccountAddress
-                            }
-                          }
-                        } else {
-                          stakeAccounts[poolId] = {
-                            depositBalance,
-                            rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
-                            // @ts-ignore
-                            rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
-                            stakeAccountAddress
-                          }
-                        }
-                      }
-                    })
-
-                    commit('setStakeAccounts', stakeAccounts)
-                    logger('User StakeAccounts updated')
-                  })
-                  .catch()
-              })
-              .catch()
-          })
-          .catch()
+        commit('setStakeAccounts', stakeAccounts)
+        logger('User StakeAccounts updated')
       }
     }
   }
 )
+
+async function stakeProgramIdAccount(stakeAccounts: any, conn: any, stakeFilters: any) {
+  const stakeAccountInfos = await getFilteredProgramAccountsCache(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
+  stakeAccountInfos.forEach((stakeAccountInfo) => {
+    const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+    const { data } = stakeAccountInfo.accountInfo
+
+    const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+
+    const poolId = userStakeInfo.poolId.toBase58()
+
+    const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
+
+    const farm = getFarmByPoolId(poolId)
+
+    if (farm) {
+      const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
+
+      if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
+        if (lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))) {
+          stakeAccounts[poolId] = {
+            depositBalance,
+            rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+            stakeAccountAddress
+          }
+        }
+      } else {
+        stakeAccounts[poolId] = {
+          depositBalance,
+          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+          stakeAccountAddress
+        }
+      }
+    }
+  })
+}
+
+async function stakeProgramIdAccountV4AndV5(programId: string, stakeAccounts: any, conn: any, stakeFilters: any) {
+  const stakeAccountInfos = await getFilteredProgramAccountsCache(conn, new PublicKey(programId), stakeFilters)
+
+  stakeAccountInfos.forEach((stakeAccountInfo) => {
+    const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
+    const { data } = stakeAccountInfo.accountInfo
+
+    const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V4.decode(data)
+
+    const poolId = userStakeInfo.poolId.toBase58()
+
+    const rewardDebt = getBigNumber(userStakeInfo.rewardDebt)
+    const rewardDebtB = getBigNumber(userStakeInfo.rewardDebtB)
+
+    const farm = getFarmByPoolId(poolId)
+
+    if (farm) {
+      const depositBalance = new TokenAmount(getBigNumber(userStakeInfo.depositBalance), farm.lp.decimals)
+
+      if (Object.prototype.hasOwnProperty.call(stakeAccounts, poolId)) {
+        if (lt(getBigNumber(stakeAccounts[poolId].depositBalance.wei), getBigNumber(depositBalance.wei))) {
+          stakeAccounts[poolId] = {
+            depositBalance,
+            rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+            // @ts-ignore
+            rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+            stakeAccountAddress
+          }
+        }
+      } else {
+        stakeAccounts[poolId] = {
+          depositBalance,
+          rewardDebt: new TokenAmount(rewardDebt, farm.reward.decimals),
+          // @ts-ignore
+          rewardDebtB: new TokenAmount(rewardDebtB, farm.rewardB.decimals),
+          stakeAccountAddress
+        }
+      }
+    }
+  })
+}
