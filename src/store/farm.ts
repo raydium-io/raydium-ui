@@ -7,7 +7,7 @@ import {
   USER_STAKE_INFO_ACCOUNT_LAYOUT,
   USER_STAKE_INFO_ACCOUNT_LAYOUT_V4
 } from '@/utils/stake'
-import { commitment, getFilteredProgramAccountsCache, getMultipleAccounts } from '@/utils/web3'
+import { commitment, getFilteredProgramAccounts, getMultipleAccounts } from '@/utils/web3'
 
 import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
 import { PublicKey } from '@solana/web3.js'
@@ -182,7 +182,7 @@ export const actions = actionTree(
 )
 
 async function stakeProgramIdAccount(stakeAccounts: any, conn: any, stakeFilters: any) {
-  const stakeAccountInfos = await getFilteredProgramAccountsCache(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
+  const stakeAccountInfos = await getFilteredProgramAccounts(conn, new PublicKey(STAKE_PROGRAM_ID), stakeFilters)
   stakeAccountInfos.forEach((stakeAccountInfo) => {
     const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
     const { data } = stakeAccountInfo.accountInfo
@@ -218,7 +218,7 @@ async function stakeProgramIdAccount(stakeAccounts: any, conn: any, stakeFilters
 }
 
 async function stakeProgramIdAccountV4AndV5(programId: string, stakeAccounts: any, conn: any, stakeFilters: any) {
-  const stakeAccountInfos = await getFilteredProgramAccountsCache(conn, new PublicKey(programId), stakeFilters)
+  const stakeAccountInfos = await getFilteredProgramAccounts(conn, new PublicKey(programId), stakeFilters)
 
   stakeAccountInfos.forEach((stakeAccountInfo) => {
     const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
