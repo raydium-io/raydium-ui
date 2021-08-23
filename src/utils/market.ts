@@ -1,32 +1,51 @@
-import BigNumber from 'bignumber.js';
+import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { struct, u8 } from 'buffer-layout';
+import { struct, u8 } from 'buffer-layout'
 
 import {
-  AMM_ASSOCIATED_SEED, COIN_VAULT_ASSOCIATED_SEED, LIQUIDITY_POOL_PROGRAM_ID_V4,
-  LP_MINT_ASSOCIATED_SEED, OPEN_ORDER_ASSOCIATED_SEED, PC_VAULT_ASSOCIATED_SEED,
-  SERUM_PROGRAM_ID_V3, SYSTEM_PROGRAM_ID, TARGET_ASSOCIATED_SEED, TEMP_LP_TOKEN_ASSOCIATED_SEED,
-  TOKEN_PROGRAM_ID, WITHDRAW_ASSOCIATED_SEED
-} from '@/utils/ids';
-import { TOKENS } from '@/utils/tokens';
+  AMM_ASSOCIATED_SEED,
+  COIN_VAULT_ASSOCIATED_SEED,
+  LIQUIDITY_POOL_PROGRAM_ID_V4,
+  LP_MINT_ASSOCIATED_SEED,
+  OPEN_ORDER_ASSOCIATED_SEED,
+  PC_VAULT_ASSOCIATED_SEED,
+  SERUM_PROGRAM_ID_V3,
+  SYSTEM_PROGRAM_ID,
+  TARGET_ASSOCIATED_SEED,
+  TEMP_LP_TOKEN_ASSOCIATED_SEED,
+  TOKEN_PROGRAM_ID,
+  WITHDRAW_ASSOCIATED_SEED
+} from '@/utils/ids'
+import { TOKENS } from '@/utils/tokens'
 import {
-  commitment, createAmmAuthority, createAssociatedId, findAssociatedTokenAddress,
-  getFilteredTokenAccountsByOwner, getMintDecimals, getMultipleAccounts, sendTransaction
-} from '@/utils/web3';
+  commitment,
+  createAmmAuthority,
+  createAssociatedId,
+  findAssociatedTokenAddress,
+  getFilteredTokenAccountsByOwner,
+  getMintDecimals,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
-import { Market as MarketSerum } from '@project-serum/serum';
-import { Orderbook } from '@project-serum/serum/lib/market.js';
-import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions';
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
+import { Market as MarketSerum } from '@project-serum/serum'
+import { Orderbook } from '@project-serum/serum/lib/market.js'
+import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions'
+import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
 import {
-  Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction,
+  Account,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
+  Transaction,
   TransactionInstruction
-} from '@solana/web3.js';
+} from '@solana/web3.js'
 
-import { throwIfNull } from './errors';
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts';
-import { LIQUIDITY_POOLS } from './pools';
-import { transfer } from './swap';
+import { throwIfNull } from './errors'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
+import { LIQUIDITY_POOLS } from './pools'
+import { transfer } from './swap'
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
@@ -68,6 +87,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     orderBookMsg.forEach((info) => {
       // @ts-ignore
       const data = info.account.data
+      // @ts-ignore
       const orderbook = Orderbook.decode(market, data)
       const { isBids, slab } = orderbook
       if (isBids) {
@@ -541,6 +561,7 @@ export function preInitialize(
   })
 }
 
+// @ts-ignore
 export class Market extends MarketSerum {
   public baseVault: PublicKey | null = null
   public quoteVault: PublicKey | null = null
@@ -550,8 +571,7 @@ export class Market extends MarketSerum {
   public asks: PublicKey | null = null
   public baseLotSize: number = 0
   public quoteLotSize: number = 0
-  // @ts-ignore
-  public decoded: any
+  private _decoded: any
   public quoteMint: PublicKey | null = null
   public baseMint: PublicKey | null = null
 
@@ -570,7 +590,7 @@ export class Market extends MarketSerum {
     ])
 
     const market = new Market(decoded, baseMintDecimals, quoteMintDecimals, options, programId)
-    market.decoded = decoded
+    market._decoded = decoded
     market.baseLotSize = decoded.baseLotSize
     market.quoteLotSize = decoded.quoteLotSize
     market.baseVault = decoded.baseVault
