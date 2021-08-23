@@ -77,20 +77,20 @@ export const actions = actionTree(
       }[] = []
 
       await Promise.all([
-        async () => {
+        await (async () => {
           ammAll = await getFilteredProgramAccountsCache(conn, new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4), [
             {
               dataSize: AMM_INFO_LAYOUT_V4.span
             }
           ])
-        },
-        async () => {
+        })(),
+        await (async () => {
           marketAll = await getFilteredProgramAccountsCache(conn, new PublicKey(SERUM_PROGRAM_ID_V3), [
             {
               dataSize: _MARKET_STATE_LAYOUT_V2.span
             }
           ])
-        }
+        })()
       ])
 
       const marketToLayout: { [name: string]: any } = {}
