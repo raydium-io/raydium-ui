@@ -5,7 +5,7 @@ import LocalStorage from '@/utils/local-storage'
 export const state = () => ({
   show: false,
   // percent
-  slippage: parseFloat(LocalStorage.get('RAYDIUM_SLIPPAGE') || '1')
+  slippage: parseFloat(LocalStorage.get('RAYDIUM_SLIPPAGE') || '0.5')
 })
 
 export const getters = getterTree(state, {})
