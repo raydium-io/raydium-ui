@@ -587,6 +587,14 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: 'CijuvE6qDpxZ5WqdEQEe7mS11fXEKiiHc7RR8wRiGzjY',
     tags: ['raydium']
+  },
+  CRP: {
+    symbol: 'CRP',
+    name: 'CRP',
+    mintAddress: 'DubwWZNWiNGMMeeQHPnMATNj77YZPZSAz2WVR5WjLJqz',
+    decimals: 9,
+    referrer: 'FKocyVJptELTbnkUkDRmT7y6hUem2JYrqHoph9uyvQXt',
+    tags: ['raydium']
   }
 }
 
