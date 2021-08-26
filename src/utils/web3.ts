@@ -1,20 +1,15 @@
-import { ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
-import { TOKENS } from '@/utils/tokens'
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
-// @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token'
 import {
-  Account,
-  AccountInfo,
-  Commitment,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-  TransactionSignature
-} from '@solana/web3.js'
+  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
+} from '@/utils/ids';
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
+import { TOKENS } from '@/utils/tokens';
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
+// @ts-ignore without ts ignore, yarn build will failed
+import { Token } from '@solana/spl-token';
+import {
+  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
+  TransactionInstruction, TransactionSignature
+} from '@solana/web3.js';
 
 export const web3Config = {
   strategy: 'speed',

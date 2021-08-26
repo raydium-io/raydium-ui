@@ -215,7 +215,7 @@
           v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > getUnixTs() / 1000"
           description="Users can only deposit once, and cannot add tickets or deposit a second time."
           type="warning"
-          class="alert-text"
+          class="alert-text ido-alert"
           show-icon
           banner
         />
@@ -504,7 +504,7 @@
                 ).toString()}`
           "
           type="warning"
-          class="alert-text"
+          class="alert-text ido-alert"
           show-icon
           banner
         />
@@ -863,6 +863,9 @@ export default class AcceleRaytor extends Vue {
 </script>
 
 <style lang="less" scoped>
+.ido-alert {
+  border: none;
+}
 .alert-text {
   width: 100%;
   white-space: pre-wrap;

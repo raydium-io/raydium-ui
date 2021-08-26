@@ -1,5 +1,6 @@
-import { TokenAmount } from '@/utils/safe-math'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep } from 'lodash-es';
+
+import { TokenAmount } from '@/utils/safe-math';
 
 export interface TokenInfo {
   symbol: string
@@ -594,6 +595,54 @@ export const TOKENS: Tokens = {
     mintAddress: 'DubwWZNWiNGMMeeQHPnMATNj77YZPZSAz2WVR5WjLJqz',
     decimals: 9,
     referrer: 'FKocyVJptELTbnkUkDRmT7y6hUem2JYrqHoph9uyvQXt',
+    tags: ['raydium']
+  },
+  ATLAS: {
+    symbol: 'ATLAS',
+    name: 'ATLAS',
+    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp',
+    decimals: 0,
+    referrer: '', // TODO
+
+    detailLink: 'https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f',
+    details:
+      'Star Atlas is a grand strategy game that combines space exploration, territorial conquest, and political domination. In the distant future, players can join one of three galactic factions to directly influence the course of the metaverse and earn real-world income for their contributions.\n\nThe Star Atlas offers a unique gaming experience by combining block chain mechanics with traditional game mechanics. All assets in the metaverse are directly owned by players, and can be traded on the marketplace or exchanged on other cryptocurrency networks.',
+    docs: {
+      website: 'https://staratlas.com/',
+      whitepaper: 'https://staratlas.com/files/star-atlas-white-paper.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/staratlas',
+      Telegram: 'https://t.me/staratlasgame',
+      Medium: 'https://medium.com/star-atlas',
+      Discord: 'https://discord.gg/staratlas',
+      Twitch: 'https://www.twitch.tv/staratlasgame',
+      Youtube: 'https://www.youtube.com/channel/UCt-y8Npwje5KDG5MSZ0a9Jw/videos'
+    },
+    tags: ['raydium']
+  },
+  POLIS: {
+    symbol: 'POLIS',
+    name: 'POLIS',
+    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    decimals: 0,
+    referrer: '', // TODO
+
+    detailLink: 'https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f',
+    details:
+      'POLIS is the primary governance token of Star Atlas.\n\nStar Atlas is a grand strategy game that combines space exploration, territorial conquest, and political domination. In the distant future, players can join one of three galactic factions to directly influence the course of the metaverse and earn real-world income for their contributions.\n\nThe Star Atlas offers a unique gaming experience by combining block chain mechanics with traditional game mechanics. All assets in the metaverse are directly owned by players, and can be traded on the marketplace or exchanged on other cryptocurrency networks.',
+    docs: {
+      website: 'https://staratlas.com/',
+      whitepaper: 'https://staratlas.com/files/star-atlas-white-paper.pdf'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/staratlas',
+      Telegram: 'https://t.me/staratlasgame',
+      Medium: 'https://medium.com/star-atlas',
+      Discord: 'https://discord.gg/staratlas',
+      Twitch: 'https://www.twitch.tv/staratlasgame',
+      Youtube: 'https://www.youtube.com/channel/UCt-y8Npwje5KDG5MSZ0a9Jw/videos'
+    },
     tags: ['raydium']
   }
 }

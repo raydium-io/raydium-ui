@@ -1,22 +1,20 @@
-import {
-  SYSTEM_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  RENT_PROGRAM_ID,
-  CLOCK_PROGRAM_ID,
-  IDO_PROGRAM_ID,
-  IDO_PROGRAM_ID_V2,
-  IDO_PROGRAM_ID_V3
-} from './ids'
-import { TOKENS, TokenInfo } from './tokens'
-import { TokenAmount } from './safe-math'
-import { findProgramAddress, sendTransaction, createAssociatedTokenAccount } from './web3'
-
-import { getBigNumber } from './layouts'
 // @ts-ignore
-import { u8, nu64, struct, seq } from 'buffer-layout'
-import { publicKey, u64 } from '@project-serum/borsh'
-import { cloneDeep } from 'lodash-es'
-import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { nu64, seq, struct, u8 } from 'buffer-layout';
+import { cloneDeep } from 'lodash-es';
+
+import { publicKey, u64 } from '@project-serum/borsh';
+import {
+  Account, Connection, PublicKey, Transaction, TransactionInstruction
+} from '@solana/web3.js';
+
+import {
+  CLOCK_PROGRAM_ID, IDO_PROGRAM_ID, IDO_PROGRAM_ID_V2, IDO_PROGRAM_ID_V3, RENT_PROGRAM_ID,
+  SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
+} from './ids';
+import { getBigNumber } from './layouts';
+import { TokenAmount } from './safe-math';
+import { TokenInfo, TOKENS } from './tokens';
+import { createAssociatedTokenAccount, findProgramAddress, sendTransaction } from './web3';
 
 export interface IdoPoolInfo {
   startTime: number
@@ -112,11 +110,29 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
-    base: { ...TOKENS.LIKE },
+    base: { ...TOKENS.ATLAS },
     quote: { ...TOKENS.USDC },
 
-    price: new TokenAmount(0.06, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(1666667, TOKENS.LIKE.decimals, false),
+    price: new TokenAmount(0.00138, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(180000000, TOKENS.ATLAS.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3, //
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    isPrivate: false,
+    idoId: '2V9pyK71sQ8oivjn39WSY4Eha7GaWKsk5fktvxA66onv',
+    baseVault: '5SqDb8pCMZo5GamXLPvfvNEMFUfSFKYuCG6EEDhvHFXH',
+    quoteVault: '43zEX2urrAmeQkFUjHqGGwokJwebmUdydz6WxPbpRc6W',
+    seedId: 'Gez2YfnhhSY2aUphAfK7GDWLaDN9b4z2dfe7jH2oi7Xj'
+  },
+  {
+    base: { ...TOKENS.POLIS },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.138, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(1800000, TOKENS.POLIS.decimals, false),
 
     version: 3, // just an identify for Lottery activity
     programId: IDO_PROGRAM_ID_V3,
@@ -124,10 +140,10 @@ export const IDO_POOLS: IdoPool[] = [
 
     isRayPool: true,
     isPrivate: false,
-    idoId: '6tVhfpkvg4JTYpDCrDgjb5tAEFSzvpZXLgPtAos5xThD',
-    baseVault: '91MgsAE7qotAtYAd9k7YVZqjs2RfW44zJMQ3gLxAGEur',
-    quoteVault: 'PsqkXYFRAM5PjWgyVSjYMMJGG2dqkfaWe2whUXHtEAh',
-    seedId: 'H8yyqemdjWgD2zkhhaMRsoWKUJSGWSb7kDaCEG16WH63'
+    idoId: 'J6UjtHEEwUMZe9wftSvfZMD52y3Kg9DZPZJRtSo3TPt9',
+    baseVault: 'DKPSewZxQkHaeHwKLHvafzEz9s2ZCopRsNEqk16wMP4o',
+    quoteVault: 'BbrotLDYJ6jatKhWWfKdPXpzLnCcx5Z2K1fXRtiFFG6k',
+    seedId: 'Gez2YfnhhSY2aUphAfK7GDWLaDN9b4z2dfe7jH2oi7Xj'
   },
   {
     base: { ...TOKENS.SLRS },
