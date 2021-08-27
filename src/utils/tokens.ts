@@ -1359,7 +1359,9 @@ function addUserLocalCoinMint() {
           .find((item) => item.mintAddress === mintAddress)
           .tags.includes('userAdd')
       ) {
-        TOKENS[name].tags.push('userAdd')
+        Object.values(TOKENS)
+          .find((item) => item.mintAddress === mintAddress)
+          .tags.push('userAdd')
       }
     }
   }
