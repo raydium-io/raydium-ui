@@ -125,9 +125,9 @@ export const IDO_POOLS: IdoPool[] = [
 
     isRayPool: true,
     isPrivate: false,
-    idoId: '2V9pyK71sQ8oivjn39WSY4Eha7GaWKsk5fktvxA66onv',
-    baseVault: '5SqDb8pCMZo5GamXLPvfvNEMFUfSFKYuCG6EEDhvHFXH',
-    quoteVault: '43zEX2urrAmeQkFUjHqGGwokJwebmUdydz6WxPbpRc6W',
+    idoId: '5VUvtxLeEZhqw22gLb47oKT4zi9MfnD9Lm8wtoXoxXe2',
+    baseVault: 'EjrYFq71uhywEEKu5t1Pug5hnuASyXCGJTvU4h9Pirov',
+    quoteVault: 'DvAB5zNynTwYfjrz3XkgrrXvNxuBr1dZKfv82XvhKZkv',
     seedId: 'Gez2YfnhhSY2aUphAfK7GDWLaDN9b4z2dfe7jH2oi7Xj'
   },
   {
@@ -143,9 +143,9 @@ export const IDO_POOLS: IdoPool[] = [
 
     isRayPool: true,
     isPrivate: false,
-    idoId: 'J6UjtHEEwUMZe9wftSvfZMD52y3Kg9DZPZJRtSo3TPt9',
-    baseVault: 'DKPSewZxQkHaeHwKLHvafzEz9s2ZCopRsNEqk16wMP4o',
-    quoteVault: 'BbrotLDYJ6jatKhWWfKdPXpzLnCcx5Z2K1fXRtiFFG6k',
+    idoId: 'FzwVZtojkp2PMhReaqmw1a42pz9rvk9vE9MunCNUkDvM',
+    baseVault: 'GXcxqbecKQYe7t9Vk5EtGJmQEbyT8D2JwFRAeysUPysT',
+    quoteVault: 'ABoVH9ya22W7ghER3NHCvrJoBeKXXunccaJpBacAtWop',
     seedId: 'Gez2YfnhhSY2aUphAfK7GDWLaDN9b4z2dfe7jH2oi7Xj'
   },
   {

@@ -1,6 +1,6 @@
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash-es'
 
-import { TokenAmount } from '@/utils/safe-math';
+import { TokenAmount } from '@/utils/safe-math'
 
 export interface TokenInfo {
   symbol: string
@@ -600,7 +600,7 @@ export const TOKENS: Tokens = {
   ATLAS: {
     symbol: 'ATLAS',
     name: 'ATLAS',
-    mintAddress: 'B8tomgUDeDMSd28GrqNUBeET4gaXYf891vs8JUcrhYpp',
+    mintAddress: 'ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx',
     decimals: 0,
     referrer: '', // TODO
 
@@ -624,7 +624,7 @@ export const TOKENS: Tokens = {
   POLIS: {
     symbol: 'POLIS',
     name: 'POLIS',
-    mintAddress: '2nkxLptGxQCfaar541Cr87G4v6VuA6BvVWqxsHNVCYoA',
+    mintAddress: 'poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk',
     decimals: 0,
     referrer: '', // TODO
 
