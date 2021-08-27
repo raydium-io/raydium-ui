@@ -10,9 +10,9 @@
       </div>
       <div class="image-part">
         <div class="decorator-text">
-          <div class="primary-decorator-text">IDO Launch: September 2, 13:00 UTC</div>
-          <div class="secondary-decorator-text">Pools open: September 1, 12:00 UTC</div>
-          <div class="secondary-decorator-text">Pools close: September 2, 00:00 UTC</div>
+          <div class="primary-decorator-text">IDO Launch: 2021-09-02 13:00 UTC</div>
+          <div class="secondary-decorator-text">Pools open: 2021-09-01 12:00 UTC</div>
+          <div class="secondary-decorator-text">Pools close: 2021-09-02 00:00 UTC</div>
         </div>
         <img src="../../assets/background/acceleraytor-placeholder.webp" />
       </div>

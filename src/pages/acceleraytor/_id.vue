@@ -215,9 +215,10 @@
           v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > currentTime / 1000"
           :description="
             pool.info.startTime > currentTime / 1000
-              ? `Eligible tickets will be visible closer to pool open on ${$dayjs(
-                  pool.info.startTime * 1000
-                ).toString()}`
+              ? `Eligible tickets will be visible closer to pool open on ${$dayjs
+                  .unix(pool.info.startTime)
+                  .utc()
+                  .format('YYYY-MM-DD HH:mm UTC')}`
               : 'Users can only deposit once, and cannot add tickets or deposit a second time.'
           "
           type="warning"
@@ -425,7 +426,7 @@
               disabled
               style="font-size: 13px"
             >
-              Claim after {{ $dayjs(pool.info.startWithdrawTime * 1000) }}
+              Claim after {{ $dayjs.unix(pool.info.startWithdrawTime).utc().format('YYYY-MM-DD HH:mm UTC') }}
             </Button>
 
             <Button
@@ -509,12 +510,14 @@
             pool.version === 3
               ? `Once deposited, ${
                   pool.quote.symbol
-                } can be claimed after lottery ends. Tokens can be claimed after ${$dayjs(
-                  pool.info.startWithdrawTime * 1000
-                ).toString()}`
-              : `${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs(
-                  pool.info.startWithdrawTime * 1000
-                ).toString()}`
+                } can be claimed after lottery ends. Tokens can be claimed after ${$dayjs
+                  .unix(pool.info.startWithdrawTime)
+                  .utc()
+                  .format('YYYY-MM-DD HH:mm UTC')}`
+              : `${pool.quote.symbol} can't be withdrawn after joining. Tokens can be claimed after ${$dayjs
+                  .unix(pool.info.startWithdrawTime)
+                  .utc()
+                  .format('YYYY-MM-DD HH:mm UTC')}`
           "
           type="warning"
           class="alert-text ido-alert"
@@ -548,11 +551,11 @@
           <TabPane key="pool" tab="Pool information">
             <div class="infos flex">
               <span class="key">Pool opens</span>
-              <span class="text">{{ $dayjs(pool.info.startTime * 1000) }}</span>
+              <span class="text">{{ $dayjs.unix(pool.info.startTime).utc().format('YYYY-MM-DD HH:mm UTC') }}</span>
             </div>
             <div class="infos flex">
               <span class="key">Pool closes</span>
-              <span class="text">{{ $dayjs(pool.info.endTime * 1000) }}</span>
+              <span class="text">{{ $dayjs.unix(pool.info.endTime).utc().format('YYYY-MM-DD HH:mm UTC') }}</span>
             </div>
             <div class="infos flex">
               <span class="key">Total raise</span>
@@ -605,7 +608,12 @@
             <div v-if="!pool.isPrivate" class="infos flex">
               <span class="key">RAY staking deadline</span>
               <span class="text">
-                {{ $dayjs((pool.info.startTime - 3600 * 24 * 7) * 1000) }}
+                {{
+                  $dayjs
+                    .unix(pool.info.startTime - 3600 * 24 * 7)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm UTC')
+                }}
               </span>
             </div>
           </TabPane>
