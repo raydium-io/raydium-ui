@@ -18,8 +18,8 @@
               <span v-else class="community"><span>Community Pool</span></span>
             </span>
             <span class="status">
-              <span v-if="pool.info.endTime < getUnixTs() / 1000" class="ended"> Ended </span>
-              <span v-else-if="pool.info.startTime < getUnixTs() / 1000" class="open"> Open </span>
+              <span v-if="pool.info.endTime < currentTime / 1000" class="ended"> Ended </span>
+              <span v-else-if="pool.info.startTime < currentTime / 1000" class="open"> Open </span>
               <span v-else class="upcoming"> Upcoming </span>
             </span>
           </div>
@@ -212,8 +212,14 @@
         </div>
 
         <Alert
-          v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > getUnixTs() / 1000"
-          description="Users can only deposit once, and cannot add tickets or deposit a second time."
+          v-if="pool.version === 3 && pool.info.status === 1 && pool.info.endTime > currentTime / 1000"
+          :description="
+            pool.info.startTime > currentTime / 1000
+              ? `Eligible tickets will be visible closer to pool open on ${$dayjs(
+                  pool.info.startTime * 1000
+                ).toString()}`
+              : 'Users can only deposit once, and cannot add tickets or deposit a second time.'
+          "
           type="warning"
           class="alert-text ido-alert"
           show-icon
@@ -247,7 +253,7 @@
           </div>
         </div>
 
-        <template v-if="pool.info.endTime > getUnixTs() / 1000">
+        <template v-if="pool.info.startTime < currentTime / 1000 && currentTime / 1000 < pool.info.endTime">
           <template v-if="pool.version === 3">
             <div class="input-box">
               <div class="label fs-container">
@@ -355,7 +361,8 @@
         <Button
           v-else-if="
             (!pool.userInfo || (!pool.userInfo.snapshoted && (pool.isRayPool || pool.isPrivate))) &&
-            pool.info.endTime > getUnixTs() / 1000
+            pool.info.endTime > currentTime / 1000 &&
+            pool.info.startTime < currentTime / 1000
           "
           size="large"
           ghost
@@ -363,9 +370,15 @@
         >
           Wallet not eligible for this pool
         </Button>
-        <Button v-else-if="pool.info.startTime > getUnixTs() / 1000" size="large" ghost disabled> Upcoming </Button>
 
-        <template v-else-if="pool.info.endTime < getUnixTs() / 1000">
+        <template v-else-if="pool.info.startTime > currentTime / 1000" size="large" ghost disabled>
+          <Button size="large" ghost disabled> Upcoming Pool </Button>
+          <div v-if="pool.userInfo && pool.userInfo.eligibleTicketAmount >= 0" class="upcoming-additional-details">
+            you have <span>{{ pool.userInfo.eligibleTicketAmount }}</span> eligible ticket(s)
+          </div>
+        </template>
+
+        <template v-else-if="pool.info.endTime < currentTime / 1000">
           <div v-if="pool.version === 3" class="btn-group">
             <Button
               v-if="pool.userInfo && pool.userInfo.quoteTokenDeposited > 0"
@@ -393,7 +406,7 @@
               :disabled="
                 !(pool.info.status === 2) /* allow user withdraw pc */ ||
                 winningTickets.length === 0 || // have no winning tickets
-                getUnixTs() / 1000 < pool.info.startWithdrawTime ||
+                currentTime / 1000 < pool.info.startWithdrawTime ||
                 Boolean(pool.userInfo && pool.userInfo.eligibleTicketAmount <= 0) ||
                 Boolean(pool.userInfo && pool.userInfo.baseTokenWithdrawn > 0)
               "
@@ -408,7 +421,7 @@
 
           <template v-else>
             <Button
-              v-if="getUnixTs() / 1000 < pool.info.startWithdrawTime"
+              v-if="currentTime / 1000 < pool.info.startWithdrawTime"
               size="large"
               ghost
               disabled
@@ -435,10 +448,10 @@
           You have already deposited
         </Button>
 
-        <template v-else-if="pool.info.startTime < getUnixTs() / 1000">
+        <template v-else-if="pool.info.startTime < currentTime / 1000">
           <template v-if="depositedTickets.length"></template>
           <Button
-            v-else-if="pool.info.startTime < getUnixTs() / 1000"
+            v-else-if="pool.info.startTime < currentTime / 1000"
             size="large"
             ghost
             :loading="purchasing"
@@ -490,7 +503,9 @@
         <Button v-else size="large" ghost disabled>
           {{ pool.version === 3 ? 'Unable To Join Lottery' : 'Upcoming Pool' }}
         </Button>
+
         <hr />
+
         <Alert
           :description="
             pool.version === 3
@@ -678,6 +693,13 @@ export default class AcceleRaytor extends Vue {
   value = ''
   pool = {} as IdoPool
   purchasing = false
+  currentTime = getUnixTs()
+
+  mounted() {
+    setInterval(() => {
+      this.currentTime = getUnixTs()
+    }, 1000)
+  }
 
   // only for lottery
   get eligibleTicketAmount() {
@@ -1169,6 +1191,12 @@ hr {
     color: white;
     opacity: 0.5;
   }
+}
+.upcoming-additional-details {
+  margin: 8px 0;
+  text-align: center;
+  font-size: 0.8em;
+  opacity: 0.6;
 }
 </style>
 
