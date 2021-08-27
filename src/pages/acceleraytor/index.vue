@@ -9,7 +9,11 @@
         </div>
       </div>
       <div class="image-part">
-        <div class="decorator-text">Coming Soon!</div>
+        <div class="decorator-text">
+          <div class="primary-decorator-text">IDO Launch: September 2, 13:00 UTC</div>
+          <div class="secondary-decorator-text">Pools open: September 1, 12:00 UTC</div>
+          <div class="secondary-decorator-text">Pools close: September 2, 00:00 UTC</div>
+        </div>
         <img src="../../assets/background/acceleraytor-placeholder.webp" />
       </div>
     </div>
@@ -348,9 +352,13 @@ export default class AcceleRaytor extends Vue {
   }
   .image-part {
     .decorator-text {
-      font-size: 28px;
+      font-size: 24px;
       margin-bottom: 14px;
       text-align: center;
+      .secondary-decorator-text {
+        font-size: 1rem;
+        opacity: 0.7;
+      }
     }
     img {
       width: 540px;
