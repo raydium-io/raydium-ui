@@ -511,7 +511,7 @@ export const FARMS: FarmInfo[] = [
 
     fusion: true,
     legacy: false,
-    dual: true,
+    dual: false,
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
@@ -549,7 +549,7 @@ export const FARMS: FarmInfo[] = [
 
     fusion: true,
     legacy: false,
-    dual: true,
+    dual: false,
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
