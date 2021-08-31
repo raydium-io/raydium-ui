@@ -10,9 +10,18 @@
       </div>
       <div class="image-part">
         <div class="decorator-text">
-          <div class="primary-decorator-text">IDO Launch: 2021-09-02 13:00 UTC</div>
-          <div class="secondary-decorator-text">Pools open: 2021-09-01 12:00 UTC</div>
-          <div class="secondary-decorator-text">Pools close: 2021-09-02 00:00 UTC</div>
+          <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-01 12:00 UTC</div>
+          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-02 13:00 UTC</div>
+          <div class="decorator-link">
+            full details
+            <a
+              href="https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              here</a
+            >
+          </div>
         </div>
         <img src="../../assets/background/acceleraytor-placeholder.webp" />
       </div>
@@ -331,7 +340,7 @@ export default class AcceleRaytor extends Vue {
 
 .banner {
   display: grid;
-  grid-auto-flow: column;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   align-items: center;
   grid-gap: 80px;
   gap: 80px;
@@ -351,13 +360,19 @@ export default class AcceleRaytor extends Vue {
     }
   }
   .image-part {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     .decorator-text {
       font-size: 24px;
       margin-bottom: 14px;
       text-align: center;
       .secondary-decorator-text {
         font-size: 1rem;
-        opacity: 0.7;
+      }
+      .decorator-link {
+        margin-top: 8px;
+        font-size: 1rem;
       }
     }
     img {
