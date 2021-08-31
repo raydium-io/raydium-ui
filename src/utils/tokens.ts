@@ -601,8 +601,8 @@ export const TOKENS: Tokens = {
     symbol: 'ATLAS',
     name: 'ATLAS',
     mintAddress: 'ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx',
-    decimals: 0,
-    referrer: '', // TODO
+    decimals: 8,
+    referrer: '9t9mzbkMtLdazj1D9JycS15Geb1KVtcDt4XyAkpM72Ee',
 
     detailLink: 'https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f',
     details:
@@ -625,8 +625,8 @@ export const TOKENS: Tokens = {
     symbol: 'POLIS',
     name: 'POLIS',
     mintAddress: 'poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk',
-    decimals: 0,
-    referrer: '', // TODO
+    decimals: 8,
+    referrer: 'CQ7HWCeSSp3tAfWzqH7ZEzgnTBr5Tvz1No3Y1xbiWzBm',
 
     detailLink: 'https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f',
     details:
