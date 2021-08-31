@@ -644,6 +644,14 @@ export const TOKENS: Tokens = {
       Youtube: 'https://www.youtube.com/channel/UCt-y8Npwje5KDG5MSZ0a9Jw/videos'
     },
     tags: ['raydium']
+  },
+  CHEEMS: {
+    symbol: 'CHEEMS',
+    name: 'CHEEMS',
+    mintAddress: '3FoUAsGDbvTD6YZ4wVKJgTB76onJUKz7GPEBNiR5b8wc',
+    decimals: 4,
+    referrer: '',
+    tags: ['raydium']
   }
 }
 
