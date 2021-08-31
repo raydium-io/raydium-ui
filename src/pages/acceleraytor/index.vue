@@ -13,7 +13,7 @@
           <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-01 12:00 UTC</div>
           <div class="secondary-decorator-text">IDO & start of trading: 2021-09-02 13:00 UTC</div>
           <div class="decorator-link">
-            full details
+            Full details
             <a
               href="https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f"
               rel="nofollow noopener noreferrer"
