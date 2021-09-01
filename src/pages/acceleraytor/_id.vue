@@ -252,8 +252,9 @@
             <div @click="value = pool.info.maxDepositLimit.fixed()">MAX</div>
           </div>
         </div>
-
-        <template v-if="pool.info.startTime < currentTime / 1000 && currentTime / 1000 < pool.info.endTime">
+        <template
+          v-if="pool.info.startTime - 2 * 60 * 60 < currentTime / 1000 && currentTime / 1000 < pool.info.endTime"
+        >
           <template v-if="pool.version === 3">
             <div class="input-box">
               <div class="label fs-container">
@@ -371,12 +372,9 @@
           Wallet not eligible for this pool
         </Button>
 
-        <template v-else-if="pool.info.startTime > currentTime / 1000" size="large" ghost disabled>
-          <Button size="large" ghost disabled> Upcoming Pool </Button>
-          <div v-if="pool.userInfo && pool.userInfo.eligibleTicketAmount >= 0" class="upcoming-additional-details">
-            you have <span>{{ pool.userInfo.eligibleTicketAmount }}</span> eligible ticket(s)
-          </div>
-        </template>
+        <Button v-else-if="pool.info.startTime > currentTime / 1000" size="large" ghost disabled>
+          Upcoming Pool
+        </Button>
 
         <template v-else-if="pool.info.endTime < currentTime / 1000">
           <div v-if="pool.version === 3" class="btn-group">
@@ -1191,12 +1189,6 @@ hr {
     color: white;
     opacity: 0.5;
   }
-}
-.upcoming-additional-details {
-  margin: 8px 0;
-  text-align: center;
-  font-size: 0.8em;
-  opacity: 0.6;
 }
 </style>
 
