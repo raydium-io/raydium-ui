@@ -19,7 +19,7 @@
           maxlength="79"
           spellcheck="false"
           :disabled="disabled"
-          @input="$emit('onInput', $event.target.value)"
+          @input="$emit('onInput', $event.target.value.replace(/,/g, '.'))"
           @focus="$emit('onFocus')"
         />
         <button v-if="!disabled && showHalf && balance" class="input-button" @click="inputBalanceByPercent(0.5)">
