@@ -1292,6 +1292,24 @@ export const LP_TOKENS: Tokens = {
     mintAddress: 'DkiqCQ792n743xjWQVCbBUaVtkdiuvQeYndM53ReWnCC',
     decimals: TOKENS.MNGO.decimals
   },
+  'ATALS-USDC-V4': {
+    symbol: 'ATALS-USDC',
+    name: 'ATALS-USDC LP',
+    coin: { ...TOKENS.ATALS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '9shGU9f1EsxAbiR567MYZ78WUiS6ZNCYbHe53WUULQ7n',
+    decimals: TOKENS.ATALS.decimals
+  },
+  'POLIS-USDC-V4': {
+    symbol: 'POLIS-USDC',
+    name: 'POLIS-USDC LP',
+    coin: { ...TOKENS.POLIS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8MbKSBpyXs8fVneKgt71jfHrn5SWtX8n4wMLpiVfF9So',
+    decimals: TOKENS.POLIS.decimals
+  },
   'ALEPH-RAY-V4': {
     symbol: 'ALEPH-RAY',
     name: 'ALEPH-RAY LP',
