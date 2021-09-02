@@ -1,7 +1,7 @@
-import { LP_TOKENS, TOKENS, TokenInfo } from '@/utils/tokens'
+import { cloneDeep } from 'lodash-es';
 
-import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
-import { cloneDeep } from 'lodash-es'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids';
+import { LP_TOKENS, TokenInfo, TOKENS } from '@/utils/tokens';
 
 export interface FarmInfo {
   name: string
@@ -835,6 +835,82 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '6tuhozgcTA25fq5Lp11QX9HsG8MVspUjtcn7EgYP1cs5', // lp vault
     poolRewardTokenAccount: 'ED6Ak5wnnegeVz6jWMzGEEnFQ7HY55uPdxR8Ha6hk7gz', // reward vault A
     poolRewardTokenAccountB: 'G4zqVtnHSK9Sp3SVdiQ5K56m46BdAoE2uQqpgVsmRG9d' // reward vault B
+  },
+  {
+    name: 'ATLAS-USDC',
+    lp: { ...LP_TOKENS['ATLAS-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.ATLAS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '93wRz2LeQ3TJoair827VTng62MjCzYDgJjG9Q5GmQ3Pd',
+    poolAuthority: '4yrRmmckKKGsPbCSFFupGqZrJhAFxQ4hN2DMC9Bh2pHo',
+    poolLpTokenAccount: 'HmE21hdD32ZjDnR5DvuNz7uS5q4bWbqf8jV2shx8kXmA', // lp vault
+    poolRewardTokenAccount: '9iQsupP7JagNLkp1bvdWWGVkzsLFfHUwDbh9KZPoXbw5', // reward vault A
+    poolRewardTokenAccountB: '5oQU1hU6qggyT4CU2AMPcWTcZdSRZeQBy7How5WuEp7A' // reward vault B
+  },
+  {
+    name: 'POLIS-USDC',
+    lp: { ...LP_TOKENS['POLIS-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.POLIS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7qcihXTsRW5wS5BgK7iuD84W43ECByoJP45R3hu2r6mF',
+    poolAuthority: '3MAzzKcBPJ2ykDHX1CBHzUJafy41FaTaLymg8z6SgX2Q',
+    poolLpTokenAccount: 'FwLD6rHMwm5H6edDPuGjxdBMk3u38frsnytTkPmVZVP3', // lp vault
+    poolRewardTokenAccount: 'AWQr1eX2RZiMadfeEpgPEQJBJq88f7dPLK3nqriKCPJp', // reward vault A
+    poolRewardTokenAccountB: 'DfofnRgWFPHVaxaLGSdXvFGhr4TRwjdwQQvgkjNNkJfZ' // reward vault B
+  },
+  {
+    name: 'ATLAS-RAY',
+    lp: { ...LP_TOKENS['ATLAS-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.ATLAS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'BHHhNLdJn69K1XPJcpcw4MBY3TPetpLxhj8s4K4ydsDV',
+    poolAuthority: 'DjYd34HtSwwAGfTfK13onUyq975akjzfW2abaK5YTRaS',
+    poolLpTokenAccount: '5RPJHt2V4baK7gY1E99xCRBtEzScuNEVPr9vA9PapLhs', // lp vault
+    poolRewardTokenAccount: 'AQwjpEoLwnHYnsdSnzwRpSkTSeLDNYZ6tv6odVGzXJvZ', // reward vault A
+    poolRewardTokenAccountB: 'DBXQnchh5zQuiEfaE8JBPTre8G1mksVTsHXoSqRPfA3r' // reward vault B
+  },
+  {
+    name: 'POLIS-RAY',
+    lp: { ...LP_TOKENS['POLIS-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.POLIS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'HHm8Pgnzc56fTUYkicPv4DqGYp5fcPZFV1V1uhixSrMk',
+    poolAuthority: 'GHPg6z7HYx1bsdK4W9WpdmV8BcjpPBBsRGMmj9dAD3yq',
+    poolLpTokenAccount: '4wGbaNEGeGjqqgW5S9AAWvQL3LwWZioH1JWMZFBdPFge', // lp vault
+    poolRewardTokenAccount: '4xrr44aG4kkgqQPZhBre93vg5fFY2htkkEEmTQjx5hiG', // reward vault A
+    poolRewardTokenAccountB: 'EanBQNubTJs2fNgeosUcESCfBnvk6bci391U5SH4Kzoo' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
