@@ -1310,6 +1310,24 @@ export const LP_TOKENS: Tokens = {
     mintAddress: '8MbKSBpyXs8fVneKgt71jfHrn5SWtX8n4wMLpiVfF9So',
     decimals: TOKENS.POLIS.decimals
   },
+  'ATLAS-RAY-V4': {
+    symbol: 'ATLAS-RAY',
+    name: 'ATLAS-RAY LP',
+    coin: { ...TOKENS.ATLAS },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '418MFhkaYQtbn529wmjLLqL6uKxDz7j4eZBaV1cobkyd',
+    decimals: TOKENS.ATLAS.decimals
+  },
+  'POLIS-RAY-V4': {
+    symbol: 'POLIS-RAY',
+    name: 'POLIS-RAY LP',
+    coin: { ...TOKENS.POLIS },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '9ysGKUH6WqzjQEUT4dxqYCUaFNVK9QFEa24pGzjFq8xg',
+    decimals: TOKENS.POLIS.decimals
+  },
   'ALEPH-RAY-V4': {
     symbol: 'ALEPH-RAY',
     name: 'ALEPH-RAY LP',

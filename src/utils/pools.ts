@@ -2204,6 +2204,64 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     official: true
   },
   {
+    name: 'ATLAS-RAY',
+    coin: { ...TOKENS.ATLAS },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['ATLAS-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: 'F73euqPynBwrgcZn3fNSEneSnYasDQohPM5aZazW9hp2',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '2CbuxnkjsBvaQoAubc5MAmbeZSMn36z8sZnfMvZWH1vb',
+    ammTargetOrders: '6GZrucFa9hAQW7yHiPt3oZj9GkL6oBipngyY1Hw3zMx',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '33UaaUmmySzxK7q3yhmQiXMrW1tQrwqojyD6ZEFgM6FZ',
+    poolPcTokenAccount: '9SYRTwYE5UV2cxEuRz8iiJcV8gMbMnJUYFC8zgDAsUwB',
+    poolWithdrawQueue: '6bznLHPLPA3axnRfjh3sFzkxeMUQDLWhDuaHzjGL1EE6',
+    poolTempLpTokenAccount: 'FnmoaJqFYHotLTG2Ur84jSUmVUACVWrBvBvRHdPzhqvb',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: 'Bn7n597jMxU4KjBPUo3QwJhbqr5145cHy31p6EPwPHwL',
+    serumBids: '9zAgdk4Na8fBKLiTWzsqZwgYQETuHBDjPe2GYqHy17L',
+    serumAsks: 'Fv6MY3w7PP7A54cuPQHevQNuwekGy8yksXWioBsyVd42',
+    serumEventQueue: '75iVJf9QKovBdsvgxcCFfwn2N4QyxEXyKxQdBvZTdzjr',
+    serumCoinVaultAccount: '9tBagdm862GCoxZNFvXv7HFjLUFmypxPYxfiT3j9S3h3',
+    serumPcVaultAccount: '4oc1kGhKByyxRnh3oXupjTn5P6JwWPnoxwvLxjZzi2vE',
+    serumVaultSigner: 'EK2TjcyoXzUweNJnJupQf6sZK8756mvBJeGBvi6y18Cq',
+    official: true
+  },
+  {
+    name: 'POLIS-RAY',
+    coin: { ...TOKENS.POLIS },
+    pc: { ...TOKENS.RAY },
+    lp: { ...LP_TOKENS['POLIS-RAY-V4'] },
+
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '5tho4By9RsqTF1rbm9Akiepik3kZBT7ffUzGg8bL1mD',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: 'UBa61sKev8gr19nqVyN3BZbW2jG7eAGjbjeZvpU4wu8',
+    ammTargetOrders: 'FgMtC8pDrSQJUovmnrDiRWgLGVrVSq9kui98re6uRz5i',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'Ah9T12tzwnTXWrWVWzLmCrwCEmVHS7HMdWKG4qLUDzJP',
+    poolPcTokenAccount: 'J7kjQkrpafcLjL7cCpmMamxLAFnCkGApLTC2QrbHe2NQ',
+    poolWithdrawQueue: 'EgZgi8skDug7YecbFuCFxXx3SPFPhbGSVrGiNzLHErkj',
+    poolTempLpTokenAccount: 'TYw7qQDt6sqpwUFSRfNBaLHEA1SUxbEWtmZxtZQhojk',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '3UP5PuGN6db7NhWf4Q76FLnR4AguVFN14GvgDbDj1u7h',
+    serumBids: '4tAuffNhWeF2MDWjMDgrRoR8X8Jg3BLvUAaerXzLsFpG',
+    serumAsks: '9W133475h1LZ2ZzY7aJtbJajLDSCn5hNnKcsu6gXgE2G',
+    serumEventQueue: '5DX4tJ8jZt91XzM7JUUPhu6CL4o6UDGnfjLJZtkmEfVT',
+    serumCoinVaultAccount: 'pLD9GMk4LACBXDJAWJSgbT1batbHgunBVyy8BaVBazG',
+    serumPcVaultAccount: 'Ah3JVyTAGLbH63XPWDDnJUwV1xYwHhFX2J81CDHomkLk',
+    serumVaultSigner: '5RqVkFy8hUbYDR81ucZhF6rAwpgYJngLJLSynMTeC4vM',
+    official: true
+  },
+  {
     name: 'ALEPH-RAY',
     coin: { ...TOKENS.ALEPH },
     pc: { ...TOKENS.RAY },
