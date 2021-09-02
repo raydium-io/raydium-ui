@@ -104,7 +104,8 @@
                       .dividedBy(pool.raise.toEther().multipliedBy(pool.price.toEther()))
                       .multipliedBy(100)
                   )
-                )) + '%'
+                )
+            ).toFixed(2) + '%'
           }}
         </span>
         <span slot="status" slot-scope="info, pool" class="status">
