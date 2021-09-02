@@ -635,15 +635,15 @@ export function purchaseInstruction<Flag extends '' | '3' | 'private' = ''>(
   const dataLayout = struct([u8('instruction'), nu64('amount')])
   const keys = [
     // system
-    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: RENT_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: false },
     // pubkeys
     ...Object.entries(instructionKeys).map(([name, pubkey]) => ({
       pubkey,
       isSigner: name === 'userOwner',
-      isWritable: true
+      isWritable: !['authority', 'userOwner', 'userIdoCheck', 'userStakeInfo'].includes(name)
     }))
   ]
 
@@ -683,12 +683,12 @@ export function claimInstruction<Version extends '' | '3' = ''>(
   const dataLayout = struct([u8('instruction')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: CLOCK_PROGRAM_ID, isSigner: false, isWritable: false },
     ...Object.entries(instructionKeys).map(([name, pubkey]) => ({
       pubkey,
       isSigner: name === 'userOwner',
-      isWritable: true
+      isWritable: !['authority', 'userOwner'].includes(name)
     }))
   ]
 

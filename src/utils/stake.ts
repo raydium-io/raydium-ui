@@ -1,13 +1,18 @@
-import { getBigNumber } from './layouts'
-import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
-import { createProgramAccountIfNotExist, sendTransaction, createAssociatedTokenAccountIfNotExist } from '@/utils/web3'
 // @ts-ignore
-import { nu64, struct, u8, blob } from 'buffer-layout'
-import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { blob, nu64, struct, u8 } from 'buffer-layout';
 
-import { FarmInfo } from '@/utils/farms'
-import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { TokenAmount } from '@/utils/safe-math'
+import { FarmInfo } from '@/utils/farms';
+import { TOKEN_PROGRAM_ID } from '@/utils/ids';
+import { TokenAmount } from '@/utils/safe-math';
+import {
+  createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist, sendTransaction
+} from '@/utils/web3';
+import { publicKey, u128, u64 } from '@project-serum/borsh';
+import {
+  Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction
+} from '@solana/web3.js';
+
+import { getBigNumber } from './layouts';
 
 // deposit
 export async function deposit(
@@ -317,15 +322,15 @@ export function depositInstruction(
 
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
-    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
     { pubkey: userInfoAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true }
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
@@ -365,15 +370,15 @@ export function depositInstructionV4(
 
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
-    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
     { pubkey: userInfoAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: userRewardTokenAccountB, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]
@@ -413,15 +418,15 @@ export function withdrawInstruction(
 
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
-    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
     { pubkey: userInfoAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true }
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
@@ -461,15 +466,15 @@ export function withdrawInstructionV4(
 
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
-    { pubkey: poolAuthority, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
     { pubkey: userInfoAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userRewardTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: userRewardTokenAccountB, isSigner: false, isWritable: true },
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]

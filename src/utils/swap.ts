@@ -1,21 +1,22 @@
-import { getBigNumber } from './layouts'
-import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 // @ts-ignore
-import { u8, nu64, struct } from 'buffer-layout'
-import { Market, OpenOrders, _OPEN_ORDERS_LAYOUT_V2 } from '@project-serum/serum/lib/market'
-// eslint-disable-next-line
-import { NATIVE_SOL, TOKENS, getTokenByMintAddress } from './tokens'
+import { nu64, struct, u8 } from 'buffer-layout';
+
+import { TokenAmount } from '@/utils/safe-math';
 import {
-  createProgramAccountIfNotExist,
-  createTokenAccountIfNotExist,
-  createAssociatedTokenAccountIfNotExist,
-  mergeTransactions,
-  sendTransaction
-} from '@/utils/web3'
-import { TokenAmount } from '@/utils/safe-math'
+  createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist,
+  createTokenAccountIfNotExist, mergeTransactions, sendTransaction
+} from '@/utils/web3';
+import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market';
+import { closeAccount } from '@project-serum/serum/lib/token-instructions';
+import {
+  Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction
+} from '@solana/web3.js';
+
 // eslint-disable-next-line
-import { TOKEN_PROGRAM_ID, MEMO_PROGRAM_ID, SERUM_PROGRAM_ID_V3 } from './ids'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { MEMO_PROGRAM_ID, SERUM_PROGRAM_ID_V3, TOKEN_PROGRAM_ID } from './ids';
+import { getBigNumber } from './layouts';
+// eslint-disable-next-line
+import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens';
 
 export function getOutAmount(
   market: any,
@@ -552,26 +553,26 @@ export function swapInstruction(
 
   const keys = [
     // spl token
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     // amm
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
     { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     // serum
-    { pubkey: serumProgramId, isSigner: false, isWritable: true },
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
     { pubkey: serumMarket, isSigner: false, isWritable: true },
     { pubkey: serumBids, isSigner: false, isWritable: true },
     { pubkey: serumAsks, isSigner: false, isWritable: true },
     { pubkey: serumEventQueue, isSigner: false, isWritable: true },
     { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
     { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
-    { pubkey: serumVaultSigner, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
     { pubkey: userSourceTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userDestTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)

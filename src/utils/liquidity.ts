@@ -1,29 +1,23 @@
-import { getBigNumber, MINT_LAYOUT } from './layouts'
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
-import {
-  LiquidityPoolInfo,
-  getLpMintByTokenMintAddresses,
-  getPoolByLpMintAddress,
-  getPoolByTokenMintAddresses,
-  canWrap,
-  LIQUIDITY_POOLS
-} from '@/utils/pools'
-import { NATIVE_SOL, TOKENS, TokenInfo, LP_TOKENS } from '@/utils/tokens'
-import {
-  createTokenAccountIfNotExist,
-  sendTransaction,
-  commitment,
-  getMultipleAccounts,
-  createAssociatedTokenAccountIfNotExist
-} from '@/utils/web3'
+import BigNumber from 'bignumber.js';
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout'
-import { publicKey, u64, u128 } from '@project-serum/borsh'
+import { nu64, struct, u8 } from 'buffer-layout';
 
-import BigNumber from 'bignumber.js'
-import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { TokenAmount } from '@/utils/safe-math'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids';
+import {
+  canWrap, getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS, LiquidityPoolInfo
+} from '@/utils/pools';
+import { TokenAmount } from '@/utils/safe-math';
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
+import {
+  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
+  getMultipleAccounts, sendTransaction
+} from '@/utils/web3';
+import { publicKey, u128, u64 } from '@project-serum/borsh';
+import { closeAccount } from '@project-serum/serum/lib/token-instructions';
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+
+import { getBigNumber, MINT_LAYOUT } from './layouts';
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
@@ -389,19 +383,19 @@ export function addLiquidityInstruction(
   const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
-    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: false },
     { pubkey: ammQuantities, isSigner: false, isWritable: true },
     { pubkey: lpMintAddress, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
@@ -448,19 +442,19 @@ export function addLiquidityInstructionV4(
   const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
-    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: false },
     { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: lpMintAddress, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
@@ -511,9 +505,9 @@ export function removeLiquidityInstruction(
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
     { pubkey: ammQuantities, isSigner: false, isWritable: true },
     { pubkey: lpMintAddress, isSigner: false, isWritable: true },
@@ -521,15 +515,15 @@ export function removeLiquidityInstruction(
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolWithdrawQueue, isSigner: false, isWritable: true },
     { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: serumProgramId, isSigner: false, isWritable: true },
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
     { pubkey: serumMarket, isSigner: false, isWritable: true },
     { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
     { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
-    { pubkey: serumVaultSigner, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
@@ -578,9 +572,9 @@ export function removeLiquidityInstructionV4(
   const dataLayout = struct([u8('instruction'), nu64('amount')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: ammId, isSigner: false, isWritable: true },
-    { pubkey: ammAuthority, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
     { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: lpMintAddress, isSigner: false, isWritable: true },
@@ -588,15 +582,15 @@ export function removeLiquidityInstructionV4(
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolWithdrawQueue, isSigner: false, isWritable: true },
     { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: serumProgramId, isSigner: false, isWritable: true },
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
     { pubkey: serumMarket, isSigner: false, isWritable: true },
     { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
     { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
-    { pubkey: serumVaultSigner, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: true }
+    { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
