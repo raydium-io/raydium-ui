@@ -1292,14 +1292,14 @@ export const LP_TOKENS: Tokens = {
     mintAddress: 'DkiqCQ792n743xjWQVCbBUaVtkdiuvQeYndM53ReWnCC',
     decimals: TOKENS.MNGO.decimals
   },
-  'ATALS-USDC-V4': {
-    symbol: 'ATALS-USDC',
-    name: 'ATALS-USDC LP',
-    coin: { ...TOKENS.ATALS },
+  'ATLAS-USDC-V4': {
+    symbol: 'ATLAS-USDC',
+    name: 'ATLAS-USDC LP',
+    coin: { ...TOKENS.ATLAS },
     pc: { ...TOKENS.USDC },
 
     mintAddress: '9shGU9f1EsxAbiR567MYZ78WUiS6ZNCYbHe53WUULQ7n',
-    decimals: TOKENS.ATALS.decimals
+    decimals: TOKENS.ATLAS.decimals
   },
   'POLIS-USDC-V4': {
     symbol: 'POLIS-USDC',

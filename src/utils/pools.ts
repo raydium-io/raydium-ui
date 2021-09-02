@@ -2146,10 +2146,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     official: true
   },
   {
-    name: 'ATALS-USDC',
-    coin: { ...TOKENS.ATALS },
+    name: 'ATLAS-USDC',
+    coin: { ...TOKENS.ATLAS },
     pc: { ...TOKENS.USDC },
-    lp: { ...LP_TOKENS['ATALS-USDC-V4'] },
+    lp: { ...LP_TOKENS['ATLAS-USDC-V4'] },
 
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
