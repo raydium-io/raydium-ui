@@ -28,7 +28,7 @@
         <button v-if="!disabled && balance" class="input-button" @click="inputBalanceByPercent(1)">MAX</button>
         <button class="select-button fc-container" @click="$emit('onSelect')">
           <div v-if="coinName" class="fc-container">
-            <CoinIcon :mint-address="mintAddress" />
+            <CoinIcon :mint-address="mintAddress" style="border-radius: 50%" />
             <span>{{ coinName }}</span>
           </div>
           <span v-else>Select a token</span>
