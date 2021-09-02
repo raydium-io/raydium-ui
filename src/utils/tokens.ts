@@ -1,6 +1,6 @@
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash-es'
 
-import { TokenAmount } from '@/utils/safe-math';
+import { TokenAmount } from '@/utils/safe-math'
 
 export interface TokenInfo {
   symbol: string
@@ -650,7 +650,7 @@ export const TOKENS: Tokens = {
     name: 'GRAPE',
     mintAddress: '8upjSpvjcdpuzhfR1zriwg5NXkwDruejqNE9WNbPRtyA',
     decimals: 6,
-    referrer: '', // TODO
+    referrer: 'M4nDMB9krXbaNFPVu1DjrBTfqPUHbKEQLZSSDNH2JrL',
 
     detailLink: 'https://raydium.medium.com/grape-protocol-launching-on-acceleraytor-547f58c12937',
     details:
