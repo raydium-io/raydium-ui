@@ -1,7 +1,7 @@
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash-es'
 
-import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids';
-import { LP_TOKENS, TokenInfo, TOKENS } from '@/utils/tokens';
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
+import { LP_TOKENS, TokenInfo, TOKENS } from '@/utils/tokens'
 
 export interface FarmInfo {
   name: string
@@ -883,7 +883,7 @@ export const FARMS: FarmInfo[] = [
 
     fusion: true,
     legacy: false,
-    dual: false,
+    dual: true,
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
@@ -902,7 +902,7 @@ export const FARMS: FarmInfo[] = [
 
     fusion: true,
     legacy: false,
-    dual: false,
+    dual: true,
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
