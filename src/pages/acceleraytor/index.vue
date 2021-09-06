@@ -10,12 +10,12 @@
       </div>
       <div class="image-part">
         <div class="decorator-text">
-          <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-01 12:00 UTC</div>
-          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-02 13:00 UTC</div>
+          <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-07 12:00 UTC</div>
+          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-08 12:00 UTC</div>
           <div class="decorator-link">
             Full details
             <a
-              href="https://raydium.medium.com/star-atlas-is-launching-on-acceleraytor-fa35cfe3291f"
+              href="https://raydium.medium.com/grape-protocol-launching-on-acceleraytor-547f58c12937"
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
