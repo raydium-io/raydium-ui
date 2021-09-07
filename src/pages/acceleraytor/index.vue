@@ -11,7 +11,7 @@
       <div class="image-part">
         <div class="decorator-text">
           <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-07 12:00 UTC</div>
-          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-08 12:00 UTC</div>
+          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-14 12:00 UTC</div>
           <div class="decorator-link">
             Full details
             <a
