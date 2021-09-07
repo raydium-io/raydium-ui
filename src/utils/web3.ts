@@ -1,15 +1,20 @@
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
-} from '@/utils/ids';
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
-import { TOKENS } from '@/utils/tokens';
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
+import { TOKENS } from '@/utils/tokens'
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 // @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token';
+import { Token } from '@solana/spl-token'
 import {
-  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
-  TransactionInstruction, TransactionSignature
-} from '@solana/web3.js';
+  Account,
+  AccountInfo,
+  Commitment,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+  TransactionSignature
+} from '@solana/web3.js'
 
 export const web3Config = {
   strategy: 'speed',
@@ -250,29 +255,18 @@ export async function getFilteredProgramAccounts(
   }))
 }
 
-export async function getFilteredProgramAccountsCache(
+export async function getFilteredProgramAccountsAmmOrMarketCache(
+  cacheName: String,
   connection: Connection,
   programId: PublicKey,
   filters: any
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
   try {
-    const resp = await (
-      await fetch('https://api.raydium.io/cache/rpc', {
-        method: 'POST',
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'getProgramAccounts',
-          params: [
-            programId.toBase58(),
-            {
-              commitment: connection.commitment,
-              filters,
-              encoding: 'base64'
-            }
-          ]
-        })
-      })
-    ).json()
+    if (!cacheName) {
+      throw new Error('cacheName error')
+    }
+
+    const resp = await (await fetch('https://api.raydium.io/cache/rpc/' + cacheName)).json()
     if (resp.error) {
       throw new Error(resp.error.message)
     }
