@@ -1399,6 +1399,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'A7GCVHA8NSsbdFscHdoNU41tL1TRKNmCH4K94CgcLK9F',
     decimals: TOKENS.COPE.decimals
+  },
+  'ETH-SOL-V4': {
+    symbol: 'ETH-SOL',
+    name: 'ETH-SOL LP',
+    coin: { ...TOKENS.ETH },
+    pc: { ...TOKENS.SOL },
+
+    mintAddress: 'GKfgC86iJoMjwAtcyiLu6nWnjggqUXsDQihXkP14fDez',
+    decimals: TOKENS.ETH.decimals
   }
 }
 
