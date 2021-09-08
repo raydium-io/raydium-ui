@@ -71,7 +71,7 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolongWalletAdapter } from '@solana/wallet-adapter-solong'
 import { MathWalletWalletAdapter } from '@solana/wallet-adapter-mathwallet'
 import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
-import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger'
+import { LedgerWalletAdapter, getDerivationPath } from '@solana/wallet-adapter-ledger'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 import { Coin98WalletAdapter } from '@solana/wallet-adapter-coin98'
 import { SlopeWalletAdapter } from '@solana/wallet-adapter-slope'
@@ -138,7 +138,7 @@ export default class Wallet extends Vue {
     Ledger: {
       website: 'https://www.ledger.com',
       getAdapter() {
-        return new LedgerWalletAdapter()
+        return new LedgerWalletAdapter({ derivationPath: getDerivationPath() })
       }
     },
     MathWallet: {
