@@ -65,6 +65,7 @@ import {
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
+import LocalStorage from '@/utils/local-storage'
 import type { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolongWalletAdapter } from '@solana/wallet-adapter-solong'
@@ -210,6 +211,9 @@ export default class Wallet extends Vue {
     adapter: null as WalletAdapter | null
   }
 
+  // autoConnect
+  lastWalletName = LocalStorage.get('WALLET_NAME')
+
   // auto refresh
   walletTimer: number | undefined = undefined
   priceTimer: number | undefined = undefined
@@ -269,6 +273,10 @@ export default class Wallet extends Vue {
     this.setIdoTimer()
   }
 
+  mounted() {
+    this.autoConnect()
+  }
+
   beforeDestroy() {
     window.clearInterval(this.walletTimer)
     window.clearInterval(this.priceTimer)
@@ -282,8 +290,18 @@ export default class Wallet extends Vue {
   /* ========== METHODS ========== */
   importIcon = importIcon
 
+  autoConnect() {
+    const name = this.lastWalletName
+    if (name && !this.$accessor.wallet.connected) {
+      const info = this.wallets[name]
+      if (info) {
+        this.connect(name, info)
+      }
+    }
+  }
+
   onConnect() {
-    const { adapter } = this.connectingWallet
+    const { name, adapter } = this.connectingWallet
 
     this.$accessor.wallet.closeModal().then(() => {
       if (adapter && adapter.publicKey) {
@@ -304,8 +322,10 @@ export default class Wallet extends Vue {
         this.subWallet()
         this.$notify.success({
           message: 'Wallet connected',
-          description: ''
+          description: `Connect to ${name}`
         })
+
+        LocalStorage.set('WALLET_NAME', name)
       }
     })
   }
