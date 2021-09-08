@@ -358,11 +358,6 @@ export default class Wallet extends Vue {
   onWalletError(error: Error) {
     const { name } = this.connectingWallet
 
-    this.connectingWallet = {
-      name: null,
-      adapter: null
-    }
-
     if (name) {
       const info = this.wallets[name]
 
@@ -398,6 +393,11 @@ export default class Wallet extends Vue {
           return
         }
       }
+    }
+
+    if (['SecurityError'].includes(error.name)) {
+      this.onConnect()
+      return
     }
 
     this.$notify.error({
