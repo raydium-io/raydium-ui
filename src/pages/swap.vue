@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="swap container">
     <div class="page-head fs-container">
       <span class="title">Swap</span>
       <div class="buttons">
@@ -303,7 +303,15 @@
           :loading="swaping"
           style="width: 100%"
           :class="`swap-btn ${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
-          @click="placeOrder"
+          @click="
+            () => {
+              if (priceImpact > 10) {
+                confirmModalIsOpen = true
+              } else {
+                placeOrder()
+              }
+            }
+          "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="(!marketAddress && !lpMintAddress && !isWrap) || !initialized">
@@ -395,13 +403,45 @@
         </table>
       </div>
     </div>
+
+    <Modal
+      class="swap-confirm-modal"
+      title="Warning"
+      :visible="confirmModalIsOpen === true"
+      :footer="null"
+      @cancel="confirmModalIsOpen = false"
+      @ok="
+        () => {
+          confirmModalIsOpen = false
+          placeOrder()
+        }
+      "
+    >
+      <div class="title">Price Impact Warning</div>
+      <div class="description">
+        Your swap is large relative to liquidity in the pool. Price impact is
+        <span class="highlight">higher than 10%</span>. If you're unsure what to do, read about price impact
+        <a
+          href="https://raydium.gitbook.io/raydium/trading-on-serum/faq#what-is-price-impact"
+          rel="nofollow noopener noreferrer"
+          target="_blank"
+        >
+          here</a
+        >.
+      </div>
+      <div class="description-secondary">Are you sure you want to confirm this swap?</div>
+      <div class="btn-group">
+        <Button class="cancel-btn" ghost size="large"> Cancel </Button>
+        <Button class="swap-btn" type="text"> Swap anyway </Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress, Spin } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
@@ -430,7 +470,8 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress,
-    Spin
+    Spin,
+    Modal
   },
 
   data() {
@@ -474,6 +515,9 @@ export default Vue.extend({
 
       // wrap
       isWrap: false,
+      // if priceImpact is higher than 10%, a confirm modal will be shown
+      confirmModalIsOpen: false,
+
       // serum
       market: null as any,
       marketAddress: '',
@@ -1391,6 +1435,40 @@ export default Vue.extend({
   }
 })
 </script>
+
+<style>
+.swap-confirm-modal .ant-btn-text {
+  background: transparent;
+  border: none;
+}
+.swap-confirm-modal .title {
+  font-size: 22px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.swap-confirm-modal .description {
+  text-align: center;
+  margin: 0 64px 32px;
+}
+.swap-confirm-modal .description-secondary {
+  font-size: 16px;
+  text-align: center;
+  margin: 0 32px 16px;
+}
+.swap-confirm-modal .description .highlight {
+  font-weight: bold;
+  color: #ed4b9e;
+}
+.swap-confirm-modal .btn-group {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+.swap-confirm-modal .btn-group .cancel-btn {
+  width: 156px;
+}
+</style>
 
 <style lang="less" sxcoped>
 .warning-style {
