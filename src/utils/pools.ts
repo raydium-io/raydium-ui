@@ -2503,7 +2503,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     lp: { ...LP_TOKENS['ETH-SOL-V4'] },
 
     version: 4,
-    programId: 'LIQUIDITY_POOL_PROGRAM_ID_V4',
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
 
     ammId: '9Hm8QX7ZhE9uB8L2arChmmagZZBtBmnzBbpfxzkQp85D',
     ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
@@ -2523,6 +2523,34 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumCoinVaultAccount: 'HMPki4uRhncFhMHpLAacHCDAU4QazjgFTsB8SQgh6bMY',
     serumPcVaultAccount: 'BeWaZ85mTxmrYfS3J9E1jQQ5tKgDRA6qmTpksKnGeNps',
     serumVaultSigner: 'GPNCigFBsjNhXu3cbmU1uxfbGVuxCA8bJN4bobwDjuTm',
+    official: true
+  },
+  {
+    name: 'stSOL-USDC',
+    coin: { ...TOKENS.stSOL },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['stSOL-USDC-V4'] },
+    version: 4,
+    programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
+
+    ammId: '6a1CsrpeZubDjEJE9s1CMVheB6HWM5d7m1cj2jkhyXhj',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '28NQqHxrqMYMQ67aWyn9AzZ1F16PYd4zvLpiiKnEZpsD',
+    ammTargetOrders: 'B8nmqinHQjyqAnMWNiqSzs1Jb8VbMpX5k9VUMnDp1gUA',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: 'DD6oh3HRCvMzqHkGeUW3za4pLgWNPJdV6aNYW3gVjXXi',
+    poolPcTokenAccount: '6KR4qkJN91LGko2gdizheri8LMtCwsJrhtsQt6QPwCi5',
+    poolWithdrawQueue: '5i9pTTk9x7r8fx8mJMBCEN85URVLAnkLzZXKyoutUJhU',
+    poolTempLpTokenAccount: 'GiuNbiBirwsBp9GuxGYgNUMMKGM6Qf6wqgnxbJFHTYFa',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '5F7LGsP1LPtaRV7vVKgxwNYX4Vf22xvuzyXjyar7jJqp',
+    serumBids: 'HjJSzUbis6VhBZLCbSFN1YtvWLLdxutb7WEvymCLrBJt',
+    serumAsks: '9e37wf6QUqe2s4J6UUNsuv6REQkwTxd47hXhDanm1adp',
+    serumEventQueue: 'CQY7LwdZJrfLRZcmEzUYp34XJbxhnxgF4UXmLKqJPLCk',
+    serumCoinVaultAccount: '4gqecEySZu6SEgCNhBJm7cEn2TFqCMsMNoiyski5vMTD',
+    serumPcVaultAccount: '6FketuhRzyTpevhgjz4fFgd5GL9fHeBeRsq9uJvu8h9m',
+    serumVaultSigner: 'x1vRSsrhXkSn7xzJfu9mYP2i19SPqG1gjyj3vUWhim1',
     official: true
   }
 ]

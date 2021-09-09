@@ -674,6 +674,14 @@ export const TOKENS: Tokens = {
     decimals: 4,
     referrer: '',
     tags: ['raydium']
+  },
+  stSOL: {
+    symbol: 'stSOL',
+    name: 'stSOL',
+    mintAddress: '7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj',
+    decimals: 9,
+    referrer: '8Mq4Tugv1fcT4gb1wf5ChdEFmdqNGKxFVCnM9TVe44vD',
+    tags: ['raydium']
   }
 }
 
@@ -1408,6 +1416,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GKfgC86iJoMjwAtcyiLu6nWnjggqUXsDQihXkP14fDez',
     decimals: TOKENS.ETH.decimals
+  },
+  'stSOL-USDC-V4': {
+    symbol: 'stSOL-USDC',
+    name: 'stSOL-USDC LP',
+    coin: { ...TOKENS.stSOL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'HDUJMwYZkjUZre63xUeDhdCi8c6LgUDiBqxmP3QC3VPX',
+    decimals: TOKENS.stSOL.decimals
   }
 }
 
