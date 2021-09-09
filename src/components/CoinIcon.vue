@@ -1,14 +1,13 @@
 <template>
   <img
-    v-if="coinPicUrl"
     :src="coinPicUrl"
     @error="
       (event) => {
-        event.path[0].src = importIcon(`/coins/${coinName}.png`)
+        errorCount++
+        getCoinPicUrl()
       }
     "
   />
-  <img v-else :src="importIcon(`/coins/${coinName}.png`)" />
 </template>
 
 <script lang="ts">
@@ -29,7 +28,8 @@ export default Vue.extend({
   data() {
     return {
       coinPicUrl: '',
-      coinName: ''
+      coinName: '',
+      errorCount: 0
     }
   },
   computed: {
@@ -54,10 +54,13 @@ export default Vue.extend({
       }
       if (token) {
         this.coinName = token.symbol.toLowerCase()
-        if (token.picUrl) {
+
+        if (this.errorCount === 0) {
+          this.coinPicUrl = `https://sdk.raydium.io/icons/${this.mintAddress}.png`
+        } else if (token.picUrl && this.errorCount === 1) {
           this.coinPicUrl = token.picUrl
         } else {
-          this.coinPicUrl = ''
+          this.coinPicUrl = importIcon(`/coins/${this.coinName}.png`)
         }
       }
     }
