@@ -682,6 +682,14 @@ export const TOKENS: Tokens = {
     decimals: 9,
     referrer: '8Mq4Tugv1fcT4gb1wf5ChdEFmdqNGKxFVCnM9TVe44vD',
     tags: ['raydium']
+  },
+  CHEEMS: {
+    symbol: 'WNAV',
+    name: 'Wrapped Navcoin',
+    mintAddress: 'HRBrRXGCrPro6TtryKQkLXuZqg3LdBMN9ZWx2v66pT4L',
+    decimals: 8,
+    referrer: '',
+    tags: ['raydium']
   }
 }
 
