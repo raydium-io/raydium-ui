@@ -210,7 +210,7 @@
             <li>
               <a
                 class="link"
-                href="https://forms.gle/EtDnY6wrr1KAb9Lw5"
+                href="https://forms.gle/Fjq4MiRA2qWbPyt29"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
                 >Apply for DropZone</a
