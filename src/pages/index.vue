@@ -210,6 +210,15 @@
             <li>
               <a
                 class="link"
+                href="https://forms.gle/EtDnY6wrr1KAb9Lw5"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+                >Apply for DropZone</a
+              >
+            </li>
+            <li>
+              <a
+                class="link"
                 href="https://docs.google.com/forms/d/1Mk-x0OcI1tCZzL0Lj_WY8d02dMXsc-Z2AG3AaO6W_Rc/edit#responses"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
