@@ -355,21 +355,6 @@ export async function signTransaction(
   return await wallet.signTransaction(transaction)
 }
 
-// async function covertToProgramWalletTransaction(
-//   connection: Connection,
-//   wallet: any,
-//   transaction: Transaction,
-//   signers: Array<Account> = []
-// ) {
-//   transaction.recentBlockhash = (await connection.getRecentBlockhash(commitment)).blockhash
-//   transaction.feePayer = wallet.publicKey
-//   if (signers.length > 0) {
-//     transaction = await wallet.convertToProgramWalletTransaction(transaction)
-//     transaction.partialSign(...signers)
-//   }
-//   return transaction
-// }
-
 export async function sendTransaction(
   connection: Connection,
   wallet: any,
@@ -384,17 +369,6 @@ export async function sendTransaction(
 
   return txid
 }
-
-// export async function sendSignedTransaction(connection: Connection, signedTransaction: Transaction): Promise<string> {
-//   const rawTransaction = signedTransaction.serialize()
-
-//   const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, {
-//     skipPreflight: true,
-//     preflightCommitment: commitment
-//   })
-
-//   return txid
-// }
 
 export function mergeTransactions(transactions: (Transaction | undefined)[]) {
   const transaction = new Transaction()
