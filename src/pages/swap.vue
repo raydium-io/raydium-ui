@@ -431,8 +431,19 @@
       </div>
       <div class="description-secondary">Are you sure you want to confirm this swap?</div>
       <div class="btn-group">
-        <Button class="cancel-btn" ghost size="large"> Cancel </Button>
-        <Button class="swap-btn" type="text"> Swap anyway </Button>
+        <Button class="cancel-btn" ghost size="large" @click="confirmModalIsOpen = false"> Cancel </Button>
+        <Button
+          class="swap-btn"
+          type="text"
+          @click="
+            () => {
+              confirmModalIsOpen = false
+              placeOrder()
+            }
+          "
+        >
+          Swap anyway
+        </Button>
       </div>
     </Modal>
   </div>
