@@ -683,7 +683,7 @@ export const TOKENS: Tokens = {
     referrer: '8Mq4Tugv1fcT4gb1wf5ChdEFmdqNGKxFVCnM9TVe44vD',
     tags: ['raydium']
   },
-  CHEEMS: {
+  WNAV: {
     symbol: 'WNAV',
     name: 'Wrapped Navcoin',
     mintAddress: 'HRBrRXGCrPro6TtryKQkLXuZqg3LdBMN9ZWx2v66pT4L',
