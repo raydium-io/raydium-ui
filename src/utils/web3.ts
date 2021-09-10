@@ -364,7 +364,7 @@ export async function sendTransaction(
   const txid: TransactionSignature = await wallet.sendTransaction(transaction, connection, {
     signers,
     skipPreflight: true,
-    preflightCommitment: commitment,
+    preflightCommitment: commitment
   })
 
   return txid
