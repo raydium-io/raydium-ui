@@ -56,17 +56,14 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Button, Modal, Icon } from 'ant-design-vue'
-import {
-  AccountInfo,
-  Context
-  // PublicKey
-} from '@solana/web3.js'
 
-import importIcon from '@/utils/import-icon'
-import logger from '@/utils/logger'
-import { commitment } from '@/utils/web3'
-import LocalStorage from '@/utils/local-storage'
-import type { WalletAdapter } from '@solana/wallet-adapter-base'
+import {
+  // eslint-disable-next-line
+  PublicKey
+} from '@solana/web3.js'
+import type { AccountInfo, Context } from '@solana/web3.js'
+
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolongWalletAdapter } from '@solana/wallet-adapter-solong'
 import { MathWalletWalletAdapter } from '@solana/wallet-adapter-mathwallet'
@@ -79,6 +76,11 @@ import { SafePalWalletAdapter } from '@solana/wallet-adapter-safepal'
 import { BloctoWalletAdapter } from '@solana/wallet-adapter-blocto'
 import { BitpieWalletAdapter } from '@solana/wallet-adapter-bitpie'
 // import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
+
+import importIcon from '@/utils/import-icon'
+import logger from '@/utils/logger'
+import { commitment } from '@/utils/web3'
+import LocalStorage from '@/utils/local-storage'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
