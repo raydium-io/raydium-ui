@@ -27,7 +27,7 @@
         </Tooltip>
         <Tooltip placement="bottomRight">
           <template slot="title">
-            <p>Addresses</p>
+            <p>Program Addresses(Do Not Deposits)</p>
             <div class="swap-info">
               <div v-if="fromCoin" class="info">
                 <div class="symbol">{{ fromCoin.symbol }}</div>
@@ -457,10 +457,10 @@ import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
+import { PublicKey } from '@solana/web3.js'
 import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment } from '@/utils/web3'
-import { PublicKey } from '@solana/web3.js'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { getOutAmount, getSwapOutAmount, place, swap, wrap, checkUnsettledInfo, settleFund } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
