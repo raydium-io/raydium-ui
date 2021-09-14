@@ -98,8 +98,14 @@
             <CollapsePanel
               v-for="farm in farms.filter(isInSearch).filter(isInTab).filter(canShowByStaked)"
               v-show="
-                (!endedFarmsPoolId.includes(farm.farmInfo.poolId) && !farm.farmInfo.legacy && poolType) ||
-                ((endedFarmsPoolId.includes(farm.farmInfo.poolId) || farm.farmInfo.legacy) && !poolType)
+                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) ||
+                  endedFarmsPoolIdWhiteList.includes(farm.farmInfo.poolId)) &&
+                  !farm.farmInfo.legacy &&
+                  poolType) ||
+                (((endedFarmsPoolId.includes(farm.farmInfo.poolId) &&
+                  !endedFarmsPoolIdWhiteList.includes(farm.farmInfo.poolId)) ||
+                  farm.farmInfo.legacy) &&
+                  !poolType)
               "
               :key="farm.farmInfo.poolId"
               :show-arrow="poolType"
@@ -346,6 +352,7 @@ export default Vue.extend({
       unstaking: false,
       poolType: true,
       endedFarmsPoolId: [] as string[],
+      endedFarmsPoolIdWhiteList: ['8GBa1cK1NxevoxiRNK6YW9tWuo2xftcA3as9Cu4nhFL7'] as string[],
       showCollapse: [] as any[]
     }
   },

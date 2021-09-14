@@ -26,5 +26,5 @@ export const MINT_LAYOUT = struct([
 ])
 
 export function getBigNumber(num: any) {
-  return parseFloat(num.toString())
+  return num === undefined || num === null ? 0 : parseFloat(num.toString())
 }
