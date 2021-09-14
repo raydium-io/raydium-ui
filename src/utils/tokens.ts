@@ -1425,6 +1425,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'HDUJMwYZkjUZre63xUeDhdCi8c6LgUDiBqxmP3QC3VPX',
     decimals: TOKENS.stSOL.decimals
+  },
+  'GRAPE-USDC-V4': {
+    symbol: 'GRAPE-USDC',
+    name: 'GRAPE-USDC LP',
+    coin: { ...TOKENS.GRAPE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'A8ZYmnZ1vwxUa4wpJVUaJgegsuTEz5TKy5CiJXffvmpt',
+    decimals: TOKENS.GRAPE.decimals
   }
 }
 

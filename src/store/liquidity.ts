@@ -1,6 +1,10 @@
 import { cloneDeep } from 'lodash-es'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
+import { OpenOrders } from '@project-serum/serum'
+import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
+// eslint-disable-next-line import/named
+import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
 import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
@@ -14,9 +18,6 @@ import {
   getFilteredProgramAccountsAmmOrMarketCache,
   getMultipleAccounts
 } from '@/utils/web3'
-import { OpenOrders } from '@project-serum/serum'
-import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
-import { AccountInfo, PublicKey } from '@solana/web3.js'
 
 const AUTO_REFRESH_TIME = 60
 
