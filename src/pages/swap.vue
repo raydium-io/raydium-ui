@@ -27,7 +27,7 @@
         </Tooltip>
         <Tooltip placement="bottomRight">
           <template slot="title">
-            <p>Program Addresses(DO NOT DEPOSIT)</p>
+            <p>Program Addresses (DO NOT DEPOSIT)</p>
             <div class="swap-info">
               <div v-if="fromCoin" class="info">
                 <div class="symbol">{{ fromCoin.symbol }}</div>
