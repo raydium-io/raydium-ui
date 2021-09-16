@@ -36,6 +36,7 @@ export default class Nav extends Vue {
     farms: false,
     staking: false,
     acceleRaytor: false,
+    dropZone: true,
     migrate: false
     // info: false
   }

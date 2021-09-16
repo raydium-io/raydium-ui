@@ -1,3 +1,5 @@
+import { getAccessorType, mutationTree, actionTree } from 'typed-vuex'
+import enquireJs from 'enquire.js'
 import * as url from './url'
 import * as route from './route'
 import * as price from './price'
@@ -8,10 +10,6 @@ import * as liquidity from './liquidity'
 import * as farm from './farm'
 import * as ido from './ido'
 import * as transaction from './transaction'
-
-import { getAccessorType, mutationTree, actionTree } from 'typed-vuex'
-
-import enquireJs from 'enquire.js'
 
 function enquireScreen(call: Function) {
   const handler = {
