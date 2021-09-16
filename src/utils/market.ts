@@ -2,31 +2,6 @@ import BigNumber from 'bignumber.js'
 // @ts-ignore
 import { struct, u8 } from 'buffer-layout'
 
-import {
-  AMM_ASSOCIATED_SEED,
-  COIN_VAULT_ASSOCIATED_SEED,
-  LIQUIDITY_POOL_PROGRAM_ID_V4,
-  LP_MINT_ASSOCIATED_SEED,
-  OPEN_ORDER_ASSOCIATED_SEED,
-  PC_VAULT_ASSOCIATED_SEED,
-  SERUM_PROGRAM_ID_V3,
-  SYSTEM_PROGRAM_ID,
-  TARGET_ASSOCIATED_SEED,
-  TEMP_LP_TOKEN_ASSOCIATED_SEED,
-  TOKEN_PROGRAM_ID,
-  WITHDRAW_ASSOCIATED_SEED
-} from '@/utils/ids'
-import { TOKENS } from '@/utils/tokens'
-import {
-  commitment,
-  createAmmAuthority,
-  createAssociatedId,
-  findAssociatedTokenAddress,
-  getFilteredTokenAccountsByOwner,
-  getMintDecimals,
-  getMultipleAccounts,
-  sendTransaction
-} from '@/utils/web3'
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { Market as MarketSerum } from '@project-serum/serum'
 import { Orderbook } from '@project-serum/serum/lib/market.js'
@@ -46,6 +21,31 @@ import { throwIfNull } from './errors'
 import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
 import { LIQUIDITY_POOLS } from './pools'
 import { transfer } from './swap'
+import {
+  commitment,
+  createAmmAuthority,
+  createAssociatedId,
+  findAssociatedTokenAddress,
+  getFilteredTokenAccountsByOwner,
+  getMintDecimals,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
+import { TOKENS } from '@/utils/tokens'
+import {
+  AMM_ASSOCIATED_SEED,
+  COIN_VAULT_ASSOCIATED_SEED,
+  LIQUIDITY_POOL_PROGRAM_ID_V4,
+  LP_MINT_ASSOCIATED_SEED,
+  OPEN_ORDER_ASSOCIATED_SEED,
+  PC_VAULT_ASSOCIATED_SEED,
+  SERUM_PROGRAM_ID_V3,
+  SYSTEM_PROGRAM_ID,
+  TARGET_ASSOCIATED_SEED,
+  TEMP_LP_TOKEN_ASSOCIATED_SEED,
+  TOKEN_PROGRAM_ID,
+  WITHDRAW_ASSOCIATED_SEED
+} from '@/utils/ids'
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
@@ -493,7 +493,7 @@ export function initialize(
     { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: serumProgramId, isSigner: false, isWritable: false },
     { pubkey: serumMarket, isSigner: false, isWritable: true },
-    { pubkey: owner, isSigner: true, isWritable: true }
+    { pubkey: owner, isSigner: true, isWritable: false }
   ]
   const data = Buffer.alloc(dataLayout.span)
 
@@ -530,8 +530,8 @@ export function preInitialize(
   const dataLayout = struct([u8('instruction'), u8('nonce')])
 
   const keys = [
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
-    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
 
     { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
@@ -544,7 +544,7 @@ export function preInitialize(
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolTempLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: market, isSigner: false, isWritable: false },
-    { pubkey: owner, isSigner: true, isWritable: true }
+    { pubkey: owner, isSigner: true, isWritable: false }
   ]
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
