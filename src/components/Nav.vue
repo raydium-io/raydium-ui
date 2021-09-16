@@ -5,7 +5,7 @@
     :theme="isMobile ? 'dark' : 'light'"
     @click="changeRoute"
   >
-    <MenuItem v-for="(extra, name) in navs" :key="name.toLowerCase()">
+    <MenuItem v-for="(extra, name) in navs" :key="name">
       <a v-if="extra" :href="url[name]" target="_blank">
         {{ name.replace('-', ' ') }}
       </a>
