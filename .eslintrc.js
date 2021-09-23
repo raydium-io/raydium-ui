@@ -13,5 +13,7 @@ module.exports = {
   ],
   plugins: ['prettier', 'import'],
   // add your custom rules here
-  rules: {}
+  rules: {
+    'import/named': 0
+  }
 }

@@ -10,10 +10,12 @@
       "disableSort": true
     },
     {
+      "type": "path",
       "regex": "^@/",
       "orderLevel": 30
     },
     {
+      "type": "path",
       "regex": "^@",
       "orderLevel": 20
     }
