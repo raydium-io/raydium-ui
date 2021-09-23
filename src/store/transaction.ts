@@ -1,11 +1,11 @@
-import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+import { Context, SignatureResult } from '@solana/web3.js';
+import { actionTree, getterTree, mutationTree } from 'typed-vuex';
 
-import { Context, SignatureResult } from '@solana/web3.js'
+import { getUnixTs } from '@/utils';
+import LocalStorage from '@/utils/local-storage';
+import logger from '@/utils/logger';
 
-import LocalStorage from '@/utils/local-storage'
-import { getUnixTs } from '@/utils'
-import logger from '@/utils/logger'
-type TxHistoryInfo = { status: 'Succeed' | 'Fail' | 'Pending'; description: string; time: number }
+type TxHistoryInfo = { status: 'Succeed' | 'Fail' | 'Pending' | 'Droped'; description: string; time: number }
 export const state = () => {
   try {
     return { history: JSON.parse(LocalStorage.get('RAY_TX_HISTORY') ?? '{}') }

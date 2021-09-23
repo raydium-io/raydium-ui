@@ -1,7 +1,6 @@
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
 // @ts-ignore without ts ignore, yarn build will failed
 import { Token } from '@solana/spl-token';
-import { WalletAdapter } from '@solana/wallet-adapter-base';
 import {
   Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
   TransactionInstruction, TransactionSignature
@@ -17,10 +16,11 @@ export const web3Config = {
   strategy: 'speed',
   rpcs: [
     { url: 'https://free.rpcpool.com', weight: 10 },
+    { url: 'https://mainnet.rpcpool.com', weight: 10 },
     { url: 'https://api.rpcpool.com', weight: 10 },
     { url: 'https://solana-api.projectserum.com', weight: 10 },
     { url: 'https://raydium.rpcpool.com', weight: 50 },
-    { url: 'https://api.mainnet-beta.solana.com', weight: 20 }
+    { url: 'https://api.mainnet-beta.solana.com', weight: 10 }
   ]
 }
 
@@ -337,9 +337,24 @@ export async function getMultipleAccounts(
   })
 }
 
+// transaction
+export async function signTransaction(
+  connection: Connection,
+  wallet: any,
+  transaction: Transaction,
+  signers: Array<Account> = []
+) {
+  transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash
+  transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey))
+  if (signers.length > 0) {
+    transaction.partialSign(...signers)
+  }
+  return await wallet.signTransaction(transaction)
+}
+
 export async function sendTransaction(
   connection: Connection,
-  wallet: WalletAdapter,
+  wallet: any,
   transaction: Transaction,
   signers: Array<Account> = []
 ) {

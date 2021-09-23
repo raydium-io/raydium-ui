@@ -41,5 +41,6 @@ export {
   // home-ui
   DownOutline,
   // pools
-  LeftOutline
+  LeftOutline,
+  DeleteOutline
 } from '@ant-design/icons'

@@ -38,8 +38,9 @@
                 v-else-if="txInfo.status === 'fail'"
                 class="icon"
                 type="close-circle"
-                :style="{ color: '#f5222d' }"
+                :style="{ color: '#fa8c16' }"
               />
+              <Icon v-else-if="txInfo.status === 'droped'" class="icon" type="delete" :style="{ color: '#f5222d' }" />
               <Icon v-else class="icon" type="loading" :style="{ color: '#1890ff' }" />
               <a :href="`${$accessor.url.explorer}/tx/${txInfo.txid}`" target="_blank">{{
                 txInfo.description || txInfo.d /* old data polyfill*/
@@ -81,6 +82,7 @@ import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import LocalStorage from '@/utils/local-storage'
+import { getUnixTs } from '@/utils'
 
 // fix: Failed to resolve directive: ant-portal
 Vue.use(Modal)
@@ -222,6 +224,7 @@ export default class Wallet extends Vue {
   liquidityTimer: number | undefined = undefined
   farmTimer: number | undefined = undefined
   idoTimer: number | undefined = undefined
+  fetchTransactionsTimer: number | undefined = undefined
   // web3 listener
   walletListenerId = null as number | null
 
@@ -453,6 +456,7 @@ export default class Wallet extends Vue {
     if (wallet && wallet.publicKey) {
       this.walletListenerId = this.$web3.onAccountChange(wallet.publicKey, this.onWalletChange, commitment)
 
+      this.fetchTransactions()
       this.$accessor.wallet.getTokenAccounts()
       this.$accessor.farm.getStakeAccounts()
       this.$accessor.ido.requestInfos()
@@ -471,6 +475,51 @@ export default class Wallet extends Vue {
     } else {
       this.$router.push({ path: '/debug/' })
       this.debugCount = 0
+    }
+  }
+
+  async fetchTransactions() {
+    const pendingTxs = []
+
+    for (const txInfo of this.historyList) {
+      const status = txInfo.status
+
+      if (status === 'pending') {
+        pendingTxs.push(txInfo)
+      }
+    }
+
+    if (pendingTxs.length > 0) {
+      const { value } = await this.$web3.getSignatureStatuses(
+        pendingTxs.map((tx) => tx.txid),
+        { searchTransactionHistory: true }
+      )
+      for (const index in value) {
+        const result = value[index]
+        const tx = pendingTxs[index]
+        if (!result && getUnixTs() - 60 * 5 * 1000 > tx.time) {
+          this.$accessor.transaction.setTxStatus({
+            txid: tx.txid,
+            status: 'droped',
+            block: 0,
+            walletAddress: this.$accessor.wallet.address
+          })
+        } else if (result && !result.err) {
+          this.$accessor.transaction.setTxStatus({
+            txid: tx.txid,
+            status: 'success',
+            block: result.slot,
+            walletAddress: this.$accessor.wallet.address
+          })
+        } else if (result && result.err) {
+          this.$accessor.transaction.setTxStatus({
+            txid: tx.txid,
+            status: 'fail',
+            block: result.slot,
+            walletAddress: this.$accessor.wallet.address
+          })
+        }
+      }
     }
   }
 
