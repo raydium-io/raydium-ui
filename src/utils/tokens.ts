@@ -682,6 +682,14 @@ export const TOKENS: Tokens = {
     decimals: 9,
     referrer: '8Mq4Tugv1fcT4gb1wf5ChdEFmdqNGKxFVCnM9TVe44vD',
     tags: ['raydium']
+  },
+  LARIX: {
+    symbol: 'LARIX',
+    name: 'LARIX',
+    mintAddress: 'Lrxqnh6ZHKbGy3dcrCED43nsoLkM1LTzU2jRfWe8qUC',
+    decimals: 6,
+    referrer: 'DReKowvoxxEDdi5jnxBWJLTV73D9oHSt9uNMuSCk9cLk',
+    tags: ['raydium']
   }
 }
 
@@ -1434,6 +1442,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'A8ZYmnZ1vwxUa4wpJVUaJgegsuTEz5TKy5CiJXffvmpt',
     decimals: TOKENS.GRAPE.decimals
+  },
+  'LARIX-USDC-V4': {
+    symbol: 'LARIX-USDC',
+    name: 'LARIX-USDC LP',
+    coin: { ...TOKENS.LARIX },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7yieit4YsNsZ9CAK8H5ZEMvvk35kPEHHeXwp6naoWU9V',
+    decimals: TOKENS.LARIX.decimals
   }
 }
 
