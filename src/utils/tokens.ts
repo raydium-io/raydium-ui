@@ -690,7 +690,23 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: 'DReKowvoxxEDdi5jnxBWJLTV73D9oHSt9uNMuSCk9cLk',
     tags: ['raydium']
-  }
+  },
+  KURO: {
+    symbol: 'KURO',
+    name: 'Kurobi',
+    mintAddress: '2Kc38rfQ49DFaKHQaWbijkE7fcymUMLY5guUiUsDmFfn',
+    decimals: 6,
+    referrer: 'D29zkftDRSCXpXy6KrCA6oA3ymFpucPkF6GwPoStD8yK',
+    detailLink: 'https://kurobi.io/',
+    docs: {
+      website: 'https://kurobi.io/'
+    },
+    socials: {
+      Medium: 'https://kurobi.medium.com/',
+      Twitter: 'https://twitter.com/kurobi_io'
+    },
+    tags: ['raydium']
+  },
 }
 
 export const LP_TOKENS: Tokens = {
@@ -1451,6 +1467,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7yieit4YsNsZ9CAK8H5ZEMvvk35kPEHHeXwp6naoWU9V',
     decimals: TOKENS.LARIX.decimals
+  },
+  'KURO-USDC-V4': {
+    symbol: 'KURO-USDC',
+    name: 'KURO-USDC LP',
+    coin: { ...TOKENS.KURO },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '9FeZF2pJ7cNnVD5pxrRKEaxBiA4CYbonBpXTgZDVsLXS',
+    decimals: TOKENS.KURO.decimals
+  },
+  'KURO-SOL-V4': {
+    symbol: 'KURO-SOL',
+    name: 'KURO-SOL LP',
+    coin: { ...TOKENS.KURO },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '7YpYb55sAqCmScKbqzhqmkzA9Ju5KWqKHY8RMPjrH1UE',
+    decimals: TOKENS.KURO.decimals
   }
 }
 
