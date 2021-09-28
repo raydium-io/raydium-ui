@@ -934,8 +934,8 @@ export const FARMS: FarmInfo[] = [
   {
     name: 'LARIX-USDC',
     lp: { ...LP_TOKENS['LARIX-USDC-V4'] },
-    reward: { ...TOKENS.LARIX },
-    rewardB: { ...TOKENS.USDC },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.LARIX },
     isStake: false,
 
     fusion: true,
