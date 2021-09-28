@@ -195,6 +195,7 @@ export default class Pools extends Vue {
       ) {
         if (
           !item.name.includes('unknown') &&
+          item.liquidity !== 0 &&
           (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
         ) {
           pool.push(item)
