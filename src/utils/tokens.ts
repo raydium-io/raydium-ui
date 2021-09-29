@@ -1466,7 +1466,7 @@ export const LP_TOKENS: Tokens = {
     pc: { ...TOKENS.USDC },
 
     mintAddress: 'GfCWfrZez7BDmCSEeMERVDVUaaM2TEreyYUgb2cpuS3w',
-    decimals: TOKENS.USDC.decimals
+    decimals: TOKENS.RIN.decimals
   }
 }
 
