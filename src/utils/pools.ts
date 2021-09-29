@@ -2607,5 +2607,32 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumPcVaultAccount: 'GKU4WhnfYXKGeYxZ3bDuBDNrBGupAnnh1Qhn91eyTcu7',
     serumVaultSigner: '4fGoqGi6jR78dU9TRdL5LvBUPjwnoUCBwxNjfFxcLaCw',
     official: true
+  },
+  {
+    name: 'RIN-USDC',
+    coin: { ...TOKENS.RIN },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['RIN-USDC-V4'] },
+    version: 4,
+    programId: '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
+    ammId: '7qZJTK5NatxQJRTxZvHi3gRu4cZZsKr8ZPzs7BA5JMTC',
+    ammAuthority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+    ammOpenOrders: '21yKxhKmJSvUWpL3doX5QwjXKXuzm3oxCG7k5Kima6hu',
+    ammTargetOrders: 'DaN1UZZ1ExraQi1Ghz8YS3pKaZG44PASbNiApysiRSRg',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '7NMCVudgyHKwVXA62Rv2cFrucQiNYE9b5MMvn4cVtCPW',
+    poolPcTokenAccount: '4d9Q2ekDzHqX51Nu9EZHZ96PhGjLSpVosa5Nci7BbwLe',
+    poolWithdrawQueue: 'DjHe1Sj7fouU5gJEiFz7C4Vd5TtvApEAxWr5EVhTuEps',
+    poolTempLpTokenAccount: 'EpKgUgtmTL425M9ENLqbjupm5funsPdhVr37hB8hJiuy',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '7gZNLDbWE73ueAoHuAeFoSu7JqmorwCLpNTBXHtYSFTa',
+    serumBids: '4mSS9iidPrVmMV9D7CNJia5zza2apmBLe3SmYW8SNPFR',
+    serumAsks: '7ovw7s6Ta1EQY4PsMu1MvnHfUNyEDADacmc4Rd5m34UD',
+    serumEventQueue: '2h7YS1nRQqc86jGKQLT29xnfBk9xVQrzXx9yiB21P5gK',
+    serumCoinVaultAccount: '5JCpfGbNdFhXWxMFR4xefBfLEd2qxYgovEggS6wxtmQe',
+    serumPcVaultAccount: 'FQfVJz7STBGMheiAAuZdF8ndyvbJhJZWJvpKhFKqSqYh',
+    serumVaultSigner: 'DFoStusQdrMbHms9Sce3tiRwSHAnaPLEtXCaFAnrhSy3',
+    official: true
   }
 ]

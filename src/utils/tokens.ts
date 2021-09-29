@@ -690,6 +690,13 @@ export const TOKENS: Tokens = {
     decimals: 6,
     referrer: 'DReKowvoxxEDdi5jnxBWJLTV73D9oHSt9uNMuSCk9cLk',
     tags: ['raydium']
+  },
+  RIN: {
+    symbol: 'RIN',
+    name: 'RIN',
+    mintAddress: 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1451,6 +1458,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7yieit4YsNsZ9CAK8H5ZEMvvk35kPEHHeXwp6naoWU9V',
     decimals: TOKENS.LARIX.decimals
+  },
+  'RIN-USDC-V4': {
+    symbol: 'RIN-USDC',
+    name: 'RIN-USDC LP',
+    coin: { ...TOKENS.RIN },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GfCWfrZez7BDmCSEeMERVDVUaaM2TEreyYUgb2cpuS3w',
+    decimals: TOKENS.USDC.decimals
   }
 }
 
