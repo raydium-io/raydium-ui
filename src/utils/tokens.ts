@@ -697,6 +697,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'E5ndSkaB17Dm7CsD22dvcjfrYSDLCxFcMd6z8ddCk5wp',
     decimals: 9,
     tags: ['raydium']
+  },
+  APEX: {
+    symbol: 'APEX',
+    name: 'APEX',
+    mintAddress: '51tMb3zBKDiQhNwGqpgwbavaGH54mk8fXFzxTc1xnasg',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1467,6 +1474,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GfCWfrZez7BDmCSEeMERVDVUaaM2TEreyYUgb2cpuS3w',
     decimals: TOKENS.RIN.decimals
+  },
+  'APEX-USDC-V4': {
+    symbol: 'APEX-USDC',
+    name: 'APEX-USDC LP',
+    coin: { ...TOKENS.APEX },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '444cVqYyDxJNo6FqiMb9qQWFUd7tYzFRdDuJRFrSAGnU',
+    decimals: TOKENS.APEX.decimals
   }
 }
 
