@@ -365,6 +365,13 @@
                       target="_blank"
                       >Telegram (RU)</a
                     >
+                    <a
+                      class="link"
+                      href="https://t.me/raydiumthai"
+                      rel="nofollow noopener noreferrer"
+                      target="_blank"
+                      >Telegram (TH)</a
+                    >
                   </ul>
                 </template>
 
