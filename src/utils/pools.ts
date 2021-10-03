@@ -8,7 +8,8 @@ import {
   LIQUIDITY_POOL_PROGRAM_ID_V3,
   LIQUIDITY_POOL_PROGRAM_ID_V4,
   SERUM_PROGRAM_ID_V2,
-  SERUM_PROGRAM_ID_V3
+  SERUM_PROGRAM_ID_V3,
+  STABLE_POOL_PROGRAM_ID
 } from './ids'
 import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from './tokens'
 
@@ -42,6 +43,9 @@ export interface LiquidityPoolInfo {
   serumVaultSigner: string
 
   official: boolean
+
+  status?: number
+  currentK?: number
 }
 
 /**
@@ -79,7 +83,7 @@ export function getPoolListByTokenMintAddresses(
       if (
         ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
           (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
-        pool.version === 4 &&
+        [4, 5].includes(pool.version) &&
         pool.official
       ) {
         return !(ammIdOrMarket !== undefined && pool.ammId !== ammIdOrMarket && pool.serumMarket !== ammIdOrMarket)
@@ -98,7 +102,7 @@ export function getPoolListByTokenMintAddresses(
           if (
             ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
               (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
-            pool.version === 4
+            [4, 5].includes(pool.version)
           ) {
             return !(ammIdOrMarket !== undefined && pool.ammId !== ammIdOrMarket && pool.serumMarket !== ammIdOrMarket)
           }
@@ -114,7 +118,7 @@ export function getPoolListByTokenMintAddresses(
 export function getLpMintByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
-  version = [3, 4]
+  version = [3, 4, 5]
 ): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
@@ -134,7 +138,7 @@ export function getLpListByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
   ammIdOrMarket: string | undefined,
-  version = [4]
+  version = [4, 5]
 ): LiquidityPoolInfo[] {
   const pool = LIQUIDITY_POOLS.filter((pool) => {
     if (coinMintAddress && pcMintAddress) {
@@ -2661,5 +2665,37 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumPcVaultAccount: '7Q1TDhNbhpN9KN3vCRk7WhPi2EaETSCkXpsTdaDppvAx',
     serumVaultSigner: 'GprUwgGyqBiEC5e6ivxgpUf7uhpS17n7WRiU7HDV3VGk',
     official: true
+  },
+
+  {
+    name: 'USDT-USDC',
+    coin: { ...TOKENS.USDT },
+    pc: { ...TOKENS.USDC },
+    lp: { ...LP_TOKENS['USDT-USDC-STABLE'] },
+
+    version: 5,
+    programId: STABLE_POOL_PROGRAM_ID,
+
+    ammId: '2EXiumdi14E9b8Fy62QcA5Uh6WdHS2b38wtSxp72Mibj',
+    ammAuthority: '3uaZBfHPfmpAHW7dsimC1SnyR61X4bJqQZKWmRSCXJxv',
+    ammOpenOrders: '4zbGjjRx8bmZjynJg2KnkJ54VAk1crcrYsGMy79EXK1P',
+    ammTargetOrders: 'AYf5abBGrwjz2n2gGP4YG91hJer22zakrizrRhddTehS',
+    // no need
+    ammQuantities: NATIVE_SOL.mintAddress,
+    poolCoinTokenAccount: '5XkWQL9FJL4qEvL8c3zCzzWnMGzerM3jbGuuyRprsEgG',
+    poolPcTokenAccount: 'jfrmNrBtxnX1FH36ATeiaXnpA4ppQcKtv7EfrgMsgLJ',
+    poolWithdrawQueue: '9N13ebsrwJuLgEYa29PTc9kbd4xmpmixMNe3XhFqeP2j',
+    poolTempLpTokenAccount: 'GRL6CqZaFuKCSJa5gshx6ehtpXVFG21da4Nn87YJd93V',
+    serumProgramId: SERUM_PROGRAM_ID_V3,
+    serumMarket: '77quYg4MGneUdjgXCunt9GgM1usmrxKY31twEy3WHwcS',
+    serumBids: '37m9QdvxmKRdjm3KKV2AjTiGcXMfWHQpVFnmhtb289yo',
+    serumAsks: 'AQKXXC29ybqL8DLeAVNt3ebpwMv8Sb4csberrP6Hz6o5',
+    serumEventQueue: '9MgPMkdEHFX7DZaitSh6Crya3kCCr1As6JC75bm3mjuC',
+    serumCoinVaultAccount: 'H61Y7xVnbWVXrQQx3EojTEqf3ogKVY5GfGjEn5ewyX7B',
+    serumPcVaultAccount: '9FLih4qwFMjdqRAGmHeCxa64CgjP1GtcgKJgHHgz44ar',
+    serumVaultSigner: 'FGBvMAu88q9d1Csz7ZECB5a2gbWwp6qicNxN2Mo7QhWG',
+    official: true,
+
+    currentK: 1
   }
 ]

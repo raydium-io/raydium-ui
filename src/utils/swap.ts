@@ -1,22 +1,34 @@
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8 } from 'buffer-layout'
 
-import { TokenAmount } from '@/utils/safe-math';
-import {
-  createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist,
-  createTokenAccountIfNotExist, mergeTransactions, sendTransaction
-} from '@/utils/web3';
-import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import {
-  Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction
-} from '@solana/web3.js';
+import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 // eslint-disable-next-line
-import { MEMO_PROGRAM_ID, SERUM_PROGRAM_ID_V3, TOKEN_PROGRAM_ID } from './ids';
-import { getBigNumber } from './layouts';
+import {
+  LIQUIDITY_POOL_PROGRAM_ID_V4,
+  MEMO_PROGRAM_ID,
+  ROUTE_SWAP_PROGRAM_ID,
+  SERUM_PROGRAM_ID_V3,
+  SYSTEM_PROGRAM_ID,
+  TOKEN_PROGRAM_ID
+} from './ids'
+import { getBigNumber } from './layouts'
 // eslint-disable-next-line
-import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens';
+import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
+import { LiquidityPoolInfo } from './pools'
+import { TokenAmount } from '@/utils/safe-math'
+import {
+  createAssociatedTokenAccountIfNotExist,
+  createAtaSolIfNotExistAndWrap,
+  createProgramAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  findProgramAddress,
+  mergeTransactions,
+  sendTransaction
+} from '@/utils/web3'
+import { RouterInfoItem } from '@/types/api'
 
 export function getOutAmount(
   market: any,
@@ -57,6 +69,9 @@ export function getSwapOutAmount(
   const { coin, pc, fees } = poolInfo
   const { swapFeeNumerator, swapFeeDenominator } = fees
 
+  if (fromCoinMint === TOKENS.WSOL.mintAddress) fromCoinMint = NATIVE_SOL.mintAddress
+  if (toCoinMint === TOKENS.WSOL.mintAddress) toCoinMint = NATIVE_SOL.mintAddress
+
   if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // coin2pc
     const fromAmount = new TokenAmount(amount, coin.decimals, false)
@@ -82,7 +97,8 @@ export function getSwapOutAmount(
       false
     )
     const priceImpact =
-      ((parseFloat(beforePrice.fixed()) - parseFloat(afterPrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+      Math.abs((parseFloat(beforePrice.fixed()) - parseFloat(afterPrice.fixed())) / parseFloat(beforePrice.fixed())) *
+      100
 
     return {
       amountIn: fromAmount,
@@ -116,7 +132,8 @@ export function getSwapOutAmount(
       false
     )
     const priceImpact =
-      ((parseFloat(afterPrice.fixed()) - parseFloat(beforePrice.fixed())) / parseFloat(beforePrice.fixed())) * 100
+      Math.abs((parseFloat(afterPrice.fixed()) - parseFloat(beforePrice.fixed())) / parseFloat(beforePrice.fixed())) *
+      100
 
     return {
       amountIn: fromAmount,
@@ -125,6 +142,135 @@ export function getSwapOutAmount(
       priceImpact
     }
   }
+}
+
+export function getSwapInAmount(
+  poolInfo: any,
+  fromCoinMint: string,
+  toCoinMint: string,
+  amount: string,
+  slippage: number
+) {
+  const { coin, pc, fees } = poolInfo
+  const { swapFeeNumerator, swapFeeDenominator } = fees
+
+  const amountOut = parseFloat(amount)
+
+  let amountIn = 0
+  let amountInWithFee = 0
+  let afterPrice = 0
+  const y = parseFloat(coin.balance.fixed())
+  const x = parseFloat(pc.balance.fixed())
+  const beforePrice = x / y
+
+  // (x+delta_x)*(y+delta_y)=x*y
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // coin2pc
+    amountIn = (amountOut * y) / (x - amountOut)
+    amountInWithFee = amountIn * (1 + swapFeeNumerator / swapFeeDenominator)
+    afterPrice = (y + amountInWithFee) / (x - amountOut)
+  } else {
+    // pc2coin
+    amountIn = (x * amountOut) / (y - amountOut)
+    amountInWithFee = amountIn * (1 + swapFeeNumerator / swapFeeDenominator)
+    afterPrice = (y - amountInWithFee) / (x + amountOut)
+  }
+
+  const amountInWithSlippage = amountInWithFee / (1 + slippage / 100)
+  const priceImpact = Math.abs(((beforePrice - afterPrice) / beforePrice) * 100)
+
+  return {
+    amountIn: new TokenAmount(amountIn * 10 ** 6, 6),
+    amountOut: new TokenAmount(amountOut * 10 ** 6, 6),
+    amountOutWithSlippage: new TokenAmount(amountInWithSlippage * 10 ** pc.decimals, pc.decimals),
+    priceImpact
+  }
+}
+
+export function getSwapOutAmountStable(
+  poolInfo: any,
+  fromCoinMint: string,
+  toCoinMint: string,
+  amount: string,
+  slippage: number
+) {
+  const { coin, pc, fees, currentK } = poolInfo
+  const { swapFeeNumerator, swapFeeDenominator } = fees
+
+  const systemDecimal = Math.max(coin.decimals, pc.decimals)
+  const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
+
+  const amountIn = parseFloat(amount) * (1 - swapFeeNumerator / swapFeeDenominator)
+
+  let amountOut = 1
+  const y = parseFloat(coin.balance.fixed())
+  const ammX = k / y
+
+  // (x+delta_x)*(y+delta_y)=x*y
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // coin2pc
+    amountOut = ammX - k / (y + amountIn)
+  } else {
+    // pc2coin
+    amountOut = y - k / (ammX + amountIn)
+  }
+  const beforePrice = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+
+  const amountOutWithSlippage = amountOut / (1 + slippage / 100)
+
+  const afterY = y - amountOut
+  const afterPrice = Math.sqrt(((10 - 1) * afterY * afterY) / (10 * afterY * afterY - k))
+
+  const priceImpact = ((beforePrice - afterPrice) / beforePrice) * 100
+
+  return {
+    amountIn: new TokenAmount(amountIn * 10 ** 6, 6),
+    amountOut: new TokenAmount(amountOut * 10 ** 6, 6),
+    amountOutWithSlippage: new TokenAmount(amountOutWithSlippage * 10 ** pc.decimals, pc.decimals),
+    priceImpact
+  }
+}
+
+export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: string, toCoinMint: string) {
+  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL']
+  const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
+  const avaPools: LiquidityPoolInfo[] = []
+  for (const p of poolInfos) {
+    if (
+      p.version === 4 &&
+      p.status === 1 &&
+      ((p.coin.mintAddress === fromCoinMint && routerCoinDefault.includes(p.pc.symbol)) ||
+        (p.pc.mintAddress === fromCoinMint && routerCoinDefault.includes(p.coin.symbol)) ||
+        (p.coin.mintAddress === toCoinMint && routerCoinDefault.includes(p.pc.symbol)) ||
+        (p.pc.mintAddress === toCoinMint && routerCoinDefault.includes(p.coin.symbol)))
+    ) {
+      avaPools.push(p)
+    }
+  }
+  for (const p1 of avaPools) {
+    if (p1.coin.mintAddress === fromCoinMint) {
+      const poolInfo = avaPools.filter(
+        (p2: any) =>
+          p1.ammId !== p2.ammId &&
+          ((p2.pc.mintAddress === p1.pc.mintAddress && p2.coin.mintAddress === toCoinMint) ||
+            (p2.coin.mintAddress === p1.pc.mintAddress && p2.pc.mintAddress === toCoinMint))
+      )
+      for (const aP of poolInfo) {
+        ret.push([p1, aP])
+      }
+    } else if (p1.pc.mintAddress === fromCoinMint) {
+      const poolInfo = avaPools.filter(
+        (p2: any) =>
+          p1.ammId !== p2.ammId &&
+          ((p2.pc.mintAddress === p1.coin.mintAddress && p2.coin.mintAddress === toCoinMint) ||
+            (p2.coin.mintAddress === p1.coin.mintAddress && p2.pc.mintAddress === toCoinMint))
+      )
+      for (const aP of poolInfo) {
+        ret.push([p1, aP])
+      }
+    }
+  }
+  return ret
 }
 
 export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: number) {
@@ -385,6 +531,313 @@ export async function swap(
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
+export async function preSwapRoute(
+  connection: Connection,
+  wallet: any,
+  fromMint: string,
+  fromTokenAccount: string,
+  middleMint: string,
+  middleTokenAccount: string,
+  toMint: string,
+  toTokenAccount: string,
+  needWrapAmount: number
+) {
+  const transaction = new Transaction()
+  const signers: Account[] = []
+  const owner = wallet.publicKey
+  console.log('needWrapAmount:', needWrapAmount)
+  if (fromMint === TOKENS.WSOL.mintAddress || fromMint === NATIVE_SOL.mintAddress) {
+    await createAtaSolIfNotExistAndWrap(connection, fromTokenAccount, owner, transaction, signers, needWrapAmount)
+  }
+  if (middleMint === NATIVE_SOL.mintAddress) middleMint = TOKENS.WSOL.mintAddress
+  if (toMint === NATIVE_SOL.mintAddress) toMint = TOKENS.WSOL.mintAddress
+
+  await createAssociatedTokenAccountIfNotExist(middleTokenAccount, owner, middleMint, transaction)
+
+  await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+export async function swapRoute(
+  connection: Connection,
+  wallet: any,
+  poolInfoA: any,
+  poolInfoB: any,
+  routerInfo: RouterInfoItem,
+  fromTokenAccount: string,
+  middleTokenAccount: string,
+  toTokenAccount: string,
+  aIn: string,
+  aOut: string
+) {
+  const transaction = new Transaction()
+
+  const owner = wallet.publicKey
+
+  const fromCoinMint = routerInfo.route[0].mintA
+  const toCoinMint = routerInfo.route[1].mintB
+
+  const from = getTokenByMintAddress(fromCoinMint)
+  const middle = getTokenByMintAddress(routerInfo.middle_coin)
+  const to = getTokenByMintAddress(toCoinMint)
+  if (!from || !middle || !to) {
+    throw new Error('Miss token info')
+  }
+
+  const amountIn = new TokenAmount(aIn, from.decimals, false)
+  const amountOut = new TokenAmount(aOut, to.decimals, false)
+
+  let fromMint = fromCoinMint
+  let toMint = toCoinMint
+  let middleMint = routerInfo.middle_coin
+
+  if (fromMint === NATIVE_SOL.mintAddress) fromMint = TOKENS.WSOL.mintAddress
+  if (middleMint === NATIVE_SOL.mintAddress) middleMint = TOKENS.WSOL.mintAddress
+  if (toMint === NATIVE_SOL.mintAddress) toMint = TOKENS.WSOL.mintAddress
+
+  const newFromTokenAccount = new PublicKey(fromTokenAccount)
+  const newMiddleTokenAccount = new PublicKey(middleTokenAccount)
+  const newToTokenAccount = new PublicKey(toTokenAccount)
+
+  const { publicKey } = await findProgramAddress(
+    [new PublicKey(poolInfoA.ammId).toBuffer(), new PublicKey(middleMint).toBuffer(), owner.toBuffer()],
+    new PublicKey(ROUTE_SWAP_PROGRAM_ID)
+  )
+
+  transaction.add(
+    routeSwapInInstruction(
+      new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+      new PublicKey(poolInfoA.ammId),
+      new PublicKey(poolInfoB.ammId),
+      new PublicKey(poolInfoA.ammAuthority),
+      new PublicKey(poolInfoA.ammOpenOrders),
+      new PublicKey(poolInfoA.ammTargetOrders),
+      new PublicKey(poolInfoA.poolCoinTokenAccount),
+      new PublicKey(poolInfoA.poolPcTokenAccount),
+      new PublicKey(poolInfoA.serumProgramId),
+      new PublicKey(poolInfoA.serumMarket),
+      new PublicKey(poolInfoA.serumBids),
+      new PublicKey(poolInfoA.serumAsks),
+      new PublicKey(poolInfoA.serumEventQueue),
+      new PublicKey(poolInfoA.serumCoinVaultAccount),
+      new PublicKey(poolInfoA.serumPcVaultAccount),
+      new PublicKey(poolInfoA.serumVaultSigner),
+
+      newFromTokenAccount,
+      newMiddleTokenAccount,
+      publicKey,
+      owner,
+      Math.floor(getBigNumber(amountIn.toWei()))
+    ),
+    routeSwapOutInstruction(
+      new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+      new PublicKey(poolInfoA.ammId),
+      new PublicKey(poolInfoB.ammId),
+      new PublicKey(poolInfoB.ammAuthority),
+      new PublicKey(poolInfoB.ammOpenOrders),
+      new PublicKey(poolInfoB.ammTargetOrders),
+      new PublicKey(poolInfoB.poolCoinTokenAccount),
+      new PublicKey(poolInfoB.poolPcTokenAccount),
+      new PublicKey(poolInfoB.serumProgramId),
+      new PublicKey(poolInfoB.serumMarket),
+      new PublicKey(poolInfoB.serumBids),
+      new PublicKey(poolInfoB.serumAsks),
+      new PublicKey(poolInfoB.serumEventQueue),
+      new PublicKey(poolInfoB.serumCoinVaultAccount),
+      new PublicKey(poolInfoB.serumPcVaultAccount),
+      new PublicKey(poolInfoB.serumVaultSigner),
+      newMiddleTokenAccount,
+      newToTokenAccount,
+      publicKey,
+      owner,
+      Math.floor(getBigNumber(amountOut.toWei()))
+    )
+  )
+  return await sendTransaction(connection, wallet, transaction)
+}
+
+export async function swapRouteOld(
+  connection: Connection,
+  wallet: any,
+  poolInfoA: any,
+  poolInfoB: any,
+  routerInfo: RouterInfoItem,
+  fromTokenAccount: string,
+  middleTokenAccount: string,
+  toTokenAccount: string,
+  aIn: string,
+  aMiddle: string,
+  aOut: string
+) {
+  const transaction = new Transaction()
+
+  const owner = wallet.publicKey
+
+  const fromCoinMint = routerInfo.route[0].mintA
+  const toCoinMint = routerInfo.route[1].mintB
+
+  const from = getTokenByMintAddress(fromCoinMint)
+  const middle = getTokenByMintAddress(routerInfo.middle_coin)
+  const to = getTokenByMintAddress(toCoinMint)
+  if (!from || !middle || !to) {
+    throw new Error('Miss token info')
+  }
+
+  const amountIn = new TokenAmount(aIn, from.decimals, false)
+  const amountMiddle = new TokenAmount(aMiddle, middle.decimals, false)
+  const amountOut = new TokenAmount(aOut, to.decimals, false)
+
+  let fromMint = fromCoinMint
+  let toMint = toCoinMint
+  let middleMint = routerInfo.middle_coin
+
+  if (fromMint === NATIVE_SOL.mintAddress) {
+    fromMint = TOKENS.WSOL.mintAddress
+  }
+  if (middleMint === NATIVE_SOL.mintAddress) {
+    middleMint = TOKENS.WSOL.mintAddress
+  }
+  if (toMint === NATIVE_SOL.mintAddress) {
+    toMint = TOKENS.WSOL.mintAddress
+  }
+
+  let wrappedSolAccount: PublicKey | null = null
+  let wrappedSolAccount2: PublicKey | null = null
+  let wrappedSolAccount3: PublicKey | null = null
+
+  if (fromCoinMint === NATIVE_SOL.mintAddress) {
+    wrappedSolAccount = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      getBigNumber(amountIn.wei) + 1e7,
+      transaction,
+      []
+    )
+  }
+  if (middleMint === NATIVE_SOL.mintAddress) {
+    wrappedSolAccount2 = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount2,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      transaction,
+      []
+    )
+  }
+
+  if (toCoinMint === NATIVE_SOL.mintAddress) {
+    wrappedSolAccount3 = await createTokenAccountIfNotExist(
+      connection,
+      wrappedSolAccount3,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      1e7,
+      transaction,
+      []
+    )
+  }
+
+  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
+    fromTokenAccount,
+    owner,
+    fromMint,
+    transaction
+  )
+
+  const newMiddleTokenAccount = await createAssociatedTokenAccountIfNotExist(
+    middleTokenAccount,
+    owner,
+    middleMint,
+    transaction
+  )
+
+  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
+
+  transaction.add(
+    swapInstruction(
+      new PublicKey(poolInfoA.programId),
+      new PublicKey(poolInfoA.ammId),
+      new PublicKey(poolInfoA.ammAuthority),
+      new PublicKey(poolInfoA.ammOpenOrders),
+      new PublicKey(poolInfoA.ammTargetOrders),
+      new PublicKey(poolInfoA.poolCoinTokenAccount),
+      new PublicKey(poolInfoA.poolPcTokenAccount),
+      new PublicKey(poolInfoA.serumProgramId),
+      new PublicKey(poolInfoA.serumMarket),
+      new PublicKey(poolInfoA.serumBids),
+      new PublicKey(poolInfoA.serumAsks),
+      new PublicKey(poolInfoA.serumEventQueue),
+      new PublicKey(poolInfoA.serumCoinVaultAccount),
+      new PublicKey(poolInfoA.serumPcVaultAccount),
+      new PublicKey(poolInfoA.serumVaultSigner),
+      wrappedSolAccount ?? newFromTokenAccount,
+      wrappedSolAccount2 ?? newMiddleTokenAccount,
+      owner,
+      Math.floor(getBigNumber(amountIn.toWei())),
+      Math.floor(getBigNumber(amountMiddle.toWei()))
+    ),
+    swapInstruction(
+      new PublicKey(poolInfoB.programId),
+      new PublicKey(poolInfoB.ammId),
+      new PublicKey(poolInfoB.ammAuthority),
+      new PublicKey(poolInfoB.ammOpenOrders),
+      new PublicKey(poolInfoB.ammTargetOrders),
+      new PublicKey(poolInfoB.poolCoinTokenAccount),
+      new PublicKey(poolInfoB.poolPcTokenAccount),
+      new PublicKey(poolInfoB.serumProgramId),
+      new PublicKey(poolInfoB.serumMarket),
+      new PublicKey(poolInfoB.serumBids),
+      new PublicKey(poolInfoB.serumAsks),
+      new PublicKey(poolInfoB.serumEventQueue),
+      new PublicKey(poolInfoB.serumCoinVaultAccount),
+      new PublicKey(poolInfoB.serumPcVaultAccount),
+      new PublicKey(poolInfoB.serumVaultSigner),
+      wrappedSolAccount2 ?? newMiddleTokenAccount,
+      wrappedSolAccount3 ?? newToTokenAccount,
+      owner,
+      Math.floor(getBigNumber(amountMiddle.toWei())),
+      Math.floor(getBigNumber(amountOut.toWei()))
+    )
+  )
+
+  if (wrappedSolAccount) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount,
+        destination: owner,
+        owner
+      })
+    )
+  }
+  if (wrappedSolAccount2) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount2,
+        destination: owner,
+        owner
+      })
+    )
+  }
+
+  if (wrappedSolAccount3) {
+    transaction.add(
+      closeAccount({
+        source: wrappedSolAccount3,
+        destination: owner,
+        owner
+      })
+    )
+  }
+
+  return await sendTransaction(connection, wallet, transaction)
+}
+
 export async function place(
   connection: Connection,
   wallet: any,
@@ -581,6 +1034,156 @@ export function swapInstruction(
       instruction: 9,
       amountIn,
       minAmountOut
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function routeSwapInInstruction(
+  programId: PublicKey,
+  ammProgramId: PublicKey,
+  fromAmmId: PublicKey,
+  toAmmId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  _ammTargetOrders: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  // serum
+
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
+  serumEventQueue: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+
+  // user
+  userSourceTokenAccount: PublicKey,
+  userMiddleTokenAccount: PublicKey,
+  userPdaAccount: PublicKey,
+  userOwner: PublicKey,
+  amountIn: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amountIn')])
+
+  const keys = [
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
+    // spl token
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+
+    // amm
+    { pubkey: ammProgramId, isSigner: false, isWritable: false },
+    { pubkey: fromAmmId, isSigner: false, isWritable: true },
+    { pubkey: toAmmId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    // { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    // serum
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumBids, isSigner: false, isWritable: true },
+    { pubkey: serumAsks, isSigner: false, isWritable: true },
+    { pubkey: serumEventQueue, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+
+    { pubkey: userSourceTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userMiddleTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPdaAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 0,
+      amountIn
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function routeSwapOutInstruction(
+  programId: PublicKey,
+  ammProgramId: PublicKey,
+  fromAmmId: PublicKey,
+  toAmmId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  _ammTargetOrders: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  // serum
+
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
+  serumEventQueue: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+
+  // user
+  userMiddleTokenAccount: PublicKey,
+  userDestTokenAccount: PublicKey,
+  userPdaAccount: PublicKey,
+  userOwner: PublicKey,
+  amountOut: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amountOut')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+
+    // amm
+    { pubkey: ammProgramId, isSigner: false, isWritable: false },
+    { pubkey: fromAmmId, isSigner: false, isWritable: true },
+    { pubkey: toAmmId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    // { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    // serum
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumBids, isSigner: false, isWritable: true },
+    { pubkey: serumAsks, isSigner: false, isWritable: true },
+    { pubkey: serumEventQueue, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+
+    { pubkey: userMiddleTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userDestTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPdaAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 1,
+      amountOut
     },
     data
   )

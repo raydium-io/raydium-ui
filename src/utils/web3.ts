@@ -1,16 +1,21 @@
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 // @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token';
+import { Token } from '@solana/spl-token'
 import {
-  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
-  TransactionInstruction, TransactionSignature
-} from '@solana/web3.js';
+  Account,
+  AccountInfo,
+  Commitment,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+  TransactionSignature
+} from '@solana/web3.js'
 
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
-} from '@/utils/ids';
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
-import { TOKENS } from '@/utils/tokens';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
+import { TOKENS } from '@/utils/tokens'
 
 export const web3Config = {
   strategy: 'speed',
@@ -111,11 +116,7 @@ export async function createAssociatedTokenAccountIfNotExist(
   // @ts-ignore without ts ignore, yarn build will failed
   const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner, true)
 
-  if (
-    (!publicKey || !ata.equals(publicKey)) &&
-    mintAddress !== TOKENS.WSOL.mintAddress &&
-    !atas.includes(ata.toBase58())
-  ) {
+  if ((!publicKey || !ata.equals(publicKey)) && !atas.includes(ata.toBase58())) {
     transaction.add(
       Token.createAssociatedTokenAccountInstruction(
         ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -130,6 +131,52 @@ export async function createAssociatedTokenAccountIfNotExist(
   }
 
   return ata
+}
+
+export async function createAtaSolIfNotExistAndWrap(
+  connection: Connection,
+  account: string | undefined | null,
+  owner: PublicKey,
+  transaction: Transaction,
+  signers: Array<Account>,
+  amount: number
+) {
+  let publicKey
+  if (account) {
+    publicKey = new PublicKey(account)
+  }
+  const mint = new PublicKey(TOKENS.WSOL.mintAddress)
+  // @ts-ignore without ts ignore, yarn build will failed
+  const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner, true)
+  if (!publicKey) {
+    const rent = await Token.getMinBalanceRentForExemptAccount(connection)
+    transaction.add(
+      SystemProgram.transfer({ fromPubkey: owner, toPubkey: ata, lamports: amount + rent }),
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        mint,
+        ata,
+        owner,
+        owner
+      )
+    )
+  } else {
+    const rent = await Token.getMinBalanceRentForExemptAccount(connection)
+    const wsol = await createTokenAccountIfNotExist(
+      connection,
+      null,
+      owner,
+      TOKENS.WSOL.mintAddress,
+      amount + rent,
+      transaction,
+      signers
+    )
+    transaction.add(
+      Token.createTransferInstruction(TOKEN_PROGRAM_ID, wsol, ata, owner, [], amount),
+      Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, wsol, owner, owner, [])
+    )
+  }
 }
 
 export async function createProgramAccountIfNotExist(
@@ -178,7 +225,7 @@ export async function createAssociatedTokenAccount(
     {
       pubkey: owner,
       isSigner: true,
-      isWritable: true
+      isWritable: false
     },
     {
       pubkey: associatedTokenAddress,

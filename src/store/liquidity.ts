@@ -7,7 +7,13 @@ import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
 import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
-import { AMM_INFO_LAYOUT, AMM_INFO_LAYOUT_V3, AMM_INFO_LAYOUT_V4, getLpMintListDecimals } from '@/utils/liquidity'
+import {
+  AMM_INFO_LAYOUT,
+  AMM_INFO_LAYOUT_STABLE,
+  AMM_INFO_LAYOUT_V3,
+  AMM_INFO_LAYOUT_V4,
+  getLpMintListDecimals
+} from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { getAddressForWhat, LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
@@ -230,7 +236,6 @@ export const actions = actionTree(
           serumVaultSigner: serumVaultSigner.toString(),
           official: false
         }
-        if (itemLiquidity.ammId === '43UHp4TuwQ7BYsaULN1qfpktmg7GWs9GpR8TDb8ovu9c') console.log(itemLiquidity)
         if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
           LIQUIDITY_POOLS.push(itemLiquidity)
         } else {
@@ -312,7 +317,10 @@ export const actions = actionTree(
                 } else if (version === 3) {
                   parsed = AMM_INFO_LAYOUT_V3.decode(data)
                 } else {
-                  parsed = AMM_INFO_LAYOUT_V4.decode(data)
+                  if (version === 5) {
+                    parsed = AMM_INFO_LAYOUT_STABLE.decode(data)
+                    poolInfo.currentK = getBigNumber(parsed.currentK)
+                  } else parsed = AMM_INFO_LAYOUT_V4.decode(data)
 
                   const { swapFeeNumerator, swapFeeDenominator } = parsed
                   poolInfo.fees = {
