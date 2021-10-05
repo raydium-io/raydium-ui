@@ -256,11 +256,11 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Steps, Row, Col, Button, Tooltip, Icon } from 'ant-design-vue'
+import { PublicKey } from '@solana/web3.js'
 import { getMarket, createAmm, clearLocal } from '@/utils/market'
 import BigNumber from '@/../node_modules/bignumber.js/bignumber'
 import { TOKENS } from '@/utils/tokens'
 import { createAssociatedId } from '@/utils/web3'
-import { PublicKey } from '@solana/web3.js'
 import { AMM_ASSOCIATED_SEED, LIQUIDITY_POOL_PROGRAM_ID_V4 } from '@/utils/ids'
 import { getBigNumber } from '@/utils/layouts'
 

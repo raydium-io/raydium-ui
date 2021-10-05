@@ -377,6 +377,26 @@
       </div>
     </div>
 
+    <div v-if="get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)" class="card extra">
+      <div class="settle card-body">
+        <table class="settel-panel">
+          <thead>
+            <tr>
+              <th colspan="2">You have WSOL balances:</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row">
+              <td>{{ get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed() }}</td>
+              <td class="align-right" rowspan="2">
+                <Button class="btn" :loading="isSettlingBase" ghost @click="unwrap">UnwrapWsol</Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <Modal
       class="swap-confirm-modal"
       title="Warning"
@@ -430,10 +450,11 @@ import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
 import { cloneDeep, get } from 'lodash-es'
 import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
-import { PublicKey } from '@solana/web3.js'
+import { Account, PublicKey, Transaction } from '@solana/web3.js'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS, getTokenByMintAddress } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { getMultipleAccounts, commitment } from '@/utils/web3'
+import { getMultipleAccounts, commitment, sendTransaction } from '@/utils/web3'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import {
   getOutAmount,
@@ -452,6 +473,7 @@ import { getUnixTs } from '@/utils'
 import { canWrap } from '@/utils/liquidity'
 import { isOfficalMarket, LiquidityPoolInfo } from '@/utils/pools'
 import { RouterInfo, RouterInfoItem } from '@/types/api'
+import { getBigNumber } from '@/utils/layouts'
 
 const RAY = getTokenBySymbol('RAY')
 
@@ -677,6 +699,65 @@ export default Vue.extend({
   methods: {
     gt,
     get,
+    getBigNumber,
+
+    unwrap() {
+      const key = getUnixTs().toString()
+      this.$notify.info({
+        key,
+        message: 'Making transaction...',
+        description: '',
+        duration: 0
+      })
+
+      this.unwrapWsol()
+        .then((txid) => {
+          this.$notify.info({
+            key,
+            message: 'Transaction has been sent',
+            description: (h: any) =>
+              h('div', [
+                'Confirmation is in progress.  Check your transaction on ',
+                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+              ])
+          })
+
+          const description = `Unwrap WSOL`
+          this.$accessor.transaction.sub({ txid, description })
+        })
+        .catch((error) => {
+          this.$notify.error({
+            key,
+            message: 'Unwrap WSOL failed',
+            description: error.message
+          })
+        })
+    },
+
+    async unwrapWsol() {
+      const wsolMint = TOKENS.WSOL.mintAddress
+      const tokenAccount = get(this.wallet.tokenAccounts, `${wsolMint}.tokenAccountAddress`)
+
+      if (!tokenAccount) throw new Error('No any WSOL account')
+
+      const connection = this.$web3
+      const wallet = this.$wallet
+
+      const transaction = new Transaction()
+      const signers: Account[] = []
+
+      const owner = wallet?.publicKey
+
+      transaction.add(
+        closeAccount({
+          source: new PublicKey(tokenAccount),
+          destination: owner,
+          owner
+        })
+      )
+
+      return await sendTransaction(connection, wallet, transaction, signers)
+    },
 
     needCreateTokens() {
       if (this.endpoint !== 'Serum DEX' && !this.usedAmmId && this.usedRouteInfo !== undefined) {
