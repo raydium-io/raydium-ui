@@ -704,6 +704,13 @@ export const TOKENS: Tokens = {
     mintAddress: '51tMb3zBKDiQhNwGqpgwbavaGH54mk8fXFzxTc1xnasg',
     decimals: 9,
     tags: ['raydium']
+  },
+  MNDE: {
+    symbol: 'MNDE',
+    name: 'MNDE',
+    mintAddress: 'MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
