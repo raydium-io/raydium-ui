@@ -968,6 +968,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'HUM5nLWT94iRQRQ7GSsjJ1DDWqWKhKfdGQCJCf7SypeD', // lp vault
     poolRewardTokenAccount: 'A5W9spnyknywKui1vudnxUomdnebrZVUnjKW6BHgUdyz', // reward vault A
     poolRewardTokenAccountB: 'JE9PvgvXMnVfBkCdwJU4id1w2BaxTuxheKKFdBfRiJZi' // reward vault B
+  },
+  {
+    name: 'mSOL-RAY',
+    lp: { ...LP_TOKENS['mSOL-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNDE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7wNhbTS6XQczXs52wcVmfiodRMPfycB3YaG52dWWY6SD',
+    poolAuthority: '2MbHFiv8H2jjJboqWCaEY1iQh7WFQEwbqNQMYqXUre1p',
+    poolLpTokenAccount: '4vyJYQyWusNxCCyFDvWwzjVZFJByAVudWvuTzgHYzwTY', // lp vault
+    poolRewardTokenAccount: 'Erz6ai92ieTAqWKHP1tkpGgBKrUJsKe7dhCUyhqtjKRv', // reward vault A
+    poolRewardTokenAccountB: 'Ejed9odWtRtNrSndDnrWvu9LaiqCANbkeKHTS3g3H1Xj' // reward vault B
   }
   // {
   //   name: 'stSOL-USDC',

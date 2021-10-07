@@ -1490,6 +1490,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '444cVqYyDxJNo6FqiMb9qQWFUd7tYzFRdDuJRFrSAGnU',
     decimals: TOKENS.APEX.decimals
+  },
+  'mSOL-RAY-V4': {
+    symbol: 'mSOL-RAY',
+    name: 'mSOL-RAY LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'De2EHBAdkgfc72DpShqDGG42cV3iDWh8wvvZdPsiEcqP',
+    decimals: TOKENS.mSOL.decimals
   }
 }
 

@@ -230,7 +230,6 @@ export const actions = actionTree(
           serumVaultSigner: serumVaultSigner.toString(),
           official: false
         }
-        if (itemLiquidity.ammId === '43UHp4TuwQ7BYsaULN1qfpktmg7GWs9GpR8TDb8ovu9c') console.log(itemLiquidity)
         if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
           LIQUIDITY_POOLS.push(itemLiquidity)
         } else {
