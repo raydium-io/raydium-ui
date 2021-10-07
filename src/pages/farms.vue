@@ -454,9 +454,11 @@ export default Vue.extend({
               365 *
               this.price.prices[rewardB.symbol as string]
 
+            let coinSymbol = liquidityItem?.coin.symbol as string
+            if (coinSymbol === 'mSOL') coinSymbol = 'MNDE'
+
             const liquidityCoinValue =
-              getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) * this.price.prices[coinSymbol]
             const liquidityPcValue =
               getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
               this.price.prices[liquidityItem?.pc.symbol as string]
