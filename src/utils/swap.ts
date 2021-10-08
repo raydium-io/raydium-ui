@@ -236,17 +236,14 @@ export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: stri
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
   for (const p of poolInfos) {
-    if (
-      p.version === 4 &&
-      p.status === 1 &&
-      ((p.coin.mintAddress === fromCoinMint && routerCoinDefault.includes(p.pc.symbol)) ||
-        (p.pc.mintAddress === fromCoinMint && routerCoinDefault.includes(p.coin.symbol)) ||
-        (p.coin.mintAddress === toCoinMint && routerCoinDefault.includes(p.pc.symbol)) ||
-        (p.pc.mintAddress === toCoinMint && routerCoinDefault.includes(p.coin.symbol)))
-    ) {
+    if (!(p.version === 4 && p.status === 1)) continue
+    if ([fromCoinMint, toCoinMint].includes(p.coin.mintAddress) && routerCoinDefault.includes(p.pc.symbol)) {
+      avaPools.push(p)
+    } else if ([fromCoinMint, toCoinMint].includes(p.pc.mintAddress) && routerCoinDefault.includes(p.coin.symbol)) {
       avaPools.push(p)
     }
   }
+
   for (const p1 of avaPools) {
     if (p1.coin.mintAddress === fromCoinMint) {
       const poolInfo = avaPools.filter(

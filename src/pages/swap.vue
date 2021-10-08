@@ -74,20 +74,6 @@
                   </a>
                 </div>
               </div>
-              <div v-if="ammId" class="info">
-                <div class="symbol">AMM ID</div>
-                <div class="address">
-                  {{ ammId ? ammId.substr(0, 14) : '' }}
-                  ...
-                  {{ ammId ? ammId.substr(ammId.length - 14, 14) : '' }}
-                </div>
-                <div class="action">
-                  <Icon type="copy" @click="$accessor.copy(ammId)" />
-                  <a :href="`${url.explorer}/account/${ammId}`" target="_blank">
-                    <Icon type="link" />
-                  </a>
-                </div>
-              </div>
             </div>
           </template>
           <Icon type="info-circle" />
@@ -228,22 +214,18 @@
           </div>
         </div>
 
-        <div v-if="officialPool === false">
-          <div style="margin: 10px">
-            <div>AMM ID:</div>
-            <div>
-              {{ ammId ? ammId.substr(0, 14) : '' }}
-              ...
-              {{ ammId ? ammId.substr(ammId.length - 14, 14) : '' }}
-            </div>
-          </div>
-        </div>
+        <UnofficialUserConfirmUser
+          v-if="userCheckUnofficialShow"
+          @onClose="() => (userCheckUnofficialShow = false)"
+          @onSelect="onUserCheckUnofficialSelect"
+        />
+
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
 
         <Button
-          v-else-if="!(officialPool || (!officialPool && userCheckUnofficial))"
+          v-else-if="!(officialCoin || (!officialCoin && userCheckUnofficial))"
           size="large"
           ghost
           @click="
@@ -312,7 +294,7 @@
             Pool coming soon
           </template>
           <template v-else-if="needCreateTokens()"> Create Tokens </template>
-          <template v-else-if="needWrapSol()"> Wrap SOL </template>
+          <template v-else-if="needWrapSol()"> Wrap {{ Math.ceil(needWrapSol() / 10 ** 3) / 10 ** 6 }} SOL </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)">
             xCOPE amount must greater than 5
           </template>
@@ -452,7 +434,7 @@ import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
 
 import { Account, PublicKey, Transaction } from '@solana/web3.js'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS, getTokenByMintAddress } from '@/utils/tokens'
+import { getTokenBySymbol, TokenInfo, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getMultipleAccounts, commitment, sendTransaction } from '@/utils/web3'
 import { SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
@@ -470,7 +452,7 @@ import {
 } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
-import { canWrap } from '@/utils/liquidity'
+import { canWrap, getLiquidityInfoSimilar } from '@/utils/liquidity'
 import { isOfficalMarket, LiquidityPoolInfo } from '@/utils/pools'
 import { RouterInfo, RouterInfoItem } from '@/types/api'
 import { getBigNumber } from '@/utils/layouts'
@@ -532,7 +514,7 @@ export default Vue.extend({
       confirmModalIsOpen: false,
 
       // serum
-      market: null as any,
+      market: null as Market | null,
       marketAddress: '',
       // amm
       lpMintAddress: '',
@@ -546,22 +528,15 @@ export default Vue.extend({
       // whether user has toggle swap button
       hasPriceSwapped: false,
 
-      officialPool: true,
+      officialCoin: true,
       userCheckUnofficial: false,
       userCheckUnofficialMint: undefined as string | undefined,
       userCheckUnofficialShow: false,
-      findUrlAmmId: false,
-
-      ammId: undefined as string | undefined,
 
       ammIdSelectShow: false,
       ammIdSelectList: [] as LiquidityPoolInfo[] | [],
 
-      ammIdSelectOld: false,
-
       ammIdOrMarketSearchShow: false,
-
-      userNeedAmmIdOrMarket: undefined as string | undefined,
 
       setCoinFromMintLoading: false,
 
@@ -570,7 +545,10 @@ export default Vue.extend({
       routeInfo: undefined as RouterInfo['data'] | undefined,
       usedAmmId: undefined as string | undefined,
       usedRouteInfo: undefined as RouterInfoItem | undefined,
-      middleCoinAmount: null as any
+      middleCoinAmount: null as any,
+
+      amms: [] as LiquidityPoolInfo[],
+      routeInfos: [] as [LiquidityPoolInfo, LiquidityPoolInfo][]
     }
   },
 
@@ -594,9 +572,9 @@ export default Vue.extend({
     },
 
     'wallet.tokenAccounts': {
-      async handler(newTokenAccounts: any) {
+      handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
-        await this.findMarket()
+        this.findMarket()
         if (this.market) {
           this.fetchUnsettledByMarket()
         }
@@ -605,16 +583,14 @@ export default Vue.extend({
       deep: true
     },
 
-    async fromCoin(newCoin, oldCoin) {
+    fromCoin(newCoin, oldCoin) {
       if (
         !this.setCoinFromMintLoading &&
         (oldCoin === null || newCoin === null || newCoin.mintAddress !== oldCoin.mintAddress)
       ) {
-        this.userNeedAmmIdOrMarket = undefined
-        await this.findMarket()
+        this.findMarket()
         this.fromCoinAmount = ''
         this.toCoinAmount = ''
-        this.ammIdSelectOld = false
       }
     },
 
@@ -626,16 +602,14 @@ export default Vue.extend({
       this.isSettlingQuote = false
     },
 
-    async toCoin(newCoin, oldCoin) {
+    toCoin(newCoin, oldCoin) {
       if (
         !this.setCoinFromMintLoading &&
         (oldCoin === null || newCoin === null || newCoin.mintAddress !== oldCoin.mintAddress)
       ) {
-        this.userNeedAmmIdOrMarket = undefined
-        await this.findMarket()
+        this.findMarket()
         this.fromCoinAmount = ''
         this.toCoinAmount = ''
-        this.ammIdSelectOld = false
       }
     },
 
@@ -661,19 +635,19 @@ export default Vue.extend({
     },
 
     'liquidity.infos': {
-      async handler(_newInfos: any) {
+      handler(_newInfos: any) {
         this.updateAmounts()
         const { from, to, ammId } = this.$route.query
         // @ts-ignore
         this.setCoinFromMint(from, to, ammId)
-        await this.findMarket()
+        this.findMarket()
       },
       deep: true
     },
 
     'swap.markets': {
-      async handler(_newInfos: any) {
-        await this.findMarket()
+      handler(_newInfos: any) {
+        this.findMarket()
       },
       deep: true
     },
@@ -760,38 +734,42 @@ export default Vue.extend({
     },
 
     needCreateTokens() {
-      if (this.endpoint !== 'Serum DEX' && !this.usedAmmId && this.usedRouteInfo !== undefined) {
-        let fromMint = this.fromCoin?.mintAddress
+      if (
+        this.endpoint !== 'Serum DEX' &&
+        !this.usedAmmId &&
+        this.usedRouteInfo !== undefined &&
+        this.fromCoin !== null &&
+        this.toCoin !== null
+      ) {
+        let fromMint = this.fromCoin.mintAddress
         let midMint = this.usedRouteInfo.middle_coin
-        let toMint = this.toCoin?.mintAddress
+        let toMint = this.toCoin.mintAddress
         if (fromMint === NATIVE_SOL.mintAddress) fromMint = TOKENS.WSOL.mintAddress
         if (midMint === NATIVE_SOL.mintAddress) midMint = TOKENS.WSOL.mintAddress
         if (toMint === NATIVE_SOL.mintAddress) toMint = TOKENS.WSOL.mintAddress
-        if (
+        return !(
           get(this.wallet.tokenAccounts, `${fromMint}.tokenAccountAddress`) &&
           get(this.wallet.tokenAccounts, `${midMint}.tokenAccountAddress`) &&
           get(this.wallet.tokenAccounts, `${toMint}.tokenAccountAddress`)
         )
-          return false
-        return true
       }
       return false
     },
 
     needWrapSol() {
-      if (this.endpoint !== 'Serum DEX' && !this.usedAmmId && this.usedRouteInfo !== undefined) {
-        if (
-          this.fromCoin?.mintAddress === NATIVE_SOL.mintAddress ||
-          this.fromCoin?.mintAddress === TOKENS.WSOL.mintAddress
-        ) {
+      if (
+        this.endpoint !== 'Serum DEX' &&
+        !this.usedAmmId &&
+        this.usedRouteInfo !== undefined &&
+        this.fromCoin !== null
+      ) {
+        if ([NATIVE_SOL.mintAddress, TOKENS.WSOL.mintAddress].includes(this.fromCoin.mintAddress)) {
           let amount = get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-          // console.log('needWrapSol', amount.fixed())
-          if (!amount) amount = 0
-          else amount = Number(amount.fixed())
+          amount = amount ? Number(amount.fixed()) : 0
           if (amount < Number(this.fromCoinAmount)) return (Number(this.fromCoinAmount) - Number(amount)) * 10 ** 9
         }
       }
-      return false
+      return 0
     },
 
     openFromCoinSelect() {
@@ -845,24 +823,33 @@ export default Vue.extend({
       this.coinSelectShow = false
     },
 
-    setCoinFromMint(from: string | undefined, to: string | undefined, ammId: string | undefined) {
+    setCoinFromMint(from: string | undefined, to: string | undefined, ammIdOrMarket: string | undefined) {
       this.setCoinFromMintLoading = true
+      let fromCoin, toCoin
       try {
-        if (ammId) {
-          // @ts-ignore
-          const amm = Object.values(this.$accessor.liquidity.infos).find((p) => p.ammId === ammId) as LiquidityPoolInfo
-          if (amm) {
-            this.fromCoin = cloneDeep(amm.coin)
-            this.toCoin = cloneDeep(amm.pc)
-          }
-        } else {
+        const liquidityUser = getLiquidityInfoSimilar(ammIdOrMarket, from, to)
+        if (liquidityUser) {
           if (from) {
-            this.fromCoin = getTokenByMintAddress(from)
-            if (this.fromCoin) this.fromCoin.balance = get(this.wallet.tokenAccounts, `${from}.balance`)
+            fromCoin = liquidityUser.coin.mintAddress === from ? liquidityUser.coin : liquidityUser.pc
+            toCoin = liquidityUser.coin.mintAddress === fromCoin.mintAddress ? liquidityUser.pc : liquidityUser.coin
           }
           if (to) {
-            this.toCoin = getTokenByMintAddress(to)
-            if (this.toCoin) this.toCoin.balance = get(this.wallet.tokenAccounts, `${to}.balance`)
+            toCoin = liquidityUser.coin.mintAddress === to ? liquidityUser.coin : liquidityUser.pc
+            fromCoin = liquidityUser.coin.mintAddress === toCoin.mintAddress ? liquidityUser.pc : liquidityUser.coin
+          }
+          if (!(from && to)) {
+            fromCoin = liquidityUser.coin
+            toCoin = liquidityUser.pc
+          }
+        }
+        if (fromCoin || toCoin) {
+          if (fromCoin) {
+            fromCoin.balance = get(this.wallet.tokenAccounts, `${fromCoin.mintAddress}.balance`)
+            this.fromCoin = fromCoin
+          }
+          if (toCoin) {
+            toCoin.balance = get(this.wallet.tokenAccounts, `${toCoin.mintAddress}.balance`)
+            this.toCoin = toCoin
           }
         }
       } catch (error) {
@@ -871,29 +858,16 @@ export default Vue.extend({
           description: ''
         })
       }
-      setTimeout(async () => {
+      setTimeout(() => {
         this.setCoinFromMintLoading = false
-        await this.findMarket()
+        this.findMarket()
       }, 1)
     },
 
-    async onAmmIdSelect(liquidityInfo: LiquidityPoolInfo | undefined) {
-      this.ammIdSelectShow = false
-      if (liquidityInfo) {
-        this.lpMintAddress = liquidityInfo.lp.mintAddress
-        this.ammId = liquidityInfo.ammId
-        this.userNeedAmmIdOrMarket = this.ammId
-        this.officialPool = liquidityInfo.official
-      } else {
-        this.ammIdSelectOld = true
-      }
-      await this.findMarket()
-    },
-
-    async onAmmIdOrMarketInput(_ammIdOrMarket: string) {
+    onAmmIdOrMarketInput(ammIdOrMarket: string) {
       this.ammIdOrMarketSearchShow = false
-      // this.setCoinFromMint(ammIdOrMarket, undefined, undefined)
-      await this.findMarket()
+      this.setCoinFromMint(undefined, undefined, ammIdOrMarket)
+      this.findMarket()
     },
 
     changeCoinPosition() {
@@ -908,6 +882,8 @@ export default Vue.extend({
       this.toCoin = tempFromCoin
 
       this.changeCoinAmountPosition()
+
+      this.findMarket()
     },
 
     changeCoinAmountPosition() {
@@ -921,7 +897,6 @@ export default Vue.extend({
     updateCoinInfo(tokenAccounts: any) {
       if (this.fromCoin) {
         const fromCoin = tokenAccounts[this.fromCoin.mintAddress]
-
         if (fromCoin) {
           this.fromCoin = { ...this.fromCoin, ...fromCoin }
         }
@@ -929,7 +904,6 @@ export default Vue.extend({
 
       if (this.toCoin) {
         const toCoin = tokenAccounts[this.toCoin.mintAddress]
-
         if (toCoin) {
           this.toCoin = { ...this.toCoin, ...toCoin }
         }
@@ -943,12 +917,25 @@ export default Vue.extend({
         if (canWrap(this.fromCoin.mintAddress, this.toCoin.mintAddress)) {
           this.isWrap = true
           this.initialized = true
-          this.officialPool = true
-          this.ammId = undefined
+          this.officialCoin = true
           return
         }
 
-        let marketAddress = ''
+        this.amms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
+          (p: any) =>
+            p.version === 4 &&
+            p.status === 1 &&
+            ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
+              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
+        )
+
+        this.routeInfos = getSwapRouter(
+          Object.values(this.$accessor.liquidity.infos),
+          this.fromCoin.mintAddress,
+          this.toCoin.mintAddress
+        )
+
+        let marketAddress: string | undefined
 
         // serum
         for (const address of Object.keys(this.swap.markets)) {
@@ -966,17 +953,14 @@ export default Vue.extend({
               (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
               (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
             ) {
-              // if (!info.baseDepositsTotal.isZero() && !info.quoteDepositsTotal.isZero()) {
               marketAddress = address
-              // }
             }
           }
         }
 
-        console.log('market', marketAddress)
-
+        this.initialized = true
+        this.updateUrl()
         if (marketAddress) {
-          // const lpPool = LIQUIDITY_POOLS.find((item) => item.serumMarket === marketAddress)
           if (this.marketAddress !== marketAddress) {
             this.marketAddress = marketAddress
             this.isWrap = false
@@ -986,25 +970,17 @@ export default Vue.extend({
                 this.getOrderBooks()
               }
             )
-            // this.unsubPoolChange()
-            // this.subPoolChange()
           }
         } else {
           this.marketAddress = ''
           this.market = null
-          this.lpMintAddress = ''
           this.isWrap = false
-          // this.unsubPoolChange()
         }
       } else {
         this.marketAddress = ''
         this.market = null
-        this.lpMintAddress = ''
         this.isWrap = false
-        // this.unsubPoolChange()
       }
-      this.initialized = true
-      this.updateUrl()
     },
 
     getOrderBooks() {
@@ -1051,8 +1027,10 @@ export default Vue.extend({
 
       let impact = 0
       let endpoint = ''
-      this.usedAmmId = undefined
-      this.usedRouteInfo = undefined
+
+      let usedAmmId
+      let usedRouteInfo
+      let middleCoinAmount
 
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
         // wrap & unwrap
@@ -1062,195 +1040,10 @@ export default Vue.extend({
 
       if (this.fromCoin && this.toCoin) {
         let maxAmountOut = 0
-        const amms = Object.values(this.$accessor.liquidity.infos).filter(
-          (p: any) =>
-            p.version === 4 &&
-            p.status === 1 &&
-            ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
-              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
-        )
-        for (const poolInfo of amms) {
-          console.log(poolInfo)
-          const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
-            poolInfo,
-            this.fromCoin.mintAddress,
-            this.toCoin.mintAddress,
-            this.fromCoinAmount,
-            this.setting.slippage
-          )
-          const fAmountOut = parseFloat(amountOut.fixed())
-          if (fAmountOut > maxAmountOut) {
-            maxAmountOut = fAmountOut
-            toCoinAmount = amountOut.fixed()
-            toCoinWithSlippage = amountOutWithSlippage
-            impact = priceImpact
-            // price = fAmountOut
-            // @ts-ignore
-            this.usedAmmId = poolInfo.ammId
-            endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
-          }
-          console.log(
-            this.fromCoin.symbol,
-            '>',
-            this.toCoin.symbol,
-            // @ts-ignore
-            poolInfo.ammId,
-            amountOut.fixed(),
-            amountOutWithSlippage.fixed(),
-            priceImpact / 100
-          )
-        }
-        const routeInfos = getSwapRouter(
-          Object.values(this.$accessor.liquidity.infos),
-          this.fromCoin.mintAddress,
-          this.toCoin.mintAddress
-        )
 
-        const slippage = (Math.sqrt(1 + this.setting.slippage / 100) - 1) * 100
-        console.log('slippage', this.setting.slippage, slippage)
-
-        for (const r of routeInfos) {
-          let middleCoint
-          if (r[0].coin.mintAddress === this.fromCoin.mintAddress) {
-            middleCoint = r[0].pc
-          } else {
-            middleCoint = r[0].coin
-          }
-          // @ts-ignore
-          const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = getSwapOutAmount(
-            r[0],
-            this.fromCoin.mintAddress,
-            middleCoint.mintAddress,
-            this.fromCoinAmount,
-            slippage
-          )
-
-          // @ts-ignore
-          const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
-            r[1],
-            middleCoint.mintAddress,
-            this.toCoin.mintAddress,
-            amountOutWithSlippageA.fixed(),
-            slippage
-          )
-          const fAmountOut = parseFloat(amountOut.fixed())
-          if (fAmountOut > maxAmountOut) {
-            toCoinAmount = amountOut.fixed()
-            maxAmountOut = fAmountOut
-            toCoinWithSlippage = amountOutWithSlippage
-            impact = (((priceImpactA + 100) * (priceImpact + 100)) / 10000 - 1) * 100
-            this.usedRouteInfo = {
-              middle_coin: middleCoint.mintAddress,
-              route: [
-                {
-                  type: 'amm',
-                  id: r[0].ammId,
-                  amountA: 0,
-                  amountB: 0,
-                  mintA: this.fromCoin.mintAddress,
-                  mintB: middleCoint.mintAddress
-                },
-                {
-                  type: 'amm',
-                  id: r[1].ammId,
-                  amountA: 0,
-                  amountB: 0,
-                  mintA: middleCoint.mintAddress,
-                  mintB: this.toCoin.mintAddress
-                }
-              ]
-            }
-            this.usedAmmId = undefined
-            this.middleCoinAmount = amountOutWithSlippageA.fixed()
-            endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
-          }
-          console.log(
-            `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`,
-            amountOut.fixed(),
-            amountOutWithSlippage.fixed(),
-            priceImpact / 100,
-            ((priceImpactA + 100) * (priceImpact + 100)) / 10000
-          )
-        }
-        if (
-          this.fromCoin &&
-          this.toCoin &&
-          this.marketAddress &&
-          this.market &&
-          this.asks &&
-          this.bids &&
-          this.fromCoinAmount &&
-          !this.asksAndBidsLoading
-        ) {
-          console.log('from market')
-          // serum
-          const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
-            this.market,
-            this.asks,
-            this.bids,
-            this.fromCoin.mintAddress,
-            this.toCoin.mintAddress,
-            this.fromCoinAmount,
-            this.setting.slippage
-          )
-          const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
-          const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
-          if (!out.isNullOrZero()) {
-            console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
-            if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
-              toCoinAmount = out.fixed()
-              toCoinWithSlippage = outWithSlippage
-              impact = priceImpact
-              endpoint = 'serum DEX'
-            }
-          }
-        }
-        if (toCoinWithSlippage) {
-          this.toCoinAmount = toCoinAmount
-          this.toCoinWithSlippage = toCoinWithSlippage.fixed()
-          this.outToPirceValue =
-            // @ts-ignore
-            parseFloat(parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount).toFixed(this.toCoin.decimals))
-
-          this.priceImpact = impact
-          this.endpoint = endpoint
-        } else {
-          this.toCoinAmount = ''
-          this.toCoinWithSlippage = ''
-          this.outToPirceValue = 0
-          this.priceImpact = 0
-          this.endpoint = ''
-        }
-        console.log(
-          this.endpoint,
-          this.usedAmmId,
-          this.usedRouteInfo,
-          maxAmountOut,
-          toCoinWithSlippage?.fixed(),
-          impact,
-          'outToPirceValue',
-          this.outToPirceValue
-        )
-        return
-      }
-      if (this.fromCoin && this.toCoin && this.routeInfo) {
-        let maxAmountOut = 0
-
-        this.usedRouteInfo = undefined
-        this.usedAmmId = undefined
-
-        console.log(`this.setting.slippage ${this.setting.slippage}`)
-
-        if (this.routeInfo.amm) {
-          for (const amm of this.routeInfo.amm) {
-            const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === amm.id)
-
-            const {
-              amountOut,
-              amountOutWithSlippage,
-              priceImpact
-              // @ts-ignore
-            } = getSwapOutAmount(
+        if (this.amms) {
+          for (const poolInfo of this.amms) {
+            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
               poolInfo,
               this.fromCoin.mintAddress,
               this.toCoin.mintAddress,
@@ -1263,64 +1056,90 @@ export default Vue.extend({
               toCoinAmount = amountOut.fixed()
               toCoinWithSlippage = amountOutWithSlippage
               impact = priceImpact
-              this.usedAmmId = amm.id
+              // price = fAmountOut
+              usedAmmId = poolInfo.ammId
               endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
             }
-
             console.log(
+              'amm -> ',
               this.fromCoin.symbol,
               '>',
               this.toCoin.symbol,
-              amm.id,
+              poolInfo.ammId,
               amountOut.fixed(),
               amountOutWithSlippage.fixed(),
               priceImpact / 100
             )
           }
         }
-        for (const r of this.routeInfo.routes) {
-          const t = Object.values(TOKENS).find((item) => item.mintAddress === r.middle_coin).symbol
-          const poolInfoA = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === r.route[0].id)
 
-          const slippage = Math.sqrt(100 + this.setting.slippage) / 100
+        const slippage = (Math.sqrt(1 + this.setting.slippage / 100) - 1) * 100
+        console.log('slippage', this.setting.slippage, slippage)
 
-          const {
-            amountOut: amountOutA,
-            amountOutWithSlippage: amountOutWithSlippageA,
-            priceImpact: priceImpactA
-            // @ts-ignore
-          } = getSwapOutAmount(poolInfoA, r.route[0].mintA, r.route[0].mintB, this.fromCoinAmount, slippage)
-          const poolInfoB = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === r.route[1].id)
+        if (this.routeInfos) {
+          for (const r of this.routeInfos) {
+            let middleCoint
+            if (r[0].coin.mintAddress === this.fromCoin.mintAddress) {
+              middleCoint = r[0].pc
+            } else {
+              middleCoint = r[0].coin
+            }
+            const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = getSwapOutAmount(
+              r[0],
+              this.fromCoin.mintAddress,
+              middleCoint.mintAddress,
+              this.fromCoinAmount,
+              slippage
+            )
 
-          const {
-            amountOut,
-            amountOutWithSlippage,
-            priceImpact
-            // @ts-ignore
-          } = getSwapOutAmount(poolInfoB, r.route[1].mintA, r.route[1].mintB, amountOutWithSlippageA.fixed(), slippage)
-
-          const fAmountOut = parseFloat(amountOut.fixed())
-          if (fAmountOut > maxAmountOut) {
-            toCoinAmount = amountOut.fixed()
-            maxAmountOut = fAmountOut
-            toCoinWithSlippage = amountOutWithSlippage
-            impact = (((priceImpactA + 100) * (priceImpact + 100)) / 10000 - 1) * 100
-            this.usedRouteInfo = r
-            this.usedAmmId = undefined
-            this.middleCoinAmount = amountOutA.fixed()
-
-            endpoint = `${this.fromCoin.symbol} > ${t} > ${this.toCoin.symbol}`
+            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
+              r[1],
+              middleCoint.mintAddress,
+              this.toCoin.mintAddress,
+              amountOutWithSlippageA.fixed(),
+              slippage
+            )
+            const fAmountOut = parseFloat(amountOut.fixed())
+            if (fAmountOut > maxAmountOut) {
+              toCoinAmount = amountOut.fixed()
+              maxAmountOut = fAmountOut
+              toCoinWithSlippage = amountOutWithSlippage
+              impact = (((priceImpactA + 100) * (priceImpact + 100)) / 10000 - 1) * 100
+              usedRouteInfo = {
+                middle_coin: middleCoint.mintAddress,
+                route: [
+                  {
+                    type: 'amm',
+                    id: r[0].ammId,
+                    amountA: 0,
+                    amountB: 0,
+                    mintA: this.fromCoin.mintAddress,
+                    mintB: middleCoint.mintAddress
+                  },
+                  {
+                    type: 'amm',
+                    id: r[1].ammId,
+                    amountA: 0,
+                    amountB: 0,
+                    mintA: middleCoint.mintAddress,
+                    mintB: this.toCoin.mintAddress
+                  }
+                ]
+              }
+              usedAmmId = undefined
+              middleCoinAmount = amountOutWithSlippageA.fixed()
+              endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
+            }
+            console.log(
+              'router -> ',
+              `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`,
+              amountOut.fixed(),
+              amountOutWithSlippage.fixed(),
+              priceImpact / 100,
+              ((priceImpactA + 100) * (priceImpact + 100)) / 10000
+            )
           }
-
-          console.log(
-            `${this.fromCoin.symbol} > ${t} > ${this.toCoin.symbol}`,
-            amountOut.fixed(),
-            amountOutWithSlippage.fixed(),
-            priceImpact / 100,
-            ((priceImpactA + 100) * (priceImpact + 100)) / 10000
-          )
         }
-        console.log(this.usedAmmId, this.usedRouteInfo, maxAmountOut, toCoinWithSlippage?.fixed(), impact)
 
         if (
           this.fromCoin &&
@@ -1332,8 +1151,6 @@ export default Vue.extend({
           this.fromCoinAmount &&
           !this.asksAndBidsLoading
         ) {
-          console.log('from market')
-          // serum
           const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
             this.market,
             this.asks,
@@ -1343,11 +1160,10 @@ export default Vue.extend({
             this.fromCoinAmount,
             this.setting.slippage
           )
-
           const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
           const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
           if (!out.isNullOrZero()) {
-            console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
+            console.log('dex -> ', outWithSlippage.fixed())
             if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
               toCoinAmount = out.fixed()
               toCoinWithSlippage = outWithSlippage
@@ -1356,22 +1172,179 @@ export default Vue.extend({
             }
           }
         }
+
+        this.usedAmmId = usedAmmId
+        this.usedRouteInfo = usedRouteInfo
+        this.middleCoinAmount = middleCoinAmount
+
+        if (toCoinWithSlippage) {
+          this.toCoinAmount = toCoinAmount
+          this.toCoinWithSlippage = toCoinWithSlippage.fixed()
+          this.outToPirceValue =
+            parseFloat(toCoinAmount) / parseFloat(parseFloat(this.fromCoinAmount).toFixed(this.toCoin.decimals))
+
+          this.priceImpact = impact
+          this.endpoint = endpoint
+        } else {
+          this.toCoinAmount = ''
+          this.toCoinWithSlippage = ''
+          this.outToPirceValue = 0
+          this.priceImpact = 0
+          this.endpoint = ''
+        }
+        console.log(
+          'end -> ',
+          this.endpoint,
+          this.usedAmmId,
+          this.usedRouteInfo,
+          maxAmountOut,
+          toCoinWithSlippage?.fixed(),
+          impact,
+          'outToPirceValue',
+          this.outToPirceValue
+        )
       }
 
-      if (toCoinWithSlippage) {
-        this.toCoinAmount = toCoinAmount
-        this.toCoinWithSlippage = toCoinWithSlippage.fixed()
-        // @ts-ignore
-        this.outToPirceValue = parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount).toFixed(this.toCoin.decimals)
-        this.priceImpact = impact
-        this.endpoint = endpoint
-      } else {
-        this.toCoinAmount = ''
-        this.toCoinWithSlippage = ''
-        this.outToPirceValue = 0
-        this.priceImpact = 0
-        this.endpoint = ''
-      }
+      // if (this.fromCoin && this.toCoin && this.routeInfo) {
+      //   console.log('test')
+      //   let maxAmountOut = 0
+
+      //   this.usedRouteInfo = undefined
+      //   this.usedAmmId = undefined
+
+      //   console.log(`this.setting.slippage ${this.setting.slippage}`)
+
+      //   if (this.routeInfo.amm) {
+      //     for (const amm of this.routeInfo.amm) {
+      //       const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === amm.id)
+
+      //       const {
+      //         amountOut,
+      //         amountOutWithSlippage,
+      //         priceImpact
+      //         // @ts-ignore
+      //       } = getSwapOutAmount(
+      //         poolInfo,
+      //         this.fromCoin.mintAddress,
+      //         this.toCoin.mintAddress,
+      //         this.fromCoinAmount,
+      //         this.setting.slippage
+      //       )
+      //       const fAmountOut = parseFloat(amountOut.fixed())
+      //       if (fAmountOut > maxAmountOut) {
+      //         maxAmountOut = fAmountOut
+      //         toCoinAmount = amountOut.fixed()
+      //         toCoinWithSlippage = amountOutWithSlippage
+      //         impact = priceImpact
+      //         this.usedAmmId = amm.id
+      //         endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+      //       }
+
+      //       console.log(
+      //         this.fromCoin.symbol,
+      //         '>',
+      //         this.toCoin.symbol,
+      //         amm.id,
+      //         amountOut.fixed(),
+      //         amountOutWithSlippage.fixed(),
+      //         priceImpact / 100
+      //       )
+      //     }
+      //   }
+      //   for (const r of this.routeInfo.routes) {
+      //     const t = Object.values(TOKENS).find((item) => item.mintAddress === r.middle_coin).symbol
+      //     const poolInfoA = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === r.route[0].id)
+
+      //     const slippage = Math.sqrt(100 + this.setting.slippage) / 100
+
+      //     const {
+      //       amountOut: amountOutA,
+      //       amountOutWithSlippage: amountOutWithSlippageA,
+      //       priceImpact: priceImpactA
+      //       // @ts-ignore
+      //     } = getSwapOutAmount(poolInfoA, r.route[0].mintA, r.route[0].mintB, this.fromCoinAmount, slippage)
+      //     const poolInfoB = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === r.route[1].id)
+
+      //     const {
+      //       amountOut,
+      //       amountOutWithSlippage,
+      //       priceImpact
+      //       // @ts-ignore
+      //     } = getSwapOutAmount(poolInfoB, r.route[1].mintA, r.route[1].mintB, amountOutWithSlippageA.fixed(), slippage)
+
+      //     const fAmountOut = parseFloat(amountOut.fixed())
+      //     if (fAmountOut > maxAmountOut) {
+      //       toCoinAmount = amountOut.fixed()
+      //       maxAmountOut = fAmountOut
+      //       toCoinWithSlippage = amountOutWithSlippage
+      //       impact = (((priceImpactA + 100) * (priceImpact + 100)) / 10000 - 1) * 100
+      //       this.usedRouteInfo = r
+      //       this.usedAmmId = undefined
+      //       this.middleCoinAmount = amountOutA.fixed()
+
+      //       endpoint = `${this.fromCoin.symbol} > ${t} > ${this.toCoin.symbol}`
+      //     }
+
+      //     console.log(
+      //       `${this.fromCoin.symbol} > ${t} > ${this.toCoin.symbol}`,
+      //       amountOut.fixed(),
+      //       amountOutWithSlippage.fixed(),
+      //       priceImpact / 100,
+      //       ((priceImpactA + 100) * (priceImpact + 100)) / 10000
+      //     )
+      //   }
+      //   console.log(this.usedAmmId, this.usedRouteInfo, maxAmountOut, toCoinWithSlippage?.fixed(), impact)
+
+      //   if (
+      //     this.fromCoin &&
+      //     this.toCoin &&
+      //     this.marketAddress &&
+      //     this.market &&
+      //     this.asks &&
+      //     this.bids &&
+      //     this.fromCoinAmount &&
+      //     !this.asksAndBidsLoading
+      //   ) {
+      //     console.log('from market')
+      //     // serum
+      //     const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
+      //       this.market,
+      //       this.asks,
+      //       this.bids,
+      //       this.fromCoin.mintAddress,
+      //       this.toCoin.mintAddress,
+      //       this.fromCoinAmount,
+      //       this.setting.slippage
+      //     )
+
+      //     const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
+      //     const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
+      //     if (!out.isNullOrZero()) {
+      //       console.log(`input: ${this.fromCoinAmount}   serum out: ${outWithSlippage.fixed()}`)
+      //       if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
+      //         toCoinAmount = out.fixed()
+      //         toCoinWithSlippage = outWithSlippage
+      //         impact = priceImpact
+      //         endpoint = 'serum DEX'
+      //       }
+      //     }
+      //   }
+      // }
+
+      // if (toCoinWithSlippage) {
+      //   this.toCoinAmount = toCoinAmount
+      //   this.toCoinWithSlippage = toCoinWithSlippage.fixed()
+      //   // @ts-ignore
+      //   this.outToPirceValue = parseFloat(toCoinAmount) / parseFloat(this.fromCoinAmount).toFixed(this.toCoin.decimals)
+      //   this.priceImpact = impact
+      //   this.endpoint = endpoint
+      // } else {
+      //   this.toCoinAmount = ''
+      //   this.toCoinWithSlippage = ''
+      //   this.outToPirceValue = 0
+      //   this.priceImpact = 0
+      //   this.endpoint = ''
+      // }
     },
 
     setMarketTimer() {
@@ -1582,20 +1555,16 @@ export default Vue.extend({
             this.swaping = false
           })
       } else {
+        if (!this.market || !this.fromCoin || !this.toCoin) return
         place(
           this.$web3,
-          // @ts-ignore
           this.$wallet,
           this.market,
           this.asks,
           this.bids,
-          // @ts-ignore
           this.fromCoin.mintAddress,
-          // @ts-ignore
           this.toCoin.mintAddress,
-          // @ts-ignore
           get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
-          // @ts-ignore
           get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount,
           this.setting.slippage
@@ -1631,6 +1600,7 @@ export default Vue.extend({
       if (this.$route.path !== '/swap/') {
         return
       }
+      if (!this.liquidity.initialized) return
       const { from, to } = this.$route.query
       if (this.fromCoin && this.toCoin) {
         if (this.fromCoin.mintAddress !== from || this.toCoin.mintAddress !== to) {
@@ -1684,6 +1654,7 @@ export default Vue.extend({
     },
 
     settleFunds(from: 'base' | 'quote') {
+      if (!this.market) return
       const key = getUnixTs().toString()
       this.$notify.info({
         key,

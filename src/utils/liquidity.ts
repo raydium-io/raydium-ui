@@ -913,13 +913,17 @@ export async function getLpMintListDecimals(
   return reInfo
 }
 
-export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to: string) {
+export function getLiquidityInfoSimilar(
+  ammIdOrMarket: string | undefined,
+  from: string | undefined,
+  to: string | undefined
+) {
   // const fromCoin = from === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : from
   // const toCoin = to === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : to
   const fromCoin = from === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : from
   const toCoin = to === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : to
   const knownLiquidity = LIQUIDITY_POOLS.find((item) => {
-    if (fromCoin !== null && toCoin != null && fromCoin === toCoin) {
+    if (fromCoin !== undefined && toCoin != undefined && fromCoin === toCoin) {
       return false
     }
     if (ammIdOrMarket !== undefined && !(item.ammId === ammIdOrMarket || item.serumMarket === ammIdOrMarket)) {
