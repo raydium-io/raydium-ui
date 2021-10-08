@@ -228,16 +228,10 @@
         </Button>
 
         <Button
-          v-else-if="toCoin && userCheckUnofficialMint !== toCoin.mintAddress && toCoin.tags.includes('raydium')"
+          v-else-if="toCoin && userCheckUnofficialMint !== toCoin.mintAddress && !toCoin.tags.includes('raydium')"
           size="large"
           ghost
-          @click="
-            () => {
-              setTimeout(() => {
-                needUserCheckUnofficialShow()
-              }, 1)
-            }
-          "
+          @click="needUserCheckUnofficialShow()"
         >
           Confirm Risk Warning
         </Button>
