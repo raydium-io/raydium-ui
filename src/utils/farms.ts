@@ -932,25 +932,6 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '5i2qZN5UH4UyF3t6HNeC1bXeXhWBZy1pwpCjLDG7AdJJ' // reward vault B
   },
   {
-    name: 'LARIX-USDC',
-    lp: { ...LP_TOKENS['LARIX-USDC-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.LARIX },
-    isStake: false,
-
-    fusion: true,
-    legacy: false,
-    dual: false,
-    version: 5,
-    programId: STAKE_PROGRAM_ID_V5,
-
-    poolId: 'HzxveT6pUMwYByqnScvTbpUv4avzkUDrDpS9D7DToEry',
-    poolAuthority: 'sCDx3LzV8jPFX1VuRQDAGNKVfiCvhvrv3tJijaXzhXw',
-    poolLpTokenAccount: '6PpGF8xRLwpDdVMQHQoBhrrXuUh5Gs4dCMs1DPanpjHM', // lp vault
-    poolRewardTokenAccount: '7tPiMrZB6kct1xNWLtG1jJqJYUJaG8548bEaJsb5HdXq', // reward vault A
-    poolRewardTokenAccountB: 'DXo3ffHBd69c9tV4wWBtFhc95UZMfYJehGnk3ViifSQ3' // reward vault B
-  },
-  {
     name: 'mSOL-USDC',
     lp: { ...LP_TOKENS['mSOL-USDC-V4'] },
     reward: { ...TOKENS.RAY },
@@ -987,6 +968,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '4vyJYQyWusNxCCyFDvWwzjVZFJByAVudWvuTzgHYzwTY', // lp vault
     poolRewardTokenAccount: 'Erz6ai92ieTAqWKHP1tkpGgBKrUJsKe7dhCUyhqtjKRv', // reward vault A
     poolRewardTokenAccountB: 'Ejed9odWtRtNrSndDnrWvu9LaiqCANbkeKHTS3g3H1Xj' // reward vault B
+  },
+  {
+    name: 'LARIX-USDC',
+    lp: { ...LP_TOKENS['LARIX-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.LARIX },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'HzxveT6pUMwYByqnScvTbpUv4avzkUDrDpS9D7DToEry',
+    poolAuthority: 'sCDx3LzV8jPFX1VuRQDAGNKVfiCvhvrv3tJijaXzhXw',
+    poolLpTokenAccount: '6PpGF8xRLwpDdVMQHQoBhrrXuUh5Gs4dCMs1DPanpjHM', // lp vault
+    poolRewardTokenAccount: '7tPiMrZB6kct1xNWLtG1jJqJYUJaG8548bEaJsb5HdXq', // reward vault A
+    poolRewardTokenAccountB: 'DXo3ffHBd69c9tV4wWBtFhc95UZMfYJehGnk3ViifSQ3' // reward vault B
   },
   {
     name: 'LARIX-RAY',
