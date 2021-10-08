@@ -1517,6 +1517,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'De2EHBAdkgfc72DpShqDGG42cV3iDWh8wvvZdPsiEcqP',
     decimals: TOKENS.mSOL.decimals
+  },
+   'ARDX-SOL-V4': {
+    symbol: 'ARDX-SOL',
+    name: 'ARDX-SOL LP',
+    coin: { ...TOKENS.ARDX },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'G33cpXg1ucKpPcwronkDPp9WdoxhXFPBdD9tqEc65Cry',
+    decimals: TOKENS.ARDX.decimals
   }
 }
 
