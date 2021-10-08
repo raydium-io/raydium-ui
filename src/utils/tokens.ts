@@ -1499,6 +1499,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'De2EHBAdkgfc72DpShqDGG42cV3iDWh8wvvZdPsiEcqP',
     decimals: TOKENS.mSOL.decimals
+  },
+  'MNDE-mSOL-V4': {
+    symbol: 'MNDE-mSOL',
+    name: 'MNDE-mSOL LP',
+    coin: { ...TOKENS.MNDE },
+    pc: { ...TOKENS.mSOL },
+
+    mintAddress: '4bh8XCzTHSbqbWN8o1Jn4ueBdz1LvJFoEasN6K6CQ8Ny',
+    decimals: TOKENS.MNDE.decimals
   }
 }
 
