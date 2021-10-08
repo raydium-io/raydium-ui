@@ -1508,6 +1508,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4bh8XCzTHSbqbWN8o1Jn4ueBdz1LvJFoEasN6K6CQ8Ny',
     decimals: TOKENS.MNDE.decimals
+  },
+  'LARIX-RAY-V4': {
+    symbol: 'LARIX-RAY',
+    name: 'LARIX-RAY LP',
+    coin: { ...TOKENS.LARIX },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'ZRDfSLgWGeaYSmhdPvFNKQQhDcYdZQaue2N8YDmHX4q',
+    decimals: TOKENS.LARIX.decimals
   }
 }
 
