@@ -228,7 +228,7 @@
         </Button>
 
         <Button
-          v-else-if="!(toCoin && (userCheckUnofficialMint === toCoin.mintAddress || toCoin.tags.includes('raydium')))"
+          v-else-if="toCoin && userCheckUnofficialMint !== toCoin.mintAddress && toCoin.tags.includes('raydium')"
           size="large"
           ghost
           @click="
@@ -270,7 +270,9 @@
           "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="!endpoint"> Pool Not Found </template>
+          <template v-else-if="amms.length + routeInfos.length + (marketAddress !== '' ? 1 : 0) === 0">
+            Pool Not Found
+          </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
           <template
