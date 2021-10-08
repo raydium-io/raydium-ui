@@ -711,6 +711,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey',
     decimals: 9,
     tags: ['raydium']
+  },
+  LIQ: {
+    symbol: 'LIQ',
+    name: 'LIQ',
+    mintAddress: '4wjPQJ6PrkC4dHhYghwJzGBVP78DkBzA2U3kHoFNBuhj',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1517,6 +1524,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'ZRDfSLgWGeaYSmhdPvFNKQQhDcYdZQaue2N8YDmHX4q',
     decimals: TOKENS.LARIX.decimals
+  },
+  'LIQ-USDC-V4': {
+    symbol: 'LIQ-USDC',
+    name: 'LIQ-USDC LP',
+    coin: { ...TOKENS.LIQ },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GWpD3eTfhJB5KDCcnE85dBQrjAk2CsrgDF9b52R9CrjV',
+    decimals: TOKENS.LIQ.decimals
   }
 }
 
