@@ -718,6 +718,13 @@ export const TOKENS: Tokens = {
     mintAddress: '4wjPQJ6PrkC4dHhYghwJzGBVP78DkBzA2U3kHoFNBuhj',
     decimals: 6,
     tags: ['raydium']
+  },
+  WAG: {
+    symbol: 'WAG',
+    name: 'WAG',
+    mintAddress: '5tN42n9vMi6ubp67Uy4NnmM5DMZYN8aS8GeB3bEDHr6E',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1533,6 +1540,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GWpD3eTfhJB5KDCcnE85dBQrjAk2CsrgDF9b52R9CrjV',
     decimals: TOKENS.LIQ.decimals
+  },
+  'WAG-USDC-V4': {
+    symbol: 'WAG-USDC',
+    name: 'WAG-USDC LP',
+    coin: { ...TOKENS.WAG },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4yykyPugitUVRewNPXXCviRvxGfsfsRMoP32z3b6FmUC',
+    decimals: TOKENS.WAG.decimals
   }
 }
 
