@@ -1,6 +1,6 @@
 <template>
   <Modal
-    title="This is a Permissionless Pool"
+    title="This is a Permissionless Coin"
     :visible="true"
     :footer="null"
     :closable="false"
