@@ -711,7 +711,25 @@ export const TOKENS: Tokens = {
     mintAddress: 'MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey',
     decimals: 9,
     tags: ['raydium']
-  }
+  },
+  ARDX: {
+  symbol: 'ARDX',
+  name: 'ArdCoin',
+  mintAddress: '7zsKqN7Fg2s9VsqAq6XBoiShCVohpGshSUvoWBc6jKYh',
+  decimals: 2,
+  details:
+    'ArdCoin (ARDX) - is an innovative blockchain-based loyalty program that has been integrated into a mobile super wallet which is backed by an existing financial infrastructure which includes banking services, insurance provider, stock brokerage, investment banking and a pension fund.',
+  docs: {
+    website: 'https://ardcoin.com/',
+    whitepaper: 'https://ardcoin.com/wp-content/themes/ardcoin/white.pdf'
+  },
+  socials: {
+    Twitter: 'https://twitter.com/ard_coin',
+    Telegram: 'https://t.me/ardcoin',
+    Medium: 'https://ardcoin.medium.com/'
+  },
+  tags: ['raydium']
+},
 }
 
 export const LP_TOKENS: Tokens = {
@@ -1499,6 +1517,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'De2EHBAdkgfc72DpShqDGG42cV3iDWh8wvvZdPsiEcqP',
     decimals: TOKENS.mSOL.decimals
+  },
+   'ARDX-SOL-V4': {
+    symbol: 'ARDX-SOL',
+    name: 'ARDX-SOL LP',
+    coin: { ...TOKENS.ARDX },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'G33cpXg1ucKpPcwronkDPp9WdoxhXFPBdD9tqEc65Cry',
+    decimals: TOKENS.ARDX.decimals
   }
 }
 
