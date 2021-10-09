@@ -2774,7 +2774,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     name: 'WAG-USDC',
     coin: { ...TOKENS.WAG },
     pc: { ...TOKENS.USDC },
-    lp: { ...LP_TOKENS['LIQ-USDC-V4'] },
+    lp: { ...LP_TOKENS['WAG-USDC-V4'] },
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
     ammId: 'FEFzBbbEK8yDigqyJPgJKMR5X1xZARC25QTCskvudjuK',
