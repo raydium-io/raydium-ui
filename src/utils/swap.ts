@@ -232,7 +232,7 @@ export function getSwapOutAmountStable(
 }
 
 export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: string, toCoinMint: string) {
-  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL']
+  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL', 'mSOL', 'PAI']
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
   for (const p of poolInfos) {
