@@ -194,7 +194,7 @@
                 <template slot="title"> This venue gave the best price for your trade </template>
                 <Icon type="question-circle" /> </Tooltip
             ></span>
-            <span style="text-transform: capitalize"> {{ endpoint }} </span>
+            <span> {{ endpoint }} </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
             <span class="name">
