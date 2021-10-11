@@ -1006,26 +1006,26 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'DuYWhnzzb8yrqxnF2vd2TqP2WcWjAx9VneLhiMEwusPk', // lp vault
     poolRewardTokenAccount: 'xZHuntrMkq7EA9tahmuzC8Z4WoL7DhxoWDmGCkyaLf2', // reward vault A
     poolRewardTokenAccountB: '9AEGPpd5E6PbHkCxeFBB52xrK8fMrKdNKMaQDp95arX9' // reward vault B
+  },
+  {
+    name: 'stSOL-USDC',
+    lp: { ...LP_TOKENS['stSOL-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.wLOD },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '5gzQgxaKAU13SZeffmjjE2y9HwMJ42FxQkqJhJ5nqHeh',
+    poolAuthority: 'DKSSeokFtU7cHKMdgNcZ72JETgf9Q3PqcGsk6hnzKxT4',
+    poolLpTokenAccount: 'CoUQ1tcRkEyxbCHfLkjxgUtYVhrRbsdeMKT7zB2iCZg5', // lp vault
+    poolRewardTokenAccount: '5fnav2gjLUjPCwHEnm2vMVmsDV3V8sfjj7MwfeUdgdtM', // reward vault A
+    poolRewardTokenAccountB: '8geEcDpFkXqR2UEE2LVcYCzsD9cyGwJSu8Q56uqr1xs6' // reward vault B
   }
-  // {
-  //   name: 'stSOL-USDC',
-  //   lp: { ...LP_TOKENS['stSOL-USDC-V4'] },
-  //   reward: { ...TOKENS.RAY },
-  //   rewardB: { ...TOKENS.stSOL },
-  //   isStake: false,
-
-  //   fusion: true,
-  //   legacy: false,
-  //   dual: false,
-  //   version: 5,
-  //   programId: STAKE_PROGRAM_ID_V5,
-
-  //   poolId: '5gzQgxaKAU13SZeffmjjE2y9HwMJ42FxQkqJhJ5nqHeh',
-  //   poolAuthority: 'DKSSeokFtU7cHKMdgNcZ72JETgf9Q3PqcGsk6hnzKxT4',
-  //   poolLpTokenAccount: 'CoUQ1tcRkEyxbCHfLkjxgUtYVhrRbsdeMKT7zB2iCZg5', // lp vault
-  //   poolRewardTokenAccount: '5fnav2gjLUjPCwHEnm2vMVmsDV3V8sfjj7MwfeUdgdtM', // reward vault A
-  //   poolRewardTokenAccountB: '8geEcDpFkXqR2UEE2LVcYCzsD9cyGwJSu8Q56uqr1xs6' // reward vault B
-  // }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
 // for solana.tokenlist.json

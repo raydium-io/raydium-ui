@@ -725,6 +725,13 @@ export const TOKENS: Tokens = {
     mintAddress: '5tN42n9vMi6ubp67Uy4NnmM5DMZYN8aS8GeB3bEDHr6E',
     decimals: 9,
     tags: ['raydium']
+  },
+  wLDO: {
+    symbol: 'wLDO',
+    name: 'wLDO',
+    mintAddress: 'HZRCwxP2Vq9PCpPXooayhJ2bxTpo5xfpQrwB1svh332p',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
