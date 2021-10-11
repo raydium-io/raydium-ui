@@ -236,6 +236,33 @@
           Confirm Risk Warning
         </Button>
         <Button
+          v-else-if="
+            fromCoin &&
+            fromCoinAmount &&
+            toCoin &&
+            toCoinAmount &&
+            initialized &&
+            !loading &&
+            !swaping &&
+            (usedAmmId || usedRouteInfo) &&
+            needCreateTokens()
+          "
+          size="large"
+          ghost
+          style="border-color: rgb(218, 46, 239)"
+          @click="
+            () => {
+              if (priceImpact > 10) {
+                confirmModalIsOpen = true
+              } else {
+                placeOrder()
+              }
+            }
+          "
+        >
+          Create Tokens
+        </Button>
+        <Button
           v-else
           size="large"
           ghost
@@ -300,6 +327,24 @@
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
+        <div
+          v-if="
+            wallet.connected &&
+            fromCoin &&
+            fromCoinAmount &&
+            toCoin &&
+            toCoinAmount &&
+            initialized &&
+            !loading &&
+            !swaping &&
+            (usedAmmId || usedRouteInfo) &&
+            needCreateTokens() &&
+            !(userCheckUnofficialMint !== toCoin.mintAddress && !toCoin.tags.includes('raydium'))
+          "
+          class="not-enough-sol-alert"
+        >
+          xxxx
+        </div>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
           <span class="caution-text">Caution: Your SOL balance is low</span>
 
@@ -1207,7 +1252,7 @@ export default Vue.extend({
               toCoinAmount = out.fixed()
               toCoinWithSlippage = outWithSlippage
               impact = priceImpact
-              endpoint = 'serum DEX'
+              endpoint = 'Serum DEX'
             }
           }
         }
@@ -1310,7 +1355,7 @@ export default Vue.extend({
           .finally(() => {
             this.swaping = false
           })
-      } else if (this.endpoint !== 'serum DEX' && this.usedAmmId) {
+      } else if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
         const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
         swap(
           this.$web3,
@@ -1398,7 +1443,7 @@ export default Vue.extend({
           .finally(() => {
             this.swaping = false
           })
-      } else if (this.endpoint !== 'serum DEX' && this.usedRouteInfo !== undefined) {
+      } else if (this.endpoint !== 'Serum DEX' && this.usedRouteInfo !== undefined) {
         const poolInfoA = Object.values(this.$accessor.liquidity.infos).find(
           (p: any) => p.ammId === this.usedRouteInfo?.route[0].id
         )
