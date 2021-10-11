@@ -367,7 +367,7 @@
                     >
                     <a
                       class="link"
-                      href="https://t.me/raydiumthai"
+                      href="https://t.me/raydiumthailand"
                       rel="nofollow noopener noreferrer"
                       target="_blank"
                       >Telegram (TH)</a
