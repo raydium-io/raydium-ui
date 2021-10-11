@@ -449,6 +449,8 @@ export async function swap(
 
   let wrappedSolAccount: PublicKey | null = null
   let wrappedSolAccount2: PublicKey | null = null
+  let newFromTokenAccount = PublicKey.default
+  let newToTokenAccount = PublicKey.default
 
   if (fromCoinMint === NATIVE_SOL.mintAddress) {
     wrappedSolAccount = await createTokenAccountIfNotExist(
@@ -460,7 +462,10 @@ export async function swap(
       transaction,
       signers
     )
+  } else {
+    newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(fromTokenAccount, owner, fromMint, transaction)
   }
+
   if (toCoinMint === NATIVE_SOL.mintAddress) {
     wrappedSolAccount2 = await createTokenAccountIfNotExist(
       connection,
@@ -471,15 +476,9 @@ export async function swap(
       transaction,
       signers
     )
+  } else {
+    newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
   }
-
-  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
-    fromTokenAccount,
-    owner,
-    fromMint,
-    transaction
-  )
-  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toMint, transaction)
 
   transaction.add(
     swapInstruction(
