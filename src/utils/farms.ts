@@ -1011,7 +1011,7 @@ export const FARMS: FarmInfo[] = [
     name: 'stSOL-USDC',
     lp: { ...LP_TOKENS['stSOL-USDC-V4'] },
     reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.wLOD },
+    rewardB: { ...TOKENS.wLDO },
     isStake: false,
 
     fusion: true,
