@@ -244,7 +244,15 @@
             initialized &&
             !loading &&
             (usedAmmId || usedRouteInfo) &&
-            endpoint.split('').filter((item) => item === '>').length === 2
+            endpoint.split('').filter((item) => item === '>').length === 2 &&
+            !gt(
+              fromCoinAmount,
+              fromCoin && fromCoin.balance
+                ? fromCoin.symbol === 'SOL'
+                  ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                  : fromCoin.balance.fixed()
+                : '0'
+            )
           "
         >
           <div style="width: 45%; float: left">
