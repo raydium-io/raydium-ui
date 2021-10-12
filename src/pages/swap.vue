@@ -235,7 +235,7 @@
         >
           Confirm Risk Warning
         </Button>
-        <Button
+        <div
           v-else-if="
             fromCoin &&
             fromCoinAmount &&
@@ -243,25 +243,77 @@
             toCoinAmount &&
             initialized &&
             !loading &&
-            !swaping &&
             (usedAmmId || usedRouteInfo) &&
-            needCreateTokens()
-          "
-          size="large"
-          ghost
-          style="border-color: rgb(218, 46, 239)"
-          @click="
-            () => {
-              if (priceImpact > 10) {
-                confirmModalIsOpen = true
-              } else {
-                placeOrder()
-              }
-            }
+            endpoint.split('').filter((item) => item === '>').length === 2
           "
         >
-          Create Tokens
-        </Button>
+          <div style="width: 45%; float: left">
+            <Tooltip style="width: 100%">
+              <template slot="title">
+                <span> xxxxx </span>
+              </template>
+              <Button
+                style="width: 100%"
+                :disabled="!(needCreateTokens() || needWrapSol())"
+                size="large"
+                :loading="loadingArr['setup']"
+                ghost
+                @click="
+                  () => {
+                    if (priceImpact > 10) {
+                      confirmModalIsOpen = true
+                    } else {
+                      placeOrder('setup')
+                    }
+                  }
+                "
+              >
+                Setup
+              </Button>
+            </Tooltip>
+          </div>
+          <div style="width: 45%; float: right">
+            <Button
+              style="width: 100%"
+              :disabled="!(!needCreateTokens() && !needWrapSol())"
+              size="large"
+              :loading="loadingArr['swap']"
+              ghost
+              @click="
+                () => {
+                  if (priceImpact > 10) {
+                    confirmModalIsOpen = true
+                  } else {
+                    placeOrder('swap')
+                  }
+                }
+              "
+            >
+              Swap
+            </Button>
+          </div>
+          <div style="clear: both"></div>
+
+          <div class="step-box">
+            <div
+              class="setup-item"
+              :style="{ background: needCreateTokens() || needWrapSol() ? '#82d1ca' : '#82d1ca99' }"
+            >
+              1
+            </div>
+            <div
+              style="width: 50%; height: 5px; display: inline-block"
+              :style="{ background: needCreateTokens() || needWrapSol() ? '#85858d' : '#82d1ca99' }"
+            ></div>
+            <div
+              class="setup-item"
+              :style="{ background: needCreateTokens() || needWrapSol() ? '#85858d' : '#82d1ca' }"
+            >
+              2
+            </div>
+          </div>
+        </div>
+
         <Button
           v-else
           size="large"
@@ -327,24 +379,6 @@
           </template>
           <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
-        <div
-          v-if="
-            wallet.connected &&
-            fromCoin &&
-            fromCoinAmount &&
-            toCoin &&
-            toCoinAmount &&
-            initialized &&
-            !loading &&
-            !swaping &&
-            (usedAmmId || usedRouteInfo) &&
-            needCreateTokens() &&
-            !(userCheckUnofficialMint !== toCoin.mintAddress && !toCoin.tags.includes('raydium'))
-          "
-          class="not-enough-sol-alert"
-        >
-          xxxx
-        </div>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
           <span class="caution-text">Caution: Your SOL balance is low</span>
 
@@ -585,7 +619,12 @@ export default Vue.extend({
       middleCoinAmount: null as any,
 
       amms: [] as LiquidityPoolInfo[],
-      routeInfos: [] as [LiquidityPoolInfo, LiquidityPoolInfo][]
+      routeInfos: [] as [LiquidityPoolInfo, LiquidityPoolInfo][],
+
+      loadingArr: {
+        setup: false,
+        swap: false
+      } as { [key: string]: boolean }
     }
   },
 
@@ -1304,8 +1343,9 @@ export default Vue.extend({
       }, 1000)
     },
 
-    placeOrder() {
+    placeOrder(loadingName: string) {
       this.swaping = true
+      if (this.loadingArr[loadingName] !== undefined) this.loadingArr[loadingName] = true
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -1354,6 +1394,7 @@ export default Vue.extend({
           })
           .finally(() => {
             this.swaping = false
+            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       } else if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
         const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
@@ -1394,6 +1435,7 @@ export default Vue.extend({
           })
           .finally(() => {
             this.swaping = false
+            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       } else if (this.needCreateTokens() || this.needWrapSol()) {
         console.log(this.fromCoin?.mintAddress, this.usedRouteInfo?.middle_coin, this.toCoin?.mintAddress)
@@ -1442,6 +1484,7 @@ export default Vue.extend({
           })
           .finally(() => {
             this.swaping = false
+            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       } else if (this.endpoint !== 'Serum DEX' && this.usedRouteInfo !== undefined) {
         const poolInfoA = Object.values(this.$accessor.liquidity.infos).find(
@@ -1496,6 +1539,7 @@ export default Vue.extend({
           })
           .finally(() => {
             this.swaping = false
+            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       } else {
         if (!this.market || !this.fromCoin || !this.toCoin) return
@@ -1535,6 +1579,7 @@ export default Vue.extend({
           })
           .finally(() => {
             this.swaping = false
+            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       }
     },
@@ -1660,6 +1705,24 @@ export default Vue.extend({
 </script>
 
 <style>
+.step-box {
+  width: 100%;
+  text-align: center;
+  padding-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.step-box > *:not(:last-child) {
+  margin-right: -1px;
+}
+.setup-item {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  padding-top: 5px;
+}
 .swap-confirm-modal .ant-btn-text {
   background: transparent;
   border: none;
