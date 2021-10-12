@@ -151,7 +151,7 @@ export const actions = actionTree(
             ? NATIVE_SOL.mintAddress
             : ammInfo.pcMintAddress.toString()
         let coin = Object.values(TOKENS).find((item) => item.mintAddress === fromCoin)
-        if (!coin) {
+        if (!coin && fromCoin !== NATIVE_SOL.mintAddress) {
           TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`] = {
             symbol: 'unknown',
             name: 'unknown',
@@ -161,13 +161,15 @@ export const actions = actionTree(
             tags: []
           }
           coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
+        } else if (fromCoin === NATIVE_SOL.mintAddress) {
+          coin = NATIVE_SOL
         }
         if (!coin.tags.includes('unofficial')) {
           coin.tags.push('unofficial')
         }
 
         let pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin)
-        if (!pc) {
+        if (!pc && toCoin !== NATIVE_SOL.mintAddress) {
           TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`] = {
             symbol: 'unknown',
             name: 'unknown',
@@ -177,6 +179,8 @@ export const actions = actionTree(
             tags: []
           }
           pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
+        } else if (toCoin === NATIVE_SOL.mintAddress) {
+          pc = NATIVE_SOL
         }
         if (!pc.tags.includes('unofficial')) {
           pc.tags.push('unofficial')
