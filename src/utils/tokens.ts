@@ -704,6 +704,34 @@ export const TOKENS: Tokens = {
     mintAddress: '51tMb3zBKDiQhNwGqpgwbavaGH54mk8fXFzxTc1xnasg',
     decimals: 9,
     tags: ['raydium']
+  },
+  MNDE: {
+    symbol: 'MNDE',
+    name: 'MNDE',
+    mintAddress: 'MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  LIQ: {
+    symbol: 'LIQ',
+    name: 'LIQ',
+    mintAddress: '4wjPQJ6PrkC4dHhYghwJzGBVP78DkBzA2U3kHoFNBuhj',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  WAG: {
+    symbol: 'WAG',
+    name: 'WAG',
+    mintAddress: '5tN42n9vMi6ubp67Uy4NnmM5DMZYN8aS8GeB3bEDHr6E',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  wLDO: {
+    symbol: 'wLDO',
+    name: 'wLDO',
+    mintAddress: 'HZRCwxP2Vq9PCpPXooayhJ2bxTpo5xfpQrwB1svh332p',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
@@ -1484,14 +1512,50 @@ export const LP_TOKENS: Tokens = {
     mintAddress: '444cVqYyDxJNo6FqiMb9qQWFUd7tYzFRdDuJRFrSAGnU',
     decimals: TOKENS.APEX.decimals
   },
-  'USDT-USDC-STABLE': {
-    symbol: 'USDT-USDC',
-    name: 'USDT-USDC LP',
-    coin: { ...TOKENS.USDT },
+  'mSOL-RAY-V4': {
+    symbol: 'mSOL-RAY',
+    name: 'mSOL-RAY LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'De2EHBAdkgfc72DpShqDGG42cV3iDWh8wvvZdPsiEcqP',
+    decimals: TOKENS.mSOL.decimals
+  },
+  'MNDE-mSOL-V4': {
+    symbol: 'MNDE-mSOL',
+    name: 'MNDE-mSOL LP',
+    coin: { ...TOKENS.MNDE },
+    pc: { ...TOKENS.mSOL },
+
+    mintAddress: '4bh8XCzTHSbqbWN8o1Jn4ueBdz1LvJFoEasN6K6CQ8Ny',
+    decimals: TOKENS.MNDE.decimals
+  },
+  'LARIX-RAY-V4': {
+    symbol: 'LARIX-RAY',
+    name: 'LARIX-RAY LP',
+    coin: { ...TOKENS.LARIX },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'ZRDfSLgWGeaYSmhdPvFNKQQhDcYdZQaue2N8YDmHX4q',
+    decimals: TOKENS.LARIX.decimals
+  },
+  'LIQ-USDC-V4': {
+    symbol: 'LIQ-USDC',
+    name: 'LIQ-USDC LP',
+    coin: { ...TOKENS.LIQ },
     pc: { ...TOKENS.USDC },
 
-    mintAddress: 'As3EGgLtUVpdNpE6WCKauyNRrCCwcQ57trWQ3wyRXDa6',
-    decimals: TOKENS.USDC.decimals
+    mintAddress: 'GWpD3eTfhJB5KDCcnE85dBQrjAk2CsrgDF9b52R9CrjV',
+    decimals: TOKENS.LIQ.decimals
+  },
+  'WAG-USDC-V4': {
+    symbol: 'WAG-USDC',
+    name: 'WAG-USDC LP',
+    coin: { ...TOKENS.WAG },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4yykyPugitUVRewNPXXCviRvxGfsfsRMoP32z3b6FmUC',
+    decimals: TOKENS.WAG.decimals
   }
 }
 

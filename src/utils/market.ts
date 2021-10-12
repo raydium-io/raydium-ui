@@ -17,10 +17,6 @@ import {
   TransactionInstruction
 } from '@solana/web3.js'
 
-import { throwIfNull } from './errors'
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
-import { LIQUIDITY_POOLS } from './pools'
-import { transfer } from './swap'
 import {
   commitment,
   createAmmAuthority,
@@ -46,6 +42,10 @@ import {
   TOKEN_PROGRAM_ID,
   WITHDRAW_ASSOCIATED_SEED
 } from '@/utils/ids'
+import { throwIfNull } from './errors'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
+import { LIQUIDITY_POOLS } from './pools'
+import { transfer } from './swap'
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
@@ -69,7 +69,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     } = market
     let coinOrPcInTokenFlag = false
 
-    for (const item of [TOKENS.USDT, TOKENS.USDC, TOKENS.RAY, TOKENS.WSOL, TOKENS.SRM, TOKENS.PAI]) {
+    for (const item of [TOKENS.USDT, TOKENS.USDC, TOKENS.RAY, TOKENS.WSOL, TOKENS.SRM, TOKENS.PAI, TOKENS.mSOL]) {
       if (quoteMint?.toBase58() === item.mintAddress) {
         coinOrPcInTokenFlag = true
         break
@@ -77,7 +77,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     }
     if (!coinOrPcInTokenFlag) {
       throw new Error(
-        'Only markets that contain USDC, USDT, SOL, RAY, SRM or PAI as the Quote Token are currently supported.'
+        'Only markets that contain USDC, USDT, SOL, RAY, SRM, PAI or mSOL as the Quote Token are currently supported.'
       )
     }
     const asks: number[] = []
