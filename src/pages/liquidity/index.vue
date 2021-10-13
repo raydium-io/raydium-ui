@@ -213,6 +213,8 @@
             liquidity.loading ||
             gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
             gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '0') ||
+            isNullOrZero(fromCoinAmount) ||
+            isNullOrZero(toCoinAmount) ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -223,6 +225,7 @@
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
+          <template v-else-if="isNullOrZero(fromCoinAmount) || isNullOrZero(toCoinAmount)"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
           <template v-else-if="gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
@@ -266,7 +269,7 @@ import { getOutAmount, addLiquidity, getLiquidityInfoSimilar } from '@/utils/liq
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
 import { cloneDeep, get } from 'lodash-es'
-import { gt } from '@/utils/safe-math'
+import { gt, isNullOrZero } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLpListByTokenMintAddresses, LiquidityPoolInfo } from '@/utils/pools'
 import AmmIdSelect from '@/components/AmmIdSelect.vue'
@@ -414,6 +417,7 @@ export default Vue.extend({
 
   methods: {
     gt,
+    isNullOrZero,
 
     openFromCoinSelect() {
       this.selectFromCoin = true
@@ -757,6 +761,16 @@ export default Vue.extend({
     },
 
     supply() {
+      // check if amount is not null or zero
+      if (isNullOrZero(this.fromCoinAmount) || isNullOrZero(this.toCoinAmount)) {
+        this.$notify.error({
+          key: getUnixTs().toString(),
+          message: 'Add liquidity failed',
+          description: 'Please enter an amount'
+        })
+        return
+      }
+
       this.suppling = true
 
       const conn = this.$web3
