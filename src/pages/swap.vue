@@ -724,6 +724,7 @@ export default Vue.extend({
         this.findMarket()
         this.fromCoinAmount = ''
         this.toCoinAmount = ''
+        this.userCheckUnofficialMint = ''
         this.needUserCheckUnofficialShow()
       }
     },
