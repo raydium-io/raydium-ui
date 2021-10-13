@@ -277,6 +277,7 @@
                 :disabled="!(needCreateTokens() || needWrapSol())"
                 size="large"
                 :loading="loadingArr['setup']"
+                :class="`${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
                 ghost
                 @click="
                   () => {
@@ -298,6 +299,7 @@
               :disabled="!(!needCreateTokens() && !needWrapSol())"
               size="large"
               :loading="loadingArr['swap']"
+              :class="`${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
               ghost
               @click="
                 () => {
@@ -509,6 +511,10 @@
         >.
       </div>
       <div class="description-secondary">Are you sure you want to confirm this swap?</div>
+      <div class="description-secondary">
+        {{ fromCoinAmount }} {{ fromCoin ? fromCoin.symbol : '' }} → {{ toCoinWithSlippage }}
+        {{ toCoin ? toCoin.symbol : '' }}
+      </div>
       <div class="btn-group">
         <Button class="cancel-btn" ghost size="large" @click="confirmModalIsOpen = false"> Cancel </Button>
         <Button
