@@ -226,7 +226,7 @@
             <span :style="`color: ${priceImpact <= 1 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
-        {{ setupFlag }}--{{ setupFlagWSOL }}
+
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
