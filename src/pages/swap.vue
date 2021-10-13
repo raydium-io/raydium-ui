@@ -226,7 +226,7 @@
             <span :style="`color: ${priceImpact <= 1 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
-
+        {{ setupFlag }}--{{ setupFlagWSOL }}
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
@@ -277,7 +277,7 @@
               <template slot="title">
                 <span>
                   {{
-                    needWrapSol()
+                    setupFlagWSOL
                       ? 'Due to limits on Solana transaction sizes, this step is required to create wrapped SOL (wSOL) in your wallet before swapping.'
                       : 'Due to limits on Solana transaction sizes, this step is required to create token accounts in your wallet before swapping.'
                   }}
@@ -672,7 +672,8 @@ export default Vue.extend({
       } as { [key: string]: boolean },
 
       setupFlag: false as boolean,
-      setupLastData: '' as string
+      setupLastData: '' as string,
+      setupFlagWSOL: false as boolean
     }
   },
 
@@ -1378,11 +1379,15 @@ export default Vue.extend({
         )
 
         let setupFlag = this.setupFlag
+        let setupFlagWSOL = this.setupFlagWSOL
         if (this.endpoint !== this.setupLastData) {
           this.setupLastData = this.endpoint
           setupFlag = false
+          setupFlagWSOL = false
         }
         this.setupFlag = setupFlag || this.needCreateTokens() || this.needWrapSol() > 0
+
+        this.setupFlagWSOL = setupFlagWSOL || this.needWrapSol() > 0
       }
     },
 
