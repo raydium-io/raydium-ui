@@ -212,18 +212,18 @@
           <div
             v-if="endpoint"
             :class="`fs-container price-impact ${
-              priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''
+              priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''
             }`"
           >
             <span class="name">
-              Price Impact {{ priceImpact > 5 ? 'Warning' : '' }}
+              Price Impact {{ priceImpact > 1 ? 'Warning' : '' }}
               <Tooltip placement="right">
                 <template slot="title">
                   The difference between the market price and estimated price due to trade size
                 </template>
                 <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
             ></span>
-            <span :style="`color: ${priceImpact <= 5 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
+            <span :style="`color: ${priceImpact <= 1 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
           </div>
         </div>
 
@@ -277,11 +277,11 @@
                 :disabled="!(needCreateTokens() || needWrapSol())"
                 size="large"
                 :loading="loadingArr['setup']"
-                :class="`${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
+                :class="`${priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''}`"
                 ghost
                 @click="
                   () => {
-                    if (priceImpact > 10) {
+                    if (priceImpact > 5) {
                       confirmModalIsOpen = true
                     } else {
                       placeOrder('setup')
@@ -299,11 +299,11 @@
               :disabled="!(!needCreateTokens() && !needWrapSol())"
               size="large"
               :loading="loadingArr['swap']"
-              :class="`${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
+              :class="`${priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''}`"
               ghost
               @click="
                 () => {
-                  if (priceImpact > 10) {
+                  if (priceImpact > 5) {
                     confirmModalIsOpen = true
                   } else {
                     placeOrder('swap')
@@ -353,10 +353,10 @@
           "
           :loading="swaping"
           style="width: 100%"
-          :class="`swap-btn ${priceImpact > 10 ? 'error-style' : priceImpact > 5 ? 'warning-style' : ''}`"
+          :class="`swap-btn ${priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''}`"
           @click="
             () => {
-              if (priceImpact > 10) {
+              if (priceImpact > 5) {
                 confirmModalIsOpen = true
               } else {
                 placeOrder()
@@ -407,7 +407,7 @@
           <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
             xCOPE amount must greater than 5
           </template>
-          <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 5 ? 'Swap Anyway' : 'Swap' }}</template>
+          <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 1 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
           <span class="caution-text">Caution: Your SOL balance is low</span>

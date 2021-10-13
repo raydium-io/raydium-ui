@@ -1,6 +1,6 @@
 <template>
   <Modal
-    title="This is a Permissionless Coin"
+    title="Confirm Token"
     :visible="true"
     :footer="null"
     :closable="false"
@@ -8,14 +8,15 @@
     @cancel="$emit('onClose')"
   >
     <div class="select-token">
-      You can get unofficial coin
+      This token does not appear on the default token list. Take extra caution to confirm token addresses and that the
+      minimum amount of tokens received for your trade is acceptable.
       <br /><br />
       <label style="color: red"
         ><input v-model="userCheckUnofficial" type="checkbox" style="margin-right: 10px" />I understand</label
       >
       <label style="color: red"
-        ><input v-model="userCheckUnofficialAll" type="checkbox" style="margin-right: 10px" />Do not warn again for this
-        pool</label
+        ><input v-model="userCheckUnofficialAll" type="checkbox" style="margin-right: 10px" />Add to user token list and
+        do not warn again</label
       >
       <span>
         <Button style="width: 45%; margin-right: 8%" size="large" ghost @click="$emit('onSelect', false)">Cancel</Button
