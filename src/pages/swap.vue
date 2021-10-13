@@ -232,7 +232,12 @@
         </Button>
 
         <Button
-          v-else-if="toCoin && userCheckUnofficialMint !== toCoin.mintAddress && !toCoin.tags.includes('raydium')"
+          v-else-if="
+            toCoin &&
+            userCheckUnofficialMint !== toCoin.mintAddress &&
+            !toCoin.tags.includes('raydium') &&
+            needUserCheckUnofficial()
+          "
           size="large"
           ghost
           @click="needUserCheckUnofficialShow()"
