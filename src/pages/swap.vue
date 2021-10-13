@@ -270,7 +270,13 @@
           <div style="width: 45%; float: left">
             <Tooltip style="width: 100%">
               <template slot="title">
-                <span> xxxxx </span>
+                <span>
+                  {{
+                    needWrapSol()
+                      ? 'Due to limits on Solana transaction sizes, this step is required to create wrapped SOL (wSOL) in your wallet before swapping.'
+                      : 'Due to limits on Solana transaction sizes, this step is required to create token accounts in your wallet before swapping.'
+                  }}
+                </span>
               </template>
               <Button
                 style="width: 100%"
@@ -319,17 +325,17 @@
           <div class="step-box" style="margin-top: 20px">
             <div
               class="setup-item"
-              :style="{ background: needCreateTokens() || needWrapSol() ? '#82d1ca' : '#82d1ca99' }"
+              :style="{ borderColor: needCreateTokens() || needWrapSol() ? '#82d1ca' : '#82d1ca99' }"
             >
               1
             </div>
             <div
-              style="width: 50%; height: 5px; display: inline-block"
+              style="width: 50%; height: 2px; display: inline-block"
               :style="{ background: needCreateTokens() || needWrapSol() ? '#85858d' : '#82d1ca99' }"
             ></div>
             <div
               class="setup-item"
-              :style="{ background: needCreateTokens() || needWrapSol() ? '#85858d' : '#82d1ca' }"
+              :style="{ borderColor: needCreateTokens() || needWrapSol() ? '#85858d' : '#82d1ca' }"
             >
               2
             </div>
@@ -1768,7 +1774,8 @@ export default Vue.extend({
   width: 30px;
   height: 30px;
   border-radius: 15px;
-  padding-top: 5px;
+  padding-top: 3px;
+  border: 2px solid;
 }
 .swap-confirm-modal .ant-btn-text {
   background: transparent;
