@@ -6,6 +6,17 @@ import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 // eslint-disable-next-line
+import { TokenAmount } from '@/utils/safe-math'
+import {
+  createAssociatedTokenAccountIfNotExist,
+  createAtaSolIfNotExistAndWrap,
+  createProgramAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  findProgramAddress,
+  mergeTransactions,
+  sendTransaction
+} from '@/utils/web3'
+import { RouterInfoItem } from '@/types/api'
 import {
   LIQUIDITY_POOL_PROGRAM_ID_V4,
   MEMO_PROGRAM_ID,
@@ -18,17 +29,6 @@ import { getBigNumber } from './layouts'
 // eslint-disable-next-line
 import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
 import { LiquidityPoolInfo } from './pools'
-import { TokenAmount } from '@/utils/safe-math'
-import {
-  createAssociatedTokenAccountIfNotExist,
-  createAtaSolIfNotExistAndWrap,
-  createProgramAccountIfNotExist,
-  createTokenAccountIfNotExist,
-  findProgramAddress,
-  mergeTransactions,
-  sendTransaction
-} from '@/utils/web3'
-import { RouterInfoItem } from '@/types/api'
 
 export function getOutAmount(
   market: any,
@@ -421,7 +421,8 @@ export async function swap(
   fromTokenAccount: string,
   toTokenAccount: string,
   aIn: string,
-  aOut: string
+  aOut: string,
+  wsolAddress: string
 ) {
   const transaction = new Transaction()
   const signers: Account[] = []
@@ -436,6 +437,16 @@ export async function swap(
 
   const amountIn = new TokenAmount(aIn, from.decimals, false)
   const amountOut = new TokenAmount(aOut, to.decimals, false)
+
+  if (fromCoinMint === NATIVE_SOL.mintAddress && wsolAddress) {
+    transaction.add(
+      closeAccount({
+        source: new PublicKey(wsolAddress),
+        destination: owner,
+        owner
+      })
+    )
+  }
 
   let fromMint = fromCoinMint
   let toMint = toCoinMint

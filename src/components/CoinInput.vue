@@ -2,7 +2,9 @@
   <div class="coin-select">
     <div class="label fs-container">
       <span>{{ label }}</span>
-      <span v-if="balance && !balance.wei.isNaN()"> Balance: {{ balance.fixed() }} </span>
+      <span v-if="balance && !balance.wei.isNaN()">
+        Balance: {{ (Number(balance.fixed()) + balanceOffset).toFixed(balance.decimals) }}
+      </span>
     </div>
     <div class="coin-input">
       <div class="main-input fs-container">

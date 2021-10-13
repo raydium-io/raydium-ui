@@ -57,9 +57,17 @@
               <div v-if="wallet.loading">
                 <Icon type="loading" />
               </div>
-              <div v-else-if="token.tokenAccountAddress">
-                {{ token.balance.toEther() }}
+              <div v-else-if="token.tokenAccountAddress && token.symbol === 'SOL'">
+                {{
+                  (
+                    Number(token.balance.toEther()) +
+                    (get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                      ? Number(get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther())
+                      : 0)
+                  ).toFixed(9)
+                }}
               </div>
+              <div v-else-if="token.tokenAccountAddress">{{ token.balance.toEther() }}</div>
               <div v-else></div>
             </div>
           </div>
@@ -110,7 +118,7 @@ import { mapState } from 'vuex'
 import { Modal, Icon } from 'ant-design-vue'
 
 import { TOKENS, TokenInfo, NATIVE_SOL, TOKENS_TAGS } from '@/utils/tokens'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, get } from 'lodash-es'
 import { PublicKey } from '@solana/web3.js'
 // import { getFilteredProgramAccounts } from '@/utils/web3'
 import { MINT_LAYOUT } from '@/utils/layouts'
@@ -126,6 +134,7 @@ export default Vue.extend({
 
   data() {
     return {
+      TOKENS,
       tokensTags: TOKENS_TAGS,
       keyword: '',
       tokenList: [] as Array<TokenInfo>,
@@ -181,6 +190,8 @@ export default Vue.extend({
   },
 
   methods: {
+    get,
+
     tokenHover(token: any) {
       this.$set(this.showUserButton, token.symbol + token.mintAddress, true)
     },

@@ -108,7 +108,11 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
-          :balance-offset="fromCoin && fromCoin.symbol === 'SOL' ? -0.05 : 0"
+          :balance-offset="
+            fromCoin && fromCoin.symbol === 'SOL' && get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed() - 0.05
+              : 0
+          "
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
@@ -244,12 +248,20 @@
             initialized &&
             !loading &&
             (usedAmmId || usedRouteInfo) &&
-            endpoint.split('').filter((item) => item === '>').length === 2 &&
+            setupFlag &&
             !gt(
               fromCoinAmount,
               fromCoin && fromCoin.balance
                 ? fromCoin.symbol === 'SOL'
-                  ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                  ? fromCoin.balance
+                      .toEther()
+                      .minus(0.05)
+                      .plus(
+                        get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                          ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                          : 0
+                      )
+                      .toFixed(fromCoin.balance.decimals)
                   : fromCoin.balance.fixed()
                 : '0'
             )
@@ -302,7 +314,7 @@
           </div>
           <div style="clear: both"></div>
 
-          <div class="step-box">
+          <div class="step-box" style="margin-top: 20px">
             <div
               class="setup-item"
               :style="{ background: needCreateTokens() || needWrapSol() ? '#82d1ca' : '#82d1ca99' }"
@@ -362,7 +374,15 @@
                 fromCoinAmount,
                 fromCoin && fromCoin.balance
                   ? fromCoin.symbol === 'SOL'
-                    ? fromCoin.balance.toEther().minus(0.05).toFixed(fromCoin.balance.decimals)
+                    ? fromCoin.balance
+                        .toEther()
+                        .minus(0.05)
+                        .plus(
+                          get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                            ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                            : 0
+                        )
+                        .toFixed(fromCoin.balance.decimals)
                     : fromCoin.balance.fixed()
                   : '0'
               )
@@ -632,7 +652,10 @@ export default Vue.extend({
       loadingArr: {
         setup: false,
         swap: false
-      } as { [key: string]: boolean }
+      } as { [key: string]: boolean },
+
+      setupFlag: false as boolean,
+      setupLastData: '' as string
     }
   },
 
@@ -895,8 +918,9 @@ export default Vue.extend({
       ) {
         if ([NATIVE_SOL.mintAddress, TOKENS.WSOL.mintAddress].includes(this.fromCoin.mintAddress)) {
           let amount = get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-          amount = amount ? Number(amount.fixed()) : 0
-          if (amount < Number(this.fromCoinAmount)) return (Number(this.fromCoinAmount) - Number(amount)) * 10 ** 9
+          amount = Math.ceil((amount ? Number(amount.fixed()) : 0) * 10 ** 9)
+          const fromCoinAmountData = Math.ceil(Number(this.fromCoinAmount) * 10 ** 9)
+          if (fromCoinAmountData > amount) return fromCoinAmountData - amount
         }
       }
       return 0
@@ -1334,6 +1358,13 @@ export default Vue.extend({
           'outToPirceValue',
           this.outToPirceValue
         )
+
+        let setupFlag = this.setupFlag
+        if (this.endpoint !== this.setupLastData) {
+          this.setupLastData = this.endpoint
+          setupFlag = false
+        }
+        this.setupFlag = setupFlag || this.needCreateTokens() || this.needWrapSol() > 0
       }
     },
 
@@ -1419,7 +1450,8 @@ export default Vue.extend({
           // @ts-ignore
           get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
           this.fromCoinAmount,
-          this.toCoinWithSlippage
+          this.toCoinWithSlippage,
+          get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.tokenAccountAddress`)
         )
           .then((txid) => {
             this.$notify.info({
