@@ -1565,6 +1565,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4yykyPugitUVRewNPXXCviRvxGfsfsRMoP32z3b6FmUC',
     decimals: TOKENS.WAG.decimals
+  },
+  'ETH-mSOL-V4': {
+    symbol: 'ETH-mSOL',
+    name: 'ETH-mSOL LP',
+    coin: { ...TOKENS.ETH },
+    pc: { ...TOKENS.mSOL },
+
+    mintAddress: 'HYv3grQfi8QbV7nG7EFgNK1aJSrsJ7HynXJKJVPLL2Uh',
+    decimals: TOKENS.ETH.decimals
+  },
+  'mSOL-USDT-V4': {
+    symbol: 'mSOL-USDT',
+    name: 'mSOL-USDT LP',
+    coin: { ...TOKENS.mSOL },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: '69NCmEW9mGpiWLjAcAWHq51k4ionJZmzgRfRT3wQaCCf',
+    decimals: TOKENS.mSOL.decimals
+  },
+  'BTC-mSOL-V4': {
+    symbol: 'BTC-mSOL',
+    name: 'BTC-mSOL LP',
+    coin: { ...TOKENS.BTC },
+    pc: { ...TOKENS.mSOL },
+
+    mintAddress: '92bcERNtUmuaJ6mwLSxYHZYSph37jdKxRdoYNxpcYNPp',
+    decimals: TOKENS.BTC.decimals
   }
 }
 
