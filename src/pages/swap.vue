@@ -290,7 +290,13 @@
                 :disabled="!(needCreateTokens() || needWrapSol())"
                 size="large"
                 :loading="loadingArr['setup']"
-                :class="`${priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''}`"
+                :class="`${
+                  priceImpact > 5 && (needCreateTokens() || needWrapSol())
+                    ? 'error-style'
+                    : priceImpact > 1
+                    ? 'warning-style'
+                    : ''
+                }`"
                 ghost
                 @click="
                   () => {
