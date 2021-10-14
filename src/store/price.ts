@@ -1,8 +1,8 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
+import { cloneDeep } from 'lodash-es'
 import { PricesData } from '@/types/api'
 
-import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 
 const AUTO_REFRESH_TIME = 60

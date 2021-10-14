@@ -260,12 +260,12 @@ import {
   Context
 } from '@solana/web3.js'
 
+import { cloneDeep, get } from 'lodash-es'
 import { getTokenBySymbol, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import { inputRegex, escapeRegExp } from '@/utils/regex'
-import { getOutAmount, addLiquidity, getLiquidityInfoSimilar } from '@/utils/liquidity'
+import { getOutAmount, addLiquidity, getLiquidityInfoSimilar, getOutAmountStable } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
-import { cloneDeep, get } from 'lodash-es'
 import { gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLpListByTokenMintAddresses, LiquidityPoolInfo } from '@/utils/pools'
@@ -659,7 +659,7 @@ export default Vue.extend({
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
         if (this.fixedCoin === this.fromCoin.mintAddress) {
-          const amount = getOutAmount(
+          const amount = (poolInfo.version === 4 ? getOutAmount : getOutAmountStable)(
             poolInfo,
             this.fromCoinAmount,
             this.fromCoin.mintAddress,
@@ -675,7 +675,7 @@ export default Vue.extend({
         } else {
           const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-          const amount = getOutAmount(
+          const amount = (poolInfo.version === 4 ? getOutAmount : getOutAmountStable)(
             poolInfo,
             this.toCoinAmount,
             this.toCoin.mintAddress,

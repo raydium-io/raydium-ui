@@ -17,10 +17,6 @@ import {
   TransactionInstruction
 } from '@solana/web3.js'
 
-import { throwIfNull } from './errors'
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
-import { LIQUIDITY_POOLS } from './pools'
-import { transfer } from './swap'
 import {
   commitment,
   createAmmAuthority,
@@ -46,6 +42,10 @@ import {
   TOKEN_PROGRAM_ID,
   WITHDRAW_ASSOCIATED_SEED
 } from '@/utils/ids'
+import { throwIfNull } from './errors'
+import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
+import { LIQUIDITY_POOLS } from './pools'
+import { transfer } from './swap'
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {

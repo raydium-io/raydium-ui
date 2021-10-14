@@ -55,6 +55,24 @@ export interface CampaignInfo {
 }
 type CampaignWinners = { owner: string; count: number }[]
 
+export interface RouterInfoItem {
+  middle_coin: string
+  route: { type: string; id: string; amountA: number; amountB: number; mintA: string; mintB: string }[]
+}
+export interface RouterInfo {
+  message: string
+  data: {
+    amm: { type: string; id: string; amountA: number; amountB: number }[]
+    serum: {
+      type: string
+      id: string
+      asks: { price: number; value: number }[]
+      bids: { price: number; value: number }[]
+    }[]
+    routes: RouterInfoItem[]
+  }
+}
+
 // deprecated
 type CampaignWinnerList = string[]
 
@@ -80,4 +98,5 @@ export interface NuxtApiInstance {
   }) => Promise<CampaignInfo>
   getCompaignWinners: () => Promise<CampaignWinners>
   getCompaignWinnerList: (queryInfo: { type: 'luck' | 'valid' }) => Promise<CampaignWinnerList> // deprecated
+  getRouter: (mintIn: string, mintOut: string) => Promise<RouterInfo>
 }

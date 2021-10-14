@@ -1,23 +1,30 @@
-import BigNumber from 'bignumber.js';
+import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8 } from 'buffer-layout'
 
-import { TOKEN_PROGRAM_ID } from '@/utils/ids';
-import {
-  canWrap, getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
-  LIQUIDITY_POOLS, LiquidityPoolInfo
-} from '@/utils/pools';
-import { TokenAmount } from '@/utils/safe-math';
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
-import {
-  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
-  getMultipleAccounts, sendTransaction
-} from '@/utils/web3';
-import { publicKey, u128, u64 } from '@project-serum/borsh';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { getBigNumber, MINT_LAYOUT } from './layouts';
+import { getBigNumber, MINT_LAYOUT } from './layouts'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import {
+  canWrap,
+  getLpMintByTokenMintAddresses,
+  getPoolByLpMintAddress,
+  getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS,
+  LiquidityPoolInfo
+} from '@/utils/pools'
+import { TokenAmount } from '@/utils/safe-math'
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
+import {
+  commitment,
+  createAssociatedTokenAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
@@ -28,7 +35,15 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
     return new BigNumber(0)
   }
 
-  if (coinBase) {
+  if (poolInfo.version === 5) {
+    const { currentK = 1 } = poolInfo
+    const systemDecimal = Math.max(coin.decimals, pc.decimals)
+    const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
+    const y = parseFloat(coin.balance.fixed())
+    let price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+    if (!coinBase) price = 1 / price
+    return new BigNumber(price)
+  } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())
   } else {
     return coin.balance.toEther().dividedBy(pc.balance.toEther())
@@ -65,6 +80,39 @@ export function getOutAmount(
   }
 
   return outAmount
+}
+
+export function getOutAmountStable(
+  poolInfo: any,
+  amount: string,
+  fromCoinMint: string,
+  toCoinMint: string,
+  slippage: number
+) {
+  const { coin, pc, currentK } = poolInfo
+  const systemDecimal = Math.max(coin.decimals, pc.decimals)
+  const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
+  const y = parseFloat(coin.balance.fixed())
+  const price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+
+  const amountIn = parseFloat(amount)
+  let amountOut = 1
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // outcoin is pc
+    amountOut = amountIn * price
+  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
+    // outcoin is coin
+    amountOut = amountIn / price
+  }
+
+  const amountOutWithSlippage = amountOut / (1 - slippage / 100)
+
+  // const price = Math.sqrt((10 - 1) * y * y /(10 * y * y - k))
+  // const afterY = y - amountOut
+  // const afterPrice = Math.sqrt((10 - 1) * afterY  * afterY /(10 * afterY * afterY - k))
+  // const priceImpact = (beforePrice - afterPrice) / beforePrice * 100
+
+  return new BigNumber(amountOutWithSlippage)
 }
 
 /* eslint-disable */
@@ -143,7 +191,7 @@ export async function addLiquidity(
   )
 
   transaction.add(
-    poolInfo.version === 4
+    [4, 5].includes(poolInfo.version)
       ? addLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -280,7 +328,7 @@ export async function removeLiquidity(
   }
 
   transaction.add(
-    poolInfo.version === 4
+    [4, 5].includes(poolInfo.version)
       ? removeLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -746,6 +794,71 @@ export const AMM_INFO_LAYOUT_V4 = struct([
   publicKey('pnlOwner')
 ])
 
+export const AMM_INFO_LAYOUT_STABLE = struct([
+  u64('status'),
+  publicKey('own_address'),
+  u64('nonce'),
+  u64('orderNum'),
+  u64('depth'),
+  u64('coinDecimals'),
+  u64('pcDecimals'),
+  u64('state'),
+  u64('resetFlag'),
+  u64('minSize'),
+  u64('volMaxCutRatio'),
+  u64('amountWaveRatio'),
+  u64('coinLotSize'),
+  u64('pcLotSize'),
+  u64('minPriceMultiplier'),
+  u64('maxPriceMultiplier'),
+  u64('systemDecimalsValue'),
+
+  u64('ammMaxPrice'),
+  u64('ammMiddlePrice'),
+  u64('ammPriceMultiplier'),
+
+  // Fees
+  u64('minSeparateNumerator'),
+  u64('minSeparateDenominator'),
+  u64('tradeFeeNumerator'),
+  u64('tradeFeeDenominator'),
+  u64('pnlNumerator'),
+  u64('pnlDenominator'),
+  u64('swapFeeNumerator'),
+  u64('swapFeeDenominator'),
+  // OutPutData
+  u64('needTakePnlCoin'),
+  u64('needTakePnlPc'),
+  u64('totalPnlPc'),
+  u64('totalPnlCoin'),
+  u128('poolTotalDepositPc'),
+  u128('poolTotalDepositCoin'),
+  u128('swapCoinInAmount'),
+  u128('swapPcOutAmount'),
+  u128('swapPcInAmount'),
+  u128('swapCoinOutAmount'),
+  u64('swapPcFee'),
+  u64('swapCoinFee'),
+
+  publicKey('poolCoinTokenAccount'),
+  publicKey('poolPcTokenAccount'),
+  publicKey('coinMintAddress'),
+  publicKey('pcMintAddress'),
+  publicKey('lpMintAddress'),
+  publicKey('ammOpenOrders'),
+  publicKey('serumMarket'),
+  publicKey('serumProgramId'),
+  publicKey('ammTargetOrders'),
+  publicKey('poolWithdrawQueue'),
+  publicKey('poolTempLpTokenAccount'),
+  publicKey('ammOwner'),
+  publicKey('pnlOwner'),
+
+  u128('currentK'),
+  u128('padding1'),
+  publicKey('padding2')
+])
+
 export async function getLpMintInfo(conn: any, mintAddress: string, coin: any, pc: any): Promise<TokenInfo> {
   let lpInfo = Object.values(LP_TOKENS).find((item) => item.mintAddress === mintAddress)
   if (!lpInfo) {
@@ -800,13 +913,17 @@ export async function getLpMintListDecimals(
   return reInfo
 }
 
-export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to: string) {
+export function getLiquidityInfoSimilar(
+  ammIdOrMarket: string | undefined,
+  from: string | undefined,
+  to: string | undefined
+) {
   // const fromCoin = from === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : from
   // const toCoin = to === NATIVE_SOL.mintAddress ? TOKENS.WSOL.mintAddress : to
   const fromCoin = from === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : from
   const toCoin = to === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : to
   const knownLiquidity = LIQUIDITY_POOLS.find((item) => {
-    if (fromCoin !== null && toCoin != null && fromCoin === toCoin) {
+    if (fromCoin !== undefined && toCoin != undefined && fromCoin === toCoin) {
       return false
     }
     if (ammIdOrMarket !== undefined && !(item.ammId === ammIdOrMarket || item.serumMarket === ammIdOrMarket)) {
@@ -824,6 +941,17 @@ export function getLiquidityInfoSimilar(ammIdOrMarket: string, from: string, to:
     return false
   })
   return knownLiquidity
+}
+
+export function getLiquidityInfo(from: string, to: string) {
+  const fromCoin = from === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : from
+  const toCoin = to === TOKENS.WSOL.mintAddress ? NATIVE_SOL.mintAddress : to
+  return LIQUIDITY_POOLS.filter(
+    (item) =>
+      item.version === 4 &&
+      ((item.coin.mintAddress === fromCoin && item.pc.mintAddress === toCoin) ||
+        (item.coin.mintAddress === toCoin && item.pc.mintAddress === fromCoin))
+  )
 }
 
 export function getQueryVariable(variable: string) {

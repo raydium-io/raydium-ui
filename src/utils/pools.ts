@@ -42,6 +42,9 @@ export interface LiquidityPoolInfo {
   serumVaultSigner: string
 
   official: boolean
+
+  status?: number
+  currentK?: number
 }
 
 /**
@@ -79,7 +82,7 @@ export function getPoolListByTokenMintAddresses(
       if (
         ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
           (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
-        pool.version === 4 &&
+        [4, 5].includes(pool.version) &&
         pool.official
       ) {
         return !(ammIdOrMarket !== undefined && pool.ammId !== ammIdOrMarket && pool.serumMarket !== ammIdOrMarket)
@@ -98,7 +101,7 @@ export function getPoolListByTokenMintAddresses(
           if (
             ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
               (pool.coin.mintAddress === pcMintAddress && pool.pc.mintAddress === coinMintAddress)) &&
-            pool.version === 4
+            [4, 5].includes(pool.version)
           ) {
             return !(ammIdOrMarket !== undefined && pool.ammId !== ammIdOrMarket && pool.serumMarket !== ammIdOrMarket)
           }
@@ -114,7 +117,7 @@ export function getPoolListByTokenMintAddresses(
 export function getLpMintByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
-  version = [3, 4]
+  version = [3, 4, 5]
 ): string | null {
   const pool = LIQUIDITY_POOLS.find(
     (pool) =>
@@ -134,7 +137,7 @@ export function getLpListByTokenMintAddresses(
   coinMintAddress: string,
   pcMintAddress: string,
   ammIdOrMarket: string | undefined,
-  version = [4]
+  version = [4, 5]
 ): LiquidityPoolInfo[] {
   const pool = LIQUIDITY_POOLS.filter((pool) => {
     if (coinMintAddress && pcMintAddress) {
