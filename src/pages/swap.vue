@@ -512,7 +512,8 @@
       <div class="title">Price Impact Warning</div>
       <div class="description">
         Your swap is large relative to liquidity in the pool. Price impact is
-        <span class="highlight">higher than 10%</span>. If you're unsure what to do, read about price impact
+        <span class="highlight">{{ priceImpact.toFixed(2) }}%</span>. If you're unsure what to do, read about price
+        impact
         <a
           href="https://raydium.gitbook.io/raydium/trading-on-serum/faq#what-is-price-impact"
           rel="nofollow noopener noreferrer"
