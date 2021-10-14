@@ -318,7 +318,13 @@
               :disabled="!(!needCreateTokens() && !needWrapSol())"
               size="large"
               :loading="loadingArr['swap']"
-              :class="`${priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''}`"
+              :class="`${
+                priceImpact > 5 && !needCreateTokens() && !needWrapSol()
+                  ? 'error-style'
+                  : priceImpact > 1
+                  ? 'warning-style'
+                  : ''
+              }`"
               ghost
               @click="
                 () => {
@@ -885,6 +891,20 @@ export default Vue.extend({
             )
           } else {
             localStorage.setItem(`${this.wallet.address}--checkCoinMint`, `${this.toCoin.mintAddress}`)
+          }
+
+          if (this.toCoin.mintAddress === NATIVE_SOL.mintAddress) {
+            NATIVE_SOL.tags.push('userAdd')
+          } else {
+            const tokensKey = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === this.toCoin?.mintAddress)
+            if (tokensKey && TOKENS[tokensKey] && !TOKENS[tokensKey].tags.includes('userAdd')) {
+              TOKENS[tokensKey].tags.push('userAdd')
+            }
+          }
+          if (window.localStorage.addSolanaCoin) {
+            window.localStorage.addSolanaCoin = window.localStorage.addSolanaCoin + '---' + this.toCoin.mintAddress
+          } else {
+            window.localStorage.addSolanaCoin = this.toCoin.mintAddress
           }
         }
       } else {

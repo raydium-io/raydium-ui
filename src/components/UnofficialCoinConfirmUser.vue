@@ -1,5 +1,6 @@
 <template>
   <Modal
+    class="modal-title"
     title="Confirm Token"
     :visible="true"
     :footer="null"
@@ -10,7 +11,7 @@
     <div class="select-token">
       This token does not appear on the default token list. Take extra caution to confirm token addresses and that the
       minimum amount of tokens received for your trade is acceptable.
-      <br /><br />
+      <br />
       <label style="color: red"
         ><input v-model="userCheckUnofficial" type="checkbox" style="margin-right: 10px" />I understand</label
       >
@@ -53,6 +54,12 @@ export default Vue.extend({
 })
 </script>
 
+<style>
+.modal-title .ant-modal-title {
+  font-size: 22px !important;
+  text-align: center !important;
+}
+</style>
 <style lang="less" scoped>
 @import '../styles/variables';
 
