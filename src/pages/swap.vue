@@ -215,7 +215,7 @@
               priceImpact > 5 ? 'error-style' : priceImpact > 1 ? 'warning-style' : ''
             }`"
           >
-            <span class="name">
+            <span class="name" style="opacity: 1">
               Price Impact {{ priceImpact > 1 ? 'Warning' : '' }}
               <Tooltip placement="right">
                 <template slot="title">
