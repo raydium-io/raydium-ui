@@ -223,7 +223,9 @@
                 </template>
                 <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
             ></span>
-            <span :style="`color: ${priceImpact <= 1 ? '#31d0aa' : ''}`"> {{ priceImpact.toFixed(2) }}% </span>
+            <span :style="`color: ${priceImpact <= 1 ? '#31d0aa' : ''}`">
+              {{ priceImpact.toFixed(2) === '0.00' ? '&lt; 0.01' : priceImpact.toFixed(2) }}%
+            </span>
           </div>
         </div>
 
