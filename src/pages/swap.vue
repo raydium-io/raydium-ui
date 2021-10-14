@@ -1871,6 +1871,7 @@ export default Vue.extend({
 .error-style {
   font-weight: bold;
   color: #ed4b9e;
+  border-color: #ed4b9e !important;
 }
 .swap-btn.error-style {
   font-weight: normal;
