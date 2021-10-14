@@ -371,7 +371,6 @@
             !toCoin ||
             !initialized ||
             loading ||
-            !(usedAmmId || usedRouteInfo) ||
             swaping ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
