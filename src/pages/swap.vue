@@ -512,10 +512,14 @@
       "
     >
       <div class="title">Price Impact Warning</div>
+
+      <div class="description-secondary">
+        Your price impact is <span class="highlight">{{ priceImpact.toFixed(2) }}%</span> on this swap.
+      </div>
+
       <div class="description">
-        Your swap is large relative to liquidity in the pool. Price impact is
-        <span class="highlight">{{ priceImpact.toFixed(2) }}%</span>. If you're unsure what to do, read about price
-        impact
+        You are receiving an unfavorable price as your trade is large relative to liquidity in the pool. Read about
+        price impact
         <a
           href="https://raydium.gitbook.io/raydium/trading-on-serum/faq#what-is-price-impact"
           rel="nofollow noopener noreferrer"
@@ -524,11 +528,40 @@
           here</a
         >.
       </div>
+
       <div class="description-secondary">Are you sure you want to confirm this swap?</div>
+
       <div class="description-secondary">
-        {{ fromCoinAmount }} {{ fromCoin ? fromCoin.symbol : '' }} → {{ toCoinWithSlippage }}
-        {{ toCoin ? toCoin.symbol : '' }}
+        {{ fromCoinAmount }} {{ fromCoin && fromCoin.symbol }} → {{ toCoinAmount }} {{ toCoin && toCoin.symbol }}
       </div>
+
+      <div class="description-secondary">
+        Exchange rate:
+        <span class="price-info" style="padding: 0 12px">
+          <span v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base">
+            <span>
+              1 {{ fromCoin.symbol }} = 1
+              {{ toCoin.symbol }}
+            </span>
+          </span>
+          <span v-else-if="fromCoin && toCoin && fromCoinAmount && outToPirceValue" class="price-base">
+            <span>
+              1 {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }} ≈
+              {{
+                hasPriceSwapped
+                  ? (1 / outToPirceValue).toFixed(fromCoin.decimals)
+                  : outToPirceValue.toFixed(toCoin.decimals)
+              }}
+              {{ hasPriceSwapped ? fromCoin.symbol : toCoin.symbol }}
+              <Icon type="swap" @click="() => (hasPriceSwapped = !hasPriceSwapped)" />
+            </span>
+          </span>
+        </span>
+      </div>
+      <div class="description-secondary">
+        Minimum received: <span class="highlight">{{ toCoinWithSlippage }} {{ toCoin && toCoin.symbol }}</span>
+      </div>
+
       <div class="btn-group">
         <Button class="cancel-btn" ghost size="large" @click="confirmModalIsOpen = false"> Cancel </Button>
         <Button
@@ -1810,6 +1843,10 @@ export default Vue.extend({
   margin: 0 32px 16px;
 }
 .swap-confirm-modal .description .highlight {
+  font-weight: bold;
+  color: #ed4b9e;
+}
+.swap-confirm-modal .description-secondary .highlight {
   font-weight: bold;
   color: #ed4b9e;
 }
