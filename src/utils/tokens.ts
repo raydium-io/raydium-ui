@@ -210,46 +210,6 @@ export const TOKENS: Tokens = {
     referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P',
     tags: ['raydium']
   },
-  UBXT: {
-    symbol: 'UBXT',
-    name: 'Wrapped UBXT',
-    mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
-    decimals: 6,
-    referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879',
-    tags: ['raydium']
-  },
-  HNT: {
-    symbol: 'HNT',
-    name: 'Wrapped HNT',
-    mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
-    decimals: 6,
-    referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV',
-    tags: ['raydium']
-  },
-  FRONT: {
-    symbol: 'FRONT',
-    name: 'Wrapped FRONT',
-    mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
-    decimals: 6,
-    referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h',
-    tags: ['raydium']
-  },
-  AKRO: {
-    symbol: 'AKRO',
-    name: 'Wrapped AKRO',
-    mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
-    decimals: 6,
-    referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH',
-    tags: ['raydium']
-  },
-  HXRO: {
-    symbol: 'HXRO',
-    name: 'Wrapped HXRO',
-    mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
-    decimals: 6,
-    referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC',
-    tags: ['raydium']
-  },
   UNI: {
     symbol: 'UNI',
     name: 'Wrapped UNI',
