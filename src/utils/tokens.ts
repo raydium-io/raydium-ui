@@ -210,46 +210,6 @@ export const TOKENS: Tokens = {
     referrer: '7WPzEiozJ69MQe8bfbss1t2unR6bHR4S7FimiUVRgu7P',
     tags: ['raydium']
   },
-  UBXT: {
-    symbol: 'UBXT',
-    name: 'Wrapped UBXT',
-    mintAddress: '873KLxCbz7s9Kc4ZzgYRtNmhfkQrhfyWGZJBmyCbC3ei',
-    decimals: 6,
-    referrer: '9aocFzNkSVj9TCS6cJk2uYyuzEpXPWT7xoBBF9JcZ879',
-    tags: ['raydium']
-  },
-  HNT: {
-    symbol: 'HNT',
-    name: 'Wrapped HNT',
-    mintAddress: 'HqB7uswoVg4suaQiDP3wjxob1G5WdZ144zhdStwMCq7e',
-    decimals: 6,
-    referrer: 'B61oHrGCFh8P75Z2cRDiw2nbEwbMyhVfZhMWiwxU2qCV',
-    tags: ['raydium']
-  },
-  FRONT: {
-    symbol: 'FRONT',
-    name: 'Wrapped FRONT',
-    mintAddress: '9S4t2NEAiJVMvPdRYKVrfJpBafPBLtvbvyS3DecojQHw',
-    decimals: 6,
-    referrer: 'FnasnCc7c43hd2nanSmRjh9Sf9Cgz6aEvNj6wpDznS5h',
-    tags: ['raydium']
-  },
-  AKRO: {
-    symbol: 'AKRO',
-    name: 'Wrapped AKRO',
-    mintAddress: '6WNVCuxCGJzNjmMZoKyhZJwvJ5tYpsLyAtagzYASqBoF',
-    decimals: 6,
-    referrer: 'FihBmWJbiLSEvq4QZpPPdjokdMgxqq6pESZ7oMkE1qJH',
-    tags: ['raydium']
-  },
-  HXRO: {
-    symbol: 'HXRO',
-    name: 'Wrapped HXRO',
-    mintAddress: 'DJafV9qemGp7mLMEn5wrfqaFwxsbLgUsGVS16zKRk9kc',
-    decimals: 6,
-    referrer: '4NgrGZDRCzyqiwYvKPEePTKfQXtWzKmSDBoZJjRw6wNC',
-    tags: ['raydium']
-  },
   UNI: {
     symbol: 'UNI',
     name: 'Wrapped UNI',
@@ -731,6 +691,55 @@ export const TOKENS: Tokens = {
     name: 'wLDO',
     mintAddress: 'HZRCwxP2Vq9PCpPXooayhJ2bxTpo5xfpQrwB1svh332p',
     decimals: 8,
+    tags: ['raydium']
+  },
+  SLIM: {
+    symbol: 'SLIM',
+    name: 'SLIM',
+    mintAddress: 'xxxxa1sKNGwFtw2kFn8XauW9xq8hBZ5kVtcSesTT9fW',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  PRT: {
+    symbol: 'PRT',
+    name: 'PRT',
+    mintAddress: 'PRT88RkA4Kg5z7pKnezeNH4mafTvtQdfFgpQTGRjz44',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  SBR: {
+    symbol: 'SBR',
+    name: 'SBR',
+    mintAddress: 'Saber2gLauYim4Mvftnrasomsv6NvAuncvMEZwcLpD1',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  FAB: {
+    symbol: 'FAB',
+    name: 'FAB',
+    mintAddress: 'EdAhkbj5nF9sRM7XN7ewuW8C9XEUMs8P7cnoQ57SYE96',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  ABR: {
+    symbol: 'ABR',
+    name: 'ABR',
+    mintAddress: 'a11bdAAuV8iB2fu7X6AxAvDTo1QZ8FXB3kk5eecdasp',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  IVN: {
+    symbol: 'IVN',
+    name: 'IVN',
+    mintAddress: 'iVNcrNE9BRZBC9Aqf753iZiZfbszeAVUoikgT9yvr2a',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  CYS: {
+    symbol: 'CYS',
+    name: 'CYS',
+    mintAddress: 'BRLsMczKuaR5w9vSubF4j8HwEGGprVAyyVgS4EX7DKEg',
+    decimals: 6,
     tags: ['raydium']
   }
 }
