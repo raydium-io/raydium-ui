@@ -253,7 +253,7 @@
             initialized &&
             !loading &&
             (usedAmmId || usedRouteInfo) &&
-            setupFlag &&
+            (setupFlag || needCreateTokens() || needWrapSol()) &&
             !gt(
               fromCoinAmount,
               fromCoin && fromCoin.balance
