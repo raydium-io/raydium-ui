@@ -76,6 +76,11 @@
                     <Input :ref="`input-${poolId}`" size="small" />
                     <Button size="small" ghost @click="stake(pool)">Stake</Button>
                     <Button size="small" ghost @click="unstake(pool)">Untake</Button>
+                    <div>
+                      <Button size="small" type="danger" ghost @click="emergencyWithdraw(pool)">
+                        Emergency withdraw all LP and wipe all rewards
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -100,7 +105,7 @@ import { TOKENS } from '@/utils/tokens'
 import { sendTransaction } from '@/utils/web3'
 import { getUnixTs } from '@/utils'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { depositV4, withdrawV4, deposit, withdraw } from '@/utils/stake'
+import { depositV4, withdrawV4, deposit, withdraw, emergencyWithdrawV4 } from '@/utils/stake'
 
 @Component({
   head: {
@@ -289,6 +294,45 @@ export default class Debug extends Vue {
         })
 
         const description = `Unstake ${amount} ${poolInfo.lp.name}`
+        this.$accessor.transaction.sub({ txid, description })
+      })
+      .catch((error) => {
+        this.$notify.error({
+          key,
+          message: 'Stake failed',
+          description: error.message
+        })
+      })
+  }
+
+  emergencyWithdraw(poolInfo: any) {
+    const conn = this.$web3
+    const wallet = (this as any).$wallet
+
+    const lpAccount = safeGet(this.wallet.tokenAccounts, `${poolInfo.lp.mintAddress}.tokenAccountAddress`)
+    const infoAccount = safeGet(this.farm.stakeAccounts, `${poolInfo.poolId}.stakeAccountAddress`)
+
+    const key = getUnixTs().toString()
+    this.$notify.info({
+      key,
+      message: 'Making transaction...',
+      description: '',
+      duration: 0
+    })
+
+    emergencyWithdrawV4(conn, wallet, poolInfo, lpAccount, infoAccount)
+      .then((txid) => {
+        this.$notify.info({
+          key,
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Emergency withdraw all LP and wipe all rewards`
         this.$accessor.transaction.sub({ txid, description })
       })
       .catch((error) => {

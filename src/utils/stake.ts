@@ -1,18 +1,14 @@
 // @ts-ignore
-import { blob, nu64, struct, u8 } from 'buffer-layout';
+import { blob, nu64, struct, u8 } from 'buffer-layout'
 
-import { FarmInfo } from '@/utils/farms';
-import { TOKEN_PROGRAM_ID } from '@/utils/ids';
-import { TokenAmount } from '@/utils/safe-math';
-import {
-  createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist, sendTransaction
-} from '@/utils/web3';
-import { publicKey, u128, u64 } from '@project-serum/borsh';
-import {
-  Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction
-} from '@solana/web3.js';
+import { FarmInfo } from '@/utils/farms'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TokenAmount } from '@/utils/safe-math'
+import { createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist, sendTransaction } from '@/utils/web3'
+import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { getBigNumber } from './layouts';
+import { getBigNumber } from './layouts'
 
 // deposit
 export async function deposit(
@@ -303,6 +299,49 @@ export async function withdrawV4(
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
+export async function emergencyWithdrawV4(
+  connection: Connection | undefined | null,
+  wallet: any | undefined | null,
+  farmInfo: FarmInfo | undefined | null,
+  lpAccount: string | undefined | null,
+  infoAccount: string | undefined | null
+): Promise<string> {
+  if (!connection || !wallet) throw new Error('Miss connection')
+  if (!farmInfo) throw new Error('Miss pool infomations')
+  if (!infoAccount) throw new Error('Miss account infomations')
+
+  const transaction = new Transaction()
+  const signers: any = []
+
+  const owner = wallet.publicKey
+
+  const atas: string[] = []
+
+  const userLpAccount = await createAssociatedTokenAccountIfNotExist(
+    lpAccount,
+    owner,
+    farmInfo.lp.mintAddress,
+    transaction,
+    atas
+  )
+
+  const programId = new PublicKey(farmInfo.programId)
+
+  transaction.add(
+    emergencyWithdrawInstructionV4(
+      programId,
+      new PublicKey(farmInfo.poolId),
+      new PublicKey(farmInfo.poolAuthority),
+      new PublicKey(infoAccount),
+      wallet.publicKey,
+      userLpAccount,
+      new PublicKey(farmInfo.poolLpTokenAccount)
+    )
+  )
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
 export function depositInstruction(
   programId: PublicKey,
   // staking pool
@@ -484,6 +523,44 @@ export function withdrawInstructionV4(
     {
       instruction: 2,
       amount
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function emergencyWithdrawInstructionV4(
+  programId: PublicKey,
+  // staking pool
+  poolId: PublicKey,
+  poolAuthority: PublicKey,
+  // user
+  userInfoAccount: PublicKey,
+  userOwner: PublicKey,
+  userLpTokenAccount: PublicKey,
+  poolLpTokenAccount: PublicKey
+) {
+  const dataLayout = struct([u8('instruction')])
+
+  const keys = [
+    { pubkey: poolId, isSigner: false, isWritable: true },
+    { pubkey: poolAuthority, isSigner: false, isWritable: false },
+    { pubkey: userInfoAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 7
     },
     data
   )
