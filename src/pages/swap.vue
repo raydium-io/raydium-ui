@@ -506,9 +506,10 @@
 
     <Modal
       class="swap-confirm-modal"
-      title="Warning"
+      title="Price Impact Warning"
       :visible="confirmModalIsOpen === true"
       :footer="null"
+      style="font-size: 20px; text-align: center"
       @cancel="confirmModalIsOpen = false"
       @ok="
         () => {
@@ -517,8 +518,6 @@
         }
       "
     >
-      <div class="title">Price Impact Warning</div>
-
       <div class="description-secondary">
         Your price impact is <span class="highlight">{{ priceImpact.toFixed(2) }}%</span> on this swap.
       </div>
@@ -535,13 +534,13 @@
         >.
       </div>
 
-      <div class="description-secondary">Are you sure you want to confirm this swap?</div>
+      <div class="description-secondary">Are you sure you want to continue this swap?</div>
 
-      <div class="description-secondary">
+      <div class="description-secondary" style="font-size: 14px; margin: 0">
         {{ fromCoinAmount }} {{ fromCoin && fromCoin.symbol }} → {{ toCoinAmount }} {{ toCoin && toCoin.symbol }}
       </div>
 
-      <div class="description-secondary">
+      <div class="description-secondary" style="font-size: 14px; margin: 0">
         Exchange rate:
         <span class="price-info" style="padding: 0 12px">
           <span v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base">
@@ -564,15 +563,19 @@
           </span>
         </span>
       </div>
-      <div class="description-secondary">
+      <div class="description-secondary" style="font-size: 14px; margin: 0">
         Minimum received: <span class="highlight">{{ toCoinWithSlippage }} {{ toCoin && toCoin.symbol }}</span>
       </div>
 
-      <div class="btn-group">
-        <Button class="cancel-btn" ghost size="large" @click="confirmModalIsOpen = false"> Cancel </Button>
+      <div class="btn-group" style="margin-top: 20px; display: flex; justify-content: center; align-items: center">
+        <Button class="cancel-btn" ghost size="large" style="margin-right: 10px" @click="confirmModalIsOpen = false">
+          Cancel
+        </Button>
         <Button
-          class="swap-btn"
-          type="text"
+          class="cancel-btn"
+          ghost
+          size="large"
+          style="color: #ed4b9e; border-color: #ed4b9e"
           @click="
             () => {
               confirmModalIsOpen = false
@@ -1810,6 +1813,9 @@ export default Vue.extend({
 </script>
 
 <style>
+.swap-confirm-modal .ant-modal-header .ant-modal-title {
+  font-size: 22px;
+}
 .step-box {
   width: 100%;
   text-align: center;
