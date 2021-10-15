@@ -741,6 +741,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'BRLsMczKuaR5w9vSubF4j8HwEGGprVAyyVgS4EX7DKEg',
     decimals: 6,
     tags: ['raydium']
+  },
+  FRKT: {
+    symbol: 'FRKT',
+    name: 'FRKT',
+    mintAddress: 'ErGB9xa24Szxbk1M28u2Tx8rKPqzL6BroNkkzk5rG4zj',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
