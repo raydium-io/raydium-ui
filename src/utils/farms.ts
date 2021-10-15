@@ -1025,6 +1025,63 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'CoUQ1tcRkEyxbCHfLkjxgUtYVhrRbsdeMKT7zB2iCZg5', // lp vault
     poolRewardTokenAccount: '5fnav2gjLUjPCwHEnm2vMVmsDV3V8sfjj7MwfeUdgdtM', // reward vault A
     poolRewardTokenAccountB: '8geEcDpFkXqR2UEE2LVcYCzsD9cyGwJSu8Q56uqr1xs6' // reward vault B
+  },
+  {
+    name: 'BTC-mSOL',
+    lp: { ...LP_TOKENS['BTC-mSOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNDE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '914jyHBQFiroKFVCpKkzjGSaZyr4gMwgxE7snbNfGjnL',
+    poolAuthority: 'Gb17eJ4TK95SXPduUuh5YFJH4iz73qNFHmrqFBn1Tv9R',
+    poolLpTokenAccount: 'GYNDinXxGR5zsNn6bDWAidWFKT1JMQbyneuzPGosUDR7', // lp vault
+    poolRewardTokenAccount: 'HVAxutFAei62E2Wn1eueYCrCPCCMrkho3xq6NyzW9hQA', // reward vault A
+    poolRewardTokenAccountB: '7GbsEKskWjK9S4B3CayAGj2uL8v48u5RXZN7eSGWHABZ' // reward vault B
+  },
+  {
+    name: 'ETH-mSOL',
+    lp: { ...LP_TOKENS['ETH-mSOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNDE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '54vUWjEmg9wfCsZF7wwq2HJu5BU3cfDFAQQQgXPECcwE',
+    poolAuthority: 'E4VNit9T28vRtiLv8e5o7HgVNs7frULkViYBpUjj6pTS',
+    poolLpTokenAccount: '3vgFo13L14woTPNC249BFgwHMAAajfhjUbvDLSKDnBtP', // lp vault
+    poolRewardTokenAccount: 'YVQYnEoLYv7d7JEGPLSSkmxpwVCdWjzA4kdeoag78kd', // reward vault A
+    poolRewardTokenAccountB: '6pMVuiTtFSmzEPWzoUdQiQxcdEED5Z1jTakvQBHiGCcU' // reward vault B
+  },
+  {
+    name: 'mSOL-USDT',
+    lp: { ...LP_TOKENS['mSOL-USDT-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNDE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'HxhxYASqdLcR6yehT9hB9HUpgcF1R2t9HtkHdngGZ2Dh',
+    poolAuthority: 'FGJKdv7Wm1j75cBsj7FsZU256fhDSYVTwYkzFQ3sVQqg',
+    poolLpTokenAccount: 'CxY6pDZxPr8VAArC427NQficTpKEm3VxTVZEZQdQFexZ', // lp vault
+    poolRewardTokenAccount: '94zGzNAzv2xU8YW3uHYkiysjG9Qw2gCv7wx9tye1uYbE', // reward vault A
+    poolRewardTokenAccountB: '8mJzCGURgpUDLnB3qaSQt3xyM7MEKpPcvzXxWTGCQbTb' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
