@@ -174,10 +174,6 @@ export function getLpListByTokenMintAddresses(
   }
 }
 
-export function canWrap(fromMintAddress: string, toMintAddress: string): boolean {
-  return fromMintAddress === TOKENS.WUSDT.mintAddress && toMintAddress === TOKENS.USDT.mintAddress
-}
-
 export function getPoolByLpMintAddress(lpMintAddress: string): LiquidityPoolInfo | undefined {
   const pool = LIQUIDITY_POOLS.find((pool) => pool.lp.mintAddress === lpMintAddress)
 

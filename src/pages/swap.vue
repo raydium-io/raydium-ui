@@ -155,13 +155,7 @@
           @onSelect="openToCoinSelect"
         />
         <div class="price-info" style="padding: 0 12px">
-          <div v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base fc-container">
-            <span>
-              1 {{ fromCoin.symbol }} = 1
-              {{ toCoin.symbol }}
-            </span>
-          </div>
-          <div v-else-if="fromCoin && toCoin && fromCoinAmount && outToPirceValue" class="price-base fc-container">
+          <div v-if="fromCoin && toCoin && fromCoinAmount && outToPirceValue" class="price-base fc-container">
             <span>
               1 {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }} ≈
               {{
@@ -383,7 +377,8 @@
                       .toFixed(fromCoin.balance.decimals)
                   : fromCoin.balance.fixed()
                 : '0'
-            )
+            ) ||
+            amms.length + routeInfos.length + (marketAddress !== '' ? 1 : 0) === 0
           "
           :loading="swaping"
           style="width: 100%"
@@ -441,7 +436,6 @@
           <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
             xCOPE amount must greater than 5
           </template>
-          <template v-else>{{ isWrap ? 'Unwrap' : priceImpact > 1 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
           <span class="caution-text">Caution: Your SOL balance is low</span>
@@ -558,13 +552,7 @@
       <div class="description-secondary" style="font-size: 14px; margin: 0">
         Exchange rate:
         <span class="price-info" style="padding: 0 12px">
-          <span v-if="fromCoin && toCoin && isWrap && fromCoinAmount" class="price-base">
-            <span>
-              1 {{ fromCoin.symbol }} = 1
-              {{ toCoin.symbol }}
-            </span>
-          </span>
-          <span v-else-if="fromCoin && toCoin && fromCoinAmount && outToPirceValue" class="price-base">
+          <span v-if="fromCoin && toCoin && fromCoinAmount && outToPirceValue" class="price-base">
             <span>
               1 {{ hasPriceSwapped ? toCoin.symbol : fromCoin.symbol }} ≈
               {{
@@ -624,7 +612,6 @@ import {
   getSwapOutAmount,
   place,
   swap,
-  wrap,
   checkUnsettledInfo,
   settleFund,
   swapRoute,
@@ -633,7 +620,7 @@ import {
 } from '@/utils/swap'
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
-import { canWrap, getLiquidityInfoSimilar } from '@/utils/liquidity'
+import { getLiquidityInfoSimilar } from '@/utils/liquidity'
 import { isOfficalMarket, LiquidityPoolInfo } from '@/utils/pools'
 import { RouterInfo, RouterInfoItem } from '@/types/api'
 import { getBigNumber } from '@/utils/layouts'
@@ -689,8 +676,6 @@ export default Vue.extend({
       toCoinAmount: '',
       toCoinWithSlippage: '',
 
-      // wrap
-      isWrap: false,
       // if priceImpact is higher than 10%, a confirm modal will be shown
       confirmModalIsOpen: false,
 
@@ -1164,12 +1149,6 @@ export default Vue.extend({
     findMarket() {
       if (this.fromCoin && this.toCoin && this.liquidity.initialized) {
         // let userSelectFlag = false
-        // wrap & unwrap
-        if (canWrap(this.fromCoin.mintAddress, this.toCoin.mintAddress)) {
-          this.isWrap = true
-          this.initialized = true
-          return
-        }
 
         this.amms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
           (p: any) =>
@@ -1213,7 +1192,6 @@ export default Vue.extend({
         if (marketAddress) {
           if (this.marketAddress !== marketAddress) {
             this.marketAddress = marketAddress
-            this.isWrap = false
             Market.load(this.$web3, new PublicKey(marketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
               (market) => {
                 this.market = market
@@ -1224,12 +1202,10 @@ export default Vue.extend({
         } else {
           this.marketAddress = ''
           this.market = null
-          this.isWrap = false
         }
       } else {
         this.marketAddress = ''
         this.market = null
-        this.isWrap = false
       }
     },
 
@@ -1284,7 +1260,7 @@ export default Vue.extend({
 
       let showMarket
 
-      if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
+      if (this.fromCoin && this.toCoin && this.fromCoinAmount) {
         // wrap & unwrap
         this.toCoinAmount = this.fromCoinAmount
         return
@@ -1500,48 +1476,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      if (this.isWrap) {
-        wrap(
-          this.$axios,
-          this.$web3,
-          // @ts-ignore
-          this.$wallet,
-          // @ts-ignore
-          this.fromCoin.mintAddress,
-          // @ts-ignore
-          this.toCoin.mintAddress,
-          // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
-          // @ts-ignore
-          get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
-          this.fromCoinAmount
-        )
-          .then((txid) => {
-            this.$notify.info({
-              key,
-              message: 'Transaction has been sent',
-              description: (h: any) =>
-                h('div', [
-                  'Confirmation is in progress.  Check your transaction on ',
-                  h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-                ])
-            })
-
-            const description = `Unwrap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
-            this.$accessor.transaction.sub({ txid, description })
-          })
-          .catch((error) => {
-            this.$notify.error({
-              key,
-              message: 'Swap failed',
-              description: error.message
-            })
-          })
-          .finally(() => {
-            this.swaping = false
-            if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
-          })
-      } else if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
+      if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
         const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
         swap(
           this.$web3,

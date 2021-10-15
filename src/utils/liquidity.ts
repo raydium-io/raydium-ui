@@ -6,10 +6,8 @@ import { publicKey, u128, u64 } from '@project-serum/borsh'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { getBigNumber, MINT_LAYOUT } from './layouts'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import {
-  canWrap,
   getLpMintByTokenMintAddresses,
   getPoolByLpMintAddress,
   getPoolByTokenMintAddresses,
@@ -25,8 +23,9 @@ import {
   getMultipleAccounts,
   sendTransaction
 } from '@/utils/web3'
+import { getBigNumber, MINT_LAYOUT } from './layouts'
 
-export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
+export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo

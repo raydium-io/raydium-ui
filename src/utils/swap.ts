@@ -363,55 +363,6 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
   }
 }
 
-export async function wrap(
-  axios: any,
-  connection: Connection,
-  wallet: any,
-  fromCoinMint: string,
-  toCoinMint: string,
-  fromTokenAccount: string,
-  toTokenAccount: string,
-  amount: string
-) {
-  const transaction = new Transaction()
-  const signers: Account[] = []
-
-  const owner = wallet.publicKey
-
-  const fromCoin = getTokenByMintAddress(fromCoinMint)
-  const amountOut = new TokenAmount(amount, fromCoin?.decimals, false)
-
-  const newFromTokenAccount = await createAssociatedTokenAccountIfNotExist(
-    fromTokenAccount,
-    owner,
-    fromCoinMint,
-    transaction
-  )
-  const newToTokenAccount = await createAssociatedTokenAccountIfNotExist(toTokenAccount, owner, toCoinMint, transaction)
-
-  const solletRes = await axios.post('https://swap.sollet.io/api/swap_to', {
-    address: newToTokenAccount.toString(),
-    blockchain: 'sol',
-    coin: toCoinMint,
-    size: 1,
-    wusdtToUsdt: true
-  })
-  const { address, maxSize } = solletRes.result
-
-  if (!address) {
-    throw new Error('Unwrap not available now')
-  }
-
-  if (parseFloat(amount) > maxSize) {
-    throw new Error(`Max allow ${maxSize}`)
-  }
-
-  transaction.add(transfer(newFromTokenAccount, new PublicKey(address), owner, getBigNumber(amountOut.toWei())))
-  transaction.add(memoInstruction(newToTokenAccount.toString()))
-
-  return await sendTransaction(connection, wallet, transaction, signers)
-}
-
 export async function swap(
   connection: Connection,
   wallet: any,

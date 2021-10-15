@@ -146,142 +146,6 @@
     </div>
 
     <div class="page-head fs-container">
-      <span class="title">WUSDT Migration</span>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <p>
-          Native SPL USDT has launched on Solana. As a result, SPL Wrapped USDT (WUSDT) liquidity in the RAY-WUSDT pool
-          must migrate to a new RAY-USDT pool. This tool simplifies the process.
-        </p>
-
-        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-          Connect Wallet
-        </Button>
-        <div v-else>
-          <Steps direction="vertical" progress-dot :current="4">
-            <!-- <Step>
-              <div slot="title">Create USDT account</div>
-              <div slot="description" class="action">
-                <Button
-                  ghost
-                  :loading="creating"
-                  :disabled="creating || get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`) === 0"
-                  @click="createUsdtAccount"
-                >
-                  Create USDT Account
-                </Button>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Unstake</div>
-              <div slot="description" class="action">
-                Staked LP tokens will be unstaked from legacy RAY-WUSDT pools
-
-                <template
-                  v-for="farm in farms.filter((f) => f.farmInfo.version === 3 && f.farmInfo.lp.pc.symbol === 'WUSDT')"
-                >
-                  <Button
-                    :key="farm.farmInfo.lp.name"
-                    ghost
-                    :loading="unstaking"
-                    :disabled="unstaking"
-                    @click="unstakeWUSDT(farm.farmInfo, farm.depositBalance.fixed())"
-                  >
-                    Unstake
-                    {{ farm.depositBalance.format() }}
-                    {{ farm.farmInfo.lp.name }}
-                  </Button>
-                </template>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Remove liquidity</div>
-              <div slot="description" class="action">
-                Remove liquidity from legacy RAY-WUSDT pools
-
-                <h6
-                  v-for="liquid in liquids.filter((l) => l.poolInfo.version === 3)"
-                  :key="liquid.poolInfo.name"
-                  class="fs-container"
-                >
-                  <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
-
-                  <Button
-                    ghost
-                    :loading="removing"
-                    :disabled="liquids.length === 0"
-                    @click="remove(liquid.poolInfo, liquid.userLpBalance)"
-                  >
-                    Remove liquidity
-                  </Button>
-                </h6>
-              </div>
-            </Step> -->
-            <Step>
-              <div slot="title">Unwrap</div>
-              <div slot="description" class="action">
-                Convert WUSDT to USDT. Converting takes time to process, please give it a couple minutes.
-
-                <h6 v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]" class="fs-container">
-                  <span>WUSDT Balance</span>
-                  <span>USDT Balance</span>
-                </h6>
-                <h6
-                  v-if="wallet.connected && get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`)"
-                  class="fs-container"
-                >
-                  <span v-if="!get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`)">
-                    {{ get(wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}`).balance.format() }}
-                  </span>
-                  <span v-else>0</span>
-                  <span v-if="!get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`)"> No USDT account yet </span>
-                  <span v-else>
-                    {{ get(wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}`).balance.format() }}
-                  </span>
-                </h6>
-
-                <Button
-                  v-if="wallet.connected && wallet.tokenAccounts[TOKENS.WUSDT.mintAddress]"
-                  ghost
-                  :loading="unwraping"
-                  :disabled="
-                    unwraping || getBigNumber(wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.wei) === 0
-                  "
-                  @click="unwrapWUSDT(wallet.tokenAccounts[TOKENS.WUSDT.mintAddress].balance.fixed())"
-                >
-                  Unwrap all WUSDT
-                </Button>
-              </div>
-            </Step>
-            <!-- <Step>
-              <div slot="title">Add liquidity to new RAY-USDT pool</div>
-              <div slot="description" class="action">
-                Continue earning RAY by adding liquidity to new pools, then staking LP tokens
-
-                <Button
-                  ghost
-                  @click="
-                    $router.push({
-                      path: '/liquidity/',
-                      query: {
-                        from: TOKENS.RAY.mintAddress,
-                        to: TOKENS.USDT.mintAddress
-                      }
-                    })
-                  "
-                >
-                  Add liquidity
-                </Button>
-              </div>
-            </Step> -->
-          </Steps>
-        </div>
-      </div>
-    </div>
-
-    <div class="page-head fs-container">
       <span class="title">DEX2 to DEX3 Migration</span>
     </div>
 
@@ -362,7 +226,6 @@ import { Button, Steps, Icon } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
 import { unstakeAll, mergeTokens } from '@/utils/migrate'
-import { wrap } from '@/utils/swap'
 import { withdraw } from '@/utils/stake'
 import { TOKENS, getTokenSymbolByMint } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
@@ -388,8 +251,7 @@ export default Vue.extend({
       migrating: false,
       creating: false,
       unstaking: false,
-      removing: false,
-      unwraping: false
+      removing: false
     }
   },
 
@@ -624,59 +486,6 @@ export default Vue.extend({
     //       this.unstaking = false
     //     })
     // },
-
-    unwrapWUSDT(amount: string) {
-      this.unwraping = true
-
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
-
-      const wusdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.WUSDT.mintAddress}.tokenAccountAddress`)
-      const usdtAccount = get(this.wallet.tokenAccounts, `${TOKENS.USDT.mintAddress}.tokenAccountAddress`)
-
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
-
-      wrap(
-        this.$axios,
-        conn,
-        wallet,
-        TOKENS.WUSDT.mintAddress,
-        TOKENS.USDT.mintAddress,
-        wusdtAccount,
-        usdtAccount,
-        amount
-      )
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
-
-          const description = `Unwrap ${amount} WUSDT`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Unwrap failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.unwraping = false
-        })
-    },
 
     unstake() {
       this.unstaking = true
