@@ -373,7 +373,23 @@
             loading ||
             swaping ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
-            (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
+            (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)) ||
+            gt(
+              fromCoinAmount,
+              fromCoin && fromCoin.balance
+                ? fromCoin.symbol === 'SOL'
+                  ? fromCoin.balance
+                      .toEther()
+                      .minus(0.05)
+                      .plus(
+                        get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                          ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                          : 0
+                      )
+                      .toFixed(fromCoin.balance.decimals)
+                  : fromCoin.balance.fixed()
+                : '0'
+            )
           "
           :loading="swaping"
           style="width: 100%"
