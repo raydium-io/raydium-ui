@@ -57,26 +57,20 @@
                   </a>
                 </div>
               </div>
-              <!-- <div v-if="marketAddress" class="info">
+              <div v-if="showMarket" class="info">
                 <div class="symbol">Market</div>
                 <div class="address">
-                  {{ marketAddress.substr(0, 14) }}
+                  {{ showMarket.substr(0, 14) }}
                   ...
-                  {{ marketAddress.substr(marketAddress.length - 14, 14) }}
+                  {{ showMarket.substr(showMarket.length - 14, 14) }}
                 </div>
                 <div class="action">
-                  <Icon type="copy" @click="$accessor.copy(marketAddress)" />
-                  <a :href="`${url.trade}/${marketAddress}`" target="_blank">
+                  <Icon type="copy" @click="$accessor.copy(showMarket)" />
+                  <a :href="`${url.explorer}/account/${showMarket}`" target="_blank">
                     <Icon type="link" />
                   </a>
-                   <a v-if="!officialPool" :href="`${url.explorer}/account/${marketAddress}`" target="_blank">
-                    <Icon type="link" />
-                  </a>
-                  <a v-else :href="`${url.trade}/${marketAddress}`" target="_blank">
-                    <Icon type="link" />
-                  </a> 
                 </div>
-              </div> -->
+              </div>
             </div>
           </template>
           <Icon type="info-circle" />
@@ -739,7 +733,9 @@ export default Vue.extend({
 
       setupFlag: false as boolean,
       setupLastData: '' as string,
-      setupFlagWSOL: false as boolean
+      setupFlagWSOL: false as boolean,
+
+      showMarket: undefined as string | undefined
     }
   },
 
@@ -1286,6 +1282,8 @@ export default Vue.extend({
       let usedRouteInfo
       let middleCoinAmount
 
+      let showMarket
+
       if (this.fromCoin && this.toCoin && this.isWrap && this.fromCoinAmount) {
         // wrap & unwrap
         this.toCoinAmount = this.fromCoinAmount
@@ -1313,6 +1311,7 @@ export default Vue.extend({
               // price = fAmountOut
               usedAmmId = poolInfo.ammId
               endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              showMarket = poolInfo.serumMarket
             }
             console.log(
               'amm -> ',
@@ -1383,6 +1382,7 @@ export default Vue.extend({
               usedAmmId = undefined
               middleCoinAmount = amountOutWithSlippageA.fixed()
               endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
+              showMarket = undefined
             }
             console.log(
               'route -> ',
@@ -1423,6 +1423,7 @@ export default Vue.extend({
               toCoinWithSlippage = outWithSlippage
               impact = priceImpact
               endpoint = 'Serum DEX'
+              showMarket = this.marketAddress
             }
           }
         }
@@ -1468,6 +1469,8 @@ export default Vue.extend({
         this.setupFlag = setupFlag || this.needCreateTokens() || this.needWrapSol() > 0
 
         this.setupFlagWSOL = setupFlagWSOL || this.needWrapSol() > 0
+
+        this.showMarket = showMarket
       }
     },
 
