@@ -1082,6 +1082,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'CxY6pDZxPr8VAArC427NQficTpKEm3VxTVZEZQdQFexZ', // lp vault
     poolRewardTokenAccount: '94zGzNAzv2xU8YW3uHYkiysjG9Qw2gCv7wx9tye1uYbE', // reward vault A
     poolRewardTokenAccountB: '8mJzCGURgpUDLnB3qaSQt3xyM7MEKpPcvzXxWTGCQbTb' // reward vault B
+  },
+  {
+    name: 'MNDE-mSOL',
+    lp: { ...LP_TOKENS['MNDE-mSOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MNDE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '97N6tPMVCrAunC9embwTcffye9xC95fA5y3LauhNZ444',
+    poolAuthority: 'hK1KZ5gEkGfrtQGF6qAP3tVjhYirRTt7TY3nFfwq8UV',
+    poolLpTokenAccount: '4w3kTW8LYPMqCZAkWyHZ7wxgBrjpF72x6ca3d1Aigwki', // lp vault
+    poolRewardTokenAccount: 'EhJLBNXDDZxXNDtYVineXadSe3T7zsHN8KsgwSAskQ4R', // reward vault A
+    poolRewardTokenAccountB: 'GTzobZsm4F4RTXDLnEJoWtXF7hxu9RDLpfvgcxDRfRUk' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
