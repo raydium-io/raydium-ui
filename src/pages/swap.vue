@@ -436,6 +436,7 @@
           <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
             xCOPE amount must greater than 5
           </template>
+          <template v-else>{{ priceImpact > 1 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
           <span class="caution-text">Caution: Your SOL balance is low</span>
@@ -1259,12 +1260,6 @@ export default Vue.extend({
       let middleCoinAmount
 
       let showMarket
-
-      if (this.fromCoin && this.toCoin && this.fromCoinAmount) {
-        // wrap & unwrap
-        this.toCoinAmount = this.fromCoinAmount
-        return
-      }
 
       if (this.fromCoin && this.toCoin) {
         let maxAmountOut = 0
