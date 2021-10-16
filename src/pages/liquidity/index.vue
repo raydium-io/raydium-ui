@@ -199,9 +199,7 @@
         >
           Confirm Risk Warning
         </Button>
-
         <Button
-          v-else
           size="large"
           ghost
           :disabled="
@@ -238,6 +236,10 @@
           </template>
           <template v-else>Supply</template>
         </Button>
+        <div class="fs-container">
+          Max IL Price Divergence
+          <input name="il" value="" style="color: #5ac4be; background: transparent; border: none" placeholder="1%" />
+        </div>
       </div>
     </div>
 

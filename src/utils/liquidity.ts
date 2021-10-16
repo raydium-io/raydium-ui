@@ -1,23 +1,30 @@
-import BigNumber from 'bignumber.js';
+import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8 } from 'buffer-layout'
 
-import { TOKEN_PROGRAM_ID } from '@/utils/ids';
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import {
-  canWrap, getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
-  LIQUIDITY_POOLS, LiquidityPoolInfo
-} from '@/utils/pools';
-import { TokenAmount } from '@/utils/safe-math';
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
+  canWrap,
+  getLpMintByTokenMintAddresses,
+  getPoolByLpMintAddress,
+  getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS,
+  LiquidityPoolInfo
+} from '@/utils/pools'
+import { TokenAmount } from '@/utils/safe-math'
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import {
-  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
-  getMultipleAccounts, sendTransaction
-} from '@/utils/web3';
-import { publicKey, u128, u64 } from '@project-serum/borsh';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+  commitment,
+  createAssociatedTokenAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
+import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { getBigNumber, MINT_LAYOUT } from './layouts';
+import { getBigNumber, MINT_LAYOUT } from './layouts'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses, canWrap }
 
@@ -81,6 +88,7 @@ export async function addLiquidity(
   toAmount: string | undefined | null,
   fixedCoin: string
 ): Promise<string> {
+  console.log(fromCoinAccount, toCoinAccount, lpAccount, fromCoin, toCoin, fromAmount, toAmount, fixedCoin)
   if (!connection || !wallet) throw new Error('Miss connection')
   if (!poolInfo || !fromCoin || !toCoin) {
     throw new Error('Miss pool infomations')
