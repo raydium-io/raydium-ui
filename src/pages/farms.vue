@@ -309,7 +309,7 @@ import {
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { depositV4, withdrawV4, deposit, withdraw } from '@/utils/stake'
+import { depositV4, depositV5, withdrawV4, withdrawV5, deposit, withdraw } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -625,7 +625,7 @@ export default Vue.extend({
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
-      const isFusion = Boolean(this.farmInfo.fusion)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -634,9 +634,23 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
-      const depositPromise = isFusion
-        ? depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
-        : deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+
+      const depositPromise =
+        this.farmInfo.version === 5
+          ? depositV5(
+              conn,
+              wallet,
+              this.farmInfo,
+              lpAccount,
+              rewardAccount,
+              rewardAccountB,
+              infoAccount,
+              auxiliaryAccounts,
+              amount
+            )
+          : this.farmInfo.version === 4
+          ? depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+          : deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
 
       depositPromise
         .then((txid) => {
@@ -691,7 +705,7 @@ export default Vue.extend({
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const rewardAccountB = get(this.wallet.tokenAccounts, `${this.farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
-      const isFusion = Boolean(this.farmInfo.fusion)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -700,9 +714,23 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
-      const withdrawPromise = isFusion
-        ? withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
-        : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+
+      const withdrawPromise =
+        this.farmInfo.version === 5
+          ? withdrawV5(
+              conn,
+              wallet,
+              this.farmInfo,
+              lpAccount,
+              rewardAccount,
+              rewardAccountB,
+              infoAccount,
+              auxiliaryAccounts,
+              amount
+            )
+          : this.farmInfo.version === 4
+          ? withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+          : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
 
       withdrawPromise
         .then((txid) => {
@@ -750,6 +778,7 @@ export default Vue.extend({
       const rewardAccountB = get(this.wallet.tokenAccounts, `${farmInfo.rewardB?.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
       const isFusion = Boolean(farmInfo.fusion)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -759,9 +788,22 @@ export default Vue.extend({
         duration: 0
       })
 
-      const depositPromise = isFusion
-        ? depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
-        : deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+      const depositPromise =
+        farmInfo.version === 5
+          ? depositV5(
+              conn,
+              wallet,
+              farmInfo,
+              lpAccount,
+              rewardAccount,
+              rewardAccountB,
+              infoAccount,
+              auxiliaryAccounts,
+              '0'
+            )
+          : farmInfo.version === 4
+          ? depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+          : deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
 
       depositPromise
         .then((txid) => {

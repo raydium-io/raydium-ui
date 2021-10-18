@@ -1,21 +1,16 @@
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
 // @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token'
+import { Token } from '@solana/spl-token';
 import {
-  Account,
-  AccountInfo,
-  Commitment,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-  TransactionSignature
-} from '@solana/web3.js'
+  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
+  TransactionInstruction, TransactionSignature
+} from '@solana/web3.js';
 
-import { ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
-import { TOKENS } from '@/utils/tokens'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
+} from '@/utils/ids';
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
+import { TOKENS } from '@/utils/tokens';
 
 export const web3Config = {
   strategy: 'speed',
@@ -57,6 +52,18 @@ export async function findAssociatedTokenAddress(walletAddress: PublicKey, token
   const { publicKey } = await findProgramAddress(
     [walletAddress.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), tokenMintAddress.toBuffer()],
     ASSOCIATED_TOKEN_PROGRAM_ID
+  )
+  return publicKey
+}
+
+export async function findAssociatedStakeInfoAddress(
+  poolId: PublicKey,
+  walletAddress: PublicKey,
+  programId: PublicKey
+) {
+  const { publicKey } = await findProgramAddress(
+    [poolId.toBuffer(), walletAddress.toBuffer(), Buffer.from('staker_info_v2_associated_seed')],
+    programId
   )
   return publicKey
 }
