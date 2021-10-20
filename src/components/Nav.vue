@@ -11,6 +11,14 @@
       </a>
       <span v-else> {{ name.replace('-', ' ') }} </span>
     </MenuItem>
+    <SubMenu v-for="(subDetails, title) in subNavs" :key="title" :title="title">
+      <MenuItem v-for="(extra, name) in subDetails" :key="name">
+        <a v-if="extra" :href="url[name]" target="_blank">
+          {{ name.replace('-', ' ') }}
+        </a>
+        <span v-else> {{ name.replace('-', ' ') }} </span>
+      </MenuItem>
+    </SubMenu>
   </Menu>
 </template>
 
@@ -20,11 +28,13 @@ import { Vue, Component } from 'nuxt-property-decorator'
 import { Menu } from 'ant-design-vue'
 
 const MenuItem = Menu.Item
+const SubMenu = Menu.SubMenu
 
 @Component({
   components: {
     Menu,
-    MenuItem
+    MenuItem,
+    SubMenu
   }
 })
 export default class Nav extends Vue {
@@ -39,6 +49,13 @@ export default class Nav extends Vue {
     dropZone: true,
     migrate: false
     // info: false
+  }
+
+  subNavs = {
+    NFTs: {
+      browseNFTs: true,
+      exploreCollections: true
+    }
   }
 
   get isMobile() {
@@ -76,7 +93,7 @@ export default class Nav extends Vue {
       } else {
         this.$router.push({ path: `/${key}/` })
       }
-    } else if (!(this as any).navs[key]) {
+    } else if ((this as any).navs[key] === false) {
       this.$router.push({ path: `/${key}/` })
     }
 
@@ -91,6 +108,15 @@ export default class Nav extends Vue {
 
 .ant-menu {
   text-transform: capitalize;
+}
+.ant-menu-submenu-popup {
+  background-color: #131a35;
+}
+.ant-menu-submenu > .ant-menu {
+  background-color: #232d54;
+}
+.ant-menu-item:active {
+  background-color: unset;
 }
 
 .ant-menu-horizontal {
