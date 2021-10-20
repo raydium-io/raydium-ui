@@ -6,7 +6,7 @@
     @click="changeRoute"
   >
     <template v-for="(extra, name) in navs">
-      <MenuItem v-if="typeof extra === bool" :key="name">
+      <MenuItem v-if="typeof extra === 'boolean'" :key="name" :title="name">
         <a v-if="extra" :href="url[name]" target="_blank">
           {{ name.replace('-', ' ') }}
         </a>
