@@ -14,6 +14,7 @@ module.exports = {
   plugins: ['prettier', 'import'],
   // add your custom rules here
   rules: {
-    'import/named': 0
+    'import/named': 0,
+    'import/order': 0
   }
 }
