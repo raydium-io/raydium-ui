@@ -5,20 +5,22 @@
     :theme="isMobile ? 'dark' : 'light'"
     @click="changeRoute"
   >
-    <MenuItem v-for="(extra, name) in navs" :key="name">
-      <a v-if="extra" :href="url[name]" target="_blank">
-        {{ name.replace('-', ' ') }}
-      </a>
-      <span v-else> {{ name.replace('-', ' ') }} </span>
-    </MenuItem>
-    <SubMenu v-for="(subDetails, title) in subNavs" :key="title" :title="title">
-      <MenuItem v-for="(extra, name) in subDetails" :key="name">
+    <template v-for="(extra, name) in navs">
+      <MenuItem v-if="typeof extra === bool" :key="name">
         <a v-if="extra" :href="url[name]" target="_blank">
           {{ name.replace('-', ' ') }}
         </a>
         <span v-else> {{ name.replace('-', ' ') }} </span>
       </MenuItem>
-    </SubMenu>
+      <SubMenu v-else :key="name" :title="name">
+        <MenuItem v-for="(subExtra, subName) in extra" :key="subName">
+          <a v-if="subExtra" :href="url[subName]" target="_blank">
+            {{ subName.replace('-', ' ') }}
+          </a>
+          <span v-else> {{ subName.replace('-', ' ') }} </span>
+        </MenuItem>
+      </SubMenu>
+    </template>
   </Menu>
 </template>
 
@@ -47,15 +49,12 @@ export default class Nav extends Vue {
     staking: false,
     acceleRaytor: false,
     dropZone: true,
+    NFTs: {
+      'browse-NFTs': true,
+      'explore-Collections': true
+    },
     migrate: false
     // info: false
-  }
-
-  subNavs = {
-    NFTs: {
-      browseNFTs: true,
-      exploreCollections: true
-    }
   }
 
   get isMobile() {

@@ -5,8 +5,8 @@ export const state = () => ({
   explorer: 'https://solscan.io',
   trade: 'https://dex.raydium.io/#/market',
   dropZone: 'https://dropzone.raydium.io',
-  browseNFTs: 'https://nft.raydium.io/marketplace',
-  exploreCollections: 'https://nft.raydium.io/collections'
+  'browse-NFTs': 'https://nft.raydium.io/marketplace',
+  'explore-Collections': 'https://nft.raydium.io/collections'
 })
 
 export const getters = getterTree(state, {})
