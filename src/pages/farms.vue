@@ -255,7 +255,7 @@
                       <div class="fs-container">
                         <span style="margin-right: auto">
                           {{ farm.userInfo.depositBalance.format() }} <br />(${{
-                            (farm.userInfo.depositBalance.format() * farm.farmInfo.liquidityItemValue)
+                            (farm.userInfo.depositBalance.toEther() * farm.farmInfo.liquidityItemValue)
                               .toFixed(2)
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                           }})</span
