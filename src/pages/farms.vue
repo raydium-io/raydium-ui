@@ -253,7 +253,13 @@
                     <template v-else>
                       <div class="title">Your Staked LP</div>
                       <div class="fs-container">
-                        <span style="margin-right: auto"> {{ farm.userInfo.depositBalance.format() }}</span>
+                        <span style="margin-right: auto">
+                          {{ farm.userInfo.depositBalance.format() }} <br />(${{
+                            (farm.userInfo.depositBalance.toEther() * farm.farmInfo.liquidityItemValue)
+                              .toFixed(2)
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                          }})</span
+                        >
                         <Button
                           class="unstake"
                           size="large"
@@ -483,6 +489,8 @@ export default Vue.extend({
             newFarmInfo.aprTotal = aprTotal
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+            // @ts-ignore
+            newFarmInfo.liquidityItemValue = liquidityItemValue
             if (
               rewardPerBlockAmount.toEther().toString() === '0' &&
               rewardBPerBlockAmount.toEther().toString() === '0'
@@ -520,6 +528,8 @@ export default Vue.extend({
             newFarmInfo.apr = apr
             // @ts-ignore
             newFarmInfo.liquidityUsdValue = liquidityUsdValue
+            // @ts-ignore
+            newFarmInfo.liquidityItemValue = liquidityItemValue
 
             if (rewardPerBlockAmount.toEther().toString() === '0') {
               endedFarmsPoolId.push(poolId)
