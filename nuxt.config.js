@@ -81,8 +81,10 @@ export default {
     '@nuxtjs/axios',
     'nuxt-clipboard',
     '@nuxtjs/dayjs',
-    '@nuxtjs/google-gtag'
+    '@nuxtjs/google-gtag',
+    '@nuxtjs/gtm',
     // '@nuxtjs/sentry'
+    '@/modules/alexa'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -98,8 +100,20 @@ export default {
     plugins: ['utc']
   },
 
+  // https://github.com/nuxt-community/google-gtag-module
   'google-gtag': {
-    id: 'G-78BZ5BGCV5'
+    id: 'G-78BZ5BGCV5',
+    debug: true
+  },
+
+  alexa: {
+    id: '7D7sw1Fx9f207i'
+  },
+
+  // https://github.com/nuxt-community/gtm-module
+  gtm: {
+    id: 'GTM-MN4HVBS',
+    enabled: true
   },
 
   // sentry: {
