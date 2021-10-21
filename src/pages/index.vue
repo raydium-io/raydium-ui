@@ -198,6 +198,24 @@
                 >Documentation</a
               >
             </li>
+            <li>
+              <a
+                class="link"
+                href="https://coinmarketcap.com/currencies/raydium/"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+                >CoinMarketCap</a
+              >
+            </li>
+            <li>
+              <a
+                class="link"
+                href="https://www.coingecko.com/en/coins/raydium"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+                >CoinGecko</a
+              >
+            </li>
           </ul>
         </div>
 
