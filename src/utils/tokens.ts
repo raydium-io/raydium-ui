@@ -748,6 +748,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'ErGB9xa24Szxbk1M28u2Tx8rKPqzL6BroNkkzk5rG4zj',
     decimals: 8,
     tags: ['raydium']
+  },
+  AURY: {
+    symbol: 'AURY',
+    name: 'AURY',
+    mintAddress: 'AURYydfxJib1ZkTir1Jn1J9ECYUtjb6rKQVmtYaixWPP',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1599,6 +1606,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '92bcERNtUmuaJ6mwLSxYHZYSph37jdKxRdoYNxpcYNPp',
     decimals: TOKENS.BTC.decimals
+  },
+  'SLIM-SOL-V4': {
+    symbol: 'SLIM-SOL',
+    name: 'SLIM-SOL LP',
+    coin: { ...TOKENS.SLIM },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '9X4EK8E59VAVi6ChnNvvd39m6Yg9RtkBbAPq1mDVJT57',
+    decimals: TOKENS.SLIM.decimals
+  },
+  'AURY-USDC-V4': {
+    symbol: 'AURY-USDC',
+    name: 'AURY-USDC LP',
+    coin: { ...TOKENS.AURY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Gub5dvTy4nzP82qpmpNkBxmRqjtqRddBTBqHSdNcf2oS',
+    decimals: TOKENS.AURY.decimals
+  },
+  'PRT-SOL-V4': {
+    symbol: 'PRT-SOL',
+    name: 'PRT-SOL LP',
+    coin: { ...TOKENS.PRT },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'EcJ8Wgwt1AzSPiDpVr6aaSur8TKAsNTPmmzRACeqT68Z',
+    decimals: TOKENS.PRT.decimals
   }
 }
 
