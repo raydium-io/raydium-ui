@@ -1633,6 +1633,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'EcJ8Wgwt1AzSPiDpVr6aaSur8TKAsNTPmmzRACeqT68Z',
     decimals: TOKENS.PRT.decimals
+  },
+  'LIQ-RAY-V4': {
+    symbol: 'LIQ-RAY',
+    name: 'LIQ-RAY LP',
+    coin: { ...TOKENS.LIQ },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '49YUsDrThJosHSagCn1F59Uc9NRxbr9thVrZikUnQDXy',
+    decimals: TOKENS.LIQ.decimals
   }
 }
 
