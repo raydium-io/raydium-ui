@@ -1153,11 +1153,11 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    poolId: 'EeAH83ZFasKoLB2wHoPPfZiuN4UT5hNAyYVc6YJFFP4U',
-    poolAuthority: 'CzVokEnczpn2a6vPNN3gPUTjFvJ1N798c9LXVYqTTsr4',
-    poolLpTokenAccount: 'B48i8DZe4AzFVbqugkRCszLp8iWaLnquxHgm8oaJCu36', // lp vault
-    poolRewardTokenAccount: '6G1zvGfeTJk77a6epp7yCwrA8HgkDmjBnuHYj584HDju', // reward vault A
-    poolRewardTokenAccountB: '7qdBJdZ5NniipNjR4hPJsVYh3DDszS6Bu98E7fMAQ799' // reward vault B
+    poolId: 'Gf3qFzKnGvMCVMQZERW2Qso5uEYxd9B9kWZZHsrMmmHj',
+    poolAuthority: 'ADuiJjCaDP5rEXQEyLZYvV9WgkRHPmGgsB6hss8WCKtE',
+    poolLpTokenAccount: 'Bqz61QpzmEuvB37QzkPLgnKHW2pRkH8Zcdh54DJicayG', // lp vault
+    poolRewardTokenAccount: '4LXUy3qtHwK3nkgmrSwupdBoS4ybn2FZcZBbazCV9cHV', // reward vault A
+    poolRewardTokenAccountB: 'FJCKa9tpiVV84zT3VQTxP7uNVyghDTTEGKX1jsXvVRBz' // reward vault B
   },
   {
     name: 'SYP-SOL',
@@ -1172,11 +1172,11 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    poolId: 'Hq8SDVwohQtrfMwmRJT6LVNASCZbcZtspSQQf9sHYvgM',
-    poolAuthority: 'CGywHdrnFZ5sQqa6TjNRU794AmYWsCXu4mMFPdjP2Z7t',
-    poolLpTokenAccount: '4mW5R9QXat4wT7BcPRh18eB4boswiJ3nmWtjmvha9w4C', // lp vault
-    poolRewardTokenAccount: '4kgScK72FuYhaYas4hny8N5Au2a8uzfoQdJtAEnktc2X', // reward vault A
-    poolRewardTokenAccountB: '8a6yTqYASpxw4prQqEwV47LexnAjaREaRE4c86fmiGoU' // reward vault B
+    poolId: '2pQQnoNpm5LoG6sZs5toNBXi4m1Pj3ExXdggPQYyiP2x',
+    poolAuthority: '4t9yWe9N1tBfTZKkmUdYFRjuY3xJP9AwXNYuStASYx45',
+    poolLpTokenAccount: '81nhtKAVM1yBwUmHQSQHwbkpZGvXrs58Qz7Uj4SLAv5F', // lp vault
+    poolRewardTokenAccount: '9jSMiKksbshsUgpwyMap96yFJ6Hdjvj8uEhw8CZnS49d', // reward vault A
+    poolRewardTokenAccountB: '4jebfTbaZugbkEZwzbX17iiC6d1dzQ3Ho8XCTyTZUSBm' // reward vault B
   },
   {
     name: 'SYP-USDC',
@@ -1191,11 +1191,11 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    poolId: '2x9YzUiNU874q9KPKkYxg5G3vkL6p8gcXzH1RnkycVCc',
-    poolAuthority: 'HKkWJHbWisn5VwAugnzS5xjFKEaCnKYsHSbXAWrQhkEC',
-    poolLpTokenAccount: '2sXCUuPJbzfE6qBePRZXzWvR8E9WpT663Y81p3sK5miJ', // lp vault
-    poolRewardTokenAccount: 'F1LpvrPmd9LZREU4PXhfVSWBfyjnq6fUFtXhRhSuyZqv', // reward vault A
-    poolRewardTokenAccountB: '4CkdvRcPUYMp2kz3aVHLaZitbY2twCUynP66XNLpFe5d' // reward vault B
+    poolId: 'Byt2kL5qi45pMpdAsNNciKZ8HLp7oU5jizCbyARLtQJy',
+    poolAuthority: 'EGBJV1YpgYhRSuNkz2w6NvhNxdLg1ZqRDaZSg4HysoTF',
+    poolLpTokenAccount: '8EziNww86hPoStUXPsPSvMuPaNxXP34597azYWshi6sx', // lp vault
+    poolRewardTokenAccount: 'Fx69V3iFYHk3Sj87nUbQoZsiuQ62hDucSagX4DPUiraQ', // reward vault A
+    poolRewardTokenAccountB: 'DMy3GrT8atWEV3Lcofv8mG5FsUq1HuqDHfpU3sLTkoJx' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
