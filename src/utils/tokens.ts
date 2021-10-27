@@ -755,6 +755,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'AURYydfxJib1ZkTir1Jn1J9ECYUtjb6rKQVmtYaixWPP',
     decimals: 9,
     tags: ['raydium']
+  },
+  SYP: {
+    symbol: 'SYP',
+    name: 'SYP',
+    mintAddress: 'FnKE9n6aGjQoNWRBZXy4RW6LZVao7qwBonUbiD7edUmZ',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1642,6 +1649,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '49YUsDrThJosHSagCn1F59Uc9NRxbr9thVrZikUnQDXy',
     decimals: TOKENS.LIQ.decimals
+  },
+  'SYP-SOL-V4': {
+    symbol: 'SYP-SOL',
+    name: 'SYP-SOL LP',
+    coin: { ...TOKENS.SYP },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'KHV6dfj2bDntzJ9z1S26cDfqWfUZdJRFmteLR6LxHwW',
+    decimals: TOKENS.SYP.decimals
+  },
+  'SYP-RAY-V4': {
+    symbol: 'SYP-RAY',
+    name: 'SYP-RAY LP',
+    coin: { ...TOKENS.SYP },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'FT2KZqxxM8F2h9pZtTF4PyjK88bM4YbuBzd7ZPwQ5wMB',
+    decimals: TOKENS.SYP.decimals
+  },
+  'SYP-USDC-V4': {
+    symbol: 'SYP-USDC',
+    name: 'SYP-USDC LP',
+    coin: { ...TOKENS.SYP },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2xJGuLAivAR1WkARRA6zP1v4jaA9jV2Qis8JfMNvrVyZ',
+    decimals: TOKENS.SYP.decimals
   }
 }
 
