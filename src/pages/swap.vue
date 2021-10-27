@@ -622,7 +622,7 @@ import {
 import { TokenAmount, gt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLiquidityInfoSimilar } from '@/utils/liquidity'
-import { isOfficalMarket, LiquidityPoolInfo } from '@/utils/pools'
+import { isOfficalMarket, LiquidityPoolInfo, LIQUIDITY_POOLS } from '@/utils/pools'
 import { RouterInfo, RouterInfoItem } from '@/types/api'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -681,8 +681,8 @@ export default Vue.extend({
       confirmModalIsOpen: false,
 
       // serum
-      market: null as Market | null,
-      marketAddress: '',
+      market: {} as { [marketAddress: string]: Market },
+      marketAddress: [] as string[],
       // amm
       lpMintAddress: '',
       // trading endpoint
@@ -1149,8 +1149,6 @@ export default Vue.extend({
 
     findMarket() {
       if (this.fromCoin && this.toCoin && this.liquidity.initialized) {
-        // let userSelectFlag = false
-
         this.amms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
           (p: any) =>
             p.version === 4 &&
@@ -1165,11 +1163,11 @@ export default Vue.extend({
           this.toCoin.mintAddress
         )
 
-        let marketAddress: string | undefined
+        const marketAddress: string[] = []
 
         // serum
         for (const address of Object.keys(this.swap.markets)) {
-          if (isOfficalMarket(address)) {
+          if (isOfficalMarket(address) || LIQUIDITY_POOLS.find((item) => item.serumMarket === address)) {
             const info = cloneDeep(this.swap.markets[address])
             let fromMint = this.fromCoin.mintAddress
             let toMint = this.toCoin.mintAddress
@@ -1183,30 +1181,34 @@ export default Vue.extend({
               (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
               (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
             ) {
-              marketAddress = address
+              marketAddress.push(address)
             }
           }
         }
 
+        marketAddress.sort()
+
         this.initialized = true
         this.updateUrl()
         if (marketAddress) {
-          if (this.marketAddress !== marketAddress) {
+          if (this.marketAddress.join('-') !== marketAddress.join('-')) {
             this.marketAddress = marketAddress
-            Market.load(this.$web3, new PublicKey(marketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
-              (market) => {
-                this.market = market
-                this.getOrderBooks()
-              }
-            )
+            marketAddress.forEach((itemMarketAddress) => {
+              Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
+                (market) => {
+                  this.market[itemMarketAddress] = market
+                  this.getOrderBooks()
+                }
+              )
+            })
           }
         } else {
-          this.marketAddress = ''
-          this.market = null
+          this.marketAddress = []
+          this.market = {}
         }
       } else {
-        this.marketAddress = ''
-        this.market = null
+        this.marketAddress = []
+        this.market = {}
       }
     },
 
