@@ -16,7 +16,7 @@
             :stroke-width="10"
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
-            :class="marketAddress && loading ? 'disabled' : ''"
+            :class="loading ? 'disabled' : ''"
             @click="
               () => {
                 getOrderBooks()
@@ -378,7 +378,7 @@
                   : fromCoin.balance.fixed()
                 : '0'
             ) ||
-            amms.length + routeInfos.length + (marketAddress !== '' ? 1 : 0) === 0
+            amms.length + routeInfos.length + Object.keys(market) === 0
           "
           :loading="swaping"
           style="width: 100%"
@@ -394,9 +394,7 @@
           "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="amms.length + routeInfos.length + (marketAddress !== '' ? 1 : 0) === 0">
-            Pool Not Found
-          </template>
+          <template v-else-if="amms.length + routeInfos.length + Object.keys(market) === 0"> Pool Not Found </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
           <template
@@ -600,7 +598,7 @@ import { mapState } from 'vuex'
 import { Icon, Tooltip, Button, Progress, Spin, Modal } from 'ant-design-vue'
 
 import { cloneDeep, get } from 'lodash-es'
-import { Market, Orderbook } from '@project-serum/serum/lib/market.js'
+import { Market, OpenOrders, Orderbook } from '@project-serum/serum/lib/market.js'
 
 import { Account, PublicKey, Transaction } from '@solana/web3.js'
 import { closeAccount } from '@project-serum/serum/lib/token-instructions'
@@ -652,8 +650,6 @@ export default Vue.extend({
       loading: false,
       // swaping
       swaping: false,
-      asks: {} as any,
-      bids: {} as any,
 
       isFetchingUnsettled: false,
       unsettledOpenOrders: null as any,
@@ -665,7 +661,6 @@ export default Vue.extend({
 
       quoteSymbol: '',
       quoteUnsettledAmount: 0,
-      isSettlingQuote: false,
 
       coinSelectShow: false,
       selectFromCoin: true,
@@ -681,8 +676,20 @@ export default Vue.extend({
       confirmModalIsOpen: false,
 
       // serum
-      market: {} as { [marketAddress: string]: Market },
-      marketAddress: [] as string[],
+      market: {} as {
+        [marketAddress: string]: {
+          market: Market
+          asks?: {}
+          bids?: {}
+          unSettleConfig?: {
+            baseSymbol: string
+            baseUnsettledAmount: number
+            quoteSymbol: string
+            quoteUnsettledAmount: number
+            unsettledOpenOrders: OpenOrders
+          }
+        }
+      },
       // amm
       lpMintAddress: '',
       // trading endpoint
@@ -770,10 +777,6 @@ export default Vue.extend({
 
     baseUnsettledAmount() {
       this.isSettlingBase = false
-    },
-
-    quoteUnsettledAmount() {
-      this.isSettlingQuote = false
     },
 
     toCoin(newCoin, oldCoin) {
@@ -1087,7 +1090,7 @@ export default Vue.extend({
             this.toCoin = toCoin
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         this.$notify.warning({
           message: error.message,
           description: ''
@@ -1186,28 +1189,28 @@ export default Vue.extend({
           }
         }
 
-        marketAddress.sort()
-
         this.initialized = true
         this.updateUrl()
-        if (marketAddress) {
-          if (this.marketAddress.join('-') !== marketAddress.join('-')) {
-            this.marketAddress = marketAddress
-            marketAddress.forEach((itemMarketAddress) => {
-              Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3)).then(
-                (market) => {
-                  this.market[itemMarketAddress] = market
-                  this.getOrderBooks()
-                }
-              )
-            })
+
+        for (const itemOldMarket of Object.keys(this.market)) {
+          if (!marketAddress.includes(itemOldMarket)) {
+            delete this.market[itemOldMarket]
           }
-        } else {
-          this.marketAddress = []
-          this.market = {}
         }
+
+        Promise.all(
+          marketAddress
+            .filter((itemMarket) => !Object.keys(this.market).includes(itemMarket))
+            .map((itemMarketAddress) =>
+              Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3))
+            )
+        ).then((marketList) => {
+          marketList.forEach((itemMarket) => {
+            this.market[itemMarket.address.toString()] = { market: itemMarket }
+          })
+          this.getOrderBooks()
+        })
       } else {
-        this.marketAddress = []
         this.market = {}
       }
     },
@@ -1218,32 +1221,45 @@ export default Vue.extend({
       this.countdown = this.autoRefreshTime
 
       const conn = this.$web3
-      if (this.marketAddress && get(this.swap.markets, this.marketAddress)) {
-        const marketInfo = get(this.swap.markets, this.marketAddress)
-        const { bids, asks } = marketInfo
 
-        getMultipleAccounts(conn, [bids, asks], commitment)
+      const asksAndBidsAddressToMarket: { [address: string]: string } = {}
+
+      for (const [marketAddress, marketConfig] of Object.entries(this.market)) {
+        asksAndBidsAddressToMarket[marketConfig.market.asksAddress.toString()] = marketAddress
+        asksAndBidsAddressToMarket[marketConfig.market.bidsAddress.toString()] = marketAddress
+      }
+
+      if (asksAndBidsAddressToMarket) {
+        getMultipleAccounts(
+          conn,
+          Object.keys(asksAndBidsAddressToMarket).map((item) => new PublicKey(item)),
+          commitment
+        )
           .then((infos) => {
             infos.forEach((info) => {
-              // @ts-ignore
-              const data = info.account.data
+              if (info === null) return
 
-              const orderbook = Orderbook.decode(marketInfo, data)
+              const address = info.publicKey.toString()
+
+              if (!asksAndBidsAddressToMarket[address]) return
+              const market = asksAndBidsAddressToMarket[address]
+
+              const orderbook = Orderbook.decode(this.market[market].market, info.account.data)
 
               const { isBids, slab } = orderbook
 
               if (isBids) {
-                this.bids = slab
+                this.market[market].bids = slab
               } else {
-                this.asks = slab
+                this.market[market].asks = slab
               }
-              this.asksAndBidsLoading = false
             })
           })
           .finally(() => {
             this.initialized = true
             this.loading = false
             this.countdown = 0
+            this.asksAndBidsLoading = false
           })
       } else {
         this.loading = false
@@ -1368,35 +1384,30 @@ export default Vue.extend({
           }
         }
 
-        if (
-          this.fromCoin &&
-          this.toCoin &&
-          this.marketAddress &&
-          this.market &&
-          this.asks &&
-          this.bids &&
-          this.fromCoinAmount &&
-          !this.asksAndBidsLoading
-        ) {
-          const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
-            this.market,
-            this.asks,
-            this.bids,
-            this.fromCoin.mintAddress,
-            this.toCoin.mintAddress,
-            this.fromCoinAmount,
-            this.setting.slippage
-          )
-          const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
-          const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
-          if (!out.isNullOrZero()) {
-            console.log('dex -> ', outWithSlippage.fixed())
-            if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
-              toCoinAmount = out.fixed()
-              toCoinWithSlippage = outWithSlippage
-              impact = priceImpact
-              endpoint = 'Serum DEX'
-              showMarket = this.marketAddress
+        if (this.fromCoin && this.toCoin && this.market && this.fromCoinAmount && !this.asksAndBidsLoading) {
+          for (const [marketAddress, marketConfig] of Object.entries(this.market)) {
+            if (!marketConfig.asks || !marketConfig.bids) continue
+
+            const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
+              marketConfig.market,
+              marketConfig.asks,
+              marketConfig.bids,
+              this.fromCoin.mintAddress,
+              this.toCoin.mintAddress,
+              this.fromCoinAmount,
+              this.setting.slippage
+            )
+            const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
+            const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
+            if (!out.isNullOrZero()) {
+              console.log('dex -> ', marketAddress, outWithSlippage.fixed())
+              if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
+                toCoinAmount = out.fixed()
+                toCoinWithSlippage = outWithSlippage
+                impact = priceImpact
+                endpoint = 'Serum DEX'
+                showMarket = marketAddress
+              }
             }
           }
         }
@@ -1620,13 +1631,23 @@ export default Vue.extend({
             if (this.loadingArr[loadingName]) this.loadingArr[loadingName] = false
           })
       } else {
-        if (!this.market || !this.fromCoin || !this.toCoin) return
+        if (
+          !this.showMarket ||
+          !this.market ||
+          !this.fromCoin ||
+          !this.toCoin ||
+          !this.market[this.showMarket] ||
+          !this.market[this.showMarket].asks ||
+          !this.market[this.showMarket].bids
+        )
+          return
+        const marketConfig = this.market[this.showMarket]
         place(
           this.$web3,
           this.$wallet,
-          this.market,
-          this.asks,
-          this.bids,
+          marketConfig.market,
+          marketConfig.asks,
+          marketConfig.bids,
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
           get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
@@ -1702,22 +1723,30 @@ export default Vue.extend({
       if (!this.$web3 || !this.$wallet || !this.market) return
       this.isFetchingUnsettled = true
       try {
-        const info = await checkUnsettledInfo(this.$web3, this.$wallet, this.market)
-        if (!info) throw new Error('not enough data')
-        this.baseSymbol = info.baseSymbol ?? ''
-        this.baseUnsettledAmount = info.baseUnsettledAmount
-
-        this.quoteSymbol = info.quoteSymbol ?? ''
-        this.quoteUnsettledAmount = info.quoteUnsettledAmount
-        this.unsettledOpenOrders = info.openOrders // have to establish an extra state, to store this value
+        for (const marketAddress of Object.keys(this.market)) {
+          const info = await checkUnsettledInfo(this.$web3, this.$wallet, this.market[marketAddress].market)
+          if (!info) {
+            if (this.market[marketAddress].unSettleConfig) {
+              delete this.market[marketAddress].unSettleConfig
+            }
+            throw new Error('not enough data')
+          }
+          this.market[marketAddress].unSettleConfig = {
+            baseSymbol: info.baseSymbol ?? '',
+            baseUnsettledAmount: info.baseUnsettledAmount,
+            quoteSymbol: info.quoteSymbol ?? '',
+            quoteUnsettledAmount: info.quoteUnsettledAmount,
+            unsettledOpenOrders: info.openOrders // have to establish an extra state, to store this value
+          }
+        }
       } catch (e) {
       } finally {
         this.isFetchingUnsettled = false
       }
     },
 
-    settleFunds(from: 'base' | 'quote') {
-      if (!this.market) return
+    settleFunds(marketAddress: string) {
+      if (!this.market[marketAddress]) return
       const key = getUnixTs().toString()
       this.$notify.info({
         key,
@@ -1726,24 +1755,19 @@ export default Vue.extend({
         duration: 0
       })
 
-      let baseMint = (this.market as Market).baseMintAddress.toBase58()
-      let quoteMint = (this.market as Market).quoteMintAddress.toBase58()
+      const marketConfig = this.market[marketAddress]
 
-      let baseWallet = get(this.wallet.tokenAccounts, `${baseMint}.tokenAccountAddress`)
-      let quoteWallet = get(this.wallet.tokenAccounts, `${quoteMint}.tokenAccountAddress`)
-      if (from === 'quote') {
-        ;[baseWallet, quoteWallet] = [quoteWallet, baseWallet]
-        ;[baseMint, quoteMint] = [quoteMint, baseMint]
-      }
-      if (from === 'quote') {
-        this.isSettlingQuote = true
-      } else {
-        this.isSettlingBase = true
-      }
+      const baseMint = marketConfig.market.baseMintAddress.toBase58()
+      const quoteMint = marketConfig.market.quoteMintAddress.toBase58()
+
+      const baseWallet = get(this.wallet.tokenAccounts, `${baseMint}.tokenAccountAddress`)
+      const quoteWallet = get(this.wallet.tokenAccounts, `${quoteMint}.tokenAccountAddress`)
+
+      this.isSettlingBase = true
 
       settleFund(
         this.$web3,
-        this.market,
+        marketConfig.market,
         this.unsettledOpenOrders,
         this.$wallet,
         baseMint,
@@ -1774,7 +1798,6 @@ export default Vue.extend({
             message: 'Settle failed',
             description: error.message
           })
-          this.isSettlingQuote = false
           this.isSettlingBase = false
         })
     }
