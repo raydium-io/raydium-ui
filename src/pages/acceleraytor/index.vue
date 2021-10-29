@@ -9,20 +9,19 @@
         </div>
       </div>
       <div class="image-part">
-        <div class="decorator-text">
-          <div class="secondary-decorator-text">AcceleRaytor deposits open: 2021-09-07 12:00 UTC</div>
-          <div class="secondary-decorator-text">IDO & start of trading: 2021-09-14 12:00 UTC</div>
-          <div class="decorator-link">
-            Full details
-            <a
-              href="https://raydium.medium.com/grape-protocol-launching-on-acceleraytor-547f58c12937"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              here</a
-            >
+        <!-- <Carousel arrows>
+          <div slot="prevArrow" class="custom-slick-arrow" style="left: 10px; zindex: 1">
+            <Icon type="left-circle" />
           </div>
-        </div>
+          <div slot="nextArrow" class="custom-slick-arrow" style="right: 10px">
+            <Icon type="right-circle" />
+          </div>
+          <div><h3>1</h3></div>
+          <div><h3>2</h3></div>
+          <div><h3>3</h3></div>
+          <div><h3>4</h3></div>
+        </Carousel> -->
+        <div class="decorator-text">Coming Soon!</div>
         <img src="../../assets/background/acceleraytor-placeholder.webp" />
       </div>
     </div>
@@ -119,7 +118,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
-import { Input, Icon, Radio, Table } from 'ant-design-vue'
+import { Input, Icon, Radio, Table, Carousel } from 'ant-design-vue'
 import { filter } from 'lodash-es'
 
 import { getUnixTs } from '@/utils'
@@ -139,7 +138,8 @@ const RadioButton = Radio.Button
     Icon,
     RadioGroup,
     RadioButton,
-    Table
+    Table,
+    Carousel
   },
 
   async asyncData({ $accessor }) {

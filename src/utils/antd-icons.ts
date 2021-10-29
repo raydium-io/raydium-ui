@@ -43,4 +43,7 @@ export {
   // pools
   LeftOutline,
   DeleteOutline
-} from '@ant-design/icons'
+} from // acceleraytor
+// ArrowRightOutline,
+// ArrowLeftOutline
+'@ant-design/icons'
