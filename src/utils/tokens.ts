@@ -1676,6 +1676,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '2xJGuLAivAR1WkARRA6zP1v4jaA9jV2Qis8JfMNvrVyZ',
     decimals: TOKENS.SYP.decimals
+  },
+  'FAB-USDC-V4': {
+    symbol: 'FAB-USDC',
+    name: 'FAB-USDC LP',
+    coin: { ...TOKENS.FAB },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '5rTCvZq6BcApsC3VV1EEUuTJfaVd8uYhcGjwTy1By6P8',
+    decimals: TOKENS.FAB.decimals
   }
 }
 
