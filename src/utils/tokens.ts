@@ -762,6 +762,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'FnKE9n6aGjQoNWRBZXy4RW6LZVao7qwBonUbiD7edUmZ',
     decimals: 9,
     tags: ['raydium']
+  },
+  WOOF: {
+    symbol: 'WOOF',
+    name: 'WOOF',
+    mintAddress: '9nEqaUcb16sQ3Tn1psbkWqyhPdLmfHWjKGymREjsAgTE',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1685,6 +1692,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5rTCvZq6BcApsC3VV1EEUuTJfaVd8uYhcGjwTy1By6P8',
     decimals: TOKENS.FAB.decimals
+  },
+  'WOOF-RAY-V4': {
+    symbol: 'WOOF-RAY',
+    name: 'WOOF-RAY LP',
+    coin: { ...TOKENS.WOOF },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'H2FAnazDaGFutcmnrwDxhmdncR1Bd7GG4mhPCSUiamDX',
+    decimals: TOKENS.WOOF.decimals
+  },
+  'WOOF-USDC-V4': {
+    symbol: 'WOOF-USDC',
+    name: 'WOOF-USDC LP',
+    coin: { ...TOKENS.WOOF },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'EFSu5TMc1ijRevaYCxUkS7uGvbhsymDHEaTK3UVdNE3q',
+    decimals: TOKENS.WOOF.decimals
   }
 }
 

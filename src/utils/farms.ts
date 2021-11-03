@@ -1196,6 +1196,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '8EziNww86hPoStUXPsPSvMuPaNxXP34597azYWshi6sx', // lp vault
     poolRewardTokenAccount: 'Fx69V3iFYHk3Sj87nUbQoZsiuQ62hDucSagX4DPUiraQ', // reward vault A
     poolRewardTokenAccountB: 'DMy3GrT8atWEV3Lcofv8mG5FsUq1HuqDHfpU3sLTkoJx' // reward vault B
+  },
+  {
+    name: 'WOOF-RAY',
+    lp: { ...LP_TOKENS['WOOF-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.WOOF },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '3ftseZUcBBJDAuQTBu4HWHneSDyh7mQPBo9X1gnCSsZS',
+    poolAuthority: 'GBR6wDh5GDfyqQxj6H8iGT6WheodEEo6D9T17b7Nmn12',
+    poolLpTokenAccount: '8tHsPQAynQXr89v6DZbzEwrbDu8yFj7B4bN8iDpPfVT6', // lp vault
+    poolRewardTokenAccount: '8ixFzGz5vp8KWDmDYHcFU4mnuqcoJTfenKE44ccfA2Tc', // reward vault A
+    poolRewardTokenAccountB: '6vGTHphNvR7a4ycxy8r7sMX2U3cVEkvLfGjVzMQ3YSG5' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
