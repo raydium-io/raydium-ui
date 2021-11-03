@@ -769,6 +769,13 @@ export const TOKENS: Tokens = {
     mintAddress: '9nEqaUcb16sQ3Tn1psbkWqyhPdLmfHWjKGymREjsAgTE',
     decimals: 6,
     tags: ['raydium']
+  },
+  SLND: {
+    symbol: 'SLND',
+    name: 'SLND',
+    mintAddress: 'SLNDpmoWTVADgEdndyvWzroNL7zSi1dF9PC3xHGtPwp',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1710,6 +1717,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'EFSu5TMc1ijRevaYCxUkS7uGvbhsymDHEaTK3UVdNE3q',
     decimals: TOKENS.WOOF.decimals
+  },
+  'SLND-USDC-V4': {
+    symbol: 'SLND-USDC',
+    name: 'SLND-USDC LP',
+    coin: { ...TOKENS.SLND },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'EunE9uDh2cGsyJcsGuGKc6wte7kBn8iye2gzC4w2ePHn',
+    decimals: TOKENS.SLND.decimals
   }
 }
 
