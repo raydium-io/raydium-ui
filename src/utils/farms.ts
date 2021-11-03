@@ -1210,11 +1210,11 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    poolId: '3ftseZUcBBJDAuQTBu4HWHneSDyh7mQPBo9X1gnCSsZS',
-    poolAuthority: 'GBR6wDh5GDfyqQxj6H8iGT6WheodEEo6D9T17b7Nmn12',
-    poolLpTokenAccount: '8tHsPQAynQXr89v6DZbzEwrbDu8yFj7B4bN8iDpPfVT6', // lp vault
-    poolRewardTokenAccount: '8ixFzGz5vp8KWDmDYHcFU4mnuqcoJTfenKE44ccfA2Tc', // reward vault A
-    poolRewardTokenAccountB: '6vGTHphNvR7a4ycxy8r7sMX2U3cVEkvLfGjVzMQ3YSG5' // reward vault B
+    poolId: '8W2TqGCiFiqR1JD4sbW8uTRjV2HvFjLhkZ2tAQTYE4Gc',
+    poolAuthority: 'EShmXWydGxetCKmJGCpZbRKYk1bS67JiUjpt9yue5xZN',
+    poolLpTokenAccount: 'BpipxpLsEs5fvzdKmwHsB1o1r6umhXiqeU2RVFSjQ9mA', // lp vault
+    poolRewardTokenAccount: 'AsEty41c54HrxzjXnhDro7GGkVbGRyQQF111wSaUBM88', // reward vault A
+    poolRewardTokenAccountB: 'B7HMR3GXYfqCPqTg85V1dzjQGf3nLccPdj9tBcDcoThf' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
