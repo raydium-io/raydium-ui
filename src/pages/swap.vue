@@ -1170,7 +1170,7 @@ export default Vue.extend({
 
         // serum
         for (const address of Object.keys(this.swap.markets)) {
-          if (isOfficalMarket(address) || LIQUIDITY_POOLS.find((item) => item.serumMarket === address)) {
+          if (isOfficalMarket(address)) {
             const info = cloneDeep(this.swap.markets[address])
             let fromMint = this.fromCoin.mintAddress
             let toMint = this.toCoin.mintAddress
@@ -1185,6 +1185,25 @@ export default Vue.extend({
               (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
             ) {
               marketAddress.push(address)
+            }
+          }
+        }
+
+        for (const itemLiquidityInfo of LIQUIDITY_POOLS) {
+          let fromMint = this.fromCoin.mintAddress
+          let toMint = this.toCoin.mintAddress
+          if (fromMint === NATIVE_SOL.mintAddress) {
+            fromMint = TOKENS.WSOL.mintAddress
+          }
+          if (toMint === NATIVE_SOL.mintAddress) {
+            toMint = TOKENS.WSOL.mintAddress
+          }
+          if (
+            (itemLiquidityInfo.coin.mintAddress === fromMint && itemLiquidityInfo.pc.mintAddress === toMint) ||
+            (itemLiquidityInfo.coin.mintAddress === toMint && itemLiquidityInfo.pc.mintAddress === fromMint)
+          ) {
+            if (!marketAddress.find((item) => item === itemLiquidityInfo.serumMarket)) {
+              marketAddress.push(itemLiquidityInfo.serumMarket)
             }
           }
         }
@@ -1399,8 +1418,8 @@ export default Vue.extend({
             )
             const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
             const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
+            console.log('dex -> ', marketAddress, outWithSlippage.fixed())
             if (!out.isNullOrZero()) {
-              console.log('dex -> ', marketAddress, outWithSlippage.fixed())
               if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
                 toCoinAmount = out.fixed()
                 toCoinWithSlippage = outWithSlippage
