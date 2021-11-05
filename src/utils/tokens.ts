@@ -773,7 +773,7 @@ export const TOKENS: Tokens = {
   ORCA: {
     symbol: 'ORCA',
     name: 'ORCA',
-    mintAddress: '9nEqaUcb16sQ3Tn1psbkWqyhPdLmfHWjKGymREjsAgTE',
+    mintAddress: 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE',
     decimals: 6,
     tags: ['raydium']
   },
