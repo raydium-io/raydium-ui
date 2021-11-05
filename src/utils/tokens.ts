@@ -770,6 +770,13 @@ export const TOKENS: Tokens = {
     decimals: 6,
     tags: ['raydium']
   },
+  ORCA: {
+    symbol: 'ORCA',
+    name: 'ORCA',
+    mintAddress: 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE',
+    decimals: 6,
+    tags: ['raydium']
+  },
   SLND: {
     symbol: 'SLND',
     name: 'SLND',
