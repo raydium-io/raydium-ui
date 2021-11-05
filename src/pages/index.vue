@@ -160,8 +160,8 @@
             </div>
             <div class="feature-title">High-Liquidity Launches</div>
             <div class="feature-description">
-              AcceleRaytor offers projects a straightforward 3 step process to raise funds, launch an IDO, and bootstrap
-              liquidity on Raydium and Serum.
+              AcceleRaytor offers projects a straightforward 3 step process to raise funds and bootstrap liquidity on
+              Raydium and Serum.
             </div>
           </div>
         </div>
