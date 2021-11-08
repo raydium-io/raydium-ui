@@ -1215,6 +1215,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'BpipxpLsEs5fvzdKmwHsB1o1r6umhXiqeU2RVFSjQ9mA', // lp vault
     poolRewardTokenAccount: 'AsEty41c54HrxzjXnhDro7GGkVbGRyQQF111wSaUBM88', // reward vault A
     poolRewardTokenAccountB: 'B7HMR3GXYfqCPqTg85V1dzjQGf3nLccPdj9tBcDcoThf' // reward vault B
+  },
+  {
+    name: 'FRKT-SOL',
+    lp: { ...LP_TOKENS['FRKT-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.FRKT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '36Rf8dzq5gy4Ew2bLQEgKoCKVTku4EJPLqFYG6mzFrkr',
+    poolAuthority: 'GwXKptwrXvFQ2VjcjXc9JwVzmAeGvPH9ogtq54AaDZcm',
+    poolLpTokenAccount: '46WoMBPtrzD6rJVF8Znu5RGsCpjRvNUKCCe87eaedmQm', // lp vault
+    poolRewardTokenAccount: '6GWBHRbqtT5qsn234yfqhC7zvtHnR5pNq53rDJDAWDn4', // reward vault A
+    poolRewardTokenAccountB: 'CaGvtrQj71GkY9RXHzDerhp7iKdBD8iVr6uWEhVuMcm' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
