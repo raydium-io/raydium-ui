@@ -13,6 +13,9 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder.webp" />
+            <div class="inner-decorator-words">Coming Soon</div>
+          </div>
+          <div>
             <div class="inner-decorator-words">
               Pools open Nov 17, 12:00 UTC - Full details
               <a
@@ -23,10 +26,13 @@
                 here</a
               >
             </div>
-          </div>
-          <div>
-            <div class="inner-decorator-words">Coming Soon</div>
-            <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
+            <a
+              href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
+            </a>
           </div>
         </Carousel>
       </div>
