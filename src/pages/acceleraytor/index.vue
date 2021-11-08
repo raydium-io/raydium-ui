@@ -1,5 +1,6 @@
 <template>
   <div class="accele-raytor container">
+    <div class="carousel-box"></div>
     <div class="banner">
       <div class="text-part">
         <div class="title">AcceleRaytor</div>
@@ -9,20 +10,28 @@
         </div>
       </div>
       <div class="image-part">
-        <!-- <Carousel arrows>
-          <div slot="prevArrow" class="custom-slick-arrow" style="left: 10px; zindex: 1">
-            <Icon type="left-circle" />
+        <div :class="`decorator-text ${[1].includes(currentTab) ? 'shown' : ''}`">
+          <div class="secondary-decorator-text">Pools open Nov 17, 12:00 UTC</div>
+          <div class="decorator-link">
+            Full details
+            <a
+              href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              here</a
+            >
           </div>
-          <div slot="nextArrow" class="custom-slick-arrow" style="right: 10px">
-            <Icon type="right-circle" />
+        </div>
+        <Carousel autoplay :after-change="(t) => (currentTab = t)">
+          <div>
+            <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder.webp" />
+            <div class="inner-coming-soon">Coming Soon</div>
           </div>
-          <div><h3>1</h3></div>
-          <div><h3>2</h3></div>
-          <div><h3>3</h3></div>
-          <div><h3>4</h3></div>
-        </Carousel> -->
-        <div class="decorator-text">Coming Soon!</div>
-        <img src="../../assets/background/acceleraytor-placeholder.webp" />
+          <div>
+            <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
+          </div>
+        </Carousel>
       </div>
     </div>
 
@@ -154,6 +163,8 @@ export default class AcceleRaytor extends Vue {
     status: 'all',
     mine: 'all'
   }
+
+  currentTab = 0
 
   pools: IdoPool[] = []
 
@@ -361,25 +372,44 @@ export default class AcceleRaytor extends Vue {
     }
   }
   .image-part {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .decorator-text {
-      font-size: 24px;
-      margin-bottom: 14px;
-      text-align: center;
-      .secondary-decorator-text {
-        font-size: 1rem;
-      }
-      .decorator-link {
-        margin-top: 8px;
-        font-size: 1rem;
+    .ant-carousel {
+      .slick-slide {
+        position: relative;
+        .carousel-image {
+          width: 100%;
+          height: 100%;
+          display: inline-block;
+          object-fit: contain;
+          border-radius: 20px;
+        }
+        .inner-coming-soon {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 12%;
+          font-size: 24px;
+          color: white;
+          font-weight: 600;
+          text-align: center;
+        }
       }
     }
-    img {
-      width: 540px;
-      object-fit: contain;
-      border-radius: 20px;
+  }
+  .decorator-text {
+    opacity: 0;
+    font-size: 24px;
+    margin-bottom: 14px;
+    text-align: center;
+
+    &.shown {
+      opacity: 100;
+    }
+    .secondary-decorator-text {
+      font-size: 1rem;
+    }
+    .decorator-link {
+      margin-top: 8px;
+      font-size: 1rem;
     }
   }
 }
