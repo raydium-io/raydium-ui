@@ -1733,6 +1733,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'EunE9uDh2cGsyJcsGuGKc6wte7kBn8iye2gzC4w2ePHn',
     decimals: TOKENS.SLND.decimals
+  },
+  'FRKT-SOL-V4': {
+    symbol: 'FRKT-SOL',
+    name: 'FRKT-SOL LP',
+    coin: { ...TOKENS.FRKT },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'HYUKXgpjaxMXHttyrFYtv3z2rdhZ1U9QDH8zEc8BooQC',
+    decimals: TOKENS.FRKT.decimals
   }
 }
 
