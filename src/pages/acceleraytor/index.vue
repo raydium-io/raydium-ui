@@ -10,25 +10,22 @@
         </div>
       </div>
       <div class="image-part">
-        <div :class="`decorator-text ${[1].includes(currentTab) ? 'shown' : ''}`">
-          <div class="secondary-decorator-text">Pools open Nov 17, 12:00 UTC</div>
-          <div class="decorator-link">
-            Full details
-            <a
-              href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              here</a
-            >
-          </div>
-        </div>
-        <Carousel autoplay :after-change="(t) => (currentTab = t)">
+        <Carousel autoplay dots-class="carousel-dots">
           <div>
             <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder.webp" />
-            <div class="inner-coming-soon">Coming Soon</div>
+            <div class="inner-decorator-words">
+              Pools open Nov 17, 12:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
+            </div>
           </div>
           <div>
+            <div class="inner-decorator-words">Coming Soon</div>
             <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
           </div>
         </Carousel>
@@ -375,23 +372,29 @@ export default class AcceleRaytor extends Vue {
     .ant-carousel {
       .slick-slide {
         position: relative;
+        border-radius: 20px;
+        overflow: hidden;
         .carousel-image {
           width: 100%;
           height: 100%;
           display: inline-block;
           object-fit: contain;
-          border-radius: 20px;
         }
-        .inner-coming-soon {
+        .inner-decorator-words {
           position: absolute;
+          bottom: 0;
           left: 0;
           right: 0;
-          bottom: 12%;
-          font-size: 24px;
-          color: white;
-          font-weight: 600;
+          background-color: rgba(0, 0, 0, 0.75);
+          border-bottom-left-radius: 20px;
+          border-bottom-right-radius: 20px;
+          padding: 12px;
           text-align: center;
+          font-size: clamp(10px, 1vw, 14px);
         }
+      }
+      .carousel-dots {
+        transform: translateY(24px);
       }
     }
   }
