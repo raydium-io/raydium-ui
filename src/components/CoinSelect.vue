@@ -18,7 +18,7 @@
           >
             <CoinIcon :mint-address="token.mintAddress" />
             <div>
-              <span>{{ token.symbol }}</span>
+              <span>{{ token.symbol }}{{ tipCoin[token.mintAddress] ? ` (${tipCoin[token.mintAddress]})` : '' }}</span>
               <button
                 v-if="token.tags.includes('userAdd') && showUserButton[token.symbol + token.mintAddress]"
                 style="
@@ -144,7 +144,12 @@ export default Vue.extend({
 
       userInputCoinName: undefined,
       showSelectSourceFlag: false,
-      showUserButton: {} as { [key: string]: boolean }
+      showUserButton: {} as { [key: string]: boolean },
+      tipCoin: {
+        '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs': 'ETH Wormhole',
+        '8FU95xFJhUUkyyCLU13HSzDLs7oC4QZdXQHL6SCeab36': 'ETH Wormhole',
+        ChVzxWRmrTeSgwd3Ui3UumcN8KX7VK3WaD4KGeSKpypj: 'ETH Wormhole'
+      } as const
     }
   },
 
