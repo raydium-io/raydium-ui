@@ -783,6 +783,27 @@ export const TOKENS: Tokens = {
     mintAddress: 'SLNDpmoWTVADgEdndyvWzroNL7zSi1dF9PC3xHGtPwp',
     decimals: 6,
     tags: ['raydium']
+  },
+  whETH: {
+    symbol: 'whETH',
+    name: 'whETH',
+    mintAddress: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  weUNI: {
+    symbol: 'weUNI',
+    name: 'weUNI',
+    mintAddress: '8FU95xFJhUUkyyCLU13HSzDLs7oC4QZdXQHL6SCeab36',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  weSUSHI: {
+    symbol: 'weSUSHI',
+    name: 'weSUSHI',
+    mintAddress: 'ChVzxWRmrTeSgwd3Ui3UumcN8KX7VK3WaD4KGeSKpypj',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
@@ -1742,6 +1763,42 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'HYUKXgpjaxMXHttyrFYtv3z2rdhZ1U9QDH8zEc8BooQC',
     decimals: TOKENS.FRKT.decimals
+  },
+  'whETH-SOL-V4': {
+    symbol: 'whETH-SOL',
+    name: 'whETH-SOL LP',
+    coin: { ...TOKENS.whETH },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '3hbozt2Por7bcrGod8N7kEeJNMocFFjCJrQR16TQGBrE',
+    decimals: TOKENS.whETH.decimals
+  },
+  'whETH-USDC-V4': {
+    symbol: 'whETH-USDC',
+    name: 'whETH-USDC LP',
+    coin: { ...TOKENS.whETH },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3529SBnMCDW3S3xQ52aABbRHo7PcHvpQA4no8J12L5eK',
+    decimals: TOKENS.whETH.decimals
+  },
+  'weUNI-USDC-V4': {
+    symbol: 'weUNI-USDC',
+    name: 'weUNI-USDC LP',
+    coin: { ...TOKENS.weUNI },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'EEC4QnT41py39QaYnzQnoYQEtDUDNa6Se8SBDgfPSN2a',
+    decimals: TOKENS.weUNI.decimals
+  },
+  'weSUSHI-USDC-V4': {
+    symbol: 'weSUSHI-USDC',
+    name: 'weSUSHI-USDC LP',
+    coin: { ...TOKENS.weSUSHI },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3wVrtQZsiDNp5yTPyfEzQHPU6iuJoMmpnWg6CTt4V8sR',
+    decimals: TOKENS.weSUSHI.decimals
   }
 }
 
