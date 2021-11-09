@@ -804,6 +804,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'ChVzxWRmrTeSgwd3Ui3UumcN8KX7VK3WaD4KGeSKpypj',
     decimals: 8,
     tags: ['raydium']
+  },
+  GOFX: {
+    symbol: 'GOFX',
+    name: 'GOFX',
+    mintAddress: 'GFX1ZjR2P15tmrSwow6FjyDYcEkoFb4p4gJCpLBjaxHD',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
