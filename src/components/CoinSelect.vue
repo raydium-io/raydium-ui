@@ -92,7 +92,7 @@
             "
             @click="addUserMintToLocal"
           >
-            (Add To Attention)
+            (Add to User Token List)
           </button>
         </div>
       </div>
