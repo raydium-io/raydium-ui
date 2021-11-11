@@ -151,7 +151,8 @@ export default Vue.extend({
         ChVzxWRmrTeSgwd3Ui3UumcN8KX7VK3WaD4KGeSKpypj: 'ETH Wormhole',
         '4Hx6Bj56eGyw8EJrrheM6LBQAvVYRikYCWsALeTrwyRU': 'ETH Wormhole',
         HysWcbHiYY9888pHbaqhwLYZQeZrcQMXKQWRqS7zcPK5: 'ETH Wormhole',
-        CiKu4eHsVrc1eueVQeHn7qhXTcVu95gSQmBpX4utjL9z: 'ETH Wormhole'
+        CiKu4eHsVrc1eueVQeHn7qhXTcVu95gSQmBpX4utjL9z: 'ETH Wormhole',
+        FSu46jRsf9bEzX86XBkoXwF4MWqnYTRXAFiebvVuST2d: 'BSC Wormhole'
       } as const
     }
   },
