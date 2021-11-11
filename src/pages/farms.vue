@@ -360,7 +360,7 @@ export default Vue.extend({
       endedFarmsPoolId: [] as string[],
       endedFarmsPoolIdWhiteList: [
         'AwUDfg4NYbLQRAcFipoJwyZTpqNvw5v6C7EypryL12Y6',
-        '9kCzjTbhbpu3F4eDZ2mi3FucmoWsNsDbou1fY4E9aVtY',
+        '7fe8QcJ6W2kHKL1h1HMYYJoGXz2LUcwCjkxX6MX35orK',
         'C8BjS9DGDvC2zS3n6fTvm1rjPbA33uZ7CAvEUZ3tg7aM',
         'CZZnmfvSgNVUiDBG4wN2NNcaYbsKDN4kLsc3SN8DMw6i'
       ] as string[],

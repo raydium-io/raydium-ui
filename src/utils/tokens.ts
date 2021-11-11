@@ -836,7 +836,7 @@ export const TOKENS: Tokens = {
   weAXS: {
     symbol: 'weAXS',
     name: 'weAXS',
-    mintAddress: 'FSu46jRsf9bEzX86XBkoXwF4MWqnYTRXAFiebvVuST2d',
+    mintAddress: 'HysWcbHiYY9888pHbaqhwLYZQeZrcQMXKQWRqS7zcPK5',
     decimals: 8,
     tags: ['raydium']
   },
@@ -1902,7 +1902,7 @@ export const LP_TOKENS: Tokens = {
     coin: { ...TOKENS.weAXS },
     pc: { ...TOKENS.USDC },
 
-    mintAddress: 'Gdgnj6FzQpYRNxHqFvzAGSe8weihfcphsir23c8uhnBj',
+    mintAddress: '6PSoJQ7myQ1BJtbQC6oiWR8HSecQGyoWsPYTZRJo2ci3',
     decimals: TOKENS.weAXS.decimals
   },
   'weSHIB-USDC-V4': {

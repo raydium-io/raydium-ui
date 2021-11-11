@@ -1362,11 +1362,11 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    poolId: '9kCzjTbhbpu3F4eDZ2mi3FucmoWsNsDbou1fY4E9aVtY',
-    poolAuthority: 'HTshfJttS6MkjmiweGTzPLFUDMUAZRuE99fQd3YczdPT',
-    poolLpTokenAccount: 'HcyezDfzx6bTptGZjuhCMwfFMwpZmZtgjPNq613bVXYQ', // lp vault
-    poolRewardTokenAccount: '7znwptt8KViqFSweuVSgcriJWFxemSV2F93J44tNEwYM', // reward vault A
-    poolRewardTokenAccountB: 'Am9ejujYKECnyoKWhruyPV55qzfk58UuKocgwDwf1Loc' // reward vault B
+    poolId: '7fe8QcJ6W2kHKL1h1HMYYJoGXz2LUcwCjkxX6MX35orK',
+    poolAuthority: 'u83t5Q349zcntifRmWECeAJDoq8kuYwsNFQUcGEnwn1',
+    poolLpTokenAccount: '2QWeQZJMpvcqwNMH1kBrFRjXptk5N2Js6c4tya2Jxtdm', // lp vault
+    poolRewardTokenAccount: 'BFANrk5U8N2Mu3WnacBP453nHm8C9mHy2cZiTpVuiMEj', // reward vault A
+    poolRewardTokenAccountB: '5hEx1CZbzhTuZtWUV2UpCHLDrDgJ4o3BjQqAr2uDYkFo' // reward vault B
   },
   {
     name: 'weDYDX-USDC',
