@@ -811,6 +811,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'GFX1ZjR2P15tmrSwow6FjyDYcEkoFb4p4gJCpLBjaxHD',
     decimals: 9,
     tags: ['raydium']
+  },
+  IN: {
+    symbol: 'IN',
+    name: 'IN',
+    mintAddress: 'inL8PMVd6iiW3RCBJnr5AsrRN6nqr4BTrcNuQWQSkvY',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -1806,6 +1813,42 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3wVrtQZsiDNp5yTPyfEzQHPU6iuJoMmpnWg6CTt4V8sR',
     decimals: TOKENS.weSUSHI.decimals
+  },
+  'CYS-USDC-V4': {
+    symbol: 'CYS-USDC',
+    name: 'CYS-USDC LP',
+    coin: { ...TOKENS.CYS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GfV3QDzzdVUwCNSdfn6PjhmyJvjw18tn51RingWZYwk3',
+    decimals: TOKENS.CYS.decimals
+  },
+  'SAMO-USDC-V4': {
+    symbol: 'SAMO-USDC',
+    name: 'SAMO-USDC LP',
+    coin: { ...TOKENS.SAMO },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'B2PjGEP3vPf1999fUD14pYdxvSDRVBk43hxB2rgthwEY',
+    decimals: TOKENS.SAMO.decimals
+  },
+  'ABR-USDC-V4': {
+    symbol: 'ABR-USDC',
+    name: 'ABR-USDC LP',
+    coin: { ...TOKENS.ABR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'ECHfxkf5zjjZFTX95QfFahNyzG7feyEKcfTdjsdrMSGU',
+    decimals: TOKENS.ABR.decimals
+  },
+  'IN-USDC-V4': {
+    symbol: 'IN-USDC',
+    name: 'IN-USDC LP',
+    coin: { ...TOKENS.IN },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GbmJtVgg9fRmmmjKUYGMZeSt8wZ47cDDXasg5Y3iF4kz',
+    decimals: TOKENS.IN.decimals
   }
 }
 
