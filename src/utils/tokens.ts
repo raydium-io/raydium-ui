@@ -839,6 +839,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'FSu46jRsf9bEzX86XBkoXwF4MWqnYTRXAFiebvVuST2d',
     decimals: 8,
     tags: ['raydium']
+  },
+  weSHIB: {
+    symbol: 'weSHIB',
+    name: 'weSHIB',
+    mintAddress: 'CiKu4eHsVrc1eueVQeHn7qhXTcVu95gSQmBpX4utjL9z',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
@@ -1897,6 +1904,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Gdgnj6FzQpYRNxHqFvzAGSe8weihfcphsir23c8uhnBj',
     decimals: TOKENS.weAXS.decimals
+  },
+  'weSHIB-USDC-V4': {
+    symbol: 'weSHIB-USDC',
+    name: 'weSHIB-USDC LP',
+    coin: { ...TOKENS.weSHIB },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'AcjX5pmTMGSgxkdxc3r82r6WMKBvS6eQXXFz5ck5KKUa',
+    decimals: TOKENS.weSHIB.decimals
   }
 }
 
