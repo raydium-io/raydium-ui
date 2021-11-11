@@ -818,6 +818,27 @@ export const TOKENS: Tokens = {
     mintAddress: 'inL8PMVd6iiW3RCBJnr5AsrRN6nqr4BTrcNuQWQSkvY',
     decimals: 9,
     tags: ['raydium']
+  },
+  weDYDX: {
+    symbol: 'weDYDX',
+    name: 'weDYDX',
+    mintAddress: '4Hx6Bj56eGyw8EJrrheM6LBQAvVYRikYCWsALeTrwyRU',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  STARS: {
+    symbol: 'STARS',
+    name: 'STARS',
+    mintAddress: 'HCgybxq5Upy8Mccihrp7EsmwwFqYZtrHrsmsKwtGXLgW',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  weAXS: {
+    symbol: 'weAXS',
+    name: 'weAXS',
+    mintAddress: 'FSu46jRsf9bEzX86XBkoXwF4MWqnYTRXAFiebvVuST2d',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
@@ -1849,6 +1870,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GbmJtVgg9fRmmmjKUYGMZeSt8wZ47cDDXasg5Y3iF4kz',
     decimals: TOKENS.IN.decimals
+  },
+  'weDYDX-USDC-V4': {
+    symbol: 'weDYDX-USDC',
+    name: 'weDYDX-USDC LP',
+    coin: { ...TOKENS.weDYDX },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'BjkkMZnnzmgLqzGErzDbkk15ozv48iVKQuunpeM2Hqnk',
+    decimals: TOKENS.weDYDX.decimals
+  },
+  'STARS-USDC-V4': {
+    symbol: 'STARS-USDC',
+    name: 'STARS-USDC LP',
+    coin: { ...TOKENS.STARS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FJ68q7NChhETcGVdinMbM2FF1Cy79dpmUi6HC83K55Hv',
+    decimals: TOKENS.STARS.decimals
+  },
+  'weAXS-USDC-V4': {
+    symbol: 'weAXS-USDC',
+    name: 'weAXS-USDC LP',
+    coin: { ...TOKENS.weAXS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Gdgnj6FzQpYRNxHqFvzAGSe8weihfcphsir23c8uhnBj',
+    decimals: TOKENS.weAXS.decimals
   }
 }
 
