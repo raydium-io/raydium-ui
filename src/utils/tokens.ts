@@ -1913,6 +1913,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'AcjX5pmTMGSgxkdxc3r82r6WMKBvS6eQXXFz5ck5KKUa',
     decimals: TOKENS.weSHIB.decimals
+  },
+  'SBR-USDC-V4': {
+    symbol: 'SBR-USDC',
+    name: 'SBR-USDC LP',
+    coin: { ...TOKENS.SBR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '9FC8xTFRbgTpuZZYAYnZLxgnQ8r7FwfSBM1SWvGwgF7s',
+    decimals: TOKENS.SBR.decimals
   }
 }
 
