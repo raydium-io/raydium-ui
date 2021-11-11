@@ -361,7 +361,8 @@ export default Vue.extend({
       endedFarmsPoolIdWhiteList: [
         'AwUDfg4NYbLQRAcFipoJwyZTpqNvw5v6C7EypryL12Y6',
         '9kCzjTbhbpu3F4eDZ2mi3FucmoWsNsDbou1fY4E9aVtY',
-        'C8BjS9DGDvC2zS3n6fTvm1rjPbA33uZ7CAvEUZ3tg7aM'
+        'C8BjS9DGDvC2zS3n6fTvm1rjPbA33uZ7CAvEUZ3tg7aM',
+        'CZZnmfvSgNVUiDBG4wN2NNcaYbsKDN4kLsc3SN8DMw6i'
       ] as string[],
       showCollapse: [] as any[]
     }
