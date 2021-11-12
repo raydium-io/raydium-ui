@@ -123,12 +123,21 @@
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div v-if="farm.farmInfo.fusion" class="value">
                     <div v-if="farm.farmInfo.dual">
-                      {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                      {{
+                        farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
+                      }}
+                      {{ farm.farmInfo.reward.symbol }}
                     </div>
-                    <div>{{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}</div>
+                    <div>
+                      {{
+                        farm.userInfo.pendingRewardB.format().includes('-') ? 0 : farm.userInfo.pendingRewardB.format()
+                      }}
+                      {{ farm.farmInfo.rewardB.symbol }}
+                    </div>
                   </div>
                   <div v-else class="value">
-                    {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
+                    {{ farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format() }}
+                    {{ farm.farmInfo.reward.symbol }}
                   </div>
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 5">
