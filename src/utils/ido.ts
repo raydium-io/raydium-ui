@@ -1,9 +1,8 @@
+import { publicKey, u64 } from '@project-serum/borsh'
+import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 // @ts-ignore
 import { nu64, seq, struct, u8 } from 'buffer-layout'
 import { cloneDeep } from 'lodash-es'
-
-import { publicKey, u64 } from '@project-serum/borsh'
-import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import {
   CLOCK_PROGRAM_ID,
@@ -68,6 +67,7 @@ export interface IdoLotteryPoolInfo {
   checkProgramId: PublicKey
   idoOwner: PublicKey
   poolSeedId: PublicKey
+  isWinning: number // 0: not start   1: data is for choose win   2: data is for choose lose   3: all wins
 }
 
 export interface IdoUserInfo {
@@ -377,7 +377,8 @@ export const IDO_LOTTERY_POOL_INFO_LAYOUT = struct([
   publicKey('checkProgramId'),
   publicKey('idoOwner'),
 
-  publicKey('poolSeedId')
+  publicKey('poolSeedId'),
+  u64('isWinning') // 0: not start   1: data is for choose win   2: data is for choose lose   3: all wins
 ])
 
 export const IDO_USER_INFO_LAYOUT = struct([

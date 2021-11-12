@@ -133,7 +133,8 @@ export const actions = actionTree(
               stakeProgramId: decoded.stakeProgramId,
               checkProgramId: decoded.checkProgramId,
               idoOwner: decoded.idoOwner,
-              poolSeedId: decoded.poolSeedId
+              poolSeedId: decoded.poolSeedId,
+              isWinning: getBigNumber(decoded.isWinning)
             } as IdoLotteryPoolInfo
           } else {
             const decoded = IDO_POOL_INFO_LAYOUT.decode(data)
