@@ -82,7 +82,11 @@
                   <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
                   <div class="pending fs-container">
                     <div class="reward">
-                      <div class="token">{{ farm.userInfo.pendingReward.format() }}</div>
+                      <div class="token">
+                        {{
+                          farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
+                        }}
+                      </div>
                     </div>
                     <Button
                       size="large"
