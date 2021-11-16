@@ -114,9 +114,9 @@ export interface IdoPool {
 export const IDO_POOLS: IdoPool[] = [
   {
     base: { ...TOKENS.GENE },
-    quote: { ...TOKENS.testUSDC },
+    quote: { ...TOKENS.USDC },
 
-    price: new TokenAmount(0.8, TOKENS.testUSDC.decimals, false),
+    price: new TokenAmount(0.8, TOKENS.USDC.decimals, false),
     raise: new TokenAmount(500000, TOKENS.GENE.decimals, false),
 
     version: 3, // just an identify for Lottery activity
@@ -125,10 +125,10 @@ export const IDO_POOLS: IdoPool[] = [
 
     isRayPool: true,
     isPrivate: false,
-    idoId: '7zk92r3Hiy6JWHTc2FaqGGxyP3arhxpTyqairGiWa25M',
-    baseVault: '4nuhCrBekDVeJeJpoyGSKqe9C371CLNBEpkYo7Cx2MTP',
-    quoteVault: '8eUGYBMdB55E6r4iKxGpqdPyHtiMNVbq95bnpXXB7NVW',
-    seedId: 'FBcHy7dPGZMMaEKd1tNH5bzERMP1R1CqSTvgem4acXKx'
+    idoId: 'DGBnb4xRW3oZNa14F8h8WgsDWPFZQoX9Ffem9pPL8t1g',
+    baseVault: 'GDDSZ2nhJVAXLULhfU5nwY2EMKXWM9dCK9KtMXtKHAH3',
+    quoteVault: 'EwpeiGxn8kxFdL8jkdurw4k6sa3xxc53NRRtQLZgzAH2',
+    seedId: '5PydzUPEHXFZbnUu1t71Kfjf1mhxDiHqYmQVoGoAkJDR'
   },
   {
     base: { ...TOKENS.GRAPE },
