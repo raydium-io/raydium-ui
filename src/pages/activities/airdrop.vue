@@ -14,7 +14,9 @@
         <div class="icon minimize" />
       </div>
 
-      <a v-if="rewardIsOut" class="download-full-list" href="/winner-list/" target="_blank"> Check Winners </a>
+      <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
+        Check Winners
+      </a>
 
       <div class="title">Airdrop Points</div>
 
