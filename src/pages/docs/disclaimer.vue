@@ -86,7 +86,7 @@ export default class Index extends Vue {}
   .page-title {
     text-align: center;
     font-size: 64px;
-    margin-bottom: 64px;
+    margin-bottom: 24px;
   }
   .paragraph {
     color: hsl(222deg, 100%, 84%);
