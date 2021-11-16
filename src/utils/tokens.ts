@@ -867,6 +867,27 @@ export const TOKENS: Tokens = {
     mintAddress: 'EwJN2GqUGXXzYmoAciwuABtorHczTA5LqbukKXV1viH7',
     decimals: 6,
     tags: ['raydium']
+  },
+  weSAND: {
+    symbol: 'weSAND',
+    name: 'weSAND',
+    mintAddress: '49c7WuCZkQgc3M4qH8WuEUNXfgwupZf1xqWkDQ7gjRGt',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  weMANA: {
+    symbol: 'weMANA',
+    name: 'weMANA',
+    mintAddress: '7dgHoN8wBZCc5wbnQ2C47TDnBMAxG4Q5L3KjP67z8kNi',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  CAVE: {
+    symbol: 'CAVE',
+    name: 'CAVE',
+    mintAddress: '4SZjjNABoqhbd4hnapbvoEPEqT8mnNkfbEoAwALf1V8t',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1970,6 +1991,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '9hSUZdREEsbaYaKY4FouvXr7xyAqtpdHRDoYCb6Mb28a',
     decimals: TOKENS.UPS.decimals
+  },
+  'weSAND-USDC-V4': {
+    symbol: 'weSAND-USDC',
+    name: 'weSAND-USDC LP',
+    coin: { ...TOKENS.weSAND },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3dADrQa7utyiCsaFeVk9r7oebW1WheowhKo5soBYKBVT',
+    decimals: TOKENS.weSAND.decimals
+  },
+  'weMANA-USDC-V4': {
+    symbol: 'weMANA-USDC',
+    name: 'weMANA-USDC LP',
+    coin: { ...TOKENS.weMANA },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'HpUkVAPRJ5zNRuJ1ZwMXEhbMHL3gSuPb2QuSER9YUd3a',
+    decimals: TOKENS.weMANA.decimals
+  },
+  'CAVE-USDC-V4': {
+    symbol: 'CAVE-USDC',
+    name: 'CAVE-USDC LP',
+    coin: { ...TOKENS.CAVE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '5Gba1k3fU7Vh7UtAiBmie9vhQNNq1JfEwgn1DPGZ7NKQ',
+    decimals: TOKENS.CAVE.decimals
   }
 }
 
