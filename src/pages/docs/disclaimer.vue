@@ -79,6 +79,11 @@ export default class Index extends Vue {}
 .page-container {
   padding: 4vw 20vh;
   min-height: 100vh;
+  background-color: #141041;
+  background-image: url('../../assets/background/index_page_background.webp');
+  background-size: 100%;
+  background-repeat: no-repeat;
+  display: flow-root;
 }
 .card {
   padding: 4% 8%;

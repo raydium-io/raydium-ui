@@ -15,7 +15,7 @@ export default class Home extends Vue {}
 .home-container-background {
   background-color: #141041;
   background-image: url('../assets/background/index_page_background.webp');
-  background-size: 100%;
+  background-size: 100% 95%;
   background-repeat: no-repeat;
   display: flow-root;
 }
