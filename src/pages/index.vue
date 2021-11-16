@@ -216,6 +216,9 @@
                 >CoinGecko</a
               >
             </li>
+            <li>
+              <a class="link" href="/docs/disclaimer" target="_blank">Disclaimer</a>
+            </li>
           </ul>
         </div>
 
