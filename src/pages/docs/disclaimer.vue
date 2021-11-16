@@ -38,8 +38,7 @@ import { Icon, Popover } from 'ant-design-vue'
   components: {
     Icon,
     Popover
-  },
-  layout: 'home'
+  }
 })
 export default class Index extends Vue {}
 </script>
@@ -78,7 +77,7 @@ export default class Index extends Vue {}
 <style lang="less" scoped>
 .page-container {
   padding: 4vw 20vh;
-  min-height: 100vh;
+  min-height: calc(100vh - 64px - 82px);
   background-color: #141041;
   background-image: url('../../assets/background/index_page_background.webp');
   background-size: 100%;
@@ -90,8 +89,8 @@ export default class Index extends Vue {}
 
   .page-title {
     text-align: center;
-    font-size: 64px;
-    margin-bottom: 24px;
+    font-size: 48px;
+    margin-bottom: 20px;
   }
   .paragraph {
     color: hsl(222deg, 100%, 84%);
