@@ -28,6 +28,7 @@
                   background-color: transparent;
                   padding: 0;
                   border: 0 solid transparent;
+                  cursor: pointer;
                 "
                 @click.stop="delCoinToAttention(token)"
               >
@@ -46,6 +47,7 @@
                   background-color: transparent;
                   padding: 2px;
                   border: 0 solid transparent;
+                  cursor: pointer;
                 "
                 @click.stop="addCoinToAttention(token)"
               >
@@ -89,6 +91,7 @@
               outline: none;
               padding: 0;
               border: 0 solid transparent;
+              cursor: pointer;
             "
             @click="addUserMintToLocal"
           >
@@ -169,7 +172,8 @@ export default Vue.extend({
 
     'wallet.tokenAccounts': {
       handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
-        this.createTokenList()
+        this.createTokenList(this.keyword)
+        this.findMint(this.keyword)
       },
       deep: true
     },
@@ -191,7 +195,8 @@ export default Vue.extend({
   },
 
   mounted() {
-    this.createTokenList()
+    this.createTokenList(this.keyword)
+    this.findMint(this.keyword)
     this.$nextTick(function () {
       // @ts-ignore
       this.$refs.userInput.focus()

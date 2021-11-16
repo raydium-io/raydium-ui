@@ -378,7 +378,10 @@
                   : fromCoin.balance.fixed()
                 : '0'
             ) ||
-            amms.length + routeInfos.length + Object.keys(market) === 0
+            amms.length + routeInfos.length + Object.keys(market) === 0 ||
+            (get(liquidity.infos, `${lpMintAddress}.status`) &&
+              get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
+            (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
           "
           :loading="swaping"
           style="width: 100%"
@@ -394,7 +397,9 @@
           "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="amms.length + routeInfos.length + Object.keys(market) === 0"> Pool Not Found </template>
+          <template v-else-if="amms.length + routeInfos.length + Object.keys(market).length === 0">
+            Pool Not Found
+          </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="loading"> Updating price information </template>
           <template
@@ -421,7 +426,9 @@
           </template>
           <template
             v-else-if="
-              get(liquidity.infos, `${lpMintAddress}.status`) && get(liquidity.infos, `${lpMintAddress}.status`) !== 1
+              (get(liquidity.infos, `${lpMintAddress}.status`) &&
+                get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
+              (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
             "
           >
             Pool coming soon
