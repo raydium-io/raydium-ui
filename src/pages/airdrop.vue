@@ -554,6 +554,10 @@
 </template>
 
 <script lang="ts">
+/**
+ * @file it is the main page of airdrop activity. **useless** now.
+ */
+
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { mapState } from 'vuex'
 
