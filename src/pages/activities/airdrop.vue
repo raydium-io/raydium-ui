@@ -14,7 +14,9 @@
         <div class="icon minimize" />
       </div>
 
-      <a v-if="rewardIsOut" class="download-full-list" href="/winner-list/" target="_blank"> Check Winners </a>
+      <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
+        Check Winners
+      </a>
 
       <div class="title">Airdrop Points</div>
 
@@ -277,7 +279,7 @@
                   }
                 "
               >
-                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />TWEET NOW
+                <img class="icon" src="../../assets/icons/guide-twitter-icon.svg" />TWEET NOW
               </button>
             </a>
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
@@ -323,7 +325,7 @@
                     }
                   "
                 >
-                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FOLLOW
+                  <img class="icon" src="../../assets/icons/guide-twitter-icon.svg" />FOLLOW
                 </button>
               </a>
             </div>
@@ -364,7 +366,7 @@
                   }
                 "
               >
-                <img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
+                <img class="icon" src="../../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
               </button>
             </a>
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
@@ -435,7 +437,7 @@
               }
             "
           >
-            <img class="icon" src="../assets/icons/guide-share-icon.svg" />
+            <img class="icon" src="../../assets/icons/guide-share-icon.svg" />
           </button>
         </div>
       </div>
@@ -554,6 +556,10 @@
 </template>
 
 <script lang="ts">
+/**
+ * @file it is the main page of airdrop activity. **useless** now.
+ */
+
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { mapState } from 'vuex'
 
@@ -890,7 +896,7 @@ a.disabled {
   width: 24px;
   height: 24px;
   background-color: gray;
-  mask-image: url('../assets/icons/reward.svg');
+  mask-image: url('../../assets/icons/reward.svg');
 }
 .icon-reward.finished {
   background-color: aquamarine;
@@ -1132,7 +1138,7 @@ a.disabled {
       height: 24px;
       background-size: 100% 100%;
       background-color: aquamarine;
-      mask-image: url('../assets/icons/minimize.svg');
+      mask-image: url('../../assets/icons/minimize.svg');
     }
   }
   .download-full-list {
@@ -1201,11 +1207,11 @@ a.disabled {
     height: 40px;
     background-size: 100% 100%;
     background-color: aquamarine;
-    mask-image: url('../assets/icons/reward.svg');
+    mask-image: url('../../assets/icons/reward.svg');
     &:hover {
       width: 32px;
       height: 32px;
-      mask-image: url('../assets/icons/maximize.svg');
+      mask-image: url('../../assets/icons/maximize.svg');
     }
   }
 }

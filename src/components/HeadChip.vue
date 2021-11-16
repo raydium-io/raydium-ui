@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="head-chip">
     <div class="chip-name">The <span class="color-board">$100,000</span> Raydium Airdrop is over!</div>
-    <NuxtLink to="/airdrop/">
+    <NuxtLink to="/activities/airdrop/">
       <button class="button-like">CHECK RESULTS NOW</button>
     </NuxtLink>
     <Icon type="close" class="close" @click="show = false" />

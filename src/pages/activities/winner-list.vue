@@ -39,6 +39,9 @@
 </template>
 
 <script lang="ts">
+/**
+ * @file it is a winner-list panel for airdrop activity. **useless** now.
+ */
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Table, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
@@ -46,7 +49,7 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
 
 @Component({
   head: {
-    title: 'Raydium Pools'
+    title: 'winner list'
   },
 
   components: {
