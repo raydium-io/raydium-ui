@@ -846,6 +846,27 @@ export const TOKENS: Tokens = {
     mintAddress: 'CiKu4eHsVrc1eueVQeHn7qhXTcVu95gSQmBpX4utjL9z',
     decimals: 8,
     tags: ['raydium']
+  },
+  OXS: {
+    symbol: 'OXS',
+    name: 'OXS',
+    mintAddress: '4TGxgCSJQx2GQk9oHZ8dC5m3JNXTYZHjXumKAW3vLnNx',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  CWAR: {
+    symbol: 'CWAR',
+    name: 'CWAR',
+    mintAddress: 'HfYFjMKNZygfMC8LsQ8LtpPsPxEJoXJx4M6tqi75Hajo',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  UPS: {
+    symbol: 'UPS',
+    name: 'UPS',
+    mintAddress: 'EwJN2GqUGXXzYmoAciwuABtorHczTA5LqbukKXV1viH7',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -1922,6 +1943,33 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '9FC8xTFRbgTpuZZYAYnZLxgnQ8r7FwfSBM1SWvGwgF7s',
     decimals: TOKENS.SBR.decimals
+  },
+  'OXS-USDC-V4': {
+    symbol: 'OXS-USDC',
+    name: 'OXS-USDC LP',
+    coin: { ...TOKENS.OXS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'et9pdjWm97rbmsJoN183GkFV5qzTGru79GE1Zhe7NTU',
+    decimals: TOKENS.OXS.decimals
+  },
+  'CWAR-USDC-V4': {
+    symbol: 'CWAR-USDC',
+    name: 'CWAR-USDC LP',
+    coin: { ...TOKENS.CWAR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'HjR23bxn2gtRDB2P1Tm3DLepAPPZgazsWJpLG9wqjnYR',
+    decimals: TOKENS.CWAR.decimals
+  },
+  'UPS-USDC-V4': {
+    symbol: 'UPS-USDC',
+    name: 'UPS-USDC LP',
+    coin: { ...TOKENS.UPS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '9hSUZdREEsbaYaKY4FouvXr7xyAqtpdHRDoYCb6Mb28a',
+    decimals: TOKENS.UPS.decimals
   }
 }
 
