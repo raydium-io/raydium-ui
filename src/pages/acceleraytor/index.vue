@@ -12,8 +12,23 @@
       <div class="image-part">
         <Carousel autoplay dots-class="carousel-dots">
           <div>
-            <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder.webp" />
-            <div class="inner-decorator-words">Coming Soon</div>
+            <div class="inner-decorator-words">
+              Pools open Nov 24, 12:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/defi-land-is-launching-on-acceleraytor-8aa06caecc3c"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
+            </div>
+            <a
+              href="https://raydium.medium.com/defi-land-is-launching-on-acceleraytor-8aa06caecc3c"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder.webp"
+            /></a>
           </div>
           <div>
             <div class="inner-decorator-words">

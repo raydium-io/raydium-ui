@@ -627,6 +627,26 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  GENE: {
+    symbol: 'GENE',
+    name: 'Genopets',
+    mintAddress: 'GENEtH5amGSi8kHAtQoezp1XEXwZJ8vcuePYnXdKrMYz',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b',
+    details:
+      'Genopets is the world’s first Free-to-Play, Move-to-Earn NFT game that makes it fun and rewarding to live an active lifestyle. Build on Solana, Genopets integrates your daily activity in real life with blockchain Play-to-Earn economics so you can turn your real-life actions into expansive gameplay and earn crypto while doing it.',
+    docs: {
+      website: 'https://www.genopets.me/'
+      // whitepaper: ''
+    },
+    socials: {
+      Discord: 'https://discord.gg/genopets',
+      Medium: 'https://medium.com/@genopets',
+      Twitter: 'https://twitter.com/genopets'
+    },
+    tags: ['raydium']
+  },
   CHEEMS: {
     symbol: 'CHEEMS',
     name: 'CHEEMS',

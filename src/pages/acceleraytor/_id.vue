@@ -644,6 +644,34 @@
                 <div v-for="item in winningTickets" :key="item" class="ticket-item">ticket: {{ item }}</div>
               </div>
             </div>
+            <div class="infos big-box">
+              <span class="key">
+                {{
+                  {
+                    '0': 'Lucky Ending Numbers',
+                    '1': 'All numbers not ending with',
+                    '2': 'Lucky Ending Numbers',
+                    '3': 'All Tickets Win',
+                    undefined: 'Lucky Ending Numbers'
+                  }[String(winningTicketsTailNumbers.isWinning)]
+                }}
+              </span>
+              <div class="content full">
+                <div v-if="['1', '2'].includes(String(winningTicketsTailNumbers.isWinning))">
+                  {{
+                    winningTicketsTailNumbers.tickets
+                      .map(({ no, isPartial }) => `${no}${isPartial ? '(partial)' : ''}`)
+                      .join(', ')
+                  }}
+                </div>
+                <div v-else-if="['3'].includes(String(winningTicketsTailNumbers.isWinning))">
+                  (Every deposited ticket wins)
+                </div>
+                <div v-else className="opacity-50">
+                  {{ pool.status === 'closed' ? '(Lottery in progress)' : '(Numbers selected when lottery ends)' }}
+                </div>
+              </div>
+            </div>
           </TabPane>
         </Tabs>
       </Col>
@@ -720,6 +748,9 @@ export default class AcceleRaytor extends Vue {
 
   isTicketWin(ticketNumber: number): boolean {
     const luckyInfos = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
+    const isWinning = (this.pool.info as IdoLotteryPoolInfo).isWinning
+    if (isWinning === 0) return false
+    if (isWinning === 3) return true
     const isTargeted = luckyInfos.some(
       ({ luckyTailDigits, luckyTailNumber, luckyWithinNumber }) =>
         luckyTailDigits &&
@@ -728,7 +759,33 @@ export default class AcceleRaytor extends Vue {
           .padStart(luckyTailDigits, '0')
           .endsWith(String(luckyTailNumber).padStart(luckyTailDigits, '0'))
     )
-    return this.getWinProperty() < 0.5 ? isTargeted : !isTargeted
+    if (isWinning === 1) return !isTargeted
+    return isTargeted
+  }
+
+  get winningTicketsTailNumbers(): {
+    tickets: {
+      no: number | string
+      isPartial?: boolean
+    }[]
+    isWinning: number
+  } {
+    const isWinning = (this.pool.info as IdoLotteryPoolInfo).isWinning
+    const raisedLotteries = (this.pool.info as IdoLotteryPoolInfo).currentLotteryNumber
+    const luckyNumberRawList = (this.pool.info as IdoLotteryPoolInfo).luckyInfos
+      .filter(({ luckyTailDigits }) => Number(luckyTailDigits) !== 0)
+      .map(({ luckyTailNumber, luckyTailDigits, luckyWithinNumber }) => ({
+        no: String(luckyTailNumber).padStart(Number(luckyTailDigits), '0'),
+        isPartial: Number(raisedLotteries) !== Number(luckyWithinNumber)
+      }))
+    // 1 hit not win
+    if (isWinning === 1) return { tickets: luckyNumberRawList, isWinning }
+    // 2 hit is win
+    if (isWinning === 2) return { tickets: luckyNumberRawList, isWinning }
+    // 3 all win
+    if (isWinning === 3) return { tickets: [], isWinning }
+    // 0 not roll
+    return { tickets: [], isWinning }
   }
 
   getWinProperty(): number {
@@ -1063,6 +1120,9 @@ hr {
       overflow: auto;
       display: inline-grid;
       grid-template-columns: repeat(3, 1fr);
+      &.full {
+        grid-template-columns: unset;
+      }
     }
   }
 

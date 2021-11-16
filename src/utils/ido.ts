@@ -1,9 +1,8 @@
+import { publicKey, u64 } from '@project-serum/borsh'
+import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 // @ts-ignore
 import { nu64, seq, struct, u8 } from 'buffer-layout'
 import { cloneDeep } from 'lodash-es'
-
-import { publicKey, u64 } from '@project-serum/borsh'
-import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import {
   CLOCK_PROGRAM_ID,
@@ -68,6 +67,7 @@ export interface IdoLotteryPoolInfo {
   checkProgramId: PublicKey
   idoOwner: PublicKey
   poolSeedId: PublicKey
+  isWinning: number // 0: not start   1: data is for choose win   2: data is for choose lose   3: all wins
 }
 
 export interface IdoUserInfo {
@@ -112,6 +112,24 @@ export interface IdoPool {
 }
 
 export const IDO_POOLS: IdoPool[] = [
+  {
+    base: { ...TOKENS.GENE },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.8, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(500000, TOKENS.GENE.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    isPrivate: false,
+    idoId: 'DGBnb4xRW3oZNa14F8h8WgsDWPFZQoX9Ffem9pPL8t1g',
+    baseVault: 'GDDSZ2nhJVAXLULhfU5nwY2EMKXWM9dCK9KtMXtKHAH3',
+    quoteVault: 'EwpeiGxn8kxFdL8jkdurw4k6sa3xxc53NRRtQLZgzAH2',
+    seedId: '5PydzUPEHXFZbnUu1t71Kfjf1mhxDiHqYmQVoGoAkJDR'
+  },
   {
     base: { ...TOKENS.GRAPE },
     quote: { ...TOKENS.USDC },
@@ -377,7 +395,8 @@ export const IDO_LOTTERY_POOL_INFO_LAYOUT = struct([
   publicKey('checkProgramId'),
   publicKey('idoOwner'),
 
-  publicKey('poolSeedId')
+  publicKey('poolSeedId'),
+  u64('isWinning') // 0: not start   1: data is for choose win   2: data is for choose lose   3: all wins
 ])
 
 export const IDO_USER_INFO_LAYOUT = struct([
