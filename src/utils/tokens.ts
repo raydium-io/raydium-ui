@@ -908,6 +908,13 @@ export const TOKENS: Tokens = {
     mintAddress: '4SZjjNABoqhbd4hnapbvoEPEqT8mnNkfbEoAwALf1V8t',
     decimals: 6,
     tags: ['raydium']
+  },
+  JSOL: {
+    symbol: 'JSOL',
+    name: 'JSOL',
+    mintAddress: '7Q2afV64in6N6SeZsAAB81TJzwDoD6zpqmHkzi9Dcavn',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
