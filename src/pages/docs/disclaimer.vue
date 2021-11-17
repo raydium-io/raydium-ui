@@ -38,7 +38,8 @@ import { Icon, Popover } from 'ant-design-vue'
   components: {
     Icon,
     Popover
-  }
+  },
+  layout: 'home'
 })
 export default class Index extends Vue {}
 </script>
@@ -77,7 +78,7 @@ export default class Index extends Vue {}
 <style lang="less" scoped>
 .page-container {
   padding: 4vw 20vh;
-  min-height: calc(100vh - 64px - 82px);
+  min-height: 100vh;
   background-color: #141041;
   background-image: url('../../assets/background/index_page_background.webp');
   background-size: 100%;
