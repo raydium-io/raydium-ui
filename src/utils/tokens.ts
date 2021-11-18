@@ -2045,6 +2045,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5Gba1k3fU7Vh7UtAiBmie9vhQNNq1JfEwgn1DPGZ7NKQ',
     decimals: TOKENS.CAVE.decimals
+  },
+  'GENE-USDC-V4': {
+    symbol: 'GENE-USDC',
+    name: 'GENE-USDC LP',
+    coin: { ...TOKENS.GENE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7GKvfHEXenNiWYbJBKae89mdaMPr5gGMYwZmyC8gBNVG',
+    decimals: TOKENS.GENE.decimals
+  },
+  'GENE-RAY-V4': {
+    symbol: 'GENE-RAY',
+    name: 'GENE-RAY LP',
+    coin: { ...TOKENS.GENE },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '3HzXnc1qZ8mGqun18Ck3KA616XnZNqF1RWbgYE2nGRMA',
+    decimals: TOKENS.GENE.decimals
   }
 }
 

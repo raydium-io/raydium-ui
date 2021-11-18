@@ -1462,6 +1462,44 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '6cxqxAYhLXzgYMBZC38xjY3b2sFux9TvLZejR5Vx7khc', // lp vault
     poolRewardTokenAccount: '8yCUztutwnW9FHfJTfsAZdJZ8j77G1CoCkTVdsRDtt7f', // reward vault A
     poolRewardTokenAccountB: '49Y2DDJqjYFQHSgN1Zf2SUr7ktBrhyZooLPrdDe8xFwM' // reward vault B
+  },
+  {
+    name: 'GENE-USDC',
+    lp: { ...LP_TOKENS['GENE-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.GENE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'DDRNVVJBEXEemcprVVUcrTbYnR88JyN6jjT2ypgAQHC8',
+    poolAuthority: '9sdefPmehyrWqBPfn34PFcuKPYoxZ8Uy6g3436qr6jXk',
+    poolLpTokenAccount: 'DAfAJVWGbZpLn7Tahwc9LuVukMKB5JSVQjdHRwXk44GV', // lp vault
+    poolRewardTokenAccount: 'tMh3bpXh2GaFLK2Buzav7niYAS81m7RigkhRn7p4wga', // reward vault A
+    poolRewardTokenAccountB: 'JBi2SsBHGN969aGLpQxCLaRYaBa6U7LPShPYe23Je7oQ' // reward vault B
+  },
+  {
+    name: 'GENE-RAY',
+    lp: { ...LP_TOKENS['GENE-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.GENE },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'GVfLbXA3dpEHPvc4do9HvMZ8TACxm3x54BVrHPMEixcr',
+    poolAuthority: 'FpAPnuT9FDpvzN33kF1cAK3vWMr6BqmnJoCTvqaSeGop',
+    poolLpTokenAccount: '9zu4NVcnWBxu4gXqVYE6bPoHD24TGDQo5VF1DmaXfAwx', // lp vault
+    poolRewardTokenAccount: 'B3ACepDzCv4dicf1GnbVs8fxn1GsoLQ8fD4jSZ1y5CK1', // reward vault A
+    poolRewardTokenAccountB: '8o8JzfSvGGdFLocyVYWJQ32hDLZhXMq3z7NBuusUxfSH' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
