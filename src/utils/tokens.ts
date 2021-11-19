@@ -915,6 +915,13 @@ export const TOKENS: Tokens = {
     mintAddress: '7Q2afV64in6N6SeZsAAB81TJzwDoD6zpqmHkzi9Dcavn',
     decimals: 9,
     tags: ['raydium']
+  },
+  APT: {
+    symbol: 'APT',
+    name: 'APT',
+    mintAddress: 'APTtJyaRX5yGTsJU522N4VYWg3vCvSb65eam5GrPT5Rt',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
