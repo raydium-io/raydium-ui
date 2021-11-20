@@ -2070,6 +2070,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3HzXnc1qZ8mGqun18Ck3KA616XnZNqF1RWbgYE2nGRMA',
     decimals: TOKENS.GENE.decimals
+  },
+  'APT-USDC-V4': {
+    symbol: 'APT-USDC',
+    name: 'APT-USDC LP',
+    coin: { ...TOKENS.APT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Hk8mDAJFq4E9kF3DtNgPFwzbo5kbeiusNFJgWmo3LoQ5',
+    decimals: TOKENS.APT.decimals
   }
 }
 
