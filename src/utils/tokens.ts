@@ -2079,6 +2079,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Hk8mDAJFq4E9kF3DtNgPFwzbo5kbeiusNFJgWmo3LoQ5',
     decimals: TOKENS.APT.decimals
+  },
+  'GOFX-USDC-V4': {
+    symbol: 'GOFX-USDC',
+    name: 'GOFX-USDC LP',
+    coin: { ...TOKENS.GOFX },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4svqAwrLPGRDCQuuieYTmtLXF75wiahjeK2rEN9tY1YL',
+    decimals: TOKENS.GOFX.decimals
   }
 }
 
