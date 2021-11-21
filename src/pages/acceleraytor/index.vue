@@ -13,7 +13,7 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Pools open Nov 24, 12:00 UTC - Full details
+              Pools open Nov 23, 15:00 UTC - Full details
               <a
                 href="https://raydium.medium.com/defi-land-is-launching-on-acceleraytor-8aa06caecc3c"
                 rel="nofollow noopener noreferrer"
