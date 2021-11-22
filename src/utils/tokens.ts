@@ -2095,6 +2095,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4svqAwrLPGRDCQuuieYTmtLXF75wiahjeK2rEN9tY1YL',
     decimals: TOKENS.GOFX.decimals
+  },
+  'SONAR-USDC-V4': {
+    symbol: 'SONAR-USDC',
+    name: 'SONAR-USDC LP',
+    coin: { ...TOKENS.SONAR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2tAcfqJ1YYjpGLqwh76kyNt9VaNFDd4fJySfH6SmWfKt',
+    decimals: TOKENS.SONAR.decimals
   }
 }
 
