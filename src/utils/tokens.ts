@@ -922,6 +922,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'APTtJyaRX5yGTsJU522N4VYWg3vCvSb65eam5GrPT5Rt',
     decimals: 6,
     tags: ['raydium']
+  },
+  SONAR: {
+    symbol: 'SONAR',
+    name: 'SONAR',
+    mintAddress: 'sonarX4VtVkQemriJeLm6CKeW3GDMyiBnnAEMw1MRAE',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
