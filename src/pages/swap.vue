@@ -697,6 +697,8 @@ export default Vue.extend({
           }
         }
       },
+      side: null as 'buy' | 'sell' | null,
+      worstPrice: null as number | null,
       // amm
       lpMintAddress: '',
       // trading endpoint
@@ -1304,6 +1306,8 @@ export default Vue.extend({
       let middleCoinAmount
 
       let showMarket
+      let _side = null
+      let _worstPrice = null
 
       if (this.fromCoin && this.toCoin) {
         let maxAmountOut = 0
@@ -1414,7 +1418,7 @@ export default Vue.extend({
           for (const [marketAddress, marketConfig] of Object.entries(this.market)) {
             if (!marketConfig.asks || !marketConfig.bids) continue
 
-            const { amountOut, amountOutWithSlippage, priceImpact } = getOutAmount(
+            const { amountOut, amountOutWithSlippage, priceImpact, side, worstPrice } = getOutAmount(
               marketConfig.market,
               marketConfig.asks,
               marketConfig.bids,
@@ -1425,6 +1429,10 @@ export default Vue.extend({
             )
             const out = new TokenAmount(amountOut, this.toCoin.decimals, false)
             const outWithSlippage = new TokenAmount(amountOutWithSlippage, this.toCoin.decimals, false)
+
+            _side = side
+            _worstPrice = worstPrice
+
             console.log('dex -> ', marketAddress, outWithSlippage.fixed())
             if (!out.isNullOrZero()) {
               if (!toCoinWithSlippage || toCoinWithSlippage.wei.isLessThan(outWithSlippage.wei)) {
@@ -1481,6 +1489,8 @@ export default Vue.extend({
         this.setupFlagWSOL = setupFlagWSOL || this.needWrapSol() > 0
 
         this.showMarket = showMarket
+        this.side = _side
+        this.worstPrice = _worstPrice
       }
     },
 
@@ -1509,9 +1519,12 @@ export default Vue.extend({
         description: '',
         duration: 0
       })
+      let description = 'Swap'
 
       if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
         const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
+        description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+
         swap(
           this.$web3,
           this.$wallet,
@@ -1538,7 +1551,6 @@ export default Vue.extend({
                   h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
                 ])
             })
-            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {
@@ -1560,6 +1572,8 @@ export default Vue.extend({
         if (fromMint === NATIVE_SOL.mintAddress) fromMint = TOKENS.WSOL.mintAddress
         if (midMint === NATIVE_SOL.mintAddress) midMint = TOKENS.WSOL.mintAddress
         if (toMint === NATIVE_SOL.mintAddress) toMint = TOKENS.WSOL.mintAddress
+        description = `Create Tokens`
+
         preSwapRoute(
           this.$web3,
           // @ts-ignore
@@ -1587,7 +1601,6 @@ export default Vue.extend({
                   h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
                 ])
             })
-            const description = `Create Tokens`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error: Error) => {
@@ -1615,6 +1628,7 @@ export default Vue.extend({
         if (fromMint === NATIVE_SOL.mintAddress) fromMint = TOKENS.WSOL.mintAddress
         if (midMint === NATIVE_SOL.mintAddress) midMint = TOKENS.WSOL.mintAddress
         if (toMint === NATIVE_SOL.mintAddress) toMint = TOKENS.WSOL.mintAddress
+        description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
 
         swapRoute(
           this.$web3,
@@ -1642,7 +1656,7 @@ export default Vue.extend({
                   h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
                 ])
             })
-            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error: Error) => {
@@ -1668,18 +1682,20 @@ export default Vue.extend({
         )
           return
         const marketConfig = this.market[this.showMarket]
+        description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+
         place(
           this.$web3,
           this.$wallet,
           marketConfig.market,
-          marketConfig.asks,
-          marketConfig.bids,
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress,
           get(this.wallet.tokenAccounts, `${this.fromCoin.mintAddress}.tokenAccountAddress`),
           get(this.wallet.tokenAccounts, `${this.toCoin.mintAddress}.tokenAccountAddress`),
+          this.side,
           this.fromCoinAmount,
-          this.setting.slippage
+          this.toCoinWithSlippage,
+          this.worstPrice
         )
           .then((txid) => {
             this.$notify.info({
@@ -1692,7 +1708,6 @@ export default Vue.extend({
                 ])
             })
 
-            const description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
             this.$accessor.transaction.sub({ txid, description })
           })
           .catch((error) => {

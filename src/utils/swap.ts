@@ -1,34 +1,27 @@
+import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market';
+import { closeAccount } from '@project-serum/serum/lib/token-instructions';
+import {
+  Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction
+} from '@solana/web3.js';
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout'
+import { nu64, struct, u8 } from 'buffer-layout';
 
-import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
-
+import { RouterInfoItem } from '@/types/api';
 // eslint-disable-next-line
-import { TokenAmount } from '@/utils/safe-math'
+import { TokenAmount } from '@/utils/safe-math';
 import {
-  createAssociatedTokenAccountIfNotExist,
-  createAtaSolIfNotExistAndWrap,
-  createProgramAccountIfNotExist,
-  createTokenAccountIfNotExist,
-  findProgramAddress,
-  mergeTransactions,
-  sendTransaction
-} from '@/utils/web3'
-import { RouterInfoItem } from '@/types/api'
+  createAssociatedTokenAccountIfNotExist, createAtaSolIfNotExistAndWrap,
+  createProgramAccountIfNotExist, createTokenAccountIfNotExist, findProgramAddress,
+  mergeTransactions, sendTransaction
+} from '@/utils/web3';
 import {
-  LIQUIDITY_POOL_PROGRAM_ID_V4,
-  MEMO_PROGRAM_ID,
-  ROUTE_SWAP_PROGRAM_ID,
-  SERUM_PROGRAM_ID_V3,
-  SYSTEM_PROGRAM_ID,
-  TOKEN_PROGRAM_ID
-} from './ids'
-import { getBigNumber } from './layouts'
+  LIQUIDITY_POOL_PROGRAM_ID_V4, MEMO_PROGRAM_ID, ROUTE_SWAP_PROGRAM_ID, SERUM_PROGRAM_ID_V3,
+  SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
+} from './ids';
+import { getBigNumber } from './layouts';
+import { LiquidityPoolInfo } from './pools';
 // eslint-disable-next-line
-import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
-import { LiquidityPoolInfo } from './pools'
+import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens';
 
 export function getOutAmount(
   market: any,
@@ -308,7 +301,7 @@ export function forecastBuy(market: any, orderBook: any, pcIn: any, slippage: nu
   const maxInAllow = pcIn - availablePc
 
   return {
-    side: 'buy',
+    side: 'buy' as 'buy' | 'sell',
     maxInAllow,
     amountOut: coinOut,
     amountOutWithSlippage,
@@ -354,7 +347,7 @@ export function forecastSell(market: any, orderBook: any, coinIn: any, slippage:
   const maxInAllow = coinIn - availableCoin
 
   return {
-    side: 'sell',
+    side: 'sell' as 'buy' | 'sell',
     maxInAllow,
     amountOut: pcOut,
     amountOutWithSlippage,
@@ -800,16 +793,16 @@ export async function place(
   connection: Connection,
   wallet: any,
   market: Market,
-  asks: any,
-  bids: any,
   fromCoinMint: string,
   toCoinMint: string,
   fromTokenAccount: string,
   toTokenAccount: string,
-  amount: string,
-  slippage: number
+  side: 'buy' | 'sell' | null,
+  maxInAllow: string,
+  amountOut: string,
+  worstPrice: number | null
 ) {
-  const forecastConfig = getOutAmount(market, asks, bids, fromCoinMint, toCoinMint, amount, slippage)
+  if (!side || !worstPrice) throw new Error('Miss side')
 
   const transaction = new Transaction()
   const signers: Account[] = []
@@ -835,13 +828,13 @@ export async function place(
 
   if (fromCoinMint === NATIVE_SOL.mintAddress) {
     let lamports
-    if (forecastConfig.side === 'buy') {
-      lamports = Math.round(forecastConfig.worstPrice * forecastConfig.amountOut * 1.01 * LAMPORTS_PER_SOL)
+    if (side === 'buy') {
+      lamports = Math.round(worstPrice * Number(amountOut) * 1.01 * LAMPORTS_PER_SOL)
       if (openOrdersAccounts.length > 0) {
         lamports -= getBigNumber(openOrdersAccounts[0].quoteTokenFree)
       }
     } else {
-      lamports = Math.round(forecastConfig.maxInAllow * LAMPORTS_PER_SOL)
+      lamports = Math.round(Number(maxInAllow) * LAMPORTS_PER_SOL)
       if (openOrdersAccounts.length > 0) {
         lamports -= getBigNumber(openOrdersAccounts[0].baseTokenFree)
       }
@@ -864,12 +857,9 @@ export async function place(
       owner,
       payer: wrappedSolAccount ?? new PublicKey(fromTokenAccount),
       // @ts-ignore
-      side: forecastConfig.side,
-      price: forecastConfig.worstPrice,
-      size:
-        forecastConfig.side === 'buy'
-          ? parseFloat(forecastConfig.amountOut.toFixed(6))
-          : parseFloat(forecastConfig.maxInAllow.toFixed(6)),
+      side,
+      price: worstPrice,
+      size: side === 'buy' ? parseFloat(Number(amountOut).toFixed(6)) : parseFloat(Number(maxInAllow).toFixed(6)),
       orderType: 'ioc',
       openOrdersAddressKey: openOrdersAddress
       // feeDiscountPubkey: useFeeDiscountPubkey
