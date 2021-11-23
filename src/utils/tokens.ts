@@ -647,6 +647,27 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  DFL: {
+    symbol: 'DFL',
+    name: 'DeFi Land',
+    mintAddress: 'DFL1zNkaGPWm1BqAVqRjCZvHmwTFrEaJtbzJWgseoNJh',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/defi-land-is-launching-on-acceleraytor-8aa06caecc3c',
+    details:
+      'DeFi Land is a multi-chain agriculture simulation web game created to gamify decentralized finance. The game will have all the features that traditional platforms have, but it will be gathered all in one place. DeFi Land gamifies decentralized finance by turning investment activities into games.',
+    docs: {
+      website: 'https://defiland.app/'
+      // whitepaper: ''
+    },
+    socials: {
+      Discord: 'https://discord.gg/defiland',
+      Medium: 'https://defiland.medium.com/',
+      Twitter: 'https://twitter.com/DeFi_Land',
+      Telegram: 'https://t.me/defiland_official'
+    },
+    tags: ['raydium']
+  },
   CHEEMS: {
     symbol: 'CHEEMS',
     name: 'CHEEMS',
