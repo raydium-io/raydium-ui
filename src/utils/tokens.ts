@@ -2104,6 +2104,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '2tAcfqJ1YYjpGLqwh76kyNt9VaNFDd4fJySfH6SmWfKt',
     decimals: TOKENS.SONAR.decimals
+  },
+  'JSOL-SOL-V4': {
+    symbol: 'JSOL-SOL',
+    name: 'JSOL-SOL LP',
+    coin: { ...TOKENS.JSOL },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '61z37rpHsU6d3Fq5sUjJ85K6tXGzkoYKDAG3kPJQNDRo',
+    decimals: TOKENS.JSOL.decimals
+  },
+  'JSOL-USDC-V4': {
+    symbol: 'JSOL-USDC',
+    name: 'JSOL-USDC LP',
+    coin: { ...TOKENS.JSOL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3JZqf2VPNxj1kDZQsfzC7myM6spsGQbGuFv1gVfdYosN',
+    decimals: TOKENS.JSOL.decimals
   }
 }
 
