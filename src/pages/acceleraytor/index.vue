@@ -32,9 +32,9 @@
           </div>
           <div>
             <div class="inner-decorator-words">
-              Pools open Nov 17, 12:00 UTC - Full details
+              Pools open Dec 1, 12:00 UTC - Full details
               <a
-                href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
+                href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
               >
@@ -42,7 +42,7 @@
               >
             </div>
             <a
-              href="https://raydium.medium.com/genopets-is-launching-on-acceleraytor-a4cba0b9f78b"
+              href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
