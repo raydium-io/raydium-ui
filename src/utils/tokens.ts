@@ -950,6 +950,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'sonarX4VtVkQemriJeLm6CKeW3GDMyiBnnAEMw1MRAE',
     decimals: 9,
     tags: ['raydium']
+  },
+  SHILL: {
+    symbol: 'SHILL',
+    name: 'SHILL',
+    mintAddress: '6cVgJUqo4nmvQpbgrDZwyfd6RwWw5bfnCamS3M9N1fd',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2143,6 +2150,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3JZqf2VPNxj1kDZQsfzC7myM6spsGQbGuFv1gVfdYosN',
     decimals: TOKENS.JSOL.decimals
+  },
+  'SHILL-USDC-V4': {
+    symbol: 'SHILL-USDC',
+    name: 'SHILL-USDC LP',
+    coin: { ...TOKENS.SHILL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'CnUhYBtQEbSBZ76bgxAouVCTCb8rofZzwerVF5z5LREJ',
+    decimals: TOKENS.SHILL.decimals
   }
 }
 
