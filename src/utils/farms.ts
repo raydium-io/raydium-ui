@@ -1538,6 +1538,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '3DpNmc28m7z18HVQp3CzmYjvoT5Snk7qFkNMJDz2GW8g', // lp vault
     poolRewardTokenAccount: 'eH3XbcgLAC43CJgs9NnqDoVTfRNXXwA3nmYHnrR1GVe', // reward vault A
     poolRewardTokenAccountB: '6mqPeL7aEwfiYLpDDRfb4ZjMe9sGN6gS7Vsa5exXyoC7' // reward vault B
+  },
+  {
+    name: 'APT-USDC',
+    lp: { ...LP_TOKENS['APT-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.APT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7W8BKbMgcVpGYvTgEK758pJgDRZJ9WafKfgkV1XCkP33',
+    poolAuthority: '2LziV5nuaf7MJBExG4YPYZUBSqzQE6YcqUyVGPSFux3p',
+    poolLpTokenAccount: '6WSdTvV5k7D76FGBUucdFLbfYaMh3XAY6AEsMSMHp32z', // lp vault
+    poolRewardTokenAccount: 'EEWM6DY2XxL4mBNCjJyxpKLYZUss4rFLQsnyw81VqV6V', // reward vault A
+    poolRewardTokenAccountB: 'MKy2NdnjJf9A423yy72qcEmPAqpoLcLLECyWqEkKUJ8' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
