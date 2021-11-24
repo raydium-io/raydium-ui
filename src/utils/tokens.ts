@@ -2159,6 +2159,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'CnUhYBtQEbSBZ76bgxAouVCTCb8rofZzwerVF5z5LREJ',
     decimals: TOKENS.SHILL.decimals
+  },
+  'DFL-USDC-V4': {
+    symbol: 'DFL-USDC',
+    name: 'DFL-USDC LP',
+    coin: { ...TOKENS.DFL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Fffijd6UVJdQeLVXhenS8YcsnMUdWJqpbBeH42LFkXgS',
+    decimals: TOKENS.DFL.decimals
   }
 }
 

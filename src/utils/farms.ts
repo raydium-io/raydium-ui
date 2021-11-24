@@ -1557,6 +1557,44 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '6WSdTvV5k7D76FGBUucdFLbfYaMh3XAY6AEsMSMHp32z', // lp vault
     poolRewardTokenAccount: 'EEWM6DY2XxL4mBNCjJyxpKLYZUss4rFLQsnyw81VqV6V', // reward vault A
     poolRewardTokenAccountB: 'MKy2NdnjJf9A423yy72qcEmPAqpoLcLLECyWqEkKUJ8' // reward vault B
+  },
+  {
+    name: 'SHILL-USDC',
+    lp: { ...LP_TOKENS['SHILL-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SHILL },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'CgokwBwwdYsgo8hbUMtJ3GoNM3bVjvMcmaPrVvCw4sBi',
+    poolAuthority: 'HBWs4knSBV4FQX1CMqtiDvicESo4LcU4tKshDtCaETZk',
+    poolLpTokenAccount: '9WVDvYZ7zS2eiheHLa74uiJk3f28cg5bCM2XpYK6D8oC', // lp vault
+    poolRewardTokenAccount: '4Hb3CkSgqUprbHwuWkJxqdZytyLC5Wz1PLAk4AhozcJM', // reward vault A
+    poolRewardTokenAccountB: '4dehDyT2E4soVXtgYLCFw58Wmg5Q3wQm71n3mBfMybdp' // reward vault B
+  },
+  {
+    name: 'DFL-USDC',
+    lp: { ...LP_TOKENS['DFL-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.DFL },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'AWbmotuJS7NLBmra9ctbfVR1BnoHmiG1HGW6hm49TuRZ',
+    poolAuthority: 'HphbMv737TNN9P5Q7fnfJSLKt88YBjKwF4ocv69cVvFE',
+    poolLpTokenAccount: '91LAgDBRbit1LP8aP9NKDN1PRKbThtcvid3zYTBzHR8f', // lp vault
+    poolRewardTokenAccount: '5gJE2xtx9B23rReu35EZEHuxL1ZRHKAExL6u9VNLZhJ1', // reward vault A
+    poolRewardTokenAccountB: 'ujQqfpP9JzqiMGrg7QeMnwfpcKGRqvJZxJAfxp74oWF' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
