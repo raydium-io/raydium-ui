@@ -957,6 +957,25 @@ export const TOKENS: Tokens = {
     mintAddress: '6cVgJUqo4nmvQpbgrDZwyfd6RwWw5bfnCamS3M9N1fd',
     decimals: 6,
     tags: ['raydium']
+  },
+  TTT: {
+    symbol: 'TTT',
+    name: 'TabTrader',
+    mintAddress: 'FNFKRV3V8DtA3gVJN6UshMiLGYA8izxFwkNWmJbFjmRj',
+    decimals: 6,
+
+    detailLink: 'https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628',
+    details:
+      'TabTrader is a trading terminal that supports 34 exchanges with over 12,000 instruments, a variety of analytical tools, and a convenient interface. It’s a quick-access application allowing you to track your exchange accounts, trade, analyze charts, and get instantly notified on price changes, all within one unified interface. The app has a rating of 4.7 on the Apple App Store (with over 52,000 ratings) and a rating of 4.5 on the Google Play Store (with over 55,000 ratings).',
+    docs: {
+      website: 'https://tab-trader.com/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/tabtraderpro',
+      Telegram: 'https://t.me/tabtrader_en'
+    },
+    tags: ['raydium']
   }
 }
 
