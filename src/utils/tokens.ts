@@ -627,6 +627,24 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  SLB: {
+    symbol: 'SLB',
+    name: 'Solberg',
+    mintAddress: '2uRFEWRBQLEKpLmF8mohFZGDcFQmrkQEEZmHQvMUBvY7',
+    decimals: 9,
+    referrer: 'GVitrsSUFinuxRCJhTKuUGPRmiaSFQ6RewG5H9Zf1K2d',
+    details:
+      'With the goal to make investing in the future of decentralized finance (DeFi) easy and accessible to everyone, Solberg mission is to empower people to access decentralized finance (DeFi) and easily transfer to the Solana blockchain with minimal efforts. Through Solberg we decided to show all of the benefits of using decentralized finance (DeFi) and Solana Platform.',
+    docs: {
+      website: 'https://solbergtoken.com',
+      whitepaper: 'https://solbergtoken.com/assets/whitepaper/SolbergWhitepaper.pdf'
+    },
+    socials: {
+      Discord: 'https://discord.gg/zX4NRpY6pG',
+      Twitter: 'https://twitter.com/SolbergToken',
+      Telegram: 'https://t.me/solbergtokencommunity'
+    },
+  },
   GENE: {
     symbol: 'GENE',
     name: 'Genopets',
@@ -1081,6 +1099,33 @@ export const LP_TOKENS: Tokens = {
     decimals: TOKENS.RAY.decimals
   },
   // v4
+  'SLB-SOL-V4': {
+    symbol: 'SLB-SOL',
+    name: 'SLB-SOL LP',
+    coin: { ...TOKENS.SLB },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '67YxPMnsx5jqnyegtYC3yLdGDiLuEWEMGGfrY7mF9UNE',
+    decimals: TOKENS.SLB.decimals
+  },
+  'SLB-USDC-V4': {
+    symbol: 'SLB-USDC',
+    name: 'SLB-USDC LP',
+    coin: { ...TOKENS.SLB },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '6hiMMhsv3QX3R3GhxmTbrbchTCBpaUxCTAGpwQnS3ajn',
+    decimals: TOKENS.SLB.decimals
+  },
+  'SLB-USDT-V4': {
+    symbol: 'SLB-USDT',
+    name: 'SLB-USDT LP',
+    coin: { ...TOKENS.SLB },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: 'BKnUXt52LmwTfZ3bUZugJ7PGL1ZdpxzjqopWePeFNZPE',
+    decimals: TOKENS.SLB.decimals
+  },
   'FIDA-RAY-V4': {
     symbol: 'FIDA-RAY',
     name: 'FIDA-RAY LP',
