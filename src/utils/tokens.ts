@@ -435,7 +435,7 @@ export const TOKENS: Tokens = {
 
     detailLink: 'https://raydium.medium.com/solrise-is-launching-on-acceleraytor-c2c980362037',
     details:
-      'Solrise Finance is a fully decentralized and non-custodial protocol for investment funds on Solana. What this means in practice is that anyone can open a fund, and anyone can invest in it.\n\nSolrise’s platform allows fund managers from all across the globe — whether they are well-established and looking for a new channel, or ambitious rookies with something to prove — to open a fund, with performance kept completely transparent.\n\nExisting decentralized fund management platforms on Ethereum are suffering from brutally high transaction fees. With Solrise, you can create, enter, and exit funds all for under $0.01.',
+      'Solrise Finance is a fully decentralized and non-custodial protocol for investment funds on Solana. What this means in practice is that anyone can open a fund, and anyone can invest in it.\n\nSolrise’s platform allows fund managers from all across the globe — weWether they are well-established and looking for a new channel, or ambitious rookies with something to prove — to open a fund, with performance kept completely transparent.\n\nExisting decentralized fund management platforms on Ethereum are suffering from brutally high transaction fees. With Solrise, you can create, enter, and exit funds all for under $0.01.',
     docs: {
       website: 'https://solrise.finance/',
       docs: 'https://docs.solrise.finance/'
@@ -825,9 +825,9 @@ export const TOKENS: Tokens = {
     decimals: 6,
     tags: ['raydium']
   },
-  whETH: {
-    symbol: 'whETH',
-    name: 'whETH',
+  weWETH: {
+    symbol: 'weWETH',
+    name: 'weWETH',
     mintAddress: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
     decimals: 8,
     tags: ['raydium']
@@ -1943,23 +1943,23 @@ export const LP_TOKENS: Tokens = {
     mintAddress: 'HYUKXgpjaxMXHttyrFYtv3z2rdhZ1U9QDH8zEc8BooQC',
     decimals: TOKENS.FRKT.decimals
   },
-  'whETH-SOL-V4': {
-    symbol: 'whETH-SOL',
-    name: 'whETH-SOL LP',
-    coin: { ...TOKENS.whETH },
+  'weWETH-SOL-V4': {
+    symbol: 'weWETH-SOL',
+    name: 'weWETH-SOL LP',
+    coin: { ...TOKENS.weWETH },
     pc: { ...NATIVE_SOL },
 
     mintAddress: '3hbozt2Por7bcrGod8N7kEeJNMocFFjCJrQR16TQGBrE',
-    decimals: TOKENS.whETH.decimals
+    decimals: TOKENS.weWETH.decimals
   },
-  'whETH-USDC-V4': {
-    symbol: 'whETH-USDC',
-    name: 'whETH-USDC LP',
-    coin: { ...TOKENS.whETH },
+  'weWETH-USDC-V4': {
+    symbol: 'weWETH-USDC',
+    name: 'weWETH-USDC LP',
+    coin: { ...TOKENS.weWETH },
     pc: { ...TOKENS.USDC },
 
     mintAddress: '3529SBnMCDW3S3xQ52aABbRHo7PcHvpQA4no8J12L5eK',
-    decimals: TOKENS.whETH.decimals
+    decimals: TOKENS.weWETH.decimals
   },
   'weUNI-USDC-V4': {
     symbol: 'weUNI-USDC',

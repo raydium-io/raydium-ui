@@ -3202,10 +3202,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     official: true
   },
   {
-    name: 'whETH-SOL',
-    coin: { ...TOKENS.whETH },
+    name: 'weWETH-SOL',
+    coin: { ...TOKENS.weWETH },
     pc: { ...NATIVE_SOL },
-    lp: { ...LP_TOKENS['whETH-SOL-V4'] },
+    lp: { ...LP_TOKENS['weWETH-SOL-V4'] },
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
     ammId: '4yrHms7ekgTBgJg77zJ33TsWrraqHsCXDtuSZqUsuGHb',
@@ -3229,10 +3229,10 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     official: true
   },
   {
-    name: 'whETH-USDC',
-    coin: { ...TOKENS.whETH },
+    name: 'weWETH-USDC',
+    coin: { ...TOKENS.weWETH },
     pc: { ...TOKENS.USDC },
-    lp: { ...LP_TOKENS['whETH-USDC-V4'] },
+    lp: { ...LP_TOKENS['weWETH-USDC-V4'] },
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
     ammId: 'EoNrn8iUhwgJySD1pHu8Qxm5gSQqLK3za4m8xzD2RuEb',

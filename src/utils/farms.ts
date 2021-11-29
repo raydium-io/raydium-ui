@@ -1255,8 +1255,8 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '2LQWPUn6rxYrzW1oPM48ddXmWLJQTQ8P6UrJnE9ZCSy2' // reward vault B
   },
   {
-    name: 'whETH-SOL',
-    lp: { ...LP_TOKENS['whETH-SOL-V4'] },
+    name: 'weWETH-SOL',
+    lp: { ...LP_TOKENS['weWETH-SOL-V4'] },
     reward: { ...TOKENS.RAY },
     rewardB: { ...TOKENS.SRM },
     isStake: false,
@@ -1274,8 +1274,8 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '6DhjnWKLbxnDSFZApaVJXCY2wbzgt2mYhvW3yBreaYsY' // reward vault B
   },
   {
-    name: 'whETH-USDC',
-    lp: { ...LP_TOKENS['whETH-USDC-V4'] },
+    name: 'weWETH-USDC',
+    lp: { ...LP_TOKENS['weWETH-USDC-V4'] },
     reward: { ...TOKENS.RAY },
     rewardB: { ...TOKENS.SRM },
     isStake: false,
