@@ -976,6 +976,13 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/tabtrader_en'
     },
     tags: ['raydium']
+  },
+  BOKU: {
+    symbol: 'BOKU',
+    name: 'BOKU',
+    mintAddress: 'CN7qFa5iYkHz99PTctvT4xXUHnxwjQ5MHxCuTJtPN5uS',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2187,6 +2194,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Fffijd6UVJdQeLVXhenS8YcsnMUdWJqpbBeH42LFkXgS',
     decimals: TOKENS.DFL.decimals
+  },
+  'BOKU-USDC-V4': {
+    symbol: 'BOKU-USDC',
+    name: 'BOKU-USDC LP',
+    coin: { ...TOKENS.BOKU },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8jjQn5Yagb6Nm2WGAxPW1bcGqrTWpg5adf6QukXEarcP',
+    decimals: TOKENS.BOKU.decimals
   }
 }
 
