@@ -983,6 +983,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'CN7qFa5iYkHz99PTctvT4xXUHnxwjQ5MHxCuTJtPN5uS',
     decimals: 9,
     tags: ['raydium']
+  },
+  MIMO: {
+    symbol: 'MIMO',
+    name: 'MIMO',
+    mintAddress: '9TE7ebz1dsFo1uQ2T4oYAKSm39Y6fWuHrd6Uk6XaiD16',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2203,6 +2210,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '8jjQn5Yagb6Nm2WGAxPW1bcGqrTWpg5adf6QukXEarcP',
     decimals: TOKENS.BOKU.decimals
+  },
+  'MIMO-SOL-V4': {
+    symbol: 'MIMO-SOL',
+    name: 'MIMO-SOL LP',
+    coin: { ...TOKENS.MIMO },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'HUJ1opSk8AiPfDT47r7n4hTiK2EXgrR3Msy7T8q1BywS',
+    decimals: TOKENS.MIMO.decimals
   }
 }
 

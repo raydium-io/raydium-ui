@@ -1614,6 +1614,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '6a8bAkyLK6EL675b3ds4FGpojHKGUVRy9zfpXebPXgdV', // lp vault
     poolRewardTokenAccount: '6rBSUvDjFhp6Xwi7oVK32vKB9jQQAPAEEzSxsQRzSGZk', // reward vault A
     poolRewardTokenAccountB: 'ASSJYjTNLN67sGqTZkngi3ZogTagTsH165nG2Ug6MB9x' // reward vault B
+  },
+  {
+    name: 'MIMO-SOL',
+    lp: { ...LP_TOKENS['MIMO-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MIMO },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7yk1XUWmZpWMCoFpUT985z61UNTypyBGgZF3JpKgcwmL',
+    poolAuthority: '2C4NV3mwoQCSCLagwCtmufAka6ukEfSND5DSRGBtejRr',
+    poolLpTokenAccount: 'APmpKr8kjm3dxvRLbQVHqZnqHM5FSyMvg1Wn2zqTYVF4', // lp vault
+    poolRewardTokenAccount: '6YNQYqUC7mKwJBuHMbEasRpNwq567Wh5iPcMmrK4rDT', // reward vault A
+    poolRewardTokenAccountB: '8nRwtcygNWfFsPmRkaPGbZ6mWrPCwDprAE9d1EvV4EuB' // reward vault B
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
