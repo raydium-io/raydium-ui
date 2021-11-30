@@ -990,6 +990,20 @@ export const TOKENS: Tokens = {
     mintAddress: '9TE7ebz1dsFo1uQ2T4oYAKSm39Y6fWuHrd6Uk6XaiD16',
     decimals: 9,
     tags: ['raydium']
+  },
+  wbWBNB: {
+    symbol: 'wbWBNB',
+    name: 'wbWBNB',
+    mintAddress: '9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  wePEOPLE: {
+    symbol: 'wePEOPLE',
+    name: 'wePEOPLE',
+    mintAddress: 'CobcsUrt3p91FwvULYKorQejgsm5HoQdv5T8RUZ6PnLA',
+    decimals: 8,
+    tags: ['raydium']
   }
 }
 
@@ -2219,6 +2233,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'HUJ1opSk8AiPfDT47r7n4hTiK2EXgrR3Msy7T8q1BywS',
     decimals: TOKENS.MIMO.decimals
+  },
+  'wbWBNB-USDC-V4': {
+    symbol: 'wbWBNB-USDC',
+    name: 'wbWBNB-USDC LP',
+    coin: { ...TOKENS.wbWBNB },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FEsEfEJJSfiMQcshUgZ5UigfytfGRQ3z5puyF6DXDp9C',
+    decimals: TOKENS.wbWBNB.decimals
+  },
+  'wePEOPLE-USDC-V4': {
+    symbol: 'wePEOPLE-USDC',
+    name: 'wePEOPLE-USDC LP',
+    coin: { ...TOKENS.wePEOPLE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3e5ZCKi4etorpV4pv1fSckP5iJD67xcUkx3RtFCZhbzD',
+    decimals: TOKENS.wePEOPLE.decimals
   }
 }
 
