@@ -50,8 +50,23 @@
             </a>
           </div>
           <div>
-            <div class="inner-decorator-words">Pools open Dec 9, full details coming soon!</div>
-            <img class="carousel-image" src="../../assets/background/acceleraytor-realy.jpg" />
+            <div class="inner-decorator-words">
+              Pools open Dec 9, 12:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/realy-is-launching-on-acceleraytor-b6d6a63d69d8"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
+            </div>
+            <a
+              href="https://raydium.medium.com/realy-is-launching-on-acceleraytor-b6d6a63d69d8"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
+              <img class="carousel-image" src="../../assets/background/acceleraytor-realy.jpg" />
+            </a>
           </div>
         </Carousel>
       </div>
