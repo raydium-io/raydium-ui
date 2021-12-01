@@ -435,7 +435,7 @@ export const TOKENS: Tokens = {
 
     detailLink: 'https://raydium.medium.com/solrise-is-launching-on-acceleraytor-c2c980362037',
     details:
-      'Solrise Finance is a fully decentralized and non-custodial protocol for investment funds on Solana. What this means in practice is that anyone can open a fund, and anyone can invest in it.\n\nSolrise’s platform allows fund managers from all across the globe — whether they are well-established and looking for a new channel, or ambitious rookies with something to prove — to open a fund, with performance kept completely transparent.\n\nExisting decentralized fund management platforms on Ethereum are suffering from brutally high transaction fees. With Solrise, you can create, enter, and exit funds all for under $0.01.',
+      'Solrise Finance is a fully decentralized and non-custodial protocol for investment funds on Solana. What this means in practice is that anyone can open a fund, and anyone can invest in it.\n\nSolrise’s platform allows fund managers from all across the globe — weWether they are well-established and looking for a new channel, or ambitious rookies with something to prove — to open a fund, with performance kept completely transparent.\n\nExisting decentralized fund management platforms on Ethereum are suffering from brutally high transaction fees. With Solrise, you can create, enter, and exit funds all for under $0.01.',
     docs: {
       website: 'https://solrise.finance/',
       docs: 'https://docs.solrise.finance/'
@@ -843,9 +843,9 @@ export const TOKENS: Tokens = {
     decimals: 6,
     tags: ['raydium']
   },
-  whETH: {
-    symbol: 'whETH',
-    name: 'whETH',
+  weWETH: {
+    symbol: 'weWETH',
+    name: 'weWETH',
     mintAddress: '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
     decimals: 8,
     tags: ['raydium']
@@ -993,6 +993,34 @@ export const TOKENS: Tokens = {
       Twitter: 'https://twitter.com/tabtraderpro',
       Telegram: 'https://t.me/tabtrader_en'
     },
+    tags: ['raydium']
+  },
+  BOKU: {
+    symbol: 'BOKU',
+    name: 'BOKU',
+    mintAddress: 'CN7qFa5iYkHz99PTctvT4xXUHnxwjQ5MHxCuTJtPN5uS',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  MIMO: {
+    symbol: 'MIMO',
+    name: 'MIMO',
+    mintAddress: '9TE7ebz1dsFo1uQ2T4oYAKSm39Y6fWuHrd6Uk6XaiD16',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  wbWBNB: {
+    symbol: 'wbWBNB',
+    name: 'wbWBNB',
+    mintAddress: '9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa',
+    decimals: 8,
+    tags: ['raydium']
+  },
+  wePEOPLE: {
+    symbol: 'wePEOPLE',
+    name: 'wePEOPLE',
+    mintAddress: 'CobcsUrt3p91FwvULYKorQejgsm5HoQdv5T8RUZ6PnLA',
+    decimals: 8,
     tags: ['raydium']
   }
 }
@@ -1981,23 +2009,23 @@ export const LP_TOKENS: Tokens = {
     mintAddress: 'HYUKXgpjaxMXHttyrFYtv3z2rdhZ1U9QDH8zEc8BooQC',
     decimals: TOKENS.FRKT.decimals
   },
-  'whETH-SOL-V4': {
-    symbol: 'whETH-SOL',
-    name: 'whETH-SOL LP',
-    coin: { ...TOKENS.whETH },
+  'weWETH-SOL-V4': {
+    symbol: 'weWETH-SOL',
+    name: 'weWETH-SOL LP',
+    coin: { ...TOKENS.weWETH },
     pc: { ...NATIVE_SOL },
 
     mintAddress: '3hbozt2Por7bcrGod8N7kEeJNMocFFjCJrQR16TQGBrE',
-    decimals: TOKENS.whETH.decimals
+    decimals: TOKENS.weWETH.decimals
   },
-  'whETH-USDC-V4': {
-    symbol: 'whETH-USDC',
-    name: 'whETH-USDC LP',
-    coin: { ...TOKENS.whETH },
+  'weWETH-USDC-V4': {
+    symbol: 'weWETH-USDC',
+    name: 'weWETH-USDC LP',
+    coin: { ...TOKENS.weWETH },
     pc: { ...TOKENS.USDC },
 
     mintAddress: '3529SBnMCDW3S3xQ52aABbRHo7PcHvpQA4no8J12L5eK',
-    decimals: TOKENS.whETH.decimals
+    decimals: TOKENS.weWETH.decimals
   },
   'weUNI-USDC-V4': {
     symbol: 'weUNI-USDC',
@@ -2232,6 +2260,42 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Fffijd6UVJdQeLVXhenS8YcsnMUdWJqpbBeH42LFkXgS',
     decimals: TOKENS.DFL.decimals
+  },
+  'BOKU-USDC-V4': {
+    symbol: 'BOKU-USDC',
+    name: 'BOKU-USDC LP',
+    coin: { ...TOKENS.BOKU },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8jjQn5Yagb6Nm2WGAxPW1bcGqrTWpg5adf6QukXEarcP',
+    decimals: TOKENS.BOKU.decimals
+  },
+  'MIMO-SOL-V4': {
+    symbol: 'MIMO-SOL',
+    name: 'MIMO-SOL LP',
+    coin: { ...TOKENS.MIMO },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'HUJ1opSk8AiPfDT47r7n4hTiK2EXgrR3Msy7T8q1BywS',
+    decimals: TOKENS.MIMO.decimals
+  },
+  'wbWBNB-USDC-V4': {
+    symbol: 'wbWBNB-USDC',
+    name: 'wbWBNB-USDC LP',
+    coin: { ...TOKENS.wbWBNB },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FEsEfEJJSfiMQcshUgZ5UigfytfGRQ3z5puyF6DXDp9C',
+    decimals: TOKENS.wbWBNB.decimals
+  },
+  'wePEOPLE-USDC-V4': {
+    symbol: 'wePEOPLE-USDC',
+    name: 'wePEOPLE-USDC LP',
+    coin: { ...TOKENS.wePEOPLE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3e5ZCKi4etorpV4pv1fSckP5iJD67xcUkx3RtFCZhbzD',
+    decimals: TOKENS.wePEOPLE.decimals
   }
 }
 
