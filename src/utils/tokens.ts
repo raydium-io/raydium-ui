@@ -1004,6 +1004,55 @@ export const TOKENS: Tokens = {
     mintAddress: 'CobcsUrt3p91FwvULYKorQejgsm5HoQdv5T8RUZ6PnLA',
     decimals: 8,
     tags: ['raydium']
+  },
+  XTAG: {
+    symbol: 'XTAG',
+    name: 'XTAG',
+    mintAddress: '5gs8nf4wojB5EXgDUWNLwXpknzgV2YWDhveAeBZpVLbp',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  KKO: {
+    symbol: 'KKO',
+    name: 'KKO',
+    mintAddress: 'kiNeKo77w1WBEzFFCXrTDRWGRWGP8yHvKC9rX6dqjQh',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  VI: {
+    symbol: 'VI',
+    name: 'VI',
+    mintAddress: '7zBWymxbZt7PVHQzfi3i85frc1YRiQc23K7bh3gos8ZC',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  SOLC: {
+    symbol: 'SOLC',
+    name: 'SOLC',
+    mintAddress: 'Bx1fDtvTN6NvE4kjdPHQXtmGSg582bZx9fGy4DQNMmAT',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  STR: {
+    symbol: 'STR',
+    name: 'STR',
+    mintAddress: '9zoqdwEBKWEi9G5Ze8BSkdmppxGgVv1Kw4LuigDiNr9m',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  SPWN: {
+    symbol: 'SPWN',
+    name: 'SPWN',
+    mintAddress: '5U9QqCPhqXAJcEv9uyzFJd5zhN93vuPk1aNNkXnUfPnt',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  ISOLA: {
+    symbol: 'ISOLA',
+    name: 'ISOLA',
+    mintAddress: '333iHoRM2Awhf9uVZtSyTfU8AekdGrgQePZsKMFPgKmS',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2251,6 +2300,69 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3e5ZCKi4etorpV4pv1fSckP5iJD67xcUkx3RtFCZhbzD',
     decimals: TOKENS.wePEOPLE.decimals
+  },
+  'ISOLA-USDT-V4': {
+    symbol: 'ISOLA-USDT',
+    name: 'ISOLA-USDT LP',
+    coin: { ...TOKENS.ISOLA },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: 'H8s1wQsZpRK61pyLF3XwyQc6E8vNUnwRDhy3TBDCDENQ',
+    decimals: TOKENS.ISOLA.decimals
+  },
+  'SPWN-USDC-V4': {
+    symbol: 'SPWN-USDC',
+    name: 'SPWN-USDC LP',
+    coin: { ...TOKENS.SPWN },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'B5uyCAQcX6nAjZypLgiivbEKabSptgUb8JK9tkaSnqdW',
+    decimals: TOKENS.SPWN.decimals
+  },
+  'STR-USDC-V4': {
+    symbol: 'STR-USDC',
+    name: 'STR-USDC LP',
+    coin: { ...TOKENS.STR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8uDVKmVwNmbXHDB7rNKqtpcT9VAsFHTJ5pPYxjyoBbNg',
+    decimals: TOKENS.STR.decimals
+  },
+  'SOLC-USDT-V4': {
+    symbol: 'SOLC-USDT',
+    name: 'SOLC-USDT LP',
+    coin: { ...TOKENS.SOLC },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: '2g9JzTWycLzK4KEBBHsponAtZRee2ii63bRrJ8tefEyt',
+    decimals: TOKENS.SOLC.decimals
+  },
+  'VI-USDC-V4': {
+    symbol: 'VI-USDC',
+    name: 'VI-USDC LP',
+    coin: { ...TOKENS.VI },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3MwHyHCRfVqtH3ABFtdKXdY9dwemr9GGxQFaBkeq6NjY',
+    decimals: TOKENS.VI.decimals
+  },
+  'KKO-USDC-V4': {
+    symbol: 'KKO-USDC',
+    name: 'KKO-USDC LP',
+    coin: { ...TOKENS.KKO },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7xr1Doc1NiMWbUg99YVFqQSLfYXNzo6YvacXUsSgBMNW',
+    decimals: TOKENS.KKO.decimals
+  },
+  'XTAG-USDC-V4': {
+    symbol: 'XTAG-USDC',
+    name: 'XTAG-USDC LP',
+    coin: { ...TOKENS.XTAG },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GCEQbLg4ik5YJ4CMcbtuVqEc4sjLdSGy34rFk1CtGjdg',
+    decimals: TOKENS.XTAG.decimals
   }
 }
 
