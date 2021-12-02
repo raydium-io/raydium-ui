@@ -204,21 +204,6 @@ export async function createAmm(
     )
   )
 
-  const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
-  const destLpTokenInfo = await conn.getAccountInfo(destLpToken)
-  if (!destLpTokenInfo) {
-    transaction.add(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        lpMintAddress,
-        destLpToken,
-        owner,
-        owner
-      )
-    )
-  }
-
   if (!accountSuccessFlag) {
     const txid = await sendTransaction(conn, wallet, transaction, signers)
     console.log('txid', txid)
@@ -255,7 +240,6 @@ export async function createAmm(
     ammTargetOrders,
     poolWithdrawQueue,
     poolTempLpTokenAccount,
-    destLpToken,
     nonce
   }
 
@@ -271,7 +255,8 @@ export async function createAmm(
       userInputBaseValue,
       userInputQuoteValue,
       poolCoinTokenAccount,
-      poolPcTokenAccount
+      poolPcTokenAccount,
+      lpMintAddress
     )
   }
 
@@ -289,7 +274,8 @@ async function initAmm(
   userInputBaseValue: number,
   userInputQuoteValue: number,
   poolCoinTokenAccount: PublicKey,
-  poolPcTokenAccount: PublicKey
+  poolPcTokenAccount: PublicKey,
+  lpMintAddress: PublicKey
 ) {
   const baseMintDecimals = new BigNumber(await getMintDecimals(conn, market.baseMintAddress as PublicKey))
   const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
@@ -331,6 +317,21 @@ async function initAmm(
     (quoteToken === null && market.quoteMintAddress.toString() !== TOKENS.WSOL.mintAddress)
   ) {
     throw new Error('no money')
+  }
+
+  const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
+  const destLpTokenInfo = await conn.getAccountInfo(destLpToken)
+  if (!destLpTokenInfo) {
+    transaction.add(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        lpMintAddress,
+        destLpToken,
+        owner,
+        owner
+      )
+    )
   }
 
   if (market.baseMintAddress.toString() === TOKENS.WSOL.mintAddress) {
@@ -415,7 +416,7 @@ async function initAmm(
       ammKeys.poolPcTokenAccount,
       ammKeys.poolWithdrawQueue,
       ammKeys.ammTargetOrders,
-      ammKeys.destLpToken,
+      destLpToken,
       ammKeys.poolTempLpTokenAccount,
       dexProgramId,
       market.address,
