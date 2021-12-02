@@ -1,5 +1,6 @@
 <template>
   <div class="airdrop">
+    <div @click="$i18n.setLocale('zh')">11111</div>
     <section class="page-title">
       <img class="icon" src="../assets/background/huobi.svg" style="margin-bottom: 40px" />
       <div class="page-sub-leading">Learn, Trade, Follow, Refer and Earn RAY</div>
@@ -180,6 +181,32 @@
 
     <section class="step-game">
       <div class="task-level">STEP 1</div>
+
+      <div class="box form">
+        <div class="box-title">Write Huobi UID</div>
+        <div class="input-box">
+          <label>Discord Username</label>
+          <input v-model="discordUserName" />
+        </div>
+        <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
+          {{ $accessor.wallet.connected ? (isDiscording ? 'SUBMITING...' : 'SUBMIT') : 'CONNECT WALLET' }}
+          <div
+            v-if="$accessor.wallet.connected"
+            :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+            :title="`${
+              haveDiscord
+                ? 'Congratulations! You completed this task.'
+                : isDiscordPending
+                ? 'Points pending. Please check again in 30 minutes.'
+                : 'you have not done this task'
+            }`"
+          />
+        </button>
+      </div>
+    </section>
+
+    <section class="step-game">
+      <div class="task-level">STEP 2</div>
       <div class="title">Get Started on Raydium</div>
 
       <div ref="step-1" class="box watch-video">
@@ -224,7 +251,7 @@
     </section>
 
     <section class="connect-wallet">
-      <div class="task-level">STEP 2</div>
+      <div class="task-level">STEP 3</div>
       <div class="title">Try Raydium’s Light Speed Swaps & Confirm Referral</div>
       <div class="subtitle">Total Points +5</div>
       <div class="box-grid">
@@ -532,8 +559,8 @@
       </table>
     </section>
 
-    <section class="teams-conditions">
-      <div class="title">TEAMS & CONDITIONS</div>
+    <section class="terms-conditions">
+      <div class="title">TERMS & CONDITIONS</div>
       <ul>
         <li>
           Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible to
@@ -645,6 +672,8 @@ export default class Airdrop extends Vue {
 
   mounted() {
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
+
+    console.log(this)
   }
 
   @Watch('initBackendResponse', { deep: true })
@@ -1345,7 +1374,7 @@ a.disabled {
   }
 }
 
-.teams-conditions {
+.terms-conditions {
   .title {
     font-weight: 500;
     font-size: 24px;
