@@ -853,7 +853,8 @@ export default Vue.extend({
       if (!this.searchText) return true
       const loweredSearchText = this.searchText.toLowerCase()
       const loweredFarmName = name.toLowerCase()
-      return [...loweredSearchText].every((char) => loweredFarmName.includes(char))
+      return loweredFarmName.includes(loweredSearchText)
+      // return [...loweredSearchText].every((char) => loweredFarmName.includes(char))
     },
     isInTab({ farmInfo: { fusion } }: { farmInfo: FarmInfo }) {
       if (this.tab === 'All Farms') return true
