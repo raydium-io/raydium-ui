@@ -4059,7 +4059,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     serumMarket: 'GsWEL352sYgQC3uAVKgEQz2TtA1RA5cgNwUQahyzwJyz',
     serumBids: 'DNkoCo9nN7mnnfWEvL6Qp9cyn5BjqDgVrgX3QktkXdnP',
     serumAsks: '5ZJAmbMPvjUXR345TkCH7kxXaeCGHKnoozrUhzD4TxjR',
-    serumEventQueue: 'ZYhSiaFWkuNTBzRFM9UPJXwHPyTGbujCKvPXhbssYPG',
+    serumEventQueue: 'FQnZjJVgRrrDJGA9ohPUrdmWMbuGwCGTVeZLqv1zJoc6',
     serumCoinVaultAccount: 'CGNexJSnAQFYZRUWj5cqtb9QN2wHNo1WxuGLErbHmxxU',
     serumPcVaultAccount: '4i1ZsFFcVQG1Ufmeak8ibU4ur88t4QFLonyh9kR7Eh8m',
     serumVaultSigner: '8EnrqayT31TqvUQRsCxC3ZZTNrTQjMNxki8MN71Hwp6B',
