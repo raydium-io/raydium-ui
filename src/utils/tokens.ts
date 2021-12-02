@@ -2413,6 +2413,8 @@ function addTokensSolana() {
     })
 }
 
+const notUseSolanaPicMint: string[] = [TOKENS.TTT.mintAddress]
+
 function addTokensSolanaFunc(tokens: any[]) {
   tokens.forEach((itemToken: any) => {
     if (itemToken.tags && itemToken.tags.includes('lp-token')) {
@@ -2436,7 +2438,7 @@ function addTokensSolanaFunc(tokens: any[]) {
         token.tags.push('solana')
       }
       const picToken = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.address)
-      if (picToken) {
+      if (picToken && !notUseSolanaPicMint.includes(itemToken.address)) {
         picToken.picUrl = itemToken.logoURI
       }
     }
