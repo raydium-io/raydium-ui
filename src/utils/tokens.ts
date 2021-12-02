@@ -2363,6 +2363,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GCEQbLg4ik5YJ4CMcbtuVqEc4sjLdSGy34rFk1CtGjdg',
     decimals: TOKENS.XTAG.decimals
+  },
+  'TTT-USDC-V4': {
+    symbol: 'TTT-USDC',
+    name: 'TTT-USDC LP',
+    coin: { ...TOKENS.TTT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '84fmrerHGohoRf4iLPDQ1KG4CjSjCRksYWGzjWfCRM8a',
+    decimals: TOKENS.TTT.decimals
   }
 }
 
