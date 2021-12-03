@@ -1053,6 +1053,27 @@ export const TOKENS: Tokens = {
     mintAddress: '333iHoRM2Awhf9uVZtSyTfU8AekdGrgQePZsKMFPgKmS',
     decimals: 6,
     tags: ['raydium']
+  },
+  RUN: {
+    symbol: 'RUN',
+    name: 'RUN',
+    mintAddress: '6F9XriABHfWhit6zmMUYAQBSy6XK5VF1cHXuW5LDpRtC',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/runnode-is-launching-on-acceleraytor-3ff7326864b0',
+    details:
+      'RunNode is a bridge from web 2.0 to 3.0 and powers the infrastructure of Solana through its RPC protocol. With a quick onboarding application to get an RPC endpoint in under 30 seconds, any project can launch, build and scale its Solana dApp — now.',
+    docs: {
+      website: 'https://runnode.com/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/RunNode',
+      Telegram: 'https://t.me/runnode',
+      Discord: 'https://discord.gg/V2f74X8Zrt'
+    },
+
+    tags: ['raydium']
   }
 }
 
