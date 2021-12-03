@@ -1,9 +1,11 @@
 <template>
   <div class="airdrop">
-    <div @click="$i18n.setLocale('en')">11111</div>
-    <div @click="$i18n.setLocale('zh')">22222</div>
     <section class="page-title">
-      <img class="icon" src="../assets/background/huobi.svg" style="margin-bottom: 40px" />
+      <img
+        class="icon"
+        src="../assets/background/huobi.svg"
+        style="margin-bottom: 40px; width: 100%; max-width: 400px"
+      />
       <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
       <div class="page-main-title">{{ $t('airdrop.title') }}</div>
       <!-- <div class="page-additional-description">
@@ -185,7 +187,7 @@
     </section>
 
     <section class="nav-btns">
-      <button @click="to('details')">{{ $t('airdrop.reward-details') }}</button>
+      <button @click="to('details')">{{ $t('airdrop.reward-details.link-name') }}</button>
     </section>
 
     <section class="step-game">
@@ -194,7 +196,7 @@
       <div class="box form">
         <div class="box-title">{{ $t('airdrop.step1.title') }}</div>
         <div class="input-box">
-          <input v-model="discordUserName" />
+          <input v-model="discordUserName" placeholder="Enter Huobi UID" />
         </div>
         <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
           {{
@@ -298,7 +300,14 @@
           </div>
           <a href="/swap/" target="_blank" style="align-self: end"><button>GO TO SWAP</button></a>
         </div>
+      </div>
+    </section>
 
+    <section class="media-entries">
+      <div class="task-level">EARN BONUS POINTS</div>
+      <div class="title">Join Forces With Raydium</div>
+      <div class="subtitle">Total Points +2</div>
+      <div class="box-grid">
         <div class="box">
           <div class="box-title">
             {{ $t('airdrop.step3.twitter.title') }}
@@ -343,271 +352,98 @@
             <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="media-entries">
-      <div class="task-level">EARN BONUS POINTS</div>
-      <div class="title">Join Forces With Raydium</div>
-      <div class="subtitle">Total Points +2</div>
-      <div class="box-grid">
-        <div class="twitter">
-          <div class="box social-media">
-            <div class="box-title">
-              Follow Raydium
-              <div>
-                <div
-                  :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`"
-                  :title="`${
-                    haveFollow
-                      ? 'Congratulations! You completed this task.'
-                      : isFollowPending
-                      ? 'Points pending. Please check again in 30 minutes.'
-                      : 'you have not done this task'
-                  }`"
-                />
-                <div class="point-label">+1 POINTS</div>
-              </div>
-            </div>
-            <div class="btn-row">
-              <a
-                :href="`https://twitter.com/RaydiumProtocol`"
-                class="link"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                <button
-                  @click="
-                    () => {
-                      !isActivityEnd && submit({ task: 'twitter', result: '' })
-                    }
-                  "
-                >
-                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />FOLLOW
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="discord">
-          <div class="box social-media">
-            <div class="box-title">
-              Join the Raydium Discord
-              <div>
-                <div
-                  :class="`icon-reward ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
-                  :title="`${
-                    haveDiscord
-                      ? 'Congratulations! You completed this task.'
-                      : isDiscordPending
-                      ? 'Points pending. Please check again in 30 minutes.'
-                      : 'you have not done this task'
-                  }`"
-                />
-                <div class="point-label">+1 POINT</div>
-              </div>
-            </div>
-            <a
-              v-if="$accessor.wallet.connected"
-              href="https://discord.com/invite/6EvFwvCfpx"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <button
-                @click="
-                  () => {
-                    if (!$accessor.wallet.connected) {
-                      $accessor.wallet.openModal()
-                    } else {
-                      showLinkInput = true
-                    }
-                  }
-                "
-              >
-                <img class="icon" src="../assets/icons/guide-discord-icon.svg" />JOIN DISCORD
-              </button>
-            </a>
-            <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
+        <div class="box">
+          <div class="box-title">
+            Refer now with your customized link below
+            <div class="point-label">+1 POINT / REFERRAL</div>
           </div>
 
-          <svg
-            v-if="!isActivityEnd && showLinkInput && !haveDiscord"
-            class="step-gap-line social-media"
-            viewBox="0 0 440 88"
-          >
-            <polyline points="220,0 220,88" fill="none" stroke-width="2" stroke-dasharray="12" />
-          </svg>
+          <div class="box-text small">
+            Your referral link:
+            <br />
+            {{ referralLink }}
+          </div>
 
-          <div v-if="!isActivityEnd && showLinkInput && !haveDiscord" class="box form">
-            <div class="box-title">Input Discord Username</div>
-            <div class="input-box">
-              <label>Discord Username</label>
-              <input v-model="discordUserName" />
-            </div>
+          <div class="icon-btns">
             <button
-              :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)"
-              @click="submitDiscord"
+              class="icon-btn"
+              title="click here to copy it"
+              @click="
+                () => {
+                  if (!$accessor.wallet.connected) {
+                    $accessor.wallet.openModal()
+                  } else {
+                    $accessor.copy(referralLink)
+                  }
+                }
+              "
             >
-              {{ $accessor.wallet.connected ? (isDiscording ? 'SUBMITING...' : 'SUBMIT') : 'CONNECT WALLET' }}
-              <div
-                v-if="$accessor.wallet.connected"
-                :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
-                :title="`${
-                  haveDiscord
-                    ? 'Congratulations! You completed this task.'
-                    : isDiscordPending
-                    ? 'Points pending. Please check again in 30 minutes.'
-                    : 'you have not done this task'
-                }`"
-              />
+              <img class="icon" src="../assets/icons/guide-share-icon.svg" />
             </button>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="referrals">
+    <!-- <section class="referrals">
       <div class="title">Share With More Friends</div>
       <div class="subtitle">To Earn $2,000 in RAY</div>
-      <div class="box">
-        <div class="box-title">
-          Refer now with your customized link below
-          <div class="point-label">+1 POINT / REFERRAL</div>
-        </div>
-
-        <div class="box-text small">
-          Your referral link:
-          <br />
-          {{ referralLink }}
-        </div>
-
-        <div class="icon-btns">
-          <button
-            class="icon-btn"
-            title="click here to copy it"
-            @click="
-              () => {
-                if (!$accessor.wallet.connected) {
-                  $accessor.wallet.openModal()
-                } else {
-                  $accessor.copy(referralLink)
-                }
-              }
-            "
-          >
-            <img class="icon" src="../assets/icons/guide-share-icon.svg" />
-          </button>
-        </div>
-      </div>
-    </section>
+    </section> -->
 
     <section ref="details" class="reward-details">
-      <div class="title">REWARD DETAILS</div>
+      <div class="title">{{ $t('airdrop.reward-details.title') }}</div>
       <ol>
-        <li>
-          Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification
-          by tweeting their customized referral code. Qualified users will receive a minimum of 5 points for the lucky
-          airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY tokens.
-        </li>
-        <li>
-          The first 4,000 users to connect a wallet, swap, verify Twitter, and refer at least 1 qualified user are
-          guaranteed to win $10 in RAY tokens each. The aforementioned steps are worth 5 points in the lucky draw
-          airdrop pool where verified users will also be eligible to receive an airdrop of up to $1,000 in RAY tokens.
-        </li>
-        <li>
-          Qualified users can earn extra points for the lucky airdrop pool by completing bonus tasks; 1) Following
-          Raydium on Twitter and 2) Joining the Raydium Discord, worth 1 entry each.
-        </li>
-        <li>
-          The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as
-          extra points for the lucky draw pool.
-        </li>
-        <li>
-          Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100
-          winners of $100, 250 winners of $50, and 1,000 winners of $20). Winners are ineligible to win multiple prizes
-          from the lucky draw pool.
-        </li>
+        <li v-for="item of $t('airdrop.reward-details.words')" :key="item">{{ item }}</li>
       </ol>
       <hr />
       <table class="detail-panel">
         <tr>
-          <th>Requirements</th>
-          <th style="width: 200px">Number of Winners</th>
-          <th style="width: 200px">Airdrop Amounts</th>
-          <th>Airdrop Eligibility</th>
+          <th>{{ $t('airdrop.reward-details.table.head[0]') }}</th>
+          <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[1]') }}</th>
+          <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[2]') }}</th>
+          <th>{{ $t('airdrop.reward-details.table.head[3]') }}</th>
         </tr>
         <tr>
           <td>
-            <strong>First 4,000</strong> to Swap on Raydium, Complete Twitter Verification, & Successfully Refer at
-            least 1 Friend
+            <strong>{{ $t('airdrop.reward-details.table.R1.requirements[0]') }}</strong>
+            {{ $t('airdrop.reward-details.table.R1.requirements[1]') }}
           </td>
-          <td>4,000 Winners</td>
-          <td>$10 of RAY tokens</td>
-          <td>Guaranteed $10 airdrop + Lucky Draw Pool</td>
+          <td>{{ $t('airdrop.reward-details.table.R1.winners') }}</td>
+          <td>{{ $t('airdrop.reward-details.table.R1.amount') }}</td>
+          <td>{{ $t('airdrop.reward-details.table.R1.eligibility') }}</td>
         </tr>
         <tr>
           <td style="white-space: pre-line">
-            <strong>Lucky Draw Pool</strong> Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)
+            <strong>{{ $t('airdrop.reward-details.table.R2.requirements[0]') }}</strong>
+            {{ $t('airdrop.reward-details.table.R2.requirements[1]') }}
             <br />
-            <strong>Earn Bonus Entries!</strong> Follow Raydium and Join us on Discord
+            <strong>{{ $t('airdrop.reward-details.table.R2.requirements[2]') }}</strong>
+            {{ $t('airdrop.reward-details.table.R2.requirements[3]') }}
           </td>
           <td>
-            3 Winners
-            <div class="ghost-line" />
-            15 Winners
-            <div class="ghost-line" />
-            100 Winners
-            <div class="ghost-line" />
-            250 Winners
-            <div class="ghost-line" />
-            1000 Winners
+            <div v-for="item of $t('airdrop.reward-details.table.R2.winners')" :key="item">{{ item }}</div>
           </td>
           <td>
-            $1,000 of RAY tokens
-            <div class="ghost-line" />
-            $300 of RAY tokens
-            <div class="ghost-line" />
-            $100 of RAY tokens
-            <div class="ghost-line" />
-            $50 of RAY tokens
-            <div class="ghost-line" />
-            $20 of RAY tokens
+            <div v-for="item of $t('airdrop.reward-details.table.R2.amount')" :key="item">{{ item }}</div>
           </td>
-          <td>All users who complete a swap and share their referral code to Twitter are eligible</td>
+          <td>{{ $t('airdrop.reward-details.table.R2.eligibility') }}</td>
         </tr>
         <tr>
-          <td><strong>Top 5 on the referral leaderboard</strong></td>
-          <td>5 Winners</td>
-          <td>$2,000 of RAY tokens</td>
-          <td>Guaranteed $2,000 airdrop</td>
+          <td>
+            <strong>{{ $t('airdrop.reward-details.table.R3.requirements') }}</strong>
+          </td>
+          <td>{{ $t('airdrop.reward-details.table.R3.winners') }}</td>
+          <td>{{ $t('airdrop.reward-details.table.R3.amount') }}</td>
+          <td>{{ $t('airdrop.reward-details.table.R3.eligibility') }}</td>
         </tr>
       </table>
     </section>
 
     <section class="terms-conditions">
-      <div class="title">TERMS & CONDITIONS</div>
+      <div class="title">{{ $t('airdrop.terms-conditions.title') }}</div>
       <ul>
-        <li>
-          Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible to
-          participate and win the random draws for the $20, $50, $100, $300, and $1,000 in rewards. However,
-          participants will not be able to win multiple lucky draws.
-        </li>
-
-        <li>
-          Users will need to verify their completion of tasks via the Raydium Airdrop Page in order to qualify for the
-          lucky draw. Lucky draw winners will be selected by the Raydium team.
-        </li>
-
-        <li>
-          Raydium reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final
-          interpretation of user task completion.
-        </li>
-
-        <li>
-          Rewards will be distributed to eligible participants via the address linked to the account they used to swap.
-        </li>
-
-        <li>The airdrop campaign will conclude at 12:00 (UTC) on August 19.</li>
+        <li v-for="item of $t('airdrop.terms-conditions.words')" :key="item">{{ item }}</li>
       </ul>
     </section>
   </div>
