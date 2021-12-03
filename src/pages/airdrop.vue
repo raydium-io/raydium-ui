@@ -1,9 +1,10 @@
 <template>
   <div class="airdrop">
-    <div @click="$i18n.setLocale('zh')">11111</div>
+    <div @click="$i18n.setLocale('en')">11111</div>
+    <div @click="$i18n.setLocale('zh')">22222</div>
     <section class="page-title">
       <img class="icon" src="../assets/background/huobi.svg" style="margin-bottom: 40px" />
-      <div class="page-sub-leading">Learn, Trade, Follow, Refer and Earn RAY</div>
+      <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
       <div class="page-main-title">{{ $t('airdrop.title') }}</div>
       <!-- <div class="page-additional-description">
         The Airdrop is <span class="alert">complete!</span> Rewards have been sent to winners, connect your wallet to
@@ -145,52 +146,65 @@
     </div>
 
     <section class="TLDR">
-      <div class="title">Earn up to $2,000 in RAY in 3 easy steps</div>
+      <div class="title">{{ $t('airdrop.introduction-activities.title') }}</div>
       <table class="TLDR-table">
         <tr>
           <th class="th"></th>
-          <th class="th">Task</th>
-          <th class="th">Points</th>
+          <th class="th">{{ $t('airdrop.introduction-activities.tasks') }}</th>
+          <th class="th">{{ $t('airdrop.introduction-activities.points') }}</th>
         </tr>
         <tr>
           <td class="td order">1</td>
-          <td class="td">Huobi ID</td>
-          <td class="td"><div class="point-label">+5 POINTS</div></td>
+          <td class="td">{{ $t('airdrop.introduction-activities.task.huobi.title') }}</td>
+          <td class="td">
+            <div class="point-label">{{ $t('airdrop.introduction-activities.task.huobi.point') }}</div>
+          </td>
         </tr>
         <tr>
           <td class="td order">2</td>
-          <td class="td">Swap & Confirm Referral</td>
-          <td class="td"><div class="point-label">+5 POINTS</div></td>
+          <td class="td">{{ $t('airdrop.introduction-activities.task.swap.title') }}</td>
+          <td class="td">
+            <div class="point-label">{{ $t('airdrop.introduction-activities.task.swap.point') }}</div>
+          </td>
         </tr>
         <tr>
           <td class="td order">3</td>
-          <td class="td">Earn Bonus Entries</td>
-          <td class="td"><div class="point-label">+2 POINTS</div></td>
+          <td class="td">{{ $t('airdrop.introduction-activities.task.earn-bonus.title') }}</td>
+          <td class="td">
+            <div class="point-label">{{ $t('airdrop.introduction-activities.task.earn-bonus.point') }}</div>
+          </td>
         </tr>
         <tr>
-          <td class="td order">4</td>
-          <td class="td">Refer More Friends</td>
-          <td class="td"><div class="point-label">+1 POINT / REFERRAL</div></td>
+          <td class="td order">3</td>
+          <td class="td">{{ $t('airdrop.introduction-activities.task.refer.title') }}</td>
+          <td class="td">
+            <div class="point-label">{{ $t('airdrop.introduction-activities.task.refer.point') }}</div>
+          </td>
         </tr>
       </table>
     </section>
 
     <section class="nav-btns">
-      <button @click="to('details')">REWARD DETAILS</button>
+      <button @click="to('details')">{{ $t('airdrop.reward-details') }}</button>
     </section>
 
     <section class="step-game">
-      <div class="task-level">STEP 1</div>
+      <div class="task-level">{{ $t('airdrop.step1.step') }}</div>
 
       <div class="box form">
-        <div class="box-title">Write Huobi UID</div>
+        <div class="box-title">{{ $t('airdrop.step1.title') }}</div>
         <div class="input-box">
-          <label>Discord Username</label>
           <input v-model="discordUserName" />
         </div>
         <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
-          {{ $accessor.wallet.connected ? (isDiscording ? 'SUBMITING...' : 'SUBMIT') : 'CONNECT WALLET' }}
-          <div
+          {{
+            $accessor.wallet.connected
+              ? isDiscording
+                ? $t('airdrop.step1.sub-btn-loading')
+                : $t('airdrop.step1.sub-btn')
+              : $t('airdrop.connect-wallet')
+          }}
+          <!-- <div
             v-if="$accessor.wallet.connected"
             :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
             :title="`${
@@ -200,21 +214,22 @@
                 ? 'Points pending. Please check again in 30 minutes.'
                 : 'you have not done this task'
             }`"
-          />
+          /> -->
         </button>
       </div>
     </section>
 
     <section class="step-game">
-      <div class="task-level">STEP 2</div>
-      <div class="title">Get Started on Raydium</div>
+      <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
+      <div class="title">{{ $t('airdrop.step2.title') }}</div>
 
       <div ref="step-1" class="box watch-video">
         <div class="box-title has-step">
-          Watch how to create a wallet on Solana and make your first Swap on Raydium.
+          {{ $t('airdrop.step2.video-title') }}
         </div>
         <div class="video-box">
           <iframe
+            v-if="$i18n.locale === 'en'"
             width="100%"
             height="480"
             src="https://www.youtube.com/embed/ViFSfsAqSLg"
@@ -223,10 +238,17 @@
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
+          <iframe
+            v-else
+            width="100%"
+            height="480"
+            src="https://www.youtube.com/embed/XUnEQ6cy9WI"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
         </div>
-        <a :href="`https://youtu.be/XUnEQ6cy9WI`" rel="nofollow noopener noreferrer" target="_blank" class="footnote"
-          >Chinese Version</a
-        >
       </div>
 
       <svg class="step-gap-line" viewBox="0 0 532 132">
@@ -234,16 +256,19 @@
       </svg>
 
       <div class="box wallet">
-        <div class="box-title has-step">Connect wallet to recieve airdrop rewards</div>
+        <div class="box-title has-step">{{ $t('airdrop.step2.connect-wallet') }}</div>
         <div class="box-text">
           <div>
-            Download<a href="https://phantom.app/" rel="nofollow noopener noreferrer" target="_blank">
-              Phantom (desktop)
+            {{ $t('airdrop.step2.download')
+            }}<a href="https://phantom.app/" rel="nofollow noopener noreferrer" target="_blank">
+              {{ $t('airdrop.step2.phantom') }}
             </a>
           </div>
           <div>
-            On mobile? Try
-            <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">Sollet</a>
+            {{ $t('airdrop.step2.try-sollet') }}
+            <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">{{
+              $t('airdrop.step2.sollet')
+            }}</a>
           </div>
         </div>
         <Wallet />
@@ -251,13 +276,13 @@
     </section>
 
     <section class="connect-wallet">
-      <div class="task-level">STEP 3</div>
-      <div class="title">Try Raydium’s Light Speed Swaps & Confirm Referral</div>
-      <div class="subtitle">Total Points +5</div>
+      <div class="task-level">{{ $t('airdrop.step3.step') }}</div>
+      <div class="title">{{ $t('airdrop.step3.title') }}</div>
+      <div class="subtitle">{{ $t('airdrop.step3.point') }}</div>
       <div class="box-grid">
         <div class="box">
           <div class="box-title has-step">
-            Swap on Raydium
+            {{ $t('airdrop.step3.swap.title') }}
             <div>
               <div
                 :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
@@ -276,7 +301,7 @@
 
         <div class="box">
           <div class="box-title">
-            Share to Twitter
+            {{ $t('airdrop.step3.twitter.title') }}
             <div>
               <div
                 :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"

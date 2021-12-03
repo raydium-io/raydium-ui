@@ -1,5 +1,63 @@
 {
   "airdrop": {
-    "title": "Raydium Bounty Airdrop"
-  }
+    "title": "Raydium Bounty Airdrop",
+    "pre-title": "Learn, Trade, Follow, Refer and Earn RAY",
+
+    "introduction-activities": {
+      "title": "Earn up to $2,000 in RAY in 3 easy steps",
+      "tasks": "Task",
+      "points": "Points",
+      "task": {
+        "huobi": {
+          "title": "Huobi ID",
+          "point": "+5 POINTS"
+        },
+        "swap": {
+          "title": "Swap & Confirm Referral",
+          "point": "+5 POINTS"
+        },
+        "earn-bonus": {
+          "title": "Earn Bonus Entries",
+          "point": "+2 POINTS"
+        },
+        "refer": {
+          "title": "Refer More Friends",
+          "point": "+1 POINT / REFERRAL"
+        }
+      }
+    },
+    "reward-details": "REWARD DETAILS",
+
+    "step1": {
+      "step": "STEP 1",
+      "title": "Write Huobi UID",
+      "sub-btn": "SUBMIT",
+      "sub-btn-loading": "SUBMITING..."
+    },
+    "step2": {
+      "step": "STEP 2",
+      "title": "Get Started on Raydium",
+      "video-title": "Watch how to create a wallet on Solana and make your first Swap on Raydium.",
+      "connect-wallet": "Connect wallet to recieve airdrop rewards",
+      "download": "Download",
+      "phantom": "Phantom (desktop)",
+      "try-sollet": "On mobile? Try",
+      "sollet": "Sollet"
+    },
+    "step3": {
+      "step": "STEP 3",
+      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
+      "point": "Total Points +5",
+      "swap": {
+        "title": "Swap on Raydium"
+      },
+      "twitter": {
+        "title": "Share to Twitter"
+      }
+    },
+    "step4": {
+      "step": ""
+    }
+  },
+  "connect-wallet": "CONNECT WALLET"
 }
