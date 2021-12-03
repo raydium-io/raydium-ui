@@ -1,5 +1,120 @@
 {
   "airdrop": {
-    "title": "123"
-  }
+    "title": "Raydium Bounty Airdrop",
+    "pre-title": "Learn, Trade, Follow, Refer and Earn RAY",
+
+    "introduction-activities": {
+      "title": "Earn up to $2,000 in RAY in 3 easy steps",
+      "tasks": "Task",
+      "points": "Points",
+      "task": {
+        "huobi": {
+          "title": "Trade on Huobi",
+          "point": "+5 POINTS"
+        },
+        "swap": {
+          "title": "Swap & Confirm Referral",
+          "point": "+5 POINTS"
+        },
+        "earn-bonus": {
+          "title": "Earn Bonus Entries",
+          "point": "+2 POINTS"
+        },
+        "refer": {
+          "title": "Refer More Friends",
+          "point": "+1 POINT / REFERRAL"
+        }
+      }
+    },
+
+    "step1": {
+      "step": "STEP 1",
+      "title": "Trade on Huobi",
+      "sub-btn": "SUBMIT",
+      "sub-btn-loading": "SUBMITING..."
+    },
+    "step2": {
+      "step": "STEP 2",
+      "title": "Get Started on Raydium",
+      "video-title": "Watch how to create a wallet on Solana and make your first Swap on Raydium.",
+      "connect-wallet": "Connect wallet to recieve airdrop rewards",
+      "download": "Download",
+      "phantom": "Phantom (desktop)",
+      "try-sollet": "On mobile? Try",
+      "sollet": "Sollet"
+    },
+    "step3": {
+      "step": "STEP 3",
+      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
+      "point": "Total Points +5",
+      "swap": {
+        "title": "Swap on Raydium"
+      },
+      "twitter": {
+        "title": "Share to Twitter"
+      }
+    },
+    "step4": {
+      "step": ""
+    },
+
+    "reward-details": {
+      "link-name": "REWARD DETAILS",
+      "title": "REWARD DETAILS",
+      "words": [
+        "Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification by tweeting their customized referral code. Qualified users will receive a minimum of 5 points for the lucky airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY tokens.",
+        "The first 4,000 users to connect a wallet, swap, verify Twitter, and refer at least 1 qualified user are guaranteed to win $10 in RAY tokens each. The aforementioned steps are worth 5 points in the lucky draw airdrop pool where verified users will also be eligible to receive an airdrop of up to $1,000 in RAY tokens.",
+        "Qualified users can earn extra points for the lucky airdrop pool by completing bonus tasks; 1) Following Raydium on Twitter and 2) Joining the Raydium Discord, worth 1 entry each.",
+        "The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as extra points for the lucky draw pool.",
+        "Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, 250 winners of $50, and 1,000 winners of $20). Winners are ineligible to win multiple prizes from the lucky draw pool."
+      ],
+      "table": {
+        "head": ["Requirements", "Number of Winners", "Airdrop Amounts", "Airdrop Eligibility"],
+        "R1": {
+          "requirements": [
+            "First 4,000",
+            "to Swap on Raydium, Complete Twitter Verification, & Successfully Refer at least 1 Friend"
+          ],
+          "winners": "4,000 Winners",
+          "amount": "$10 of RAY tokens",
+          "eligibility": "Guaranteed $10 airdrop + Lucky Draw Pool"
+        },
+        "R2": {
+          "requirements": [
+            "Lucky Draw Pool",
+            "Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)",
+            "Earn Bonus Entries!",
+            "Follow Raydium and Join us on Discord"
+          ],
+          "winners": ["3 Winners", "15 Winners", "100 Winners", "250 Winners", "1000 Winners"],
+          "amount": [
+            "$1,000 of RAY tokens",
+            "$300 of RAY tokens",
+            "$100 of RAY tokens",
+            "$50 of RAY tokens",
+            "$20 of RAY tokens"
+          ],
+          "eligibility": "All users who complete a swap and share their referral code to Twitter are eligible"
+        },
+        "R3": {
+          "requirements": "Top 5 on the referral leaderboard",
+          "winners": "5 Winners",
+          "amount": "$2,000 of RAY tokens",
+          "eligibility": "Guaranteed $2,000 airdrop"
+        }
+      }
+    },
+
+    "terms-conditions": {
+      "title": "TERMS & CONDITIONS",
+      "words": [
+        "Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible to participate and win the random draws for the $20, $50, $100, $300, and $1,000 in rewards. However, participants will not be able to win multiple lucky draws.",
+        "Users will need to verify their completion of tasks via the Raydium Airdrop Page in order to qualify for the lucky draw. Lucky draw winners will be selected by the Raydium team.",
+        "Raydium reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final interpretation of user task completion.",
+        "Rewards will be distributed to eligible participants via the address linked to the account they used to swap.",
+        "The airdrop campaign will conclude at 12:00 (UTC) on August 19."
+      ]
+    }
+  },
+  "connect-wallet": "CONNECT WALLET"
 }
