@@ -13,25 +13,6 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Pools open Dec 1, 12:00 UTC - Full details
-              <a
-                href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                here</a
-              >
-            </div>
-            <a
-              href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
-            </a>
-          </div>
-          <div>
-            <div class="inner-decorator-words">
               Pools open Dec 6, 12:00 UTC - Full details
               <a
                 href="https://raydium.medium.com/runnode-is-launching-on-acceleraytor-3ff7326864b0"
