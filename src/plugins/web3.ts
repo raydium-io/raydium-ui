@@ -42,11 +42,13 @@ const web3Plugin: Plugin = async (ctx, inject) => {
   let configFrom
 
   try {
-    config = await $api.getConfig()
-    configFrom = 'remote'
-    if (!window.location.hostname.includes('raydium')) {
-      config = web3Config
-    }
+    // config = await $api.getConfig()
+    // configFrom = 'remote'
+    // if (!window.location.hostname.includes('raydium')) {
+    //   config = web3Config
+    // }
+    config = web3Config
+    configFrom = 'local'
   } catch (error) {
     config = web3Config
     configFrom = 'local'
