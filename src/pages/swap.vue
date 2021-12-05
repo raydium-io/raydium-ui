@@ -1265,7 +1265,11 @@ export default Vue.extend({
         let maxAmountOut = 0
 
         if (this.amms) {
+          console.log("amms:: ", this.amms)
+
           for (const poolInfo of this.amms) {
+                  console.log("poolinfo:: ", poolInfo)
+
             const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
               poolInfo,
               this.fromCoin.mintAddress,
@@ -1426,7 +1430,7 @@ export default Vue.extend({
           maxAmountOut,
           toCoinWithSlippage?.fixed(),
           impact,
-          'outToPirceValue',
+          'outToPirceValue: updateAmounts',
           this.outToPirceValue
         )
 

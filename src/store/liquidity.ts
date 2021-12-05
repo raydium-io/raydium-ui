@@ -209,10 +209,13 @@ export const actions = actionTree(
 
         const market = marketToLayout[ammInfo.serumMarket]
 
-        const serumVaultSigner = await PublicKey.createProgramAddress(
-          [ammInfo.serumMarket.toBuffer(), market.vaultSignerNonce.toArrayLike(Buffer, 'le', 8)],
-          new PublicKey(SERUM_PROGRAM_ID_V3)
-        )
+        console.log("market.vaultSignerNonce", market.vaultSignerNonce.toArrayLike(Buffer, 'le', 8))
+
+        // const serumVaultSigner = await PublicKey.createProgramAddress(
+        //   [ammInfo.serumMarket.toBuffer(), market.vaultSignerNonce.toArrayLike(Buffer, 'le', 8)],
+        //   new PublicKey(SERUM_PROGRAM_ID_V3)
+        // )
+        const serumVaultSigner = new PublicKey('B87AhxX6BkBsj3hnyHzcerX2WxPoACC7ZyDr8E7H9geN')
 
         const itemLiquidity: LiquidityPoolInfo = {
           name: `${coin.symbol}-${pc.symbol}`,
