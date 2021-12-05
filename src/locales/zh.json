@@ -28,13 +28,24 @@
     },
 
     "step1": {
-      "step": "STEP 1",
-      "title": "Trade XXX $RAY on Huobi",
-      "sub-btn": "SUBMIT",
-      "sub-btn-loading": "SUBMITING..."
+      "step": "STEP 1"
     },
+
     "step2": {
-      "step": "STEP 2",
+      "step": "STEP 2"
+    },
+    "step3": {
+      "step": "STEP 3",
+      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
+      "point": "Total Points +5"
+    },
+    "step4": {
+      "step": "EARN BONUS POINTS",
+      "title": "Join Forces With Raydium",
+      "point": "Total Points +2"
+    },
+
+    "video": {
       "title": "Get Started on Raydium",
       "video-title": "Watch how to create a wallet on Solana and make your first Swap on Raydium.",
       "connect-wallet": "Connect wallet to recieve airdrop rewards",
@@ -43,19 +54,36 @@
       "try-sollet": "On mobile? Try",
       "sollet": "Sollet"
     },
-    "step3": {
-      "step": "STEP 3",
-      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
-      "point": "Total Points +5",
-      "swap": {
-        "title": "Swap on Raydium"
-      },
-      "twitter": {
-        "title": "Share to Twitter"
-      }
+
+    "huobiID": {
+      "title": "Trade XXX $RAY on Huobi",
+      "sub-btn": "SUBMIT",
+      "sub-btn-loading": "SUBMITING...",
+      "sub-btn-placeholder": "Enter Huobi UID"
     },
-    "step4": {
-      "step": ""
+
+    "swap": {
+      "title": "Swap on Raydium",
+      "completed": "Congratulations! You completed this task.",
+      "pending": "Points pending. Please check again in 30 minutes.",
+      "notDoneTask": "you have not done this task",
+      "btn": "GO TO SWAP"
+    },
+
+    "twitter": {
+      "title": "Share to Twitter",
+      "completed": "Congratulations! You completed this task.",
+      "pending": "Points pending. Please check again in 30 minutes.",
+      "notDoneTask": "you have not done this task",
+      "btn": "TWEET NOW",
+      "point-msg": "BONUS +1 POINT / REFERRAL",
+      "prompt": "Tweet must include referral code for API tracking"
+    },
+
+    "refer": {
+      "title": "Refer now with your customized link below",
+      "point-msg": "+1 POINT / REFERRAL",
+      "prompt": "Your referral link"
     },
 
     "reward-details": {
@@ -114,6 +142,17 @@
         "Rewards will be distributed to eligible participants via the address linked to the account they used to swap.",
         "The airdrop campaign will conclude at 12:00 (UTC) on August 19."
       ]
+    },
+
+    "user": {
+      "title": "Airdrop Points",
+      "not-connect": "Connect wallet to view your current points",
+
+      "finish": {
+        "winner-list": "Check Winners",
+        "prompt": "Rewards have already been sent to winning addresses"
+      },
+      "calculating": "Calculating..."
     }
   },
   "connect-wallet": "CONNECT WALLET"

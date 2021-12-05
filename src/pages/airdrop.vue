@@ -20,13 +20,13 @@
       </div>
 
       <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
-        Check Winners
+        {{ $t('airdrop.user.finish.winner-list') }}
       </a>
 
-      <div class="title">Airdrop Points</div>
+      <div class="title">{{ $t('airdrop.user.title') }}</div>
 
       <div v-if="rewardIsOut" class="note" style="text-align: center; margin-top: 12px">
-        Rewards have already been sent to winning addresses
+        {{ $t('airdrop.user.finish.prompt') }}
       </div>
 
       <template v-if="$accessor.wallet.connected">
@@ -50,7 +50,7 @@
               </td>
             </tr>
           </table>
-          <div v-if="!rewardIsOut">Cacluating...</div>
+          <div v-if="!rewardIsOut">{{ $t('airdrop.user.calculating') }}</div>
         </template>
         <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">Total Points</h1>
         <table class="your-table">
@@ -135,11 +135,11 @@
             </tr>
           </tbody>
         </table>
-        <div v-else>Cacluating...</div>
+        <div v-else>{{ $t('airdrop.user.calculating') }}</div>
       </template>
       <template v-else>
-        <div class="subtitle">Connect wallet to view your current points</div>
-        <button @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
+        <div class="subtitle">{{ $t('airdrop.user.not-connect') }}</div>
+        <button @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
       </template>
     </section>
 
@@ -177,7 +177,7 @@
           </td>
         </tr>
         <tr>
-          <td class="td order">3</td>
+          <td class="td order">4</td>
           <td class="td">{{ $t('airdrop.introduction-activities.task.refer.title') }}</td>
           <td class="td">
             <div class="point-label">{{ $t('airdrop.introduction-activities.task.refer.point') }}</div>
@@ -192,42 +192,11 @@
 
     <section class="step-game">
       <div class="task-level">{{ $t('airdrop.step1.step') }}</div>
-
-      <div class="box form">
-        <div class="box-title">{{ $t('airdrop.step1.title') }}</div>
-        <div class="input-box">
-          <input v-model="discordUserName" placeholder="Enter Huobi UID" />
-        </div>
-        <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
-          {{
-            $accessor.wallet.connected
-              ? isDiscording
-                ? $t('airdrop.step1.sub-btn-loading')
-                : $t('airdrop.step1.sub-btn')
-              : $t('airdrop.connect-wallet')
-          }}
-          <!-- <div
-            v-if="$accessor.wallet.connected"
-            :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
-            :title="`${
-              haveDiscord
-                ? 'Congratulations! You completed this task.'
-                : isDiscordPending
-                ? 'Points pending. Please check again in 30 minutes.'
-                : 'you have not done this task'
-            }`"
-          /> -->
-        </button>
-      </div>
-    </section>
-
-    <section class="step-game">
-      <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
-      <div class="title">{{ $t('airdrop.step2.title') }}</div>
+      <div class="title">{{ $t('airdrop.video.title') }}</div>
 
       <div ref="step-1" class="box watch-video">
         <div class="box-title has-step">
-          {{ $t('airdrop.step2.video-title') }}
+          {{ $t('airdrop.video.video-title') }}
         </div>
         <div class="video-box">
           <iframe
@@ -258,22 +227,53 @@
       </svg>
 
       <div class="box wallet">
-        <div class="box-title has-step">{{ $t('airdrop.step2.connect-wallet') }}</div>
+        <div class="box-title has-step">{{ $t('airdrop.video.connect-wallet') }}</div>
         <div class="box-text">
           <div>
-            {{ $t('airdrop.step2.download')
+            {{ $t('airdrop.video.download')
             }}<a href="https://phantom.app/" rel="nofollow noopener noreferrer" target="_blank">
-              {{ $t('airdrop.step2.phantom') }}
+              {{ $t('airdrop.video.phantom') }}
             </a>
           </div>
           <div>
-            {{ $t('airdrop.step2.try-sollet') }}
+            {{ $t('airdrop.video.try-sollet') }}
             <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">{{
-              $t('airdrop.step2.sollet')
+              $t('airdrop.video.sollet')
             }}</a>
           </div>
         </div>
         <Wallet />
+      </div>
+    </section>
+
+    <section class="step-game">
+      <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
+
+      <div class="box form">
+        <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
+        <div class="input-box">
+          <input v-model="discordUserName" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
+        </div>
+        <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
+          {{
+            $accessor.wallet.connected
+              ? isDiscording
+                ? $t('airdrop.huobiID.sub-btn-loading')
+                : $t('airdrop.huobiID.sub-btn')
+              : $t('connect-wallet')
+          }}
+          <!-- <div
+            v-if="$accessor.wallet.connected"
+            :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
+            :title="`${
+              haveDiscord
+                ? 'Congratulations! You completed this task.'
+                : isDiscordPending
+                ? 'Points pending. Please check again in 30 minutes.'
+                : 'you have not done this task'
+            }`"
+          /> -->
+        </button>
       </div>
     </section>
 
@@ -284,49 +284,51 @@
       <div class="box-grid">
         <div class="box">
           <div class="box-title has-step">
-            {{ $t('airdrop.step3.swap.title') }}
+            {{ $t('airdrop.swap.title') }}
             <div>
               <div
                 :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
                 :title="`${
                   haveSwap
-                    ? 'Congratulations! You completed this task.'
+                    ? $t('airdrop.swap.completed')
                     : isSwapPending
-                    ? 'Points pending. Please check again in 30 minutes.'
-                    : 'you have not done this task'
+                    ? $t('airdrop.swap.pending')
+                    : $t('airdrop.swap.notDoneTask')
                 }`"
               />
             </div>
           </div>
-          <a href="/swap/" target="_blank" style="align-self: end"><button>GO TO SWAP</button></a>
+          <a href="/swap/" target="_blank" style="align-self: end"
+            ><button>{{ $t('airdrop.swap.btn') }}</button></a
+          >
         </div>
       </div>
     </section>
 
     <section class="media-entries">
-      <div class="task-level">EARN BONUS POINTS</div>
-      <div class="title">Join Forces With Raydium</div>
-      <div class="subtitle">Total Points +2</div>
+      <div class="task-level">{{ $t('airdrop.step4.step') }}</div>
+      <div class="title">{{ $t('airdrop.step4.title') }}</div>
+      <div class="subtitle">{{ $t('airdrop.step4.point') }}</div>
       <div class="box-grid">
         <div class="box">
           <div class="box-title">
-            {{ $t('airdrop.step3.twitter.title') }}
+            {{ $t('airdrop.twitter.title') }}
             <div>
               <div
                 :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"
                 :title="`${
                   haveTweet
-                    ? 'Congratulations! You completed this task.'
+                    ? $t('airdrop.twitter.completed')
                     : isTweetPending
-                    ? 'Points pending. Please check again in 30 minutes.'
-                    : 'you have not done this task'
+                    ? $t('airdrop.twitter.pending')
+                    : $t('airdrop.twitter.notDoneTask')
                 }`"
               />
-              <div class="point-label">BONUS +1 POINT / REFERRAL</div>
+              <div class="point-label">{{ $t('airdrop.twitter.point-msg') }}</div>
             </div>
           </div>
 
-          <div class="box-text red">*Tweet must include referral code for API tracking</div>
+          <div class="box-text red">*{{ $t('airdrop.twitter.prompt') }}</div>
 
           <div class="btn-row">
             <a
@@ -346,21 +348,21 @@
                   }
                 "
               >
-                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />TWEET NOW
+                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.twitter.btn') }}
               </button>
             </a>
-            <button v-else @click="$accessor.wallet.openModal()">CONNECT WALLET</button>
+            <button v-else @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
           </div>
         </div>
 
         <div class="box">
           <div class="box-title">
-            Refer now with your customized link below
-            <div class="point-label">+1 POINT / REFERRAL</div>
+            {{ $t('airdrop.refer.title') }}
+            <div class="point-label">{{ $t('airdrop.refer.point-msg') }}</div>
           </div>
 
           <div class="box-text small">
-            Your referral link:
+            {{ $t('airdrop.refer.prompt') }}:
             <br />
             {{ referralLink }}
           </div>
@@ -475,10 +477,7 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
     title: 'Raydium Bounty Airdrop'
   },
 
-  async asyncData({ $accessor, route }) {
-    if (!$accessor.ido.initialized) {
-      await $accessor.ido.requestInfos()
-    }
+  async asyncData({ route }) {
     if (route.query?.referral) {
       window.localStorage.setItem('airdrop:referral', route.query?.referral as string)
     } else {
@@ -533,8 +532,6 @@ export default class Airdrop extends Vue {
 
   mounted() {
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
-
-    console.log(this)
   }
 
   @Watch('initBackendResponse', { deep: true })
