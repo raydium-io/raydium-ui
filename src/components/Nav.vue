@@ -29,15 +29,15 @@ const MenuItem = Menu.Item
 })
 export default class Nav extends Vue {
   navs = {
-    trading: true,
+    // trading: true,
     swap: false,
     liquidity: false,
-    pools: false,
-    farms: false,
-    staking: false,
-    acceleRaytor: false,
-    dropZone: true,
-    migrate: false
+    // pools: false,
+    // farms: false,
+    // staking: false,
+    // acceleRaytor: false,
+    // dropZone: true,
+    // migrate: false
     // info: false
   }
 

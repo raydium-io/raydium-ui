@@ -360,8 +360,7 @@
             !initialized ||
             loading ||
             swaping ||
-            (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
-            (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)) ||
+           
             gt(
               fromCoinAmount,
               fromCoin && fromCoin.balance
@@ -1159,11 +1158,15 @@ export default Vue.extend({
               (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
         )
 
+        console.log(`this.amms ::: `, this.$accessor.liquidity.infos)
+
         this.routeInfos = getSwapRouter(
           Object.values(this.$accessor.liquidity.infos),
           this.fromCoin.mintAddress,
           this.toCoin.mintAddress
         )
+
+        console.log(`this.routeInfos ::: `, this.routeInfos)
 
         let marketAddress: string | undefined
 
