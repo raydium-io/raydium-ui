@@ -1,159 +1,156 @@
 {
   "airdrop": {
-    "title": "Raydium Bounty Airdrop",
-    "pre-title": "Learn, Trade, Follow, Refer and Earn RAY",
+    "title": "Raydium空投奖励",
+    "pre-title": "学习，交易，关注，推荐&赚取RAY",
 
     "introduction-activities": {
-      "title": "Earn up to $2,000 in RAY in 3 easy steps",
-      "tasks": "Task",
-      "points": "Points",
+      "title": "通过3个简单的步骤中赚取高达2000美元的RAY",
+      "tasks": "任务",
+      "points": "奖励点数",
       "task": {
         "huobi": {
-          "title": "Trade on Huobi",
-          "point": "+5 POINTS"
+          "title": "在火币交易所交易",
+          "point": "+5个点数"
         },
         "swap": {
-          "title": "Swap & Confirm Referral",
-          "point": "+5 POINTS"
+          "title": "兑换代币&确认",
+          "point": "+5个点数"
         },
         "earn-bonus": {
-          "title": "Earn Bonus Entries",
-          "point": "+2 POINTS"
+          "title": "获得奖励津贴",
+          "point": "+2个点数"
         },
         "refer": {
-          "title": "Refer More Friends",
-          "point": "+1 POINT / REFERRAL"
+          "title": "推荐给更多的朋友",
+          "point": "+1个点数 / 每一个新增推荐"
         }
       }
     },
 
     "step1": {
-      "step": "STEP 1"
+      "step": "第一步"
     },
 
     "step2": {
-      "step": "STEP 2"
+      "step": "第二步"
     },
     "step3": {
-      "step": "STEP 3",
-      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
-      "point": "Total Points +5"
+      "step": "第三步",
+      "title": "在Raydium尝试兑换代币 & 确认推荐",
+      "point": "+5个点数"
     },
     "step4": {
-      "step": "EARN BONUS POINTS",
-      "title": "Join Forces With Raydium",
-      "point": "Total Points +2"
+      "step": "赚取额外的奖励点数",
+      "title": "加入Raydium的中文社区群",
+      "point": "+2个点数"
     },
 
     "video": {
-      "title": "Get Started on Raydium",
-      "video-title": "Watch how to create a wallet on Solana and make your first Swap on Raydium.",
-      "connect-wallet": "Connect wallet to recieve airdrop rewards",
-      "download": "Download",
-      "phantom": "Phantom (desktop)",
-      "try-sollet": "On mobile? Try",
-      "sollet": "Sollet"
+      "title": "开始上手Raydium",
+      "video-title": "观看如何在Solana上创建一个钱包并在Raydium上进行第一次代币兑换.",
+      "connect-wallet": "连接钱包来接收Raydium的空投",
+      "download": "下载",
+      "phantom": "Phantom钱包 (桌面)",
+      "try-sollet": "您用的是手机端？试试",
+      "sollet": "Sollet钱包"
     },
 
     "huobiID": {
-      "title": "Trade XXX $RAY on Huobi",
-      "sub-btn": "SUBMIT",
-      "sub-btn-loading": "SUBMITING...",
-      "sub-btn-placeholder": "Enter Huobi UID"
+      "title": "在火币交易所交易 xxx $RAY",
+      "sub-btn": "提交",
+      "sub-btn-loading": "提交中....",
+      "sub-btn-placeholder": "请输入火币的UID"
     },
 
     "swap": {
-      "title": "Swap on Raydium",
-      "completed": "Congratulations! You completed this task.",
-      "pending": "Points pending. Please check again in 30 minutes.",
-      "notDoneTask": "you have not done this task",
-      "btn": "GO TO SWAP"
+      "title": "在Raydium上代币兑换",
+      "completed": "恭喜！您已经完成了任务.",
+      "pending": "积分还在路上，请在30分钟后再次查看.",
+      "notDoneTask": "您还没有完成这个任务",
+      "btn": "兑换"
     },
 
     "twitter": {
-      "title": "Share to Twitter",
-      "completed": "Congratulations! You completed this task.",
-      "pending": "Points pending. Please check again in 30 minutes.",
-      "notDoneTask": "you have not done this task",
-      "btn": "TWEET NOW",
-      "point-msg": "BONUS +1 POINT / REFERRAL",
-      "prompt": "Tweet must include referral code for API tracking"
+      "title": "分享到推特账户",
+      "completed": "恭喜！您已经完成了任务.",
+      "pending": "积分还在路上，请在30分钟后再次查看.",
+      "notDoneTask": "您还没有完成这个任务",
+      "btn": "现在转发",
+      "point-msg": "+1个点数 / 每一个新增推荐",
+      "prompt": "推特必须包括推荐代码，以便进行API跟踪"
     },
 
     "refer": {
-      "title": "Refer now with your customized link below",
-      "point-msg": "+1 POINT / REFERRAL",
-      "prompt": "Your referral link"
+      "title": "现在就用你的定制链接推荐吧！",
+      "point-msg": "+1个点数 / 每一个新增推荐",
+      "prompt": "您的推荐链接"
     },
 
     "reward-details": {
-      "link-name": "REWARD DETAILS",
-      "title": "REWARD DETAILS",
+      "link-name": "奖励细节",
+      "title": "奖励细节",
       "words": [
-        "Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification by tweeting their customized referral code. Qualified users will receive a minimum of 5 points for the lucky airdrop pool and are eligible to receive an airdrop of up to $1,000 in RAY tokens.",
-        "The first 4,000 users to connect a wallet, swap, verify Twitter, and refer at least 1 qualified user are guaranteed to win $10 in RAY tokens each. The aforementioned steps are worth 5 points in the lucky draw airdrop pool where verified users will also be eligible to receive an airdrop of up to $1,000 in RAY tokens.",
-        "Qualified users can earn extra points for the lucky airdrop pool by completing bonus tasks; 1) Following Raydium on Twitter and 2) Joining the Raydium Discord, worth 1 entry each.",
-        "The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals do not count as extra points for the lucky draw pool.",
-        "Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, 250 winners of $50, and 1,000 winners of $20). Winners are ineligible to win multiple prizes from the lucky draw pool."
+        "成功的用户指的是那些已经连接了一个钱包，完成了代币兑换，并通过推特上的定制推荐代码完成了推特验证。成功的用户将获得至少5分的幸运抽奖池空投点数，并有资格获得高达1000美元的RAY代币的空投。",
+        "前4000名连接钱包、代币兑换、验证推特和推荐至少1名的合格用户，Raydium保证每人赢得10美元的RAY代币。成功的用户将获得至少5分的幸运抽奖池空投点数，并有资格获得高达1000美元的RAY代币的空投。",
+        "符合条件的用户可以通过完成以下奖励任务为幸运空投池赚取额外积分：1）在Twitter上关注Raydium；2）加入Raydium的中文社区群，每项任务价值1分。",
+        "推荐人排行榜上的前5名将各赢得价值2000美元的RAY代币。推荐人本人不计入幸运抽奖池的额外积分。",
+        "幸运抽奖的奖品将按降序发放（即：3名获奖者获得1000美元，15名获奖者获得300美元，100名获奖者获得100美元，250名获奖者获得50美元，以及1000名获奖者获得20美元）。获奖者只能从幸运抽奖池中获得最多一个奖项。"
       ],
       "table": {
-        "head": ["Requirements", "Number of Winners", "Airdrop Amounts", "Airdrop Eligibility"],
+        "head": ["要求", "赢家数量", "空投数目", "空投资格"],
         "R1": {
-          "requirements": [
-            "First 4,000",
-            "to Swap on Raydium, Complete Twitter Verification, & Successfully Refer at least 1 Friend"
-          ],
-          "winners": "4,000 Winners",
-          "amount": "$10 of RAY tokens",
-          "eligibility": "Guaranteed $10 airdrop + Lucky Draw Pool"
+          "requirements": ["前4,000名用户", "在Raydium上进行代币兑换，完成Twitter验证，并成功推荐至少一个朋友"],
+          "winners": "4,000个赢家",
+          "amount": "价值10美元的RAY代币",
+          "eligibility": "保证价值10美元空投+幸运抽奖池"
         },
         "R2": {
           "requirements": [
-            "Lucky Draw Pool",
-            "Swap on Raydium & Complete Twitter Verification (Worth 5 Entries)",
-            "Earn Bonus Entries!",
-            "Follow Raydium and Join us on Discord"
+            "幸运抽奖池",
+            "在Raydium上代币兑换并完成Twitter验证（价值5分抽奖池空投点数）",
+            "获得抽奖池空投点数!",
+            "关注Raydium，加入我们的中文社区"
           ],
-          "winners": ["3 Winners", "15 Winners", "100 Winners", "250 Winners", "1000 Winners"],
+          "winners": ["3名中奖者", "15名中奖者", "100名中奖者", "250名中奖者", "1000名中奖者"],
           "amount": [
-            "$1,000 of RAY tokens",
-            "$300 of RAY tokens",
-            "$100 of RAY tokens",
-            "$50 of RAY tokens",
+            "价值1,000美元的RAY代币",
+            "价值300美元的RAY代币",
+            "价值100美元的RAY代币",
+            "价值50美元的RAY代币",
             "$20 of RAY tokens"
           ],
-          "eligibility": "All users who complete a swap and share their referral code to Twitter are eligible"
+          "eligibility": "所有完成代币兑换并将其推荐代码分享到Twitter的用户都有资格参加。"
         },
         "R3": {
-          "requirements": "Top 5 on the referral leaderboard",
-          "winners": "5 Winners",
-          "amount": "$2,000 of RAY tokens",
-          "eligibility": "Guaranteed $2,000 airdrop"
+          "requirements": "推荐人排行榜前五名",
+          "winners": "5名赢家",
+          "amount": "价值2,000美元的RAY代币",
+          "eligibility": "保证价值2,000美元空投"
         }
       }
     },
 
     "terms-conditions": {
-      "title": "TERMS & CONDITIONS",
+      "title": "条款声明",
       "words": [
-        "Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible to participate and win the random draws for the $20, $50, $100, $300, and $1,000 in rewards. However, participants will not be able to win multiple lucky draws.",
-        "Users will need to verify their completion of tasks via the Raydium Airdrop Page in order to qualify for the lucky draw. Lucky draw winners will be selected by the Raydium team.",
-        "Raydium reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final interpretation of user task completion.",
-        "Rewards will be distributed to eligible participants via the address linked to the account they used to swap.",
-        "The airdrop campaign will conclude at 12:00 (UTC) on August 19."
+        "有资格获得相当于10美元RAY代币的保证空投的用户，也有资格参与并赢得20美元、50美元、100美元、300美元和1000美元奖励的随机抽奖。然而，获奖者只能从幸运抽奖池中获得最多一个奖项.",
+        "用户需要通过Raydium空投页面验证他们的任务完成情况，才能有资格参加抽奖。幸运抽奖者将由Raydium团队选出.",
+        "Raydium保留取消或修改任何活动规则的权利，以及对用户完成任务的最终解释权.",
+        "奖励将通过他们用于交互的账户的链接地址发放给符合条件的参与者。.",
+        "空投活动将于北京时间x月xx日xx结束。."
       ]
     },
 
     "user": {
-      "title": "Airdrop Points",
-      "not-connect": "Connect wallet to view your current points",
+      "title": "空投点数",
+      "not-connect": "连接钱包来查看您目前持有的点数",
 
       "finish": {
-        "winner-list": "Check Winners",
-        "prompt": "Rewards have already been sent to winning addresses"
+        "winner-list": "检查赢家",
+        "prompt": "奖励已经发到那些符合要求的账户地址"
       },
-      "calculating": "Calculating..."
+      "calculating": "计算中..."
     }
   },
-  "connect-wallet": "CONNECT WALLET"
+  "connect-wallet": "连接钱包"
 }
