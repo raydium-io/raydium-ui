@@ -118,96 +118,6 @@ export default class Wallet extends Vue {
         return new PhantomWalletAdapter()
       }
     },
-    'Solflare Extension': {
-      website: 'https://solflare.com',
-      firefoxUrl: 'https://addons.mozilla.org/en-US/firefox/addon/solflare-wallet',
-      getAdapter() {
-        return new SolflareWalletAdapter()
-      }
-    },
-    'Sollet Web': {
-      website: 'https://www.sollet.io',
-      providerUrl: 'https://www.sollet.io',
-      getAdapter(providerUrl) {
-        return new SolletWalletAdapter({ provider: providerUrl })
-      }
-    },
-    'Sollet Extension': {
-      website: 'https://www.sollet.io',
-      chromeUrl: 'https://chrome.google.com/webstore/detail/sollet/fhmfendgdocmcbmfikdcogofphimnkno',
-      getAdapter() {
-        return new SolletWalletAdapter({ provider: (window as any).sollet })
-      }
-    },
-    Ledger: {
-      website: 'https://www.ledger.com',
-      getAdapter() {
-        return new LedgerWalletAdapter({ derivationPath: getDerivationPath() })
-      }
-    },
-    MathWallet: {
-      website: 'https://mathwallet.org',
-      chromeUrl: 'https://chrome.google.com/webstore/detail/math-wallet/afbcbjpbpfadlkmhmclhkeeodmamcflc',
-      getAdapter() {
-        return new MathWalletWalletAdapter()
-      }
-    },
-    Solong: {
-      website: 'https://solongwallet.com',
-      chromeUrl: 'https://chrome.google.com/webstore/detail/solong/memijejgibaodndkimcclfapfladdchj',
-      getAdapter() {
-        return new SolongWalletAdapter()
-      }
-    },
-    Coin98: {
-      website: 'https://www.coin98.com',
-      chromeUrl: 'https://chrome.google.com/webstore/detail/coin98-wallet/aeachknmefphepccionboohckonoeemg',
-      getAdapter() {
-        return new Coin98WalletAdapter()
-      }
-    },
-    Blocto: {
-      website: 'https://blocto.portto.io',
-      getAdapter() {
-        return new BloctoWalletAdapter()
-      }
-    },
-    Safepal: {
-      website: 'https://safepal.io',
-      getAdapter() {
-        return new SafePalWalletAdapter()
-      }
-    },
-    Slope: {
-      website: 'https://slope.finance',
-      chromeUrl: 'https://chrome.google.com/webstore/detail/slope-finance-wallet/pocmplpaccanhmnllbbkpgfliimjljgo',
-      getAdapter() {
-        return new SlopeWalletAdapter()
-      }
-    },
-    Bitpie: {
-      website: 'https://bitpie.com',
-      getAdapter() {
-        return new BitpieWalletAdapter()
-      }
-    },
-    // Torus: {
-    //   website: 'https://tor.us',
-    //   getAdapter() {
-    //     return new TorusWalletAdapter({
-    //       options: {
-    //         clientId: ''
-    //       }
-    //     })
-    //   }
-    // },
-    'Solflare Web': {
-      website: 'https://solflare.com',
-      providerUrl: 'https://solflare.com/access-wallet',
-      getAdapter(providerUrl) {
-        return new SolletWalletAdapter({ provider: providerUrl })
-      }
-    }
   }
 
   connectingWallet = {
@@ -414,7 +324,7 @@ export default class Wallet extends Vue {
   connect(name: string, wallet: WalletInfo) {
     const { providerUrl } = wallet
 
-    const adapter = wallet.getAdapter(providerUrl)
+    const adapter = new PhantomWalletAdapter()
 
     if (adapter) {
       // adapter.on('ready', onReady)

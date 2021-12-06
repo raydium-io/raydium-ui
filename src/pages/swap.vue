@@ -429,12 +429,6 @@
           </template>
           <template v-else-if="needCreateTokens()"> Create Tokens </template>
           <template v-else-if="needWrapSol()"> Wrap {{ Math.ceil(needWrapSol() / 10 ** 3) / 10 ** 6 }} SOL </template>
-          <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)">
-            xCOPE amount must greater than 5
-          </template>
-          <template v-else-if="toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount)">
-            xCOPE amount must greater than 5
-          </template>
           <template v-else>{{ priceImpact > 1 ? 'Swap Anyway' : 'Swap' }}</template>
         </Button>
         <div v-if="solBalance && +solBalance.balance.fixed() - 0.05 <= 0" class="not-enough-sol-alert">
