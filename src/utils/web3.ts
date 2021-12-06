@@ -400,19 +400,37 @@ export async function signTransaction(
   return await wallet.signTransaction(transaction)
 }
 
+export async function signAndSendTransaction(
+  wallet: any,
+  transaction: Transaction,
+  connection: Connection,
+  confirmation = "singleGossip"
+) {
+  let signedTrans = await wallet.signTransaction(transaction);
+  let signature = await connection.sendRawTransaction(signedTrans.serialize(), { skipPreflight: true });
+  return signature;
+}
+
+
 export async function sendTransaction(
   connection: Connection,
   wallet: any,
   transaction: Transaction,
   signers: Array<Account> = []
 ) {
-  const txid: TransactionSignature = await wallet.sendTransaction(transaction, connection, {
-    signers,
-    skipPreflight: false,
-    preflightCommitment: commitment
-  })
+  console.log(`wallet :::: `, wallet.publicKey.toBase58())
+  transaction.feePayer = wallet.publicKey;
+  let hash = await connection.getRecentBlockhash();
+  transaction.recentBlockhash = hash.blockhash;
+  const sign = await signAndSendTransaction(wallet, transaction, connection);
+  return sign;
+  // const txid: TransactionSignature = await wallet.sendTransaction(transaction, connection, {
+  //   signers,
+  //   skipPreflight: false,
+  //   preflightCommitment: commitment
+  // })
 
-  return txid
+  // return txid
 }
 
 export function mergeTransactions(transactions: (Transaction | undefined)[]) {

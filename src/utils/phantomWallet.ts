@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import { Commitment, Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { sign } from 'crypto';
 export const programId = new PublicKey('CLbDtJTcL7NMtsujFRuHx5kLxjDgjmEuM2jZqswk7bbN');
 
@@ -16,6 +16,7 @@ interface PhantomProvider {
   isConnected?: boolean;
   autoApprove?: boolean;
   signTransaction: (transaction: Transaction) => Promise<Transaction>;
+  // sendTransaction: (transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) => Promise<Transaction>;
   signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
@@ -90,6 +91,7 @@ export class PhantomWalletAdapter
     // return this._provider?.publicKey || DEFAULT_PUBLIC_KEY;
     // const marginPDA = await PublicKey.findProgramAddress([key.toBuffer()], programId);
     // console.log('this.xenonPda :>> ', this.xenonPda);
+    console.log(`this.xenonPda ::::: called ::::: `, this.xenonPda)
     return this.xenonPda
   }
   
@@ -108,8 +110,19 @@ export class PhantomWalletAdapter
     console.log("transaction final:: ", JSON.parse(JSON.stringify(transaction)))    
     return this._provider.signTransaction(transaction);
   }
+  
+  // async sendTransaction(transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} 
+  //   : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) {
+  //   console.log("transaction:: ", transaction)
+  //   if (!this._provider) {
+  //     return transaction;
+  //   }
+  //   console.log("transaction final:: ", JSON.parse(JSON.stringify(transaction)))    
+  //   return this._provider.signTransaction(transaction);
+  // }
 
   connect() {
+    console.log(">>>>>> connecting >>>>>>>> ")
     if (!this._provider) {
       window.open('https://phantom.app/', '_blank');
       return;

@@ -65,7 +65,8 @@ import {
 import type { AccountInfo, Context } from '@solana/web3.js'
 
 import { WalletAdapter } from '@solana/wallet-adapter-base'
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
+// import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
+import { PhantomWalletAdapter } from '../utils/phantomWallet'
 import { SolongWalletAdapter } from '@solana/wallet-adapter-solong'
 import { MathWalletWalletAdapter } from '@solana/wallet-adapter-mathwallet'
 import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
@@ -97,7 +98,7 @@ interface WalletInfo {
   // firefox extension install url
   firefoxUrl?: string
   // isExtension: boolean
-  getAdapter: (providerUrl?: string) => WalletAdapter
+  getAdapter: (providerUrl?: string) => PhantomWalletAdapter
 }
 
 @Component({
@@ -326,6 +327,8 @@ export default class Wallet extends Vue {
 
     const adapter = new PhantomWalletAdapter()
 
+    console.log("hereeeee >>>>> ")
+
     if (adapter) {
       // adapter.on('ready', onReady)
       adapter.on('connect', this.onConnect)
@@ -334,7 +337,7 @@ export default class Wallet extends Vue {
 
       this.connectingWallet = {
         name,
-        adapter
+        adapter: adapter as any
       }
 
       adapter.connect()
