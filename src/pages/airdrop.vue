@@ -477,13 +477,15 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
     title: 'Raydium Bounty Airdrop'
   },
 
-  async asyncData({ route }) {
-    if (route.query?.referral) {
-      window.localStorage.setItem('airdrop:referral', route.query?.referral as string)
-    } else {
-      const storedItem = window.localStorage.getItem('airdrop:referral')
-      if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
-    }
+  // async asyncData({ route }) {
+  // if (route.query?.referral) {
+  //   window.localStorage.setItem('airdrop:referral', route.query?.referral as string)
+  // // } else {
+  // //   const storedItem = window.localStorage.getItem('airdrop:referral')
+  // //   if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
+  // }
+
+  async asyncData() {
     const winnerList = await getWinnerList()
 
     return { winnerList }
