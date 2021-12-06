@@ -707,7 +707,7 @@ Join now: ${window.location.origin}/airdrop/?referral=${this.initBackendResponse
 <style lang="less" scoped>
 .airdrop {
   --primary: #141040;
-  --secondary: #8d9695;
+  --secondary: #39d0d8;
   --primary-text: #fff;
   --secondary-text: #c4d6ff;
   --video-bg: hsla(0, 0%, 0%, 0.8);

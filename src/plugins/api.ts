@@ -11,12 +11,11 @@ const apiPlugin: Plugin = (ctx, inject) => {
     getConfig: () => ctx.$axios.get('https://api.raydium.io/config', { params: { v: VERSION } }),
     getEpochInfo: (rpc: string) => ctx.$axios.post(rpc, { jsonrpc: '2.0', id: 1, method: 'getEpochInfo' }),
     getCompaign: ({ campaignId = 2, address, referral }) =>
-      ctx.$axios.get(`https://api.raydium.io/campaign/${campaignId}`, { params: { address, referral } }),
+      ctx.$axios.get(`http://localhost:8000/campaign/${campaignId}`, { params: { address, referral } }),
     postCompaign: ({ campaignId = 2, address, task, result = '', sign = '' }) =>
-      ctx.$axios.post(`https://api.raydium.io/campaign/${campaignId}`, { address, task, result, sign }),
-    getCompaignWinners: () => ctx.$axios.get(`https://api.raydium.io/campaign`),
-    getCompaignWinnerList: ({ type }) => ctx.$axios.get(`https://api.raydium.io/campaign`, { params: { type } }), // TEMP mock backend response // deprecated
-    getRouter: (mintIn, mintOut) => ctx.$axios.post(`http://54.65.53.89/routing`, { base: mintIn, quote: mintOut })
+      ctx.$axios.post(`httpp://localhost:8000/campaign/${campaignId}`, { address, task, result, sign }),
+    getCompaignWinners: () => ctx.$axios.get(`httpp://localhost:8000/campaign`),
+    getCompaignWinnerList: ({ type }) => ctx.$axios.get(`httpp://localhost:8000/campaign`, { params: { type } }) // TEMP mock backend response // deprecated
   }
 
   ctx.$api = api
