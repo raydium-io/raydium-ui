@@ -1074,6 +1074,27 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
+  },
+  REAL: {
+    symbol: 'REAL',
+    name: 'REAL',
+    mintAddress: 'AD27ov5fVU2XzwsbvnFvb1JpCBaCB5dRXrczV9CqSVGb',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/realy-is-launching-on-acceleraytor-b6d6a63d69d8',
+    details:
+      'Realy Metaverse will be the 1st Live-to-Earn metaverse on Solana. Developed via Unreal Engine, Realy is a virtual city with AAA graphics that seamlessly integrates virtual and reality.',
+    docs: {
+      website: 'https://realy.pro/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/RealyOfficial',
+      Telegram: 'https://t.me/realyofficial',
+      Discord: 'https://discord.gg/realy'
+    },
+
+    tags: ['raydium']
   }
 }
 
