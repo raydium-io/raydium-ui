@@ -393,11 +393,89 @@ export async function signTransaction(
   signers: Array<Account> = []
 ) {
   transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash
-  transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey))
+
+  console.log('wallet.pubkey :>> ', wallet.publicKey);
+  console.log('wallet.pubkey :>> ', wallet.walletPublicKey);
+  let signerKey = wallet.walletPublicKey
+
+  console.log("transaction before  :: ", JSON.parse(JSON.stringify(transaction)) )
+  console.log("signers:: ", signers)
+
+  // transaction.setSigners(...signers.map((s) => s.publicKey));
+  console.log("transaction after setSignbers :: ", JSON.parse(JSON.stringify(transaction)) )
+  // console.log("signer pubkeys from tx:: ", transaction.signatures[0].publicKey, transaction.signatures[0].signature)
+  // console.log("signer pubkeys from tx:: ", transaction.signatures[1].publicKey, transaction.signatures[1].signature)
+
+
+  console.log("transaction before:: ", JSON.parse(JSON.stringify(transaction)))
+
+  transaction.instructions.forEach(ix => {
+    if ((ix.programId.toBase58() != SystemProgram.programId.toBase58()) && (ix.programId.toBase58() != ASSOCIATED_TOKEN_PROGRAM_ID.toBase58()))
+    {
+      const puppetProg = ix.programId
+      ix.keys.unshift({pubkey: ix.programId, isSigner: false, isWritable: false})
+      ix.keys.unshift({pubkey: signerKey!, isSigner: true, isWritable: true})
+      ix.programId = new PublicKey('CLbDtJTcL7NMtsujFRuHx5kLxjDgjmEuM2jZqswk7bbN')
+      console.log("keys::", ix.keys)
+      const signerIndex = ix.keys.findIndex((x => (x.pubkey.toBase58() === wallet.publicKey.toBase58())))
+      console.log("signerIndex:: ", signerIndex)
+      if (signerIndex != -1) {
+        ix.keys[signerIndex].isSigner = false
+        ix.keys[signerIndex].isWritable = true
+      }
+      // update instruction data, append 10 as opcode
+      let new_data = new Uint8Array(ix.data.length+1)
+      new_data[0] = 10 // ix opcode
+      for (let i=0; i<ix.data.length; i++) {
+        new_data[i+1] = ix.data[i]
+      }
+      ix.data = Buffer.from(new_data.buffer)
+    }
+    else {
+      const signerIndex = ix.keys.findIndex((x => (x.pubkey.toBase58() === wallet.publicKey.toBase58())))
+      console.log("ix:: ", ix)
+      console.log("signerIndex:: ", signerIndex)
+      if (signerIndex != -1) {
+        ix.keys[signerIndex].pubkey = signerKey!
+        ix.keys[signerIndex].isSigner = false
+        ix.keys[signerIndex].isWritable = true
+      }
+    }
+  
+    });
+    
+
+  console.log("transaction after prepend data:: ", JSON.parse(JSON.stringify(transaction)))
+  // let signers = transaction.signatures.map((s) => s.publicKey)
+  // console.log("signers list before:: ", signers)
+ 
+  
+  // transaction.feePayer = this._provider.publicKey
+
   if (signers.length > 0) {
-    transaction.partialSign(...signers)
+    transaction.setSigners(
+      
+      // fee payed by the wallet owner
+      signerKey!,
+      ...signers.map((s) => s.publicKey),
+    );
+    transaction.partialSign(...signers);
   }
-  return await wallet.signTransaction(transaction)
+  else {
+    transaction.setSigners(
+      // fee payed by the wallet owner
+      signerKey!,
+    );
+  }
+  console.log("signer pubkeys from tx:: ", transaction.signatures[0].publicKey, transaction.signatures[0].signature)
+  // console.log("other singer:: ", transaction.signatures[1].publicKey.toBase58(), transaction.signatures[1].signature)
+  return await wallet.signTransaction(transaction);
+
+  // transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey))
+  // if (signers.length > 0) {
+  //   transaction.partialSign(...signers)
+  // }
+  // return await wallet.signTransaction(transaction)
 }
 
 export async function signAndSendTransaction(
@@ -418,19 +496,21 @@ export async function sendTransaction(
   transaction: Transaction,
   signers: Array<Account> = []
 ) {
-  console.log(`wallet :::: `, wallet.publicKey.toBase58())
-  transaction.feePayer = wallet.publicKey;
-  let hash = await connection.getRecentBlockhash();
-  transaction.recentBlockhash = hash.blockhash;
-  const sign = await signAndSendTransaction(wallet, transaction, connection);
-  return sign;
-  // const txid: TransactionSignature = await wallet.sendTransaction(transaction, connection, {
-  //   signers,
-  //   skipPreflight: false,
-  //   preflightCommitment: commitment
-  // })
+  // console.log(`wallet :::: `, wallet.publicKey.toBase58())
+  // transaction.feePayer = wallet.publicKey;
+  // let hash = await connection.getRecentBlockhash();
+  // transaction.recentBlockhash = hash.blockhash;
+  // const sign = await signAndSendTransaction(wallet, transaction, connection);
+  // return sign;
+  const txid: TransactionSignature = await wallet.sendTransaction(transaction, connection, {
+    signers,
+    skipPreflight: false,
+    preflightCommitment: commitment
+  })
 
-  // return txid
+  console.log("txid:: ", txid)
+
+  return txid
 }
 
 export function mergeTransactions(transactions: (Transaction | undefined)[]) {

@@ -1496,7 +1496,7 @@ export default Vue.extend({
               message: 'Transaction has been sent',
               description: (h: any) =>
                 h('div', [
-                  'Confirmation is in progress.  Check your transaction on ',
+                  'Confirmation swap() is in progress.  Check your transaction on ',
                   h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
                 ])
             })
