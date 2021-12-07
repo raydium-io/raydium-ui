@@ -43,10 +43,10 @@ export default Vue.extend({
   data() {
     return {
       isActive : true,
-      assets : 2000,
-      percent: 90,
-      usdcLeftToBorrow: 500,
-      leverage: 1.4,
+      assets : 0,
+      percent: 0,
+      usdcLeftToBorrow: 0,
+      leverage: 0,
       text: `A dog is a type of domesticated animal.Known for its loyalty and faithfulness,it can be found as a welcome guest in many households across the world.`,
       activeKey: ['1'],
     }
