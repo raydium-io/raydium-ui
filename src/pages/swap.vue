@@ -84,7 +84,7 @@
     </div>
 
     <CoinSelect v-if="coinSelectShow" @onClose="() => (coinSelectShow = false)" @onSelect="onCoinSelect" />
-
+    <SlidingOverlay />
     <InputAmmIdOrMarket
       v-if="ammIdOrMarketSearchShow"
       @onClose="() => (ammIdOrMarketSearchShow = false)"
@@ -1951,4 +1951,9 @@ export default Vue.extend({
     }
   }
 }
+
+.ant-progress-text {
+  color: white !important;
+}
+
 </style>

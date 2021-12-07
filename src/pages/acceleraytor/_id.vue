@@ -1219,7 +1219,7 @@ hr {
   margin: 0;
   width: 100%;
   text-align: right;
-  color: #f1f1f2;
+  color: #f1f1f2 !important;
 }
 
 .ant-alert-warning {
