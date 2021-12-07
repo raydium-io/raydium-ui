@@ -13,7 +13,7 @@
           "point": "+5 POINTS"
         },
         "swap": {
-          "title": "Swap & Confirm Referral",
+          "title": "Swap",
           "point": "+5 POINTS"
         },
         "earn-bonus": {
@@ -36,7 +36,7 @@
     },
     "step3": {
       "step": "STEP 3",
-      "title": "Try Raydium’s Light Speed Swaps & Confirm Referral",
+      "title": "Try Raydium’s Light Speed Swaps",
       "point": "Total Points +5"
     },
     "step4": {

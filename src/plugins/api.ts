@@ -13,9 +13,9 @@ const apiPlugin: Plugin = (ctx, inject) => {
     getCompaign: ({ campaignId = 2, address, referral }) =>
       ctx.$axios.get(`http://localhost:8000/campaign/${campaignId}`, { params: { address, referral } }),
     postCompaign: ({ campaignId = 2, address, task, result = '', sign = '' }) =>
-      ctx.$axios.post(`httpp://localhost:8000/campaign/${campaignId}`, { address, task, result, sign }),
-    getCompaignWinners: () => ctx.$axios.get(`httpp://localhost:8000/campaign`),
-    getCompaignWinnerList: ({ type }) => ctx.$axios.get(`httpp://localhost:8000/campaign`, { params: { type } }) // TEMP mock backend response // deprecated
+      ctx.$axios.post(`http://localhost:8000/campaign/${campaignId}`, { address, task, result, sign }),
+    getCompaignWinners: () => ctx.$axios.get(`http://localhost:8000/campaign`),
+    getCompaignWinnerList: ({ type }) => ctx.$axios.get(`http://localhost:8000/campaign`, { params: { type } }) // TEMP mock backend response // deprecated
   }
 
   ctx.$api = api

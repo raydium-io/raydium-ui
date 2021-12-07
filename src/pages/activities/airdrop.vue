@@ -566,7 +566,7 @@ import { mapState } from 'vuex'
 import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
-const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
+// const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   components: {
@@ -591,9 +591,9 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
       const storedItem = window.localStorage.getItem('airdrop:referral')
       if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
     }
-    const winnerList = await getWinnerList()
+    // const winnerList = await getWinnerList()
 
-    return { winnerList }
+    // return { winnerList }
   },
 
   computed: {

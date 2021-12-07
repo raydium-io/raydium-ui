@@ -19,9 +19,9 @@
         <div class="icon minimize" />
       </div>
 
-      <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
+      <!-- <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
         {{ $t('airdrop.user.finish.winner-list') }}
-      </a>
+      </a> -->
 
       <div class="title">{{ $t('airdrop.user.title') }}</div>
 
@@ -252,12 +252,12 @@
       <div class="box form">
         <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
         <div class="input-box">
-          <input v-model="discordUserName" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
+          <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
         </div>
-        <button :disabled="$accessor.wallet.connected && (!canSubmitDiscord || isDiscording)" @click="submitDiscord">
+        <button :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)" @click="submitHuobiUID">
           {{
             $accessor.wallet.connected
-              ? isDiscording
+              ? isHuobiUIDing
                 ? $t('airdrop.huobiID.sub-btn-loading')
                 : $t('airdrop.huobiID.sub-btn')
               : $t('connect-wallet')
@@ -500,13 +500,12 @@ export default class Airdrop extends Vue {
   inputChecked = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
-  showLinkInput = false
   videoHasFinished = false
   videoHasCachedComplete = false
   retweetLink = ''
-  discordUserName = ''
+  huobiUID = ''
   referralLink = ''
-  canSubmitDiscord = false
+  canSubmitHuobiUID = false
   haveTweet = false
   haveFollow = false
   haveDiscord = false
@@ -516,7 +515,7 @@ export default class Airdrop extends Vue {
   isDiscordPending = false
   isSwapPending = false
 
-  isDiscording = false
+  isHuobiUIDing = false
   intervalTimer = 0
 
   isWinningPanelOpen = true
@@ -559,8 +558,8 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('initBackendResponse', { immediate: true })
-  checkCanSubmitDiscord(res: CampaignInfo['data']) {
-    this.canSubmitDiscord = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
+  checkCanSubmitHuobiUID(res: CampaignInfo['data']) {
+    this.canSubmitHuobiUID = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
   }
 
   @Watch('initBackendResponse', { immediate: true })
@@ -604,8 +603,8 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('$accessor.wallet.connected', { immediate: true })
-  resetDiscord() {
-    this.isDiscording = false
+  resetHuobiUID() {
+    this.isHuobiUIDing = false
   }
 
   @Watch('$accessor.wallet.connected', { immediate: true })
@@ -625,36 +624,36 @@ export default class Airdrop extends Vue {
     }
   }
 
-  async downloadCSV({ targetFileName, type }: { targetFileName: string; type: 'luck' | 'valid' }) {
-    // get data content
-    let data = ''
-    if (this.cachedWinnerList[targetFileName]) {
-      data = this.cachedWinnerList[targetFileName]
-    } else {
-      try {
-        const freshRawData = await this.$api.getCompaignWinnerList({ type })
-        const parsedData = freshRawData.join('\n')
-        this.cachedWinnerList[targetFileName] = parsedData
-        data = parsedData
-      } catch (err) {}
-    }
+  // async downloadCSV({ targetFileName, type }: { targetFileName: string; type: 'luck' | 'valid' }) {
+  //   // get data content
+  //   let data = ''
+  //   if (this.cachedWinnerList[targetFileName]) {
+  //     data = this.cachedWinnerList[targetFileName]
+  //   } else {
+  //     try {
+  //       const freshRawData = await this.$api.getCompaignWinnerList({ type })
+  //       const parsedData = freshRawData.join('\n')
+  //       this.cachedWinnerList[targetFileName] = parsedData
+  //       data = parsedData
+  //     } catch (err) {}
+  //   }
 
-    // download
-    const blob = new Blob([data], { type: 'csv' })
-    const url = URL.createObjectURL(blob)
-    const tempA = document.createElement('a')
-    tempA.href = url
-    tempA.download = `${targetFileName}.csv`
-    tempA.target = '_blank'
-    tempA.click()
-  }
+  //   // download
+  //   const blob = new Blob([data], { type: 'csv' })
+  //   const url = URL.createObjectURL(blob)
+  //   const tempA = document.createElement('a')
+  //   tempA.href = url
+  //   tempA.download = `${targetFileName}.csv`
+  //   tempA.target = '_blank'
+  //   tempA.click()
+  // }
 
   async submit({
     task,
     result,
     sign
   }: {
-    task: 'video' | 'twitter' | 'discord' | 'swap' | 'referral'
+    task: 'video' | 'twitter' | 'huobiUID' | 'swap' | 'referral'
     result?: string
     sign?: string
   }) {
@@ -668,19 +667,18 @@ export default class Airdrop extends Vue {
     return response
   }
 
-  async submitDiscord() {
+  async submitHuobiUID() {
     if (!this.$accessor.wallet.connected) {
       this.$accessor.wallet.openModal()
-    } else if (this.discordUserName) {
-      this.isDiscording = true
+    } else if (this.huobiUID) {
+      this.isHuobiUIDing = true
       try {
-        const result = await this.submit({ task: 'discord', result: this.discordUserName })
+        const result = await this.submit({ task: 'huobiUID', result: this.huobiUID })
         if (result) {
           this.initBackendResponse = result.data
         }
       } finally {
-        this.showLinkInput = false
-        this.isDiscording = false
+        this.isHuobiUIDing = false
       }
     }
   }

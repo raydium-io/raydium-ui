@@ -13,7 +13,7 @@
           "point": "+5个点数"
         },
         "swap": {
-          "title": "兑换代币&确认",
+          "title": "兑换代币",
           "point": "+5个点数"
         },
         "earn-bonus": {
@@ -36,7 +36,7 @@
     },
     "step3": {
       "step": "第三步",
-      "title": "在Raydium尝试兑换代币 & 确认推荐",
+      "title": "在Raydium尝试兑换代币",
       "point": "+5个点数"
     },
     "step4": {
