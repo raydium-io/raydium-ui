@@ -2414,6 +2414,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '84fmrerHGohoRf4iLPDQ1KG4CjSjCRksYWGzjWfCRM8a',
     decimals: TOKENS.TTT.decimals
+  },
+  'RUN-USDC-V4': {
+    symbol: 'RUN-USDC',
+    name: 'RUN-USDC LP',
+    coin: { ...TOKENS.RUN },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'CjTLvvKSQdEujcSzeZRYgk4w1DpuXBbMppLHaxZyz11Y',
+    decimals: TOKENS.RUN.decimals
   }
 }
 

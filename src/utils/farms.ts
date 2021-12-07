@@ -1747,6 +1747,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'jfhZy3B6sqeu95z71GukkxpkDtfHXJiFAMULM6STWxb',
     poolRewardTokenAccount: 'Bgj3meVYds8ficJc9xntbjmMBPVUuyn6CvDUm1AD39yq',
     poolRewardTokenAccountB: 'DJifNDjNt7iHbkNHs9V6Wm5pdiuddtF9w3o4WEiraKrP'
+  },
+  {
+    name: 'RUN-USDC',
+    lp: { ...LP_TOKENS['RUN-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.RUN },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '3J3SYLeFZWKnUCsrPzikw9bcD9vRs7YNGfmg7ZSg3tsK',
+    poolAuthority: 'Hps9GqZtdWSswCpsbGzUjtddWrPBNMkPMBQbvsZHRdvB',
+    poolLpTokenAccount: '4rg9ynU2SgKzsrTRzhhF9MUPvoRSmrQWdGBwK4DhRvjZ',
+    poolRewardTokenAccount: 'HboptB7p4TV9qKCer9h3Qap9kTz2wpTYn7vtatSVL7j6',
+    poolRewardTokenAccountB: '5wLYgZm5LT5QGMVbfKqmXR8qWZtzvSVcFChw1iZqTwee'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
