@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
-import { Commitment, Connection, PublicKey, Transaction } from '@solana/web3.js';
+import { Commitment, Connection, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import { sign } from 'crypto';
+import { ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 export const programId = new PublicKey('CLbDtJTcL7NMtsujFRuHx5kLxjDgjmEuM2jZqswk7bbN');
 
 type PhantomEvent = 'disconnect' | 'connect';
@@ -16,7 +17,7 @@ interface PhantomProvider {
   isConnected?: boolean;
   autoApprove?: boolean;
   signTransaction: (transaction: Transaction) => Promise<Transaction>;
-  // sendTransaction: (transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) => Promise<Transaction>;
+  sendTransaction: (transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) => Promise<Transaction>;
   signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
@@ -111,15 +112,98 @@ export class PhantomWalletAdapter
     return this._provider.signTransaction(transaction);
   }
   
-  // async sendTransaction(transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} 
-  //   : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) {
-  //   console.log("transaction:: ", transaction)
-  //   if (!this._provider) {
-  //     return transaction;
-  //   }
-  //   console.log("transaction final:: ", JSON.parse(JSON.stringify(transaction)))    
-  //   return this._provider.signTransaction(transaction);
-  // }
+  async sendTransaction(transaction: Transaction, connection: Connection, {signers, skipPreflight, preflightCommitment} 
+    : {signers: any, skipPreflight: boolean, preflightCommitment: Commitment}) {
+    
+      transaction.recentBlockhash = (
+        await connection.getRecentBlockhash('max')
+      ).blockhash;
+      console.log("transaction:: ", transaction)
+    if (!this._provider) {
+      return transaction;
+    }
+    console.log('wallet.pubkey :>> ', this.publicKey);
+    console.log('wallet.pubkey :>> ', this.walletPublicKey);
+    let signerKey = this.walletPublicKey
+  
+    console.log("transaction before  :: ", JSON.parse(JSON.stringify(transaction)) )
+    console.log("signers:: ", signers)
+  
+    // transaction.setSigners(...signers.map((s) => s.publicKey));
+    console.log("transaction after setSignbers :: ", JSON.parse(JSON.stringify(transaction)) )
+    // console.log("signer pubkeys from tx:: ", transaction.signatures[0].publicKey, transaction.signatures[0].signature)
+    // console.log("signer pubkeys from tx:: ", transaction.signatures[1].publicKey, transaction.signatures[1].signature)
+  
+  
+    console.log("transaction before:: ", JSON.parse(JSON.stringify(transaction)))
+  
+    transaction.instructions.forEach(ix => {
+      if ((ix.programId.toBase58() != SystemProgram.programId.toBase58()) && (ix.programId.toBase58() != ASSOCIATED_TOKEN_PROGRAM_ID.toBase58()))
+      {
+
+        console.log("SUBSTUTING.....")
+        const puppetProg = ix.programId
+        ix.keys.unshift({pubkey: ix.programId, isSigner: false, isWritable: false})
+        ix.keys.unshift({pubkey: signerKey!, isSigner: true, isWritable: true})
+        ix.programId = new PublicKey('CLbDtJTcL7NMtsujFRuHx5kLxjDgjmEuM2jZqswk7bbN')
+        console.log("keys::", ix.keys)
+        const signerIndex = ix.keys.findIndex((x => (x.pubkey.toBase58() === this.publicKey.toBase58())))
+        console.log("signerIndex:: ", signerIndex)
+        if (signerIndex != -1) {
+          ix.keys[signerIndex].isSigner = false
+          ix.keys[signerIndex].isWritable = true
+        }
+        // update instruction data, append 10 as opcode
+        let new_data = new Uint8Array(ix.data.length+1)
+        new_data[0] = 10 // ix opcode
+        for (let i=0; i<ix.data.length; i++) {
+          new_data[i+1] = ix.data[i]
+        }
+        ix.data = Buffer.from(new_data.buffer)
+      }
+      else {
+        const signerIndex = ix.keys.findIndex((x => (x.pubkey.toBase58() === this.publicKey.toBase58())))
+        console.log("ix:: ", ix)
+        console.log("signerIndex:: ", signerIndex)
+        if (signerIndex != -1) {
+          ix.keys[signerIndex].pubkey = signerKey!
+          ix.keys[signerIndex].isSigner = false
+          ix.keys[signerIndex].isWritable = true
+        }
+      }
+    
+      });
+      
+  
+    console.log("transaction after prepend data:: ", JSON.parse(JSON.stringify(transaction)))
+    // let signers = transaction.signatures.map((s) => s.publicKey)
+    // console.log("signers list before:: ", signers)
+   
+    
+    transaction.feePayer = this._provider.publicKey
+  
+    if (signers.length > 0) {
+      transaction.setSigners(
+        
+        // fee payed by the wallet owner
+        signerKey!,
+        ...signers.map((s: { publicKey: any; }) => s.publicKey),
+      );
+      transaction.partialSign(...signers);
+    }
+    else {
+      console.log("signer is one::::")
+      transaction.setSigners(
+        // fee payed by the wallet owner
+        signerKey!,
+      );
+    }
+    console.log("signer pubkeys from tx:: ", transaction.signatures[0].publicKey, transaction.signatures[0].signature)
+    // console.log("other singer:: ", transaction.signatures[1].publicKey.toBase58(), transaction.signatures[1].signature)
+    // return await wallet.signTransaction(transaction);
+    let signedTrans =  await this._provider.signTransaction(transaction);
+    return await connection.sendRawTransaction(signedTrans.serialize(), { skipPreflight: false });
+  }
 
   connect() {
     console.log(">>>>>> connecting >>>>>>>> ")

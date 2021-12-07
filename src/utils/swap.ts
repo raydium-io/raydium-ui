@@ -486,6 +486,7 @@ export async function swap(
     )
   }
 
+  console.log("calling sendtrx")
   return await sendTransaction(connection, wallet, transaction, signers)
 }
 
@@ -991,7 +992,7 @@ export function swapInstruction(
     {
       instruction: 9,
       amountIn,
-      minAmountOut
+      minAmountOut: 1
     },
     data
   )

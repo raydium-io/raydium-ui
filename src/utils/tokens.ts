@@ -110,7 +110,7 @@ export const TOKENS: Tokens = {
   ETH: {
     symbol: 'ETH',
     name: 'Wrapped Ethereum',
-    mintAddress: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
+    mintAddress: 'Cu84KB3tDL6SbFgToHMLYVDJJXdJjenNzSKikeAvzmkA',
     decimals: 6,
     referrer: 'CXPTcSxxh4AT38gtv3SPbLS7oZVgXzLbMb83o4ziXjjN',
     tags: ['raydium']
