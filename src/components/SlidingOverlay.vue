@@ -1,6 +1,8 @@
 <template>
   <div class="sliding_card_warper" v-bind:class="{ active_card: isActive }">
-            <div class="sliding_card_switch" v-on:click="isActive = !isActive"></div>
+            <div class="sliding_card_switch" v-on:click="isActive = !isActive"> 
+              <img src="../assets/icons/acceleRaytor.svg" width="20" height="20" />
+            </div>
             <div class="sliding_card_inner borrow_account_status_wrapper">
                 <h2>Margin Account</h2>
                 <div class="account-status-list">
@@ -19,85 +21,7 @@
                     <p>Health</p>
                     <Progress :percent="percent"/>
                 </div>
-                <!-- <Collapse 
-                    defaultActiveKey="1"
-                    expandIcon={({ isActive }) => <CaretDownOutlined rotate={isActive ? 180 : 0} />}
-                    class="site-collapse-custom-collapse"
-                    ghost
-                >
-                    <Panel header={
-                        <div class={'sliding-card-panel-head'}>
-                            <h4><div class="state-img" style={{'background': '#d27800'}}></div>USDC</h4>
-                            <span>500$</span>
-                        </div>
-                    } key="1">
-                    <table class="sliding-card-table">
-                            <tr>
-                                <th>Token</th>
-                                <th>Amount</th>
-                                <th>Value</th>
-                            </tr>
-                            <tr>
-                                <td>SRM</td>
-                                <td>11</td>
-                                <td>$33</td>
-                            </tr>
-                            <tr>
-                                <td>FTT</td>
-                                <td>122</td>
-                                <td>$2000</td>
-                            </tr>
-                    </table>
-                    </Panel>
-                    <Panel header={
-                        <div class={'sliding-card-panel-head'}>
-                            <h4><div class="state-img" style={{'background': '#2671C4'}}></div>RAY</h4>
-                            <span>223$</span>
-                        </div>
-                    } key="2">
-                        <table class="sliding-card-table">
-                            <tr>
-                                <th>Token</th>
-                                <th>Amount</th>
-                                <th>Value</th>
-                            </tr>
-                            <tr>
-                                <td>SRM</td>
-                                <td>11</td>
-                                <td>$33</td>
-                            </tr>
-                            <tr>
-                                <td>FTT</td>
-                                <td>122</td>
-                                <td>$2000</td>
-                            </tr>
-                        </table>
-                    </Panel>
-                    <Panel header={
-                        <div class={'sliding-card-panel-head'}>
-                            <h4><div class="state-img" style={{'background': '#00B65B'}}></div>IVN</h4>
-                            <span>392$</span>
-                        </div>
-                    } key="3">
-                    <table class="sliding-card-table">
-                            <tr>
-                                <th>Token</th>
-                                <th>Amount</th>
-                                <th>Value</th>
-                            </tr>
-                            <tr>
-                                <td>SRM</td>
-                                <td>11</td>
-                                <td>$33</td>
-                            </tr>
-                            <tr>
-                                <td>FTT</td>
-                                <td>122</td>
-                                <td>$2000</td>
-                            </tr>
-                        </table>
-                    </Panel>
-                </Collapse> -->
+
                 <button class="sliding-card-btn">Get 200$ Faucet</button>
             </div>
         </div>
@@ -108,12 +32,13 @@ import Vue from 'vue'
 // import { Progress, } from 'ant-design-vue'
 // import 'ant-design-vue/dist/antd.css';
 
-import { Progress } from 'ant-design-vue';
-Vue.use(Progress);
+import { Progress, Collapse } from 'ant-design-vue';
+Vue.use(Progress, Collapse);
 
 export default Vue.extend({
   components: {
-    Progress
+    Progress,
+    Collapse
   },
   data() {
     return {
@@ -121,8 +46,15 @@ export default Vue.extend({
       assets : 2000,
       percent: 90,
       usdcLeftToBorrow: 500,
-      leverage: 1.4
+      leverage: 1.4,
+      text: `A dog is a type of domesticated animal.Known for its loyalty and faithfulness,it can be found as a welcome guest in many households across the world.`,
+      activeKey: ['1'],
     }
+  },
+  watch: {
+    activeKey(key) {
+      console.log(key);
+    },
   },
   props: {
     show: {
