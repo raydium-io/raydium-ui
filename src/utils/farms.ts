@@ -1766,6 +1766,44 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '4rg9ynU2SgKzsrTRzhhF9MUPvoRSmrQWdGBwK4DhRvjZ',
     poolRewardTokenAccount: 'HboptB7p4TV9qKCer9h3Qap9kTz2wpTYn7vtatSVL7j6',
     poolRewardTokenAccountB: '5wLYgZm5LT5QGMVbfKqmXR8qWZtzvSVcFChw1iZqTwee'
+  },
+  {
+    name: 'CRWNY-RAY',
+    lp: { ...LP_TOKENS['CRWNY-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.CRWNY },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'BYmeWrwA4ixvJhNrxWzQsA3Fsz6EtUDJTo39WYZ6o1FS',
+    poolAuthority: 'Eb5RguxKYW4XqsGvM2faB7RisyxMcSs4NF7RTU1MMv9X',
+    poolLpTokenAccount: 'DCQoi1ZFXrZLHV11CDPrR3ChLpqEu3uaddqXre3fVpRD',
+    poolRewardTokenAccount: '3emSqcHiXUjaZkqUE5Kw13iBJxWLf7LMQ6fsBdGSdCF8',
+    poolRewardTokenAccountB: 'HDdd78Yg191z1TbHKYaPfpVLHYz9XMJJooBFEQqZjQjN'
+  },
+  {
+    name: 'CRWNY-USDC',
+    lp: { ...LP_TOKENS['CRWNY-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.CRWNY },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '6VNF4rF7ESUohzNeRf3aTg61dyFjbab749RGUHCTDFQL',
+    poolAuthority: '4EkurC1mTx89e3XpFSPZmzZhaHGWcs6KtqYubtjvLHf4',
+    poolLpTokenAccount: '43h1qx8Ct5uTqqcrv27h16u2zP2zJQbxYEqwrxMtYmFv',
+    poolRewardTokenAccount: '4RKLi4F1T55zwMf1t2aUsPGNouAvGeRejj2d7s3z9tii',
+    poolRewardTokenAccountB: 'Bv2fbTAaC55xiW1LJkY2NFpEAr4TkoVzwnetxNMhJ9rS'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 

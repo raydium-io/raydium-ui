@@ -1095,6 +1095,13 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
+  },
+  CRWNY: {
+    symbol: 'CRWNY',
+    name: 'CRWNY',
+    mintAddress: 'CRWNYkqdgvhGGae9CKfNka58j6QQkaD5bLhKXvUYqnc1',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2423,6 +2430,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'CjTLvvKSQdEujcSzeZRYgk4w1DpuXBbMppLHaxZyz11Y',
     decimals: TOKENS.RUN.decimals
+  },
+  'CRWNY-USDC-V4': {
+    symbol: 'CRWNY-USDC',
+    name: 'CRWNY-USDC LP',
+    coin: { ...TOKENS.CRWNY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'H3D9Gyi4frRLW6bS9vBthDVDJyzyRJ6XhhpP6PJGWaDC',
+    decimals: TOKENS.CRWNY.decimals
+  },
+  'CRWNY-RAY-V4': {
+    symbol: 'CRWNY-RAY',
+    name: 'CRWNY-RAY LP',
+    coin: { ...TOKENS.CRWNY },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '5Cz9wGStNjiUg81q8t6sJJeckuT2C14CYSfyQbtYirSX',
+    decimals: TOKENS.CRWNY.decimals
   }
 }
 
