@@ -242,7 +242,18 @@
             }}</a>
           </div>
         </div>
-        <Wallet />
+        <div>
+          <Button v-if="!$accessor.wallet.connected" ghost @click="$accessor.wallet.openModal">
+            <Icon type="wallet" />
+            Connect
+          </Button>
+          <Button v-else @click="$accessor.wallet.openModal">
+            <Icon type="wallet" />
+            {{ $accessor.wallet.address.substr(0, 4) }}
+            ...
+            {{ $accessor.wallet.address.substr($accessor.wallet.address.length - 4, 4) }}
+          </Button>
+        </div>
       </div>
     </section>
 
@@ -251,18 +262,23 @@
 
       <div class="box form">
         <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
-        <div class="input-box">
-          <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
-        </div>
-        <button :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)" @click="submitHuobiUID">
-          {{
-            $accessor.wallet.connected
-              ? isHuobiUIDing
-                ? $t('airdrop.huobiID.sub-btn-loading')
-                : $t('airdrop.huobiID.sub-btn')
-              : $t('connect-wallet')
-          }}
-          <!-- <div
+        <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-huobiUID') }}{{ huobiUID }}</div>
+        <div v-else>
+          <div class="input-box">
+            <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
+          </div>
+          <button
+            :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
+            @click="submitHuobiUID"
+          >
+            {{
+              $accessor.wallet.connected
+                ? isHuobiUIDing
+                  ? $t('airdrop.huobiID.sub-btn-loading')
+                  : $t('airdrop.huobiID.sub-btn')
+                : $t('connect-wallet')
+            }}
+            <!-- <div
             v-if="$accessor.wallet.connected"
             :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
             :title="`${
@@ -273,7 +289,8 @@
                 : 'you have not done this task'
             }`"
           /> -->
-        </button>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -496,26 +513,20 @@ import { CampaignInfo, CampaignWinners } from '@/types/api'
   }
 })
 export default class Airdrop extends Vue {
-  inputContent = ''
-  inputChecked = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
-  videoHasFinished = false
-  videoHasCachedComplete = false
-  retweetLink = ''
   huobiUID = ''
   referralLink = ''
   canSubmitHuobiUID = false
   haveTweet = false
   haveFollow = false
-  haveDiscord = false
   haveSwap = false
+
   isTweetPending = false
   isFollowPending = false
-  isDiscordPending = false
   isSwapPending = false
-
   isHuobiUIDing = false
+
   intervalTimer = 0
 
   isWinningPanelOpen = true
@@ -559,7 +570,12 @@ export default class Airdrop extends Vue {
 
   @Watch('initBackendResponse', { immediate: true })
   checkCanSubmitHuobiUID(res: CampaignInfo['data']) {
-    this.canSubmitHuobiUID = !(res.tasks?.discard?.finished || res.tasks?.discard?.enabled)
+    this.canSubmitHuobiUID = !(res.tasks?.huobiUID?.finished || res.tasks?.huobiUID?.enabled)
+  }
+
+  @Watch('initBackendResponse', { immediate: true })
+  checkHuobiUID(res: CampaignInfo['data']) {
+    this.huobiUID = res.tasks?.huobiUID?.key
   }
 
   @Watch('initBackendResponse', { immediate: true })
@@ -570,11 +586,6 @@ export default class Airdrop extends Vue {
   @Watch('initBackendResponse', { immediate: true })
   checkHaveFollow(res: CampaignInfo['data']) {
     this.haveFollow = res.tasks?.twitter?.finished
-  }
-
-  @Watch('initBackendResponse', { immediate: true })
-  checkHaveDiscord(res: CampaignInfo['data']) {
-    this.haveDiscord = res.tasks?.discord?.finished
   }
 
   @Watch('initBackendResponse', { immediate: true })
@@ -590,11 +601,6 @@ export default class Airdrop extends Vue {
   @Watch('initBackendResponse', { immediate: true })
   checkIsFollowPending(res: CampaignInfo['data']) {
     this.isFollowPending = res.tasks?.twitter?.enabled
-  }
-
-  @Watch('initBackendResponse', { immediate: true })
-  checkIsDiscordPending(res: CampaignInfo['data']) {
-    this.isDiscordPending = res.tasks?.discord?.enabled
   }
 
   @Watch('initBackendResponse', { immediate: true })

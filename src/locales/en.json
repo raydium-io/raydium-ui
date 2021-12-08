@@ -59,7 +59,8 @@
       "title": "Trade XXX $RAY on Huobi",
       "sub-btn": "SUBMIT",
       "sub-btn-loading": "SUBMITING...",
-      "sub-btn-placeholder": "Enter Huobi UID"
+      "sub-btn-placeholder": "Enter Huobi UID",
+      "sub-huobiUID": "huobi UID:"
     },
 
     "swap": {
