@@ -1331,25 +1331,6 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '2YsF3Nvw4ZaTUNqbvaGr8UzrvnoWFB343s1tFRjvM1pE' // reward vault B
   },
   {
-    name: 'SRM-USDC',
-    lp: { ...LP_TOKENS['SRM-USDC-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.SRM },
-    isStake: false,
-
-    fusion: true,
-    legacy: false,
-    dual: false,
-    version: 5,
-    programId: STAKE_PROGRAM_ID_V5,
-
-    poolId: '27bysJaX5eu5Urb5kftR66otiVc6DKK7TnifKwnpNzYu',
-    poolAuthority: 'HAWwtFc4MFNSXFyQbUZd2GefSwZLntCiumt1D6XM8jfk',
-    poolLpTokenAccount: 'HVEm5BG4jMHtwgrUtuiC9K17bjp9CjFpgqmzVABmzLxr', // lp vault
-    poolRewardTokenAccount: '9gs6XnKs3RMMSSQAZm3VCbRpoNmPMrGaQQGMmRKjPeSU', // reward vault A
-    poolRewardTokenAccountB: 'BsuQ3XCCapopam8byEzHzazyxcRn5dCT3UX9kUzozhw' // reward vault B
-  },
-  {
     name: 'weAXS-USDC',
     lp: { ...LP_TOKENS['weAXS-USDC-V4'] },
     reward: { ...TOKENS.RAY },
@@ -1443,6 +1424,63 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '67KBaLyhWRSci4cqKgKQ2xEmuYFiRBxPHVZD5vtST5rm', // lp vault
     poolRewardTokenAccount: 'kquv6VidWpoqFMrR7nz76EPP8X7xFJJetEL1yNB92V2', // reward vault A
     poolRewardTokenAccountB: '91NJTMLgChsTWTZ5oG5NJSyCGT6jxFSjPTe47k9Gn7He' // reward vault B
+  },
+  {
+    name: 'wbWBNB-USDC',
+    lp: { ...LP_TOKENS['wbWBNB-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SRM },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '6AxxjJhAz6APspTQM4vVCHgfzEyZgBTCogJLdai7bXYE',
+    poolAuthority: '6KTAUxr9iHbSRLu4FuAtZ97JujUqaezeL12cTvwjR6a8',
+    poolLpTokenAccount: 'GNS68JMuV4bLiAX1s6hBvVupk1XqnGNgAGLpNPTwbSCN',
+    poolRewardTokenAccount: '9czTqXfWQ4bdyrrQczSaH77zWD1TFifCTbp6Xesa7p2J',
+    poolRewardTokenAccountB: '6mTuc1dfyD4uAckzmS3LVbf7cm8YAQxvJRxHmJRPwgQ6'
+  },
+  {
+    name: 'wePEOPLE-USDC',
+    lp: { ...LP_TOKENS['wePEOPLE-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SRM },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '3HGPRHH3XFFu972MR1EdS65qc1nN9sM7miZtFTi6QcEd',
+    poolAuthority: 'FGUfADCRsS11YZimCgAbridWueJh1EBGA9hY3WkaNcAg',
+    poolLpTokenAccount: '926QfWYN6Dgia6LiAm2PfmbL2Nj3q2DGuinBGVPAdGw5',
+    poolRewardTokenAccount: 'nEFW5G7467mSWBHJB754gMwwKyFhyu9A321UEiGDQje',
+    poolRewardTokenAccountB: '9W8fX6moUPNwmCctgg1SdS7xVDrV2FuduWeG5VVXTEpa'
+  },
+  {
+    name: 'SRM-USDC',
+    lp: { ...LP_TOKENS['SRM-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SRM },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '27bysJaX5eu5Urb5kftR66otiVc6DKK7TnifKwnpNzYu',
+    poolAuthority: 'HAWwtFc4MFNSXFyQbUZd2GefSwZLntCiumt1D6XM8jfk',
+    poolLpTokenAccount: 'HVEm5BG4jMHtwgrUtuiC9K17bjp9CjFpgqmzVABmzLxr', // lp vault
+    poolRewardTokenAccount: '9gs6XnKs3RMMSSQAZm3VCbRpoNmPMrGaQQGMmRKjPeSU', // reward vault A
+    poolRewardTokenAccountB: 'BsuQ3XCCapopam8byEzHzazyxcRn5dCT3UX9kUzozhw' // reward vault B
   },
   {
     name: 'CAVE-USDC',
@@ -1633,44 +1671,6 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'APmpKr8kjm3dxvRLbQVHqZnqHM5FSyMvg1Wn2zqTYVF4', // lp vault
     poolRewardTokenAccount: '6YNQYqUC7mKwJBuHMbEasRpNwq567Wh5iPcMmrK4rDT', // reward vault A
     poolRewardTokenAccountB: '8nRwtcygNWfFsPmRkaPGbZ6mWrPCwDprAE9d1EvV4EuB' // reward vault B
-  },
-  {
-    name: 'wbWBNB-USDC',
-    lp: { ...LP_TOKENS['wbWBNB-USDC-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.SRM },
-    isStake: false,
-
-    fusion: true,
-    legacy: false,
-    dual: false,
-    version: 5,
-    programId: STAKE_PROGRAM_ID_V5,
-
-    poolId: '6AxxjJhAz6APspTQM4vVCHgfzEyZgBTCogJLdai7bXYE',
-    poolAuthority: '6KTAUxr9iHbSRLu4FuAtZ97JujUqaezeL12cTvwjR6a8',
-    poolLpTokenAccount: 'GNS68JMuV4bLiAX1s6hBvVupk1XqnGNgAGLpNPTwbSCN',
-    poolRewardTokenAccount: '9czTqXfWQ4bdyrrQczSaH77zWD1TFifCTbp6Xesa7p2J',
-    poolRewardTokenAccountB: '6mTuc1dfyD4uAckzmS3LVbf7cm8YAQxvJRxHmJRPwgQ6'
-  },
-  {
-    name: 'wePEOPLE-USDC',
-    lp: { ...LP_TOKENS['wePEOPLE-USDC-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.SRM },
-    isStake: false,
-
-    fusion: true,
-    legacy: false,
-    dual: false,
-    version: 5,
-    programId: STAKE_PROGRAM_ID_V5,
-
-    poolId: '3HGPRHH3XFFu972MR1EdS65qc1nN9sM7miZtFTi6QcEd',
-    poolAuthority: 'FGUfADCRsS11YZimCgAbridWueJh1EBGA9hY3WkaNcAg',
-    poolLpTokenAccount: '926QfWYN6Dgia6LiAm2PfmbL2Nj3q2DGuinBGVPAdGw5',
-    poolRewardTokenAccount: 'nEFW5G7467mSWBHJB754gMwwKyFhyu9A321UEiGDQje',
-    poolRewardTokenAccountB: '9W8fX6moUPNwmCctgg1SdS7xVDrV2FuduWeG5VVXTEpa'
   },
   {
     name: 'XTAG-USDC',
