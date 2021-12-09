@@ -9,448 +9,454 @@
       <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
       <div class="page-main-title">{{ $t('airdrop.title') }}</div>
 
-      <div v-if="!rewardIsOut && isActivityEnd" class="page-additional-description">
-        {{ $t('airdrop.pending-reward') }}
-      </div>
+      <div v-if="!comingSoon">
+        <div v-if="!rewardIsOut && isActivityEnd" class="page-additional-description">
+          {{ $t('airdrop.pending-reward') }}
+        </div>
 
-      <div v-if="rewardIsOut" class="page-additional-description">
-        {{ $t('airdrop.reward[0]') }}<span class="alert">{{ $t('airdrop.reward[1]') }}</span
-        >{{ $t('airdrop.reward[2]') }}
+        <div v-if="rewardIsOut" class="page-additional-description">
+          {{ $t('airdrop.reward[0]') }} <span class="alert"> {{ $t('airdrop.reward[1]') }} </span>
+          {{ $t('airdrop.reward[2]') }}
+        </div>
+        <div v-if="rewardIsOut && !showWinnerList" class="page-additional-description">{{ $t('airdrop.reflush') }}</div>
       </div>
-      <div v-if="rewardIsOut && !showWinnerList" class="page-additional-description">{{ $t('airdrop.reflush') }}</div>
     </section>
 
-    <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
-      <div class="close-btn" @click="isWinningPanelOpen = false">
-        <div class="icon minimize" />
-      </div>
+    <div v-if="!comingSoon">
+      <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
+        <div class="close-btn" @click="isWinningPanelOpen = false">
+          <div class="icon minimize" />
+        </div>
 
-      <Select :show-arrow="false" :default-value="$i18n.locale" class="select-language" @change="$i18n.setLocale">
-        <Option value="en">EN</Option>
-        <Option value="zh">中文</Option>
-      </Select>
+        <Select :show-arrow="false" :default-value="$i18n.locale" class="select-language" @change="$i18n.setLocale">
+          <Option value="en">EN</Option>
+          <Option value="zh">中文</Option>
+        </Select>
 
-      <a v-if="rewardIsOut && showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
-        {{ $t('airdrop.user.finish.winner-list') }}
-      </a>
+        <a v-if="rewardIsOut && showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
+          {{ $t('airdrop.user.finish.winner-list') }}
+        </a>
 
-      <div class="title">{{ $t('airdrop.user.title') }}</div>
+        <div class="title">{{ $t('airdrop.user.title') }}</div>
 
-      <div v-if="rewardIsOut && showWinnerList" class="note" style="text-align: center; margin-top: 12px">
-        {{ $t('airdrop.user.finish.prompt') }}
-      </div>
+        <div v-if="rewardIsOut && showWinnerList" class="note" style="text-align: center; margin-top: 12px">
+          {{ $t('airdrop.user.finish.prompt') }}
+        </div>
 
-      <template v-if="$accessor.wallet.connected">
-        <template v-if="isActivityEnd && showWinnerList">
-          <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
-            {{ $t('airdrop.user.your-reward')
-            }}<span v-if="rewardIsOut && rewardInfos"
-              >: ${{ Object.values(rewardInfos).reduce((sum, value) => sum + value, 0) }}</span
-            >
-          </h1>
-          <table v-if="rewardIsOut" class="your-reward">
+        <template v-if="$accessor.wallet.connected">
+          <template v-if="isActivityEnd && showWinnerList">
+            <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
+              {{ $t('airdrop.user.your-reward')
+              }}<span v-if="rewardIsOut && rewardInfos"
+                >: ${{ Object.values(rewardInfos).reduce((sum, value) => sum + value, 0) }}</span
+              >
+            </h1>
+            <table v-if="rewardIsOut" class="your-reward">
+              <tr>
+                <th class="th" style="width: 70%"></th>
+                <th class="th" style="width: 24%"></th>
+              </tr>
+              <tr v-for="(value, key) in rewardInfos" :key="key">
+                <td v-if="key === 'refer'" class="td">{{ $t('airdrop.user.reward-info[0]') }}</td>
+                <td v-if="key === 'first'" class="td">{{ $t('airdrop.user.reward-info[1]') }}</td>
+                <td v-if="key === 'luck'" class="td">{{ $t('airdrop.user.reward-info[2]') }}</td>
+                <td class="td">
+                  <div class="point-label">${{ value }}</div>
+                </td>
+              </tr>
+            </table>
+            <div v-if="!rewardIsOut">{{ $t('airdrop.user.calculating') }}</div>
+          </template>
+          <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">{{ $t('airdrop.user.total-points') }}</h1>
+          <table class="your-table">
             <tr>
               <th class="th" style="width: 70%"></th>
               <th class="th" style="width: 24%"></th>
             </tr>
-            <tr v-for="(value, key) in rewardInfos" :key="key">
-              <td v-if="key === 'refer'" class="td">{{ $t('airdrop.user.reward-info[0]') }}</td>
-              <td v-if="key === 'first'" class="td">{{ $t('airdrop.user.reward-info[1]') }}</td>
-              <td v-if="key === 'luck'" class="td">{{ $t('airdrop.user.reward-info[2]') }}</td>
+            <tr>
               <td class="td">
-                <div class="point-label">${{ value }}</div>
+                {{ $t('airdrop.user.eligible.title') }}
+                <Tooltip placement="left">
+                  <template slot="title">
+                    {{ $t('airdrop.user.eligible.tips') }}
+                  </template>
+                  <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+                </Tooltip>
+              </td>
+              <td class="td">
+                {{ initBackendResponse && initBackendResponse.user && initBackendResponse.user.valid ? 'Yes' : 'No' }}
               </td>
             </tr>
-          </table>
-          <div v-if="!rewardIsOut">{{ $t('airdrop.user.calculating') }}</div>
-        </template>
-        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">{{ $t('airdrop.user.total-points') }}</h1>
-        <table class="your-table">
-          <tr>
-            <th class="th" style="width: 70%"></th>
-            <th class="th" style="width: 24%"></th>
-          </tr>
-          <tr>
-            <td class="td">
-              {{ $t('airdrop.user.eligible.title') }}
-              <Tooltip placement="left">
-                <template slot="title">
-                  {{ $t('airdrop.user.eligible.tips') }}
-                </template>
-                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
-              </Tooltip>
-            </td>
-            <td class="td">
-              {{ initBackendResponse && initBackendResponse.user && initBackendResponse.user.valid ? 'Yes' : 'No' }}
-            </td>
-          </tr>
-          <tr>
-            <td class="td">
-              {{ $t('airdrop.user.point.title') }}
-              <Tooltip placement="left">
-                <template slot="title">
-                  {{ $t('airdrop.user.point.tips') }}
-                </template>
-                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
-              </Tooltip>
-            </td>
-            <td class="td">
-              <div class="point-label">
-                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.point) || 0 }}
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="td">
-              {{ $t('airdrop.user.qualified.title') }}
-              <Tooltip placement="left">
-                <template slot="title">
-                  {{ $t('airdrop.user.qualified.title') }}
-                </template>
-                <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
-              </Tooltip>
-            </td>
-            <td class="td">
-              <div class="point-label">
-                {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.referral_count) || 0 }}
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
-          {{ rewardIsOut ? 'Top 5: $2,000 Each' : 'Referral Leaderboard' }}
-        </h1>
-        <table v-if="!isActivityEnd" class="winner-table">
-          <tbody>
-            <tr v-for="winnerInfo in winners" :key="winnerInfo.owner">
-              <td class="td address">{{ winnerInfo.owner }}</td>
+            <tr>
+              <td class="td">
+                {{ $t('airdrop.user.point.title') }}
+                <Tooltip placement="left">
+                  <template slot="title">
+                    {{ $t('airdrop.user.point.tips') }}
+                  </template>
+                  <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+                </Tooltip>
+              </td>
               <td class="td">
                 <div class="point-label">
-                  {{ winnerInfo.count }}
+                  {{ (initBackendResponse && initBackendResponse.user && initBackendResponse.user.point) || 0 }}
                 </div>
               </td>
             </tr>
-          </tbody>
-        </table>
-        <table v-else-if="rewardIsOut" class="winner-table">
-          <tbody>
-            <tr v-for="winnerInfo in winnerList['top 5']" :key="winnerInfo.owner">
-              <td class="td address">{{ winnerInfo.owner }}</td>
+            <tr>
               <td class="td">
-                <div class="point-label">${{ winnerInfo.reward }}</div>
+                {{ $t('airdrop.user.qualified.title') }}
+                <Tooltip placement="left">
+                  <template slot="title">
+                    {{ $t('airdrop.user.qualified.title') }}
+                  </template>
+                  <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
+                </Tooltip>
+              </td>
+              <td class="td">
+                <div class="point-label">
+                  {{
+                    (initBackendResponse && initBackendResponse.user && initBackendResponse.user.referral_count) || 0
+                  }}
+                </div>
               </td>
             </tr>
-          </tbody>
+          </table>
+
+          <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
+            {{ rewardIsOut ? 'Top 5: $2,000 Each' : 'Referral Leaderboard' }}
+          </h1>
+          <table v-if="!isActivityEnd" class="winner-table">
+            <tbody>
+              <tr v-for="winnerInfo in winners" :key="winnerInfo.owner">
+                <td class="td address">{{ winnerInfo.owner }}</td>
+                <td class="td">
+                  <div class="point-label">
+                    {{ winnerInfo.count }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table v-else-if="rewardIsOut" class="winner-table">
+            <tbody>
+              <tr v-for="winnerInfo in winnerList['top 5']" :key="winnerInfo.owner">
+                <td class="td address">{{ winnerInfo.owner }}</td>
+                <td class="td">
+                  <div class="point-label">${{ winnerInfo.reward }}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-else>{{ $t('airdrop.user.calculating') }}</div>
+        </template>
+        <template v-else>
+          <div class="subtitle">{{ $t('airdrop.user.not-connect') }}</div>
+          <button @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
+        </template>
+      </section>
+
+      <div v-else class="winner-trigger" @click="isWinningPanelOpen = true">
+        <div class="icon" />
+      </div>
+
+      <section class="TLDR">
+        <div class="title">{{ $t('airdrop.introduction-activities.title') }}</div>
+        <table class="TLDR-table">
+          <tr>
+            <th class="th"></th>
+            <th class="th">{{ $t('airdrop.introduction-activities.tasks') }}</th>
+            <th class="th">{{ $t('airdrop.introduction-activities.points') }}</th>
+          </tr>
+          <tr>
+            <td class="td order">1</td>
+            <td class="td">{{ $t('airdrop.introduction-activities.task.huobi.title') }}</td>
+            <td class="td">
+              <div class="point-label">{{ $t('airdrop.introduction-activities.task.huobi.point') }}</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td order">2</td>
+            <td class="td">{{ $t('airdrop.introduction-activities.task.swap.title') }}</td>
+            <td class="td">
+              <div class="point-label">{{ $t('airdrop.introduction-activities.task.swap.point') }}</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td order">3</td>
+            <td class="td">{{ $t('airdrop.introduction-activities.task.earn-bonus.title') }}</td>
+            <td class="td">
+              <div class="point-label">{{ $t('airdrop.introduction-activities.task.earn-bonus.point') }}</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td order">4</td>
+            <td class="td">{{ $t('airdrop.introduction-activities.task.refer.title') }}</td>
+            <td class="td">
+              <div class="point-label">{{ $t('airdrop.introduction-activities.task.refer.point') }}</div>
+            </td>
+          </tr>
         </table>
-        <div v-else>{{ $t('airdrop.user.calculating') }}</div>
-      </template>
-      <template v-else>
-        <div class="subtitle">{{ $t('airdrop.user.not-connect') }}</div>
-        <button @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
-      </template>
-    </section>
+      </section>
 
-    <div v-else class="winner-trigger" @click="isWinningPanelOpen = true">
-      <div class="icon" />
-    </div>
+      <section class="nav-btns">
+        <button @click="to('details')">{{ $t('airdrop.reward-details.link-name') }}</button>
+      </section>
 
-    <section class="TLDR">
-      <div class="title">{{ $t('airdrop.introduction-activities.title') }}</div>
-      <table class="TLDR-table">
-        <tr>
-          <th class="th"></th>
-          <th class="th">{{ $t('airdrop.introduction-activities.tasks') }}</th>
-          <th class="th">{{ $t('airdrop.introduction-activities.points') }}</th>
-        </tr>
-        <tr>
-          <td class="td order">1</td>
-          <td class="td">{{ $t('airdrop.introduction-activities.task.huobi.title') }}</td>
-          <td class="td">
-            <div class="point-label">{{ $t('airdrop.introduction-activities.task.huobi.point') }}</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="td order">2</td>
-          <td class="td">{{ $t('airdrop.introduction-activities.task.swap.title') }}</td>
-          <td class="td">
-            <div class="point-label">{{ $t('airdrop.introduction-activities.task.swap.point') }}</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="td order">3</td>
-          <td class="td">{{ $t('airdrop.introduction-activities.task.earn-bonus.title') }}</td>
-          <td class="td">
-            <div class="point-label">{{ $t('airdrop.introduction-activities.task.earn-bonus.point') }}</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="td order">4</td>
-          <td class="td">{{ $t('airdrop.introduction-activities.task.refer.title') }}</td>
-          <td class="td">
-            <div class="point-label">{{ $t('airdrop.introduction-activities.task.refer.point') }}</div>
-          </td>
-        </tr>
-      </table>
-    </section>
+      <section class="step-game">
+        <div class="task-level">{{ $t('airdrop.step1.step') }}</div>
+        <div class="title">{{ $t('airdrop.video.title') }}</div>
 
-    <section class="nav-btns">
-      <button @click="to('details')">{{ $t('airdrop.reward-details.link-name') }}</button>
-    </section>
-
-    <section class="step-game">
-      <div class="task-level">{{ $t('airdrop.step1.step') }}</div>
-      <div class="title">{{ $t('airdrop.video.title') }}</div>
-
-      <div ref="step-1" class="box watch-video">
-        <div class="box-title has-step">
-          {{ $t('airdrop.video.video-title') }}
-        </div>
-        <div class="video-box">
-          <iframe
-            v-if="$i18n.locale === 'en'"
-            width="100%"
-            height="480"
-            src="https://www.youtube.com/embed/ViFSfsAqSLg"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-          <iframe
-            v-else
-            width="100%"
-            height="480"
-            src="https://www.youtube.com/embed/XUnEQ6cy9WI"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-
-      <svg class="step-gap-line" viewBox="0 0 532 132">
-        <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
-      </svg>
-
-      <div class="box wallet">
-        <div class="box-title has-step">{{ $t('airdrop.video.connect-wallet') }}</div>
-        <div class="box-text">
-          <div>
-            {{ $t('airdrop.video.download')
-            }}<a href="https://phantom.app/" rel="nofollow noopener noreferrer" target="_blank">
-              {{ $t('airdrop.video.phantom') }}
-            </a>
-          </div>
-          <div>
-            {{ $t('airdrop.video.try-sollet') }}
-            <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">{{
-              $t('airdrop.video.sollet')
-            }}</a>
-          </div>
-        </div>
-        <div>
-          <Button v-if="!$accessor.wallet.connected" ghost @click="$accessor.wallet.openModal">
-            <Icon type="wallet" />
-            Connect
-          </Button>
-          <Button v-else @click="$accessor.wallet.openModal">
-            <Icon type="wallet" />
-            {{ $accessor.wallet.address.substr(0, 4) }}
-            ...
-            {{ $accessor.wallet.address.substr($accessor.wallet.address.length - 4, 4) }}
-          </Button>
-        </div>
-      </div>
-    </section>
-
-    <section class="step-game">
-      <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
-
-      <div class="box form">
-        <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
-        <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-huobiUID') }}{{ huobiUID }}</div>
-        <div v-else>
-          <div class="input-box">
-            <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
-          </div>
-          <button
-            :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
-            @click="submitHuobiUID"
-          >
-            {{
-              $accessor.wallet.connected
-                ? isHuobiUIDing
-                  ? $t('airdrop.huobiID.sub-btn-loading')
-                  : $t('airdrop.huobiID.sub-btn')
-                : $t('connect-wallet')
-            }}
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section class="connect-wallet">
-      <div class="task-level">{{ $t('airdrop.step3.step') }}</div>
-      <div class="title">{{ $t('airdrop.step3.title') }}</div>
-      <div class="subtitle">{{ $t('airdrop.step3.point') }}</div>
-      <div class="box-grid">
-        <div class="box">
+        <div ref="step-1" class="box watch-video">
           <div class="box-title has-step">
-            {{ $t('airdrop.swap.title') }}
-            <div>
-              <div
-                :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
-                :title="`${
-                  haveSwap
-                    ? $t('airdrop.swap.completed')
-                    : isSwapPending
-                    ? $t('airdrop.swap.pending')
-                    : $t('airdrop.swap.notDoneTask')
-                }`"
-              />
-            </div>
+            {{ $t('airdrop.video.video-title') }}
           </div>
-          <a href="/swap/" target="_blank" style="align-self: end"
-            ><button>{{ $t('airdrop.swap.btn') }}</button></a
-          >
+          <div class="video-box">
+            <iframe
+              v-if="$i18n.locale === 'en'"
+              width="100%"
+              height="480"
+              src="https://www.youtube.com/embed/ViFSfsAqSLg"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+            <iframe
+              v-else
+              width="100%"
+              height="480"
+              src="https://www.youtube.com/embed/XUnEQ6cy9WI"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <section class="media-entries">
-      <div class="task-level">{{ $t('airdrop.step4.step') }}</div>
-      <div class="title">{{ $t('airdrop.step4.title') }}</div>
-      <div class="subtitle">{{ $t('airdrop.step4.point') }}</div>
-      <div class="box-grid">
-        <div class="box">
-          <div class="box-title">
-            {{ $t('airdrop.twitter.title') }}
+        <svg class="step-gap-line" viewBox="0 0 532 132">
+          <polyline points="266,0 266,132" fill="none" stroke-width="2" stroke-dasharray="12" />
+        </svg>
+
+        <div class="box wallet">
+          <div class="box-title has-step">{{ $t('airdrop.video.connect-wallet') }}</div>
+          <div class="box-text">
             <div>
-              <div
-                :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"
-                :title="`${
-                  haveTweet
-                    ? $t('airdrop.twitter.completed')
-                    : isTweetPending
-                    ? $t('airdrop.twitter.pending')
-                    : $t('airdrop.twitter.notDoneTask')
-                }`"
-              />
-              <div class="point-label">{{ $t('airdrop.twitter.point-msg') }}</div>
+              {{ $t('airdrop.video.download')
+              }}<a href="https://phantom.app/" rel="nofollow noopener noreferrer" target="_blank">
+                {{ $t('airdrop.video.phantom') }}
+              </a>
+            </div>
+            <div>
+              {{ $t('airdrop.video.try-sollet') }}
+              <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">{{
+                $t('airdrop.video.sollet')
+              }}</a>
+            </div>
+          </div>
+          <div>
+            <Button v-if="!$accessor.wallet.connected" ghost @click="$accessor.wallet.openModal">
+              <Icon type="wallet" />
+              Connect
+            </Button>
+            <Button v-else @click="$accessor.wallet.openModal">
+              <Icon type="wallet" />
+              {{ $accessor.wallet.address.substr(0, 4) }}
+              ...
+              {{ $accessor.wallet.address.substr($accessor.wallet.address.length - 4, 4) }}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section class="step-game">
+        <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
+
+        <div class="box form">
+          <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
+          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-huobiUID') }}{{ huobiUID }}</div>
+          <div v-else>
+            <div class="input-box">
+              <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
+            </div>
+            <button
+              :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
+              @click="submitHuobiUID"
+            >
+              {{
+                $accessor.wallet.connected
+                  ? isHuobiUIDing
+                    ? $t('airdrop.huobiID.sub-btn-loading')
+                    : $t('airdrop.huobiID.sub-btn')
+                  : $t('connect-wallet')
+              }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="connect-wallet">
+        <div class="task-level">{{ $t('airdrop.step3.step') }}</div>
+        <div class="title">{{ $t('airdrop.step3.title') }}</div>
+        <div class="subtitle">{{ $t('airdrop.step3.point') }}</div>
+        <div class="box-grid">
+          <div class="box">
+            <div class="box-title has-step">
+              {{ $t('airdrop.swap.title') }}
+              <div>
+                <div
+                  :class="`icon-reward ${haveSwap ? 'finished' : isSwapPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveSwap
+                      ? $t('airdrop.swap.completed')
+                      : isSwapPending
+                      ? $t('airdrop.swap.pending')
+                      : $t('airdrop.swap.notDoneTask')
+                  }`"
+                />
+              </div>
+            </div>
+            <a href="/swap/" target="_blank" style="align-self: end"
+              ><button>{{ $t('airdrop.swap.btn') }}</button></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="media-entries">
+        <div class="task-level">{{ $t('airdrop.step4.step') }}</div>
+        <div class="title">{{ $t('airdrop.step4.title') }}</div>
+        <div class="subtitle">{{ $t('airdrop.step4.point') }}</div>
+        <div class="box-grid">
+          <div class="box">
+            <div class="box-title">
+              {{ $t('airdrop.twitter.title') }}
+              <div>
+                <div
+                  :class="`icon-reward ${haveTweet ? 'finished' : isTweetPending ? 'pending' : 'muted'}`"
+                  :title="`${
+                    haveTweet
+                      ? $t('airdrop.twitter.completed')
+                      : isTweetPending
+                      ? $t('airdrop.twitter.pending')
+                      : $t('airdrop.twitter.notDoneTask')
+                  }`"
+                />
+                <div class="point-label">{{ $t('airdrop.twitter.point-msg') }}</div>
+              </div>
+            </div>
+
+            <div class="box-text red">*{{ $t('airdrop.twitter.prompt') }}</div>
+
+            <div class="btn-row">
+              <a
+                v-if="$accessor.wallet.connected"
+                :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                <button
+                  @click="
+                    () => {
+                      if (!$accessor.wallet.connected) {
+                        $accessor.wallet.openModal()
+                      } else {
+                        !isActivityEnd && submit({ task: 'referral', result: '' })
+                      }
+                    }
+                  "
+                >
+                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.twitter.btn') }}
+                </button>
+              </a>
+              <button v-else @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
             </div>
           </div>
 
-          <div class="box-text red">*{{ $t('airdrop.twitter.prompt') }}</div>
+          <div class="box">
+            <div class="box-title">
+              {{ $t('airdrop.refer.title') }}
+              <div class="point-label">{{ $t('airdrop.refer.point-msg') }}</div>
+            </div>
 
-          <div class="btn-row">
-            <a
-              v-if="$accessor.wallet.connected"
-              :href="`https://twitter.com/intent/tweet?text=${getDefaultText()}`"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
+            <div class="box-text small">
+              {{ $t('airdrop.refer.prompt') }}:
+              <br />
+              {{ referralLink }}
+            </div>
+
+            <div class="icon-btns">
               <button
+                class="icon-btn"
+                title="click here to copy it"
                 @click="
                   () => {
                     if (!$accessor.wallet.connected) {
                       $accessor.wallet.openModal()
                     } else {
-                      !isActivityEnd && submit({ task: 'referral', result: '' })
+                      $accessor.copy(referralLink)
                     }
                   }
                 "
               >
-                <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.twitter.btn') }}
+                <img class="icon" src="../assets/icons/guide-share-icon.svg" />
               </button>
-            </a>
-            <button v-else @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="box">
-          <div class="box-title">
-            {{ $t('airdrop.refer.title') }}
-            <div class="point-label">{{ $t('airdrop.refer.point-msg') }}</div>
-          </div>
-
-          <div class="box-text small">
-            {{ $t('airdrop.refer.prompt') }}:
-            <br />
-            {{ referralLink }}
-          </div>
-
-          <div class="icon-btns">
-            <button
-              class="icon-btn"
-              title="click here to copy it"
-              @click="
-                () => {
-                  if (!$accessor.wallet.connected) {
-                    $accessor.wallet.openModal()
-                  } else {
-                    $accessor.copy(referralLink)
-                  }
-                }
-              "
-            >
-              <img class="icon" src="../assets/icons/guide-share-icon.svg" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section ref="details" class="reward-details">
-      <div class="title">{{ $t('airdrop.reward-details.title') }}</div>
-      <ol>
-        <li v-for="item of $t('airdrop.reward-details.words')" :key="item">{{ item }}</li>
-      </ol>
-      <hr />
-      <table class="detail-panel">
-        <tr>
-          <th>{{ $t('airdrop.reward-details.table.head[0]') }}</th>
-          <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[1]') }}</th>
-          <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[2]') }}</th>
-          <th>{{ $t('airdrop.reward-details.table.head[3]') }}</th>
-        </tr>
-        <tr>
-          <td>
-            <strong>{{ $t('airdrop.reward-details.table.R1.requirements[0]') }}</strong>
-            {{ $t('airdrop.reward-details.table.R1.requirements[1]') }}
-          </td>
-          <td>{{ $t('airdrop.reward-details.table.R1.winners') }}</td>
-          <td>{{ $t('airdrop.reward-details.table.R1.amount') }}</td>
-          <td>{{ $t('airdrop.reward-details.table.R1.eligibility') }}</td>
-        </tr>
-        <tr>
-          <td style="white-space: pre-line">
-            <strong>{{ $t('airdrop.reward-details.table.R2.requirements[0]') }}</strong>
-            {{ $t('airdrop.reward-details.table.R2.requirements[1]') }}
-            <br />
-            <strong>{{ $t('airdrop.reward-details.table.R2.requirements[2]') }}</strong>
-            {{ $t('airdrop.reward-details.table.R2.requirements[3]') }}
-          </td>
-          <td>
-            <div v-for="item of $t('airdrop.reward-details.table.R2.winners')" :key="item">{{ item }}</div>
-          </td>
-          <td>
-            <div v-for="item of $t('airdrop.reward-details.table.R2.amount')" :key="item">{{ item }}</div>
-          </td>
-          <td>{{ $t('airdrop.reward-details.table.R2.eligibility') }}</td>
-        </tr>
-        <tr>
-          <td>
-            <strong>{{ $t('airdrop.reward-details.table.R3.requirements') }}</strong>
-          </td>
-          <td>{{ $t('airdrop.reward-details.table.R3.winners') }}</td>
-          <td>{{ $t('airdrop.reward-details.table.R3.amount') }}</td>
-          <td>{{ $t('airdrop.reward-details.table.R3.eligibility') }}</td>
-        </tr>
-      </table>
-    </section>
-
+      <section ref="details" class="reward-details">
+        <div class="title">{{ $t('airdrop.reward-details.title') }}</div>
+        <ol>
+          <li v-for="item of $t('airdrop.reward-details.words')" :key="item">{{ item }}</li>
+        </ol>
+        <hr />
+        <table class="detail-panel">
+          <tr>
+            <th>{{ $t('airdrop.reward-details.table.head[0]') }}</th>
+            <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[1]') }}</th>
+            <th style="width: 200px">{{ $t('airdrop.reward-details.table.head[2]') }}</th>
+            <th>{{ $t('airdrop.reward-details.table.head[3]') }}</th>
+          </tr>
+          <tr>
+            <td>
+              <strong>{{ $t('airdrop.reward-details.table.R1.requirements[0]') }}</strong>
+              {{ $t('airdrop.reward-details.table.R1.requirements[1]') }}
+            </td>
+            <td>{{ $t('airdrop.reward-details.table.R1.winners') }}</td>
+            <td>{{ $t('airdrop.reward-details.table.R1.amount') }}</td>
+            <td>{{ $t('airdrop.reward-details.table.R1.eligibility') }}</td>
+          </tr>
+          <tr>
+            <td style="white-space: pre-line">
+              <strong>{{ $t('airdrop.reward-details.table.R2.requirements[0]') }}</strong>
+              {{ $t('airdrop.reward-details.table.R2.requirements[1]') }}
+              <br />
+              <strong>{{ $t('airdrop.reward-details.table.R2.requirements[2]') }}</strong>
+              {{ $t('airdrop.reward-details.table.R2.requirements[3]') }}
+            </td>
+            <td>
+              <div v-for="item of $t('airdrop.reward-details.table.R2.winners')" :key="item">{{ item }}</div>
+            </td>
+            <td>
+              <div v-for="item of $t('airdrop.reward-details.table.R2.amount')" :key="item">{{ item }}</div>
+            </td>
+            <td>{{ $t('airdrop.reward-details.table.R2.eligibility') }}</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>{{ $t('airdrop.reward-details.table.R3.requirements') }}</strong>
+            </td>
+            <td>{{ $t('airdrop.reward-details.table.R3.winners') }}</td>
+            <td>{{ $t('airdrop.reward-details.table.R3.amount') }}</td>
+            <td>{{ $t('airdrop.reward-details.table.R3.eligibility') }}</td>
+          </tr>
+        </table>
+      </section>
+    </div>
+    <div v-else style="text-align: center; font-size: 40px">Coming Soon</div>
     <section class="terms-conditions">
       <div class="title">{{ $t('airdrop.terms-conditions.title') }}</div>
       <ul>
@@ -501,7 +507,8 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
   }
 })
 export default class Airdrop extends Vue {
-  showWinnerList = true
+  comingSoon = true
+  showWinnerList = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
   huobiUID = ''
@@ -612,6 +619,7 @@ export default class Airdrop extends Vue {
         })
         this.initBackendResponse = response?.data ?? {}
         this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
+        this.comingSoon = response.campaign_info.start > Date.now()
         if (!this.isActivityEnd) {
           this.winners = await this.$api.getCompaignWinners()
         }
