@@ -1102,6 +1102,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'CRWNYkqdgvhGGae9CKfNka58j6QQkaD5bLhKXvUYqnc1',
     decimals: 6,
     tags: ['raydium']
+  },
+  BLOCK: {
+    symbol: 'BLOCK',
+    name: 'BLOCK',
+    mintAddress: 'NFTUkR4u7wKxy9QLaX2TGvd9oZSWoMo4jqSJqdMb7Nk',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
