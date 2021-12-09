@@ -8,10 +8,16 @@
       />
       <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
       <div class="page-main-title">{{ $t('airdrop.title') }}</div>
-      <!-- <div class="page-additional-description">
-        The Airdrop is <span class="alert">complete!</span> Rewards have been sent to winners, connect your wallet to
-        see results!
-      </div> -->
+
+      <div v-if="!rewardIsOut && isActivityEnd" class="page-additional-description">
+        {{ $t('airdrop.pending-reward') }}
+      </div>
+
+      <div v-if="rewardIsOut" class="page-additional-description">
+        {{ $t('airdrop.reward[0]') }}<span class="alert">{{ $t('airdrop.reward[1]') }}</span
+        >{{ $t('airdrop.reward[2]') }}
+      </div>
+      <div v-if="rewardIsOut && !showWinnerList" class="page-additional-description">{{ $t('airdrop.reflush') }}</div>
     </section>
 
     <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
@@ -19,20 +25,26 @@
         <div class="icon minimize" />
       </div>
 
-      <!-- <a v-if="rewardIsOut" class="download-full-list" href="/activities/winner-list/" target="_blank">
+      <Select :show-arrow="false" :default-value="$i18n.locale" class="select-language" @change="$i18n.setLocale">
+        <Option value="en">EN</Option>
+        <Option value="zh">中文</Option>
+      </Select>
+
+      <a v-if="rewardIsOut && showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
         {{ $t('airdrop.user.finish.winner-list') }}
-      </a> -->
+      </a>
 
       <div class="title">{{ $t('airdrop.user.title') }}</div>
 
-      <div v-if="rewardIsOut" class="note" style="text-align: center; margin-top: 12px">
+      <div v-if="rewardIsOut && showWinnerList" class="note" style="text-align: center; margin-top: 12px">
         {{ $t('airdrop.user.finish.prompt') }}
       </div>
 
       <template v-if="$accessor.wallet.connected">
-        <template v-if="isActivityEnd">
+        <template v-if="isActivityEnd && showWinnerList">
           <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
-            Your reward<span v-if="rewardIsOut && rewardInfos"
+            {{ $t('airdrop.user.your-reward')
+            }}<span v-if="rewardIsOut && rewardInfos"
               >: ${{ Object.values(rewardInfos).reduce((sum, value) => sum + value, 0) }}</span
             >
           </h1>
@@ -42,9 +54,9 @@
               <th class="th" style="width: 24%"></th>
             </tr>
             <tr v-for="(value, key) in rewardInfos" :key="key">
-              <td v-if="key === 'refer'" class="td">Top 5</td>
-              <td v-if="key === 'first'" class="td">First 4,000</td>
-              <td v-if="key === 'luck'" class="td">Lucky Draw Pool</td>
+              <td v-if="key === 'refer'" class="td">{{ $t('airdrop.user.reward-info[0]') }}</td>
+              <td v-if="key === 'first'" class="td">{{ $t('airdrop.user.reward-info[1]') }}</td>
+              <td v-if="key === 'luck'" class="td">{{ $t('airdrop.user.reward-info[2]') }}</td>
               <td class="td">
                 <div class="point-label">${{ value }}</div>
               </td>
@@ -52,7 +64,7 @@
           </table>
           <div v-if="!rewardIsOut">{{ $t('airdrop.user.calculating') }}</div>
         </template>
-        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">Total Points</h1>
+        <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">{{ $t('airdrop.user.total-points') }}</h1>
         <table class="your-table">
           <tr>
             <th class="th" style="width: 70%"></th>
@@ -60,11 +72,10 @@
           </tr>
           <tr>
             <td class="td">
-              Eligible for Lucky Draw?
+              {{ $t('airdrop.user.eligible.title') }}
               <Tooltip placement="left">
                 <template slot="title">
-                  Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter
-                  verification by tweeting their customized referral code.
+                  {{ $t('airdrop.user.eligible.tips') }}
                 </template>
                 <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
               </Tooltip>
@@ -75,12 +86,10 @@
           </tr>
           <tr>
             <td class="td">
-              Points for Lucky Draw
+              {{ $t('airdrop.user.point.title') }}
               <Tooltip placement="left">
                 <template slot="title">
-                  1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of
-                  $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes
-                  from the lucky draw pool.
+                  {{ $t('airdrop.user.point.tips') }}
                 </template>
                 <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
               </Tooltip>
@@ -93,11 +102,10 @@
           </tr>
           <tr>
             <td class="td">
-              Qualified Referrals
+              {{ $t('airdrop.user.qualified.title') }}
               <Tooltip placement="left">
                 <template slot="title">
-                  Referral points are earned from users who used your code to connect a wallet, complete a swap, and
-                  complete Twitter verification.
+                  {{ $t('airdrop.user.qualified.title') }}
                 </template>
                 <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
               </Tooltip>
@@ -278,17 +286,6 @@
                   : $t('airdrop.huobiID.sub-btn')
                 : $t('connect-wallet')
             }}
-            <!-- <div
-            v-if="$accessor.wallet.connected"
-            :class="`icon ${haveDiscord ? 'finished' : isDiscordPending ? 'pending' : 'muted'}`"
-            :title="`${
-              haveDiscord
-                ? 'Congratulations! You completed this task.'
-                : isDiscordPending
-                ? 'Points pending. Please check again in 30 minutes.'
-                : 'you have not done this task'
-            }`"
-          /> -->
           </button>
         </div>
       </div>
@@ -405,11 +402,6 @@
       </div>
     </section>
 
-    <!-- <section class="referrals">
-      <div class="title">Share With More Friends</div>
-      <div class="subtitle">To Earn $2,000 in RAY</div>
-    </section> -->
-
     <section ref="details" class="reward-details">
       <div class="title">{{ $t('airdrop.reward-details.title') }}</div>
       <ol>
@@ -476,10 +468,12 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { mapState } from 'vuex'
 
-import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
+import { Tooltip, Input, Icon, Table, Checkbox, Select } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
-// const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
+const Option = Select.Option
+
+const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   components: {
@@ -487,32 +481,27 @@ import { CampaignInfo, CampaignWinners } from '@/types/api'
     Input,
     Icon,
     Table,
-    Checkbox
+    Checkbox,
+    Select,
+    Option
   },
 
   head: {
     title: 'Raydium Bounty Airdrop'
   },
 
-  // async asyncData({ route }) {
-  // if (route.query?.referral) {
-  //   window.localStorage.setItem('airdrop:referral', route.query?.referral as string)
-  // // } else {
-  // //   const storedItem = window.localStorage.getItem('airdrop:referral')
-  // //   if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
-  // }
+  async asyncData() {
+    const winnerList = await getWinnerList()
 
-  // async asyncData() {
-  //   const winnerList = await getWinnerList()
-
-  //   return { winnerList }
-  // },
+    return { winnerList }
+  },
 
   computed: {
     ...mapState(['isMobile'])
   }
 })
 export default class Airdrop extends Vue {
+  showWinnerList = true
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
   huobiUID = ''
@@ -663,6 +652,7 @@ export default class Airdrop extends Vue {
     result?: string
     sign?: string
   }) {
+    if (this.isActivityEnd) return
     const response = await this.$api.postCompaign({
       address: this.initBackendResponse.user?.address,
       task,
@@ -677,6 +667,7 @@ export default class Airdrop extends Vue {
     if (!this.$accessor.wallet.connected) {
       this.$accessor.wallet.openModal()
     } else if (this.huobiUID) {
+      if (this.isActivityEnd) return
       this.isHuobiUIDing = true
       try {
         const result = await this.submit({ task: 'huobiUID', result: this.huobiUID })
@@ -707,6 +698,12 @@ Join now: ${window.location.origin}/airdrop/?referral=${this.initBackendResponse
 .ant-checkbox .ant-checkbox-inner {
   background-color: transparent;
   border-color: var(--secondary-text);
+}
+.ant-select-dropdown {
+  background: transparent;
+}
+.airdrop .ant-select-selection {
+  background: transparent;
 }
 </style>
 
@@ -1039,6 +1036,13 @@ a.disabled {
       background-color: aquamarine;
       mask-image: url('../assets/icons/minimize.svg');
     }
+  }
+  .select-language {
+    position: absolute;
+    left: 4%;
+    top: 4%;
+    background: transparent;
+    color: aquamarine;
   }
   .download-full-list {
     color: var(--secondary);

@@ -45,7 +45,7 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 import { Table, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
-// const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
+const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   head: {
@@ -62,8 +62,8 @@ import { Table, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
   },
 
   async asyncData() {
-    // const winnerList = await getWinnerList()
-    // return { winnerList }
+    const winnerList = await getWinnerList()
+    return { winnerList }
   }
 })
 export default class WinnerList extends Vue {}

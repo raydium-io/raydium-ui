@@ -2,6 +2,13 @@
   "airdrop": {
     "title": "Raydium Bounty Airdrop",
     "pre-title": "Learn, Trade, Follow, Refer and Earn RAY",
+    "pending-reward": "Events end and Pending rewards",
+    "reward": [
+      "The Airdrop is ",
+      "complete!",
+      "Rewards have been sent to winners, connect your wallet to see results!"
+    ],
+    "reflush": "Please refresh the page to see the winner list",
 
     "introduction-activities": {
       "title": "Earn up to $2,000 in RAY in 3 easy steps",
@@ -153,7 +160,24 @@
         "winner-list": "Check Winners",
         "prompt": "Rewards have already been sent to winning addresses"
       },
-      "calculating": "Calculating..."
+      "calculating": "Calculating...",
+
+      "your-reward": "Your reward",
+      "reward-info": ["Top 5", "First 4,000", "Lucky Draw Pool"],
+
+      "total-points": "Total Points",
+      "eligible": {
+        "title": "Eligible for Lucky Draw?",
+        "tips": "Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification by tweeting their customized referral code."
+      },
+      "point": {
+        "title": "Points for Lucky Draw",
+        "tips": "1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool."
+      },
+      "qualified": {
+        "title": "Qualified Referrals",
+        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
+      }
     }
   },
   "connect-wallet": "CONNECT WALLET"

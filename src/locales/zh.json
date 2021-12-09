@@ -2,6 +2,9 @@
   "airdrop": {
     "title": "Raydium空投奖励",
     "pre-title": "学习，交易，关注，推荐&赚取RAY",
+    "pending-reward": "活动结束 开奖中",
+    "reward": ["空投已经", "完成！", "奖励已经发放给中奖者，连接钱包来查看您的抽奖结果！"],
+    "reflush": "请刷新查看获奖名单",
 
     "introduction-activities": {
       "title": "通过3个简单的步骤中赚取高达2000美元的RAY",
@@ -150,7 +153,24 @@
         "winner-list": "检查赢家",
         "prompt": "奖励已经发到那些符合要求的账户地址"
       },
-      "calculating": "计算中..."
+      "calculating": "计算中...",
+
+      "your-reward": "Your reward",
+      "reward-info": ["Top 5", "First 4,000", "Lucky Draw Pool"],
+
+      "total-points": "Total Points",
+      "eligible": {
+        "title": "Eligible for Lucky Draw?",
+        "tips": "Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification by tweeting their customized referral code."
+      },
+      "point": {
+        "title": "Points for Lucky Draw",
+        "tips": "1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool."
+      },
+      "qualified": {
+        "title": "Qualified Referrals",
+        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
+      }
     }
   },
   "connect-wallet": "连接钱包"
