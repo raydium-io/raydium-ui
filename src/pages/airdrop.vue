@@ -455,14 +455,14 @@
           </tr>
         </table>
       </section>
+      <section class="terms-conditions">
+        <div class="title">{{ $t('airdrop.terms-conditions.title') }}</div>
+        <ul>
+          <li v-for="item of $t('airdrop.terms-conditions.words')" :key="item">{{ item }}</li>
+        </ul>
+      </section>
     </div>
-    <div v-else style="text-align: center; font-size: 40px">Coming Soon</div>
-    <section class="terms-conditions">
-      <div class="title">{{ $t('airdrop.terms-conditions.title') }}</div>
-      <ul>
-        <li v-for="item of $t('airdrop.terms-conditions.words')" :key="item">{{ item }}</li>
-      </ul>
-    </section>
+    <div v-else style="text-align: center; font-size: 40px">{{ $t('airdrop.coming-soon') }}</div>
   </div>
 </template>
 
