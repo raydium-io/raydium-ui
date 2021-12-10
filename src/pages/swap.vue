@@ -102,11 +102,7 @@
         <CoinInput
           v-model="fromCoinAmount"
           label="From"
-          :balance-offset="
-            fromCoin && fromCoin.symbol === 'SOL' && get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed() - 0.05
-              : 0
-          "
+          :balance-offset="0"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
           :balance="fromCoin ? fromCoin.balance : null"
@@ -1152,8 +1148,6 @@ export default Vue.extend({
               (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
         )
 
-        console.log(`this.amms ::: `, this.$accessor.liquidity.infos)
-
         this.routeInfos = getSwapRouter(
           Object.values(this.$accessor.liquidity.infos),
           this.fromCoin.mintAddress,
@@ -1170,12 +1164,12 @@ export default Vue.extend({
             const info = cloneDeep(this.swap.markets[address])
             let fromMint = this.fromCoin.mintAddress
             let toMint = this.toCoin.mintAddress
-            if (fromMint === NATIVE_SOL.mintAddress) {
-              fromMint = TOKENS.WSOL.mintAddress
-            }
-            if (toMint === NATIVE_SOL.mintAddress) {
-              toMint = TOKENS.WSOL.mintAddress
-            }
+            // if (fromMint === NATIVE_SOL.mintAddress) {
+            //   fromMint = TOKENS.WSOL.mintAddress
+            // }
+            // if (toMint === NATIVE_SOL.mintAddress) {
+            //   toMint = TOKENS.WSOL.mintAddress
+            // }
             if (
               (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
               (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
@@ -1205,6 +1199,7 @@ export default Vue.extend({
         this.marketAddress = ''
         this.market = null
       }
+      console.log(`marketAddress ::: `, this.marketAddress)
     },
 
     getOrderBooks() {

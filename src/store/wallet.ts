@@ -1,15 +1,31 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 
 import { PublicKey, AccountInfo, ParsedAccountData } from '@solana/web3.js'
+import { cloneDeep } from 'lodash-es'
 
-import { NATIVE_SOL } from '@/utils/tokens'
+import { NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import { TokenAmount } from '@/utils/safe-math'
-import { cloneDeep } from 'lodash-es'
 import logger from '@/utils/logger'
 import { findAssociatedTokenAddress } from '@/utils/web3'
+import { ACCOUNT_LAYOUT } from '@/utils/layouts'
 
 const AUTO_REFRESH_TIME = 60
+
+export function getOwnedAccountsFilters(publicKey: PublicKey) {
+  return [
+    {
+      memcmp: {
+        offset: ACCOUNT_LAYOUT.offsetOf('owner'),
+        bytes: publicKey.toBase58(),
+      },
+    },
+    {
+      dataSize: ACCOUNT_LAYOUT.span,
+    },
+  ];
+}
+
 
 export const state = () => ({
   initialized: false,
@@ -103,38 +119,41 @@ export const actions = actionTree(
       if (wallet && wallet.connected) {
         commit('setLoading', true)
 
-        conn
-          .getParsedTokenAccountsByOwner(
-            wallet.publicKey,
-            {
-              programId: TOKEN_PROGRAM_ID
-            },
-            'confirmed'
-          )
-          .then(async (parsedTokenAccounts) => {
+        const filters = getOwnedAccountsFilters(wallet.publicKey);
+        conn.getProgramAccounts(TOKEN_PROGRAM_ID, {
+          filters,
+        }).then(async (parsedTokenAccounts) => {
+
             const tokenAccounts: any = {}
             const auxiliaryTokenAccounts: Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }> = []
 
-            for (const tokenAccountInfo of parsedTokenAccounts.value) {
+            for (const tokenAccountInfo of parsedTokenAccounts) {
               const tokenAccountPubkey = tokenAccountInfo.pubkey
               const tokenAccountAddress = tokenAccountPubkey.toBase58()
-              const parsedInfo = tokenAccountInfo.account.data.parsed.info
-              const mintAddress = parsedInfo.mint
-              const balance = new TokenAmount(parsedInfo.tokenAmount.amount, parsedInfo.tokenAmount.decimals)
+              // console.log(`tokenAccountAddress`, tokenAccountAddress)
+              const parsedData = ACCOUNT_LAYOUT.decode(tokenAccountInfo.account.data)
+              // console.log(`parsedData :::: `, parsedData)
+              const token = TOKENS[Object.keys(TOKENS).find(t => TOKENS[t].mintAddress === parsedData.mint.toBase58()) ?? ''];
+
+              // const parsedInfo = parsedData.info
+              const mintAddress = parsedData.mint
+              const balance = new TokenAmount(parsedData.amount, token.decimals)
 
               const ata = await findAssociatedTokenAddress(wallet.publicKey, new PublicKey(mintAddress))
-
-              if (ata.equals(tokenAccountPubkey)) {
+              console.log(`ata ::: `, ata.toBase58())
+              // if (ata.equals(tokenAccountPubkey)) {
                 tokenAccounts[mintAddress] = {
                   tokenAccountAddress,
                   balance
                 }
-              } else if (parsedInfo.tokenAmount.uiAmount > 0) {
-                auxiliaryTokenAccounts.push(tokenAccountInfo)
-              }
+              // } 
+              // else if (parsedInfo.tokenAmount.uiAmount > 0) {
+                // auxiliaryTokenAccounts.push(tokenAccountInfo)
+              // }
             }
 
             const solBalance = await conn.getBalance(wallet.publicKey, 'confirmed')
+            console.log(`tokenAccounts ::: `, tokenAccounts)
             tokenAccounts[NATIVE_SOL.mintAddress] = {
               tokenAccountAddress: wallet.publicKey.toBase58(),
               balance: new TokenAmount(solBalance, NATIVE_SOL.decimals)

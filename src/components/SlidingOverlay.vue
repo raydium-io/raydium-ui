@@ -56,20 +56,6 @@ export default Vue.extend({
       console.log(key);
     },
   },
-  props: {
-    show: {
-      type: Boolean,
-      default: false
-    },
-    liquidityList: {
-      // type: List,
-      default: []
-    },
-    userClose: {
-      type: Boolean,
-      default: false
-    }
-  }
 })
 </script>
 

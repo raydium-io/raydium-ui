@@ -9,7 +9,7 @@
       <div v-if="!addUserCoin" class="token-list">
         <template v-for="token of tokenList">
           <div
-            v-if="token.cache !== true && token.mintAddress !== 'So11111111111111111111111111111111111111112'"
+            v-if="token.cache !== true"
             :key="token.symbol + token.mintAddress"
             class="token-info"
             @click="$emit('onSelect', token)"
@@ -57,7 +57,7 @@
               <div v-if="wallet.loading">
                 <Icon type="loading" />
               </div>
-              <div v-else-if="token.tokenAccountAddress && token.symbol === 'SOL'">
+              <!-- <div v-else-if="token.tokenAccountAddress && token.symbol === 'SOL'">
                 {{
                   (
                     Number(token.balance.toEther()) +
@@ -66,7 +66,7 @@
                       : 0)
                   ).toFixed(9)
                 }}
-              </div>
+              </div> -->
               <div v-else-if="token.tokenAccountAddress">{{ token.balance.toEther() }}</div>
               <div v-else></div>
             </div>
@@ -117,9 +117,9 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import { Modal, Icon } from 'ant-design-vue'
 
-import { TOKENS, TokenInfo, NATIVE_SOL, TOKENS_TAGS } from '@/utils/tokens'
 import { cloneDeep, get } from 'lodash-es'
 import { PublicKey } from '@solana/web3.js'
+import { TOKENS, TokenInfo, NATIVE_SOL, TOKENS_TAGS } from '@/utils/tokens';
 // import { getFilteredProgramAccounts } from '@/utils/web3'
 import { MINT_LAYOUT } from '@/utils/layouts'
 
@@ -199,9 +199,9 @@ export default Vue.extend({
       this.$set(this.showUserButton, token.symbol + token.mintAddress, false)
     },
     addCoinToAttention(token: any) {
-      if (token.mintAddress === NATIVE_SOL.mintAddress) {
-        NATIVE_SOL.tags.push('userAdd')
-      }
+      // if (token.mintAddress === NATIVE_SOL.mintAddress) {
+      //   NATIVE_SOL.tags.push('userAdd')
+      // }
       if (TOKENS[token.key] && !TOKENS[token.key].tags.includes('userAdd')) {
         TOKENS[token.key].tags.push('userAdd')
       }
@@ -377,9 +377,9 @@ export default Vue.extend({
           noBalance.push({ ...tokenInfo, key: symbol })
         }
       }
-
+      console.log(`this.wallet.tokenAccounts ::: `, this.wallet.tokenAccounts)
       const solAccount = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
-
+      console.log(`solAccount ::::: `, solAccount)
       if (solAccount) {
         nativeSol = { ...nativeSol, ...solAccount }
       }

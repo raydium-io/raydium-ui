@@ -92,7 +92,6 @@ export class PhantomWalletAdapter
     // return this._provider?.publicKey || DEFAULT_PUBLIC_KEY;
     // const marginPDA = await PublicKey.findProgramAddress([key.toBuffer()], programId);
     // console.log('this.xenonPda :>> ', this.xenonPda);
-    console.log(`this.xenonPda ::::: called ::::: `, this.xenonPda)
     return this.xenonPda
   }
   
