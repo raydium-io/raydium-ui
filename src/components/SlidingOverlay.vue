@@ -1,39 +1,49 @@
 <template>
   <div class="sliding_card_warper" v-bind:class="{ active_card: isActive }">
-            <div class="sliding_card_switch" v-on:click="isActive = !isActive"> 
-              <img src="../assets/icons/acceleRaytor.svg" width="20" height="20" />
-            </div>
-            <div class="sliding_card_inner borrow_account_status_wrapper">
-                <h2>Margin Account</h2>
-                <div class="account-status-list">
-                    <p>Assets</p>
-                    <span>${{assets}}</span>
-                </div>
-                <div class="account-status-list">
-                    <p>Margin available</p>
-                    <span>${{usdcLeftToBorrow}}</span>
-                </div>
-                <div class="account-status-list">
-                    <p>Leverage</p>
-                    <span>{{leverage}}x</span>
-                </div>
-                <div class="progress-bar-wrapper">
-                    <p>Health</p>
-                    <Progress :percent="percent"/>
-                </div>
+    <div class="sliding_card_switch" v-on:click="isActive = !isActive">
+      <img src="../assets/icons/acceleRaytor.svg" width="20" height="20" />
+    </div>
+    <div class="sliding_card_inner borrow_account_status_wrapper">
+      <h2>Margin Account</h2>
+      <div class="account-status-list">
+        <p>Assets</p>
+        <span>${{ assetValue }}</span>
+      </div>
+      <div class="account-status-list">
+        <p>Margin available</p>
+        <span>${{ usdcLeftToBorrow }}</span>
+      </div>
+      <div class="account-status-list">
+        <p>Leverage</p>
+        <span>{{ accountLeverage }}x</span>
+      </div>
+      <div class="progress-bar-wrapper">
+        <p>Health</p>
+        <Progress :percent="healthPercent" />
+      </div>
 
-                <button class="sliding-card-btn">Get 200$ Faucet</button>
-            </div>
-        </div>
+      <button v-on:click="checkIfWalletExists" class="sliding-card-btn">Get 200$ Faucet</button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapState } from 'vuex'
 // import { Progress, } from 'ant-design-vue'
 // import 'ant-design-vue/dist/antd.css';
 
-import { Progress, Collapse } from 'ant-design-vue';
-Vue.use(Progress, Collapse);
+import { Progress, Collapse } from 'ant-design-vue'
+import { PublicKey } from '@solana/web3.js'
+import { MARGIN_DATA, XENON_DATA } from '../utils/investinLayout'
+Vue.use(Progress, Collapse)
+
+const programId = new PublicKey('CLbDtJTcL7NMtsujFRuHx5kLxjDgjmEuM2jZqswk7bbN')
+export const MAX_RATE = 4.75 * 10 ** -8
+export const MAX_RATE_YEAR = 1.5
+export const OPTIMAL_UTIL = 0.7
+export const OPTIMAL_RATE = 1.9 * 10 ** -9
+export const OPTIMAL_RATE_YEAR = 0.06
 
 export default Vue.extend({
   components: {
@@ -42,20 +52,128 @@ export default Vue.extend({
   },
   data() {
     return {
-      isActive : true,
-      assets : 0,
+      isActive: true,
+      assets: 0,
       percent: 0,
       usdcLeftToBorrow: 0,
       leverage: 0,
       text: `A dog is a type of domesticated animal.Known for its loyalty and faithfulness,it can be found as a welcome guest in many households across the world.`,
       activeKey: ['1'],
+      xenonProgramData: {
+        total_borrows: 0,
+        total_deposits: 0,
+        last_updated: '0',
+        borrow_index: 0
+      },
+      accountMarginData: {
+        assets: 0,
+        liabs: 0
+      },
+      liabilities: 0,
+      accountLeverage: 0,
+      borrowAPR: 0,
+      assetValue: 0,
+      healthPercent: 0
     }
   },
   watch: {
     activeKey(key) {
-      console.log(key);
+      console.log(key)
     },
+    'wallet.tokenAccounts': {
+      handler(newTokenAccounts: any) {
+        this.checkIfWalletExists()
+      },
+      deep: true
+    }
   },
+  computed: {
+    ...mapState(['wallet'])
+  },
+  mounted() {
+    this.checkIfWalletExists()
+  },
+  methods: {
+    async checkIfWalletExists() {
+      if (this.$wallet) {
+        const xenonPDA = await PublicKey.findProgramAddress([Buffer.from('xenon_v1')], programId)
+        let xenonInfo = await this.$web3.getAccountInfo(xenonPDA[0])
+
+        if (xenonInfo) {
+          let xenonData = XENON_DATA.decode(xenonInfo.data)
+          this.xenonProgramData = xenonData
+
+          const xenonProgramDataSubscription = this.$web3.onAccountChange(
+            xenonPDA[0],
+            (x, y) => {
+              const data = XENON_DATA.decode(x.data)
+              this.xenonProgramData = data
+            },
+            'recent'
+          )
+        }
+
+        const marginPDA = await PublicKey.findProgramAddress([this.$wallet?.walletPublicKey.toBuffer()], programId)
+        if (xenonInfo) {
+          let marginData = MARGIN_DATA.decode(xenonInfo.data)
+          this.accountMarginData = marginData
+
+          const marginAccountSubscription = this.$web3.onAccountChange(
+            marginPDA[0],
+            (x, y) => {
+              const data = MARGIN_DATA.decode(x.data)
+              this.accountMarginData = data
+            },
+            'recent'
+          )
+        }
+
+        console.log(`second program data :: `, this.xenonProgramData)
+        let borrowRate = 0
+        if (this.xenonProgramData) {
+          const totalBorrows = this.xenonProgramData.total_borrows
+          const totalDeposits = this.xenonProgramData.total_deposits
+
+          if (totalDeposits === 0 && totalBorrows === 0) {
+            borrowRate = 0
+          }
+          if (totalDeposits <= totalBorrows) {
+            borrowRate = MAX_RATE
+          }
+
+          const utilization = totalBorrows / totalDeposits
+          if (utilization > OPTIMAL_UTIL) {
+            const extraUtil = utilization - OPTIMAL_UTIL
+            const slope = (MAX_RATE - OPTIMAL_RATE) / (1 - OPTIMAL_UTIL)
+            borrowRate = OPTIMAL_RATE + slope * extraUtil
+          } else {
+            const slope = OPTIMAL_RATE / OPTIMAL_UTIL
+            borrowRate = slope * utilization
+          }
+        } else {
+          borrowRate = 0
+        }
+
+        const assets = Number((this.accountMarginData.assets / 10 ** 6).toFixed(2))
+        const currentDate = Math.floor(Date.now() / 1000)
+        const lastUpdatedTime = (this.xenonProgramData.last_updated as any).toNumber()
+        const borrowIndex =
+          this.xenonProgramData.borrow_index +
+          this.xenonProgramData.borrow_index * borrowRate * (currentDate - lastUpdatedTime)
+        const liabs = (this.accountMarginData.liabs / 10 ** 6) * borrowIndex
+        this.liabilities = liabs
+        this.usdcLeftToBorrow = assets - 2 * liabs < 0 ? 0 : assets - 2 * liabs
+        const coll_ratio = this.accountMarginData.assets / 10 ** 6 / liabs
+        this.accountLeverage = Number((1 / (coll_ratio - 1) + 1).toFixed(2))
+        console.log(`(1 / (coll_ratio - 1) + 1).toFixed(2) ::: `, Number((1 / (coll_ratio - 1) + 1).toFixed(2)))
+        this.borrowAPR = Number((borrowRate * 3.154e7 * 100).toFixed(2))
+        this.assetValue = Number((this.accountMarginData.assets / 10 ** 6).toFixed(2))
+        this.healthPercent = Number(
+          ((this.accountMarginData.assets / this.accountMarginData.liabs - 1.2) * 100).toFixed(0)
+        )
+      }
+    }
+  }
 })
 </script>
 
@@ -94,7 +212,6 @@ export default Vue.extend({
     }
   }
 }
-
 
 .sliding_card_warper {
   width: 316px;
@@ -143,11 +260,7 @@ export default Vue.extend({
   width: 316px;
   max-height: 660px;
   height: 100%;
-  background: radial-gradient(
-    100% 100% at 0% 0%,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: radial-gradient(100% 100% at 0% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 100%);
   border: 1px solid rgba(204, 204, 204, 0.24);
   box-shadow: inset -5px -5px 250px rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
@@ -188,7 +301,7 @@ export default Vue.extend({
 
 .sliding_card_inner .account-status-list span,
 .sliding_card_inner .sliding-card-panel-head span {
-  font-family: 'Exo 2',  sans-serif;
+  font-family: 'Exo 2', sans-serif;
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
@@ -250,18 +363,13 @@ export default Vue.extend({
   cursor: pointer;
 }
 
-.sliding_card_inner
-  .ant-collapse
-  > .ant-collapse-item
-  > .ant-collapse-header
-  .ant-collapse-arrow {
+.sliding_card_inner .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
   color: #40a42e;
   position: absolute;
   right: 2px;
   top: 12px;
   font-size: 15px;
 }
-
 
 .sliding_card_inner .sliding-card-panel-head .state-img {
   position: absolute;
@@ -289,11 +397,7 @@ export default Vue.extend({
 }
 
 .sliding_card_inner .ant-collapse-item {
-  background: radial-gradient(
-    100% 100% at 0% 0%,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: radial-gradient(100% 100% at 0% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 100%);
   border: 1px solid rgba(204, 204, 204, 0.24) !important;
   box-shadow: inset -5px -5px 250px rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
@@ -315,5 +419,4 @@ export default Vue.extend({
   color: #fff;
   text-align: center;
 }
-
 </style>

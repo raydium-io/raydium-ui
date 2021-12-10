@@ -525,7 +525,7 @@ export function preInitialize(
   poolTempLpTokenAccount: PublicKey,
   market: PublicKey,
   owner: PublicKey,
-  nonce: u8
+  nonce: any
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), u8('nonce')])
 
