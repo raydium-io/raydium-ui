@@ -3,7 +3,7 @@
     <section class="page-title">
       <img
         class="icon"
-        src="../assets/background/bybit.svg"
+        src="../assets/background/okex.png"
         style="margin-bottom: 40px; width: 100%; max-width: 400px"
       />
       <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>

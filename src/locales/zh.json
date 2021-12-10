@@ -13,7 +13,7 @@
       "points": "奖励点数",
       "task": {
         "huobi": {
-          "title": "在Bybit交易所交易",
+          "title": "在OKEX交易所交易",
           "point": "+5个点数"
         },
         "swap": {
@@ -60,11 +60,11 @@
     },
 
     "huobiID": {
-      "title": "在Bybit交易所交易 xxx $RAY",
+      "title": "在OKEX交易所交易 xxx $RAY",
       "sub-btn": "提交",
       "sub-btn-loading": "提交中....",
-      "sub-btn-placeholder": "请输入Bybit的UID",
-      "sub-huobiUID": "bybit UID:"
+      "sub-btn-placeholder": "请输入OKEX的UID",
+      "sub-huobiUID": "OKEX UID:"
     },
 
     "swap": {

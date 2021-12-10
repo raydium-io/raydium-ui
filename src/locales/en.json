@@ -17,7 +17,7 @@
       "points": "Points",
       "task": {
         "huobi": {
-          "title": "Trade on Bybit",
+          "title": "Trade on OKEX",
           "point": "+5 POINTS"
         },
         "swap": {
@@ -64,11 +64,11 @@
     },
 
     "huobiID": {
-      "title": "Trade XXX $RAY on Bybit",
+      "title": "Trade XXX $RAY on OKEX",
       "sub-btn": "SUBMIT",
       "sub-btn-loading": "SUBMITING...",
-      "sub-btn-placeholder": "Enter Bybit UID",
-      "sub-huobiUID": "bybit UID:"
+      "sub-btn-placeholder": "Enter OKEX UID",
+      "sub-huobiUID": "OKEX UID:"
     },
 
     "swap": {
