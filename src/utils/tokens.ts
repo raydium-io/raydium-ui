@@ -2455,6 +2455,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5Cz9wGStNjiUg81q8t6sJJeckuT2C14CYSfyQbtYirSX',
     decimals: TOKENS.CRWNY.decimals
+  },
+  'BLOCK-USDC-V4': {
+    symbol: 'BLOCK-USDC',
+    name: 'BLOCK-USDC LP',
+    coin: { ...TOKENS.BLOCK },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8i44Y23GkkwDYZ5iSkVEqmrXUfwNmwo9grguTDWKM8wg',
+    decimals: TOKENS.BLOCK.decimals
   }
 }
 
