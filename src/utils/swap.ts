@@ -69,8 +69,8 @@ export function getSwapOutAmount(
   const { coin, pc, fees } = poolInfo
   const { swapFeeNumerator, swapFeeDenominator } = fees
 
-  if (fromCoinMint === TOKENS.WSOL.mintAddress) fromCoinMint = NATIVE_SOL.mintAddress
-  if (toCoinMint === TOKENS.WSOL.mintAddress) toCoinMint = NATIVE_SOL.mintAddress
+  // if (fromCoinMint === TOKENS.WSOL.mintAddress) fromCoinMint = NATIVE_SOL.mintAddress
+  // if (toCoinMint === TOKENS.WSOL.mintAddress) toCoinMint = NATIVE_SOL.mintAddress
 
   if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // coin2pc
@@ -389,25 +389,25 @@ export async function swap(
   const amountIn = new TokenAmount(aIn, from.decimals, false)
   const amountOut = new TokenAmount(aOut, to.decimals, false)
 
-  if (fromCoinMint === NATIVE_SOL.mintAddress && wsolAddress) {
-    transaction.add(
-      closeAccount({
-        source: new PublicKey(wsolAddress),
-        destination: owner,
-        owner
-      })
-    )
-  }
+  // if (fromCoinMint === NATIVE_SOL.mintAddress && wsolAddress) {
+  //   transaction.add(
+  //     closeAccount({
+  //       source: new PublicKey(wsolAddress),
+  //       destination: owner,
+  //       owner
+  //     })
+  //   )
+  // }
 
   let fromMint = fromCoinMint
   let toMint = toCoinMint
 
-  if (fromMint === NATIVE_SOL.mintAddress) {
-    fromMint = TOKENS.WSOL.mintAddress
-  }
-  if (toMint === NATIVE_SOL.mintAddress) {
-    toMint = TOKENS.WSOL.mintAddress
-  }
+  // if (fromMint === NATIVE_SOL.mintAddress) {
+  //   fromMint = TOKENS.WSOL.mintAddress
+  // }
+  // if (toMint === NATIVE_SOL.mintAddress) {
+  //   toMint = TOKENS.WSOL.mintAddress
+  // }
 
   let wrappedSolAccount: PublicKey | null = null
   let wrappedSolAccount2: PublicKey | null = null
@@ -1225,28 +1225,28 @@ export async function settleFund(
   let wrappedBaseAccount
   let wrappedQuoteAccount
 
-  if (baseMint === TOKENS.WSOL.mintAddress) {
-    wrappedBaseAccount = await createTokenAccountIfNotExist(
-      connection,
-      wrappedBaseAccount,
-      owner,
-      TOKENS.WSOL.mintAddress,
-      1e7,
-      tx,
-      signs
-    )
-  }
-  if (quoteMint === TOKENS.WSOL.mintAddress) {
-    wrappedQuoteAccount = await createTokenAccountIfNotExist(
-      connection,
-      wrappedQuoteAccount,
-      owner,
-      TOKENS.WSOL.mintAddress,
-      1e7,
-      tx,
-      signs
-    )
-  }
+  // if (baseMint === TOKENS.WSOL.mintAddress) {
+  //   wrappedBaseAccount = await createTokenAccountIfNotExist(
+  //     connection,
+  //     wrappedBaseAccount,
+  //     owner,
+  //     TOKENS.WSOL.mintAddress,
+  //     1e7,
+  //     tx,
+  //     signs
+  //   )
+  // }
+  // if (quoteMint === TOKENS.WSOL.mintAddress) {
+  //   wrappedQuoteAccount = await createTokenAccountIfNotExist(
+  //     connection,
+  //     wrappedQuoteAccount,
+  //     owner,
+  //     TOKENS.WSOL.mintAddress,
+  //     1e7,
+  //     tx,
+  //     signs
+  //   )
+  // }
 
   const quoteToken = getTokenByMintAddress(quoteMint)
 
@@ -1258,24 +1258,24 @@ export async function settleFund(
     quoteToken && quoteToken.referrer ? new PublicKey(quoteToken.referrer) : null
   )
 
-  if (wrappedBaseAccount) {
-    transaction.add(
-      closeAccount({
-        source: wrappedBaseAccount,
-        destination: owner,
-        owner
-      })
-    )
-  }
-  if (wrappedQuoteAccount) {
-    transaction.add(
-      closeAccount({
-        source: wrappedQuoteAccount,
-        destination: owner,
-        owner
-      })
-    )
-  }
+  // if (wrappedBaseAccount) {
+  //   transaction.add(
+  //     closeAccount({
+  //       source: wrappedBaseAccount,
+  //       destination: owner,
+  //       owner
+  //     })
+  //   )
+  // }
+  // if (wrappedQuoteAccount) {
+  //   transaction.add(
+  //     closeAccount({
+  //       source: wrappedQuoteAccount,
+  //       destination: owner,
+  //       owner
+  //     })
+  //   )
+  // }
 
   return await sendTransaction(connection, wallet, mergeTransactions([tx, transaction]), [...signs, ...signers])
 }

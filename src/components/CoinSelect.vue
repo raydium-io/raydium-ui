@@ -395,9 +395,9 @@ export default Vue.extend({
       })
 
       if (!this.desc) {
-        tokenList = [...[ray, nativeSol], ...hasBalance, ...noBalance]
+        tokenList = [...[ray], ...hasBalance, ...noBalance]
       } else {
-        tokenList = [...[ray, nativeSol], ...noBalance.reverse(), ...hasBalance]
+        tokenList = [...[ray], ...noBalance.reverse(), ...hasBalance]
       }
 
       if (keyword) {
