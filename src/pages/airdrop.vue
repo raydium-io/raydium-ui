@@ -3,7 +3,7 @@
     <section class="page-title">
       <img
         class="icon"
-        src="../assets/background/huobi.svg"
+        src="../assets/background/bybit.svg"
         style="margin-bottom: 40px; width: 100%; max-width: 400px"
       />
       <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
@@ -507,7 +507,7 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
   }
 })
 export default class Airdrop extends Vue {
-  comingSoon = true
+  comingSoon = false
   showWinnerList = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true

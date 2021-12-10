@@ -5,7 +5,7 @@
     "pending-reward": "活动结束 开奖中",
     "reward": ["空投已经", "完成！", "奖励已经发放给中奖者，连接钱包来查看您的抽奖结果！"],
     "reflush": "请刷新查看获奖名单",
-    "coming-soon": "Coming Soon",
+    "coming-soon": "即将上线",
 
     "introduction-activities": {
       "title": "通过3个简单的步骤中赚取高达2000美元的RAY",
@@ -40,7 +40,7 @@
     },
     "step3": {
       "step": "第三步",
-      "title": "在Raydium尝试兑换代币",
+      "title": "在Raydium兑换代币",
       "point": "+5个点数"
     },
     "step4": {
@@ -52,7 +52,7 @@
     "video": {
       "title": "开始上手Raydium",
       "video-title": "观看如何在Solana上创建一个钱包并在Raydium上进行第一次代币兑换.",
-      "connect-wallet": "连接钱包来接收Raydium的空投",
+      "connect-wallet": "连接钱包来获得Raydium的空投",
       "download": "下载",
       "phantom": "Phantom钱包 (桌面)",
       "try-sollet": "您用的是手机端？试试",
@@ -82,27 +82,27 @@
       "notDoneTask": "您还没有完成这个任务",
       "btn": "现在转发",
       "point-msg": "+1个点数 / 每一个新增推荐",
-      "prompt": "推特必须包括推荐代码，以便进行API跟踪"
+      "prompt": "推特必须包括个人推荐码，以便进行API跟踪"
     },
 
     "refer": {
       "title": "现在就用你的定制链接推荐吧！",
       "point-msg": "+1个点数 / 每一个新增推荐",
-      "prompt": "您的推荐链接"
+      "prompt": "您的个人推荐链接"
     },
 
     "reward-details": {
       "link-name": "奖励细节",
       "title": "奖励细节",
       "words": [
-        "成功的用户指的是那些已经连接了一个钱包，完成了代币兑换，并通过推特上的定制推荐代码完成了推特验证。成功的用户将获得至少5分的幸运抽奖池空投点数，并有资格获得高达1000美元的RAY代币的空投。",
+        "成功的用户指的是那些已经连接了一个钱包，完成了代币兑换，并通过推特上的定制个人推荐码完成了推特验证。成功的用户将获得至少5分的幸运抽奖池空投点数，并有资格获得高达1000美元的RAY代币的空投。",
         "前4000名连接钱包、代币兑换、验证推特和推荐至少1名的合格用户，Raydium保证每人赢得10美元的RAY代币。成功的用户将获得至少5分的幸运抽奖池空投点数，并有资格获得高达1000美元的RAY代币的空投。",
         "符合条件的用户可以通过完成以下奖励任务为幸运空投池赚取额外积分：1）在Twitter上关注Raydium；2）加入Raydium的中文社区群，每项任务价值1分。",
         "推荐人排行榜上的前5名将各赢得价值2000美元的RAY代币。推荐人本人不计入幸运抽奖池的额外积分。",
         "幸运抽奖的奖品将按降序发放（即：3名获奖者获得1000美元，15名获奖者获得300美元，100名获奖者获得100美元，250名获奖者获得50美元，以及1000名获奖者获得20美元）。获奖者只能从幸运抽奖池中获得最多一个奖项。"
       ],
       "table": {
-        "head": ["要求", "赢家数量", "空投数目", "空投资格"],
+        "head": ["要求", "中奖用户数量", "空投数目", "空投资格"],
         "R1": {
           "requirements": ["前4,000名用户", "在Raydium上进行代币兑换，完成Twitter验证，并成功推荐至少一个朋友"],
           "winners": "4,000个赢家",
@@ -112,7 +112,7 @@
         "R2": {
           "requirements": [
             "幸运抽奖池",
-            "在Raydium上代币兑换并完成Twitter验证（价值5分抽奖池空投点数）",
+            "在Raydium上代币兑换并完成Twitter验证（价值5分的抽奖池空投点数）",
             "获得抽奖池空投点数!",
             "关注Raydium，加入我们的中文社区"
           ],
@@ -122,9 +122,9 @@
             "价值300美元的RAY代币",
             "价值100美元的RAY代币",
             "价值50美元的RAY代币",
-            "$20 of RAY tokens"
+            "价值20美元的RAY代币"
           ],
-          "eligibility": "所有完成代币兑换并将其推荐代码分享到Twitter的用户都有资格参加。"
+          "eligibility": "所有完成代币兑换并将其个人推荐码分享到Twitter的用户都有资格参加。"
         },
         "R3": {
           "requirements": "推荐人排行榜前五名",
@@ -138,7 +138,7 @@
     "terms-conditions": {
       "title": "条款声明",
       "words": [
-        "有资格获得相当于10美元RAY代币的保证空投的用户，也有资格参与并赢得20美元、50美元、100美元、300美元和1000美元奖励的随机抽奖。然而，获奖者只能从幸运抽奖池中获得最多一个奖项.",
+        "有资格获得相当于10美元RAY代币的保证空投的用户，也有资格参与并赢得20美元、50美元、100美元、300美元和1000美元的抽奖。然而，获奖者只能从幸运抽奖池中获得最多一个奖项.",
         "用户需要通过Raydium空投页面验证他们的任务完成情况，才能有资格参加抽奖。幸运抽奖者将由Raydium团队选出.",
         "Raydium保留取消或修改任何活动规则的权利，以及对用户完成任务的最终解释权.",
         "奖励将通过他们用于交互的账户的链接地址发放给符合条件的参与者。.",
@@ -151,26 +151,26 @@
       "not-connect": "连接钱包来查看您目前持有的点数",
 
       "finish": {
-        "winner-list": "检查赢家",
+        "winner-list": "查看获奖用户",
         "prompt": "奖励已经发到那些符合要求的账户地址"
       },
       "calculating": "计算中...",
 
-      "your-reward": "Your reward",
-      "reward-info": ["Top 5", "First 4,000", "Lucky Draw Pool"],
+      "your-reward": "您的奖励",
+      "reward-info": ["最高五名", "前4,000位", "幸运抽奖池"],
 
-      "total-points": "Total Points",
+      "total-points": "总点数",
       "eligible": {
-        "title": "Eligible for Lucky Draw?",
-        "tips": "Qualified users are defined as having connected a wallet, completed a swap, and completed Twitter verification by tweeting their customized referral code."
+        "title": "如何参与幸运抽奖?",
+        "tips": "符合条件的用户指的是那些已经连接了一个钱包，完成了代币兑换，并通过推特上的定制的个人推荐码完成推特验证."
       },
       "point": {
-        "title": "Points for Lucky Draw",
-        "tips": "1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool."
+        "title": "幸运抽奖池的点数说明",
+        "tips": "1点 = 1张门票. 幸运抽奖池的奖品将按降序发放（即：3名获奖者获得1000美元，15名获奖者获得300美元，100名获奖者获得100美元等）。获奖者只能从幸运抽奖池中获得最多一个奖项."
       },
       "qualified": {
-        "title": "Qualified Referrals",
-        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
+        "title": "推荐用户赢取更多点数",
+        "tips": "如何赚取推荐点数？用您的个人推荐码连接您的钱包、完成代币兑换和完成Twitter验证."
       }
     }
   },
