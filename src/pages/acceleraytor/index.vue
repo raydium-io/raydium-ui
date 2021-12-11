@@ -512,4 +512,14 @@ export default class AcceleRaytor extends Vue {
     }
   }
 }
+
+@media (max-width: 550px) {
+  .banner {
+    display: block;
+    padding: 32px;
+    .text-part {
+      margin-bottom: 32px;
+    }
+  }
+}
 </style>
