@@ -1109,6 +1109,27 @@ export const TOKENS: Tokens = {
     mintAddress: 'NFTUkR4u7wKxy9QLaX2TGvd9oZSWoMo4jqSJqdMb7Nk',
     decimals: 6,
     tags: ['raydium']
+  },
+  SOLAR: {
+    symbol: 'SOLAR',
+    name: 'SOLAR',
+    mintAddress: '2wmKXX1xsxLfrvjEPrt2UHiqj8Gbzwxvffr9qmNjsw8g',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  BASIS: {
+    symbol: 'BASIS',
+    name: 'BASIS',
+    mintAddress: 'Basis9oJw9j8cw53oMV7iqsgo6ihi9ALw4QR31rcjUJa',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  SOLX: {
+    symbol: 'SOLX',
+    name: 'SOLX',
+    mintAddress: 'CH74tuRLTYcxG7qNJCsV9rghfLXJCQJbsu7i52a8F1Gn',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
