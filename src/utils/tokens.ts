@@ -1128,7 +1128,7 @@ export const TOKENS: Tokens = {
     symbol: 'SOLX',
     name: 'SOLX',
     mintAddress: 'CH74tuRLTYcxG7qNJCsV9rghfLXJCQJbsu7i52a8F1Gn',
-    decimals: 6,
+    decimals: 9,
     tags: ['raydium']
   }
 }
