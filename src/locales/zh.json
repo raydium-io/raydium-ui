@@ -12,7 +12,7 @@
       "tasks": "任务",
       "points": "奖励点数",
       "task": {
-        "huobi": {
+        "UID": {
           "title": "在OKEX交易所交易",
           "point": "+5个点数"
         },
@@ -64,7 +64,7 @@
       "sub-btn": "提交",
       "sub-btn-loading": "提交中....",
       "sub-btn-placeholder": "请输入OKEX的UID",
-      "sub-huobiUID": "OKEX UID:"
+      "sub-UID": "OKEX UID:"
     },
 
     "swap": {
@@ -171,8 +171,11 @@
       "qualified": {
         "title": "推荐用户赢取更多点数",
         "tips": "如何赚取推荐点数？用您的个人推荐码连接您的钱包、完成代币兑换和完成Twitter验证."
-      }
-    }
+      },
+      "referral-list": "推荐排行榜",
+      "referral-list-end": "前五名：每人$2000"
+    },
+    "exchange-name-huobi": "HUOBI"
   },
   "connect-wallet": "连接钱包"
 }

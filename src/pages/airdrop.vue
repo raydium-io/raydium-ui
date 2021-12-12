@@ -124,7 +124,7 @@
           </table>
 
           <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
-            {{ rewardIsOut ? 'Top 5: $2,000 Each' : 'Referral Leaderboard' }}
+            {{ rewardIsOut ? $t('airdrop.user.referral-list-end') : $t('airdrop.user.referral-list') }}
           </h1>
           <table v-if="!isActivityEnd" class="winner-table">
             <tbody>
@@ -170,9 +170,12 @@
           </tr>
           <tr>
             <td class="td order">1</td>
-            <td class="td">{{ $t('airdrop.introduction-activities.task.huobi.title') }}</td>
             <td class="td">
-              <div class="point-label">{{ $t('airdrop.introduction-activities.task.huobi.point') }}</div>
+              {{ $t('airdrop.introduction-activities.task.UID.title') }}
+              {{ $t(`airdrop.exchange-name-${campaignLocalesName}`) }}
+            </td>
+            <td class="td">
+              <div class="point-label">{{ $t('airdrop.introduction-activities.task.UID.point') }}</div>
             </td>
           </tr>
           <tr>
@@ -275,14 +278,14 @@
 
         <div class="box form">
           <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
-          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-huobiUID') }}{{ huobiUID }}</div>
+          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-UID') }}{{ huobiUID }}</div>
           <div v-else>
             <div class="input-box">
               <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
             </div>
             <button
               :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
-              @click="submitHuobiUID"
+              @click="submitUID(campaignTaskName, huobiUID)"
             >
               {{
                 $accessor.wallet.connected
@@ -507,7 +510,12 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
   }
 })
 export default class Airdrop extends Vue {
-  comingSoon = false
+  campaignId = 2
+
+  campaignTaskName = 'huobi'
+  campaignLocalesName = 'huobi'
+
+  comingSoon = true
   showWinnerList = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
@@ -539,6 +547,9 @@ export default class Airdrop extends Vue {
     | undefined
 
   mounted() {
+    if (!this.$accessor.wallet.connected) {
+      this.fetchData(true)
+    }
     this.intervalTimer = window.setInterval(this.fetchData, 1000 * 60 * 3)
   }
 
@@ -558,7 +569,7 @@ export default class Airdrop extends Vue {
 
   @Watch('initBackendResponse', { immediate: true })
   checkRewardIsOut(res: CampaignInfo['data']) {
-    if (!res.user) return
+    if (!res || !res.user) return
     // trueData
     this.rewardIsOut = Boolean(res.user.reward)
     this.rewardInfos = res.user.reward
@@ -610,10 +621,11 @@ export default class Airdrop extends Vue {
   }
 
   @Watch('$accessor.wallet.connected', { immediate: true })
-  async fetchData() {
-    if (this.$accessor.wallet.connected) {
+  async fetchData(getCampaignInfo = false) {
+    if (this.$accessor.wallet.connected || getCampaignInfo) {
       try {
         const response = await this.$api.getCompaign({
+          campaignId: this.campaignId,
           address: this.$accessor.wallet.address,
           referral: (this.$route.query?.referral as string) || undefined
         })
@@ -621,7 +633,7 @@ export default class Airdrop extends Vue {
         this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
         this.comingSoon = response.campaign_info.start > Date.now()
         if (!this.isActivityEnd) {
-          this.winners = await this.$api.getCompaignWinners()
+          this.winners = await this.$api.getCompaignWinners({ campaignId: this.campaignId })
         }
       } catch (err) {}
     }
@@ -651,17 +663,10 @@ export default class Airdrop extends Vue {
   //   tempA.click()
   // }
 
-  async submit({
-    task,
-    result,
-    sign
-  }: {
-    task: 'video' | 'twitter' | 'huobiUID' | 'swap' | 'referral'
-    result?: string
-    sign?: string
-  }) {
+  async submit({ task, result, sign }: { task: string; result?: string; sign?: string }) {
     if (this.isActivityEnd) return
     const response = await this.$api.postCompaign({
+      campaignId: this.campaignId,
       address: this.initBackendResponse.user?.address,
       task,
       result,
@@ -671,14 +676,14 @@ export default class Airdrop extends Vue {
     return response
   }
 
-  async submitHuobiUID() {
+  async submitUID(taskName: string, uidValue: string) {
     if (!this.$accessor.wallet.connected) {
       this.$accessor.wallet.openModal()
-    } else if (this.huobiUID) {
+    } else if (uidValue) {
       if (this.isActivityEnd) return
       this.isHuobiUIDing = true
       try {
-        const result = await this.submit({ task: 'huobiUID', result: this.huobiUID })
+        const result = await this.submit({ task: `${taskName}UID`, result: uidValue })
         if (result) {
           this.initBackendResponse = result.data
         }
