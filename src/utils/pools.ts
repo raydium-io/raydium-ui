@@ -281,7 +281,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     ammTargetOrders: '9qAqNs1KCmnR35kQnTZYMNjXWpzj5Ds8vGnFGptt7BHo',
     // no need
     ammQuantities: NATIVE_SOL.mintAddress,
-    poolCoinTokenAccount: 'Fq8nURZFto3bTPaKqmDqbBAFfArwYvfVuFKVoFyZZVD6',
+    poolCoinTokenAccount: 'v77vV7yh5LuEKabKdNWhM8X5wpDhuPidjp7eucbHGfy',
     poolPcTokenAccount: 'CYv6PtaGV2D2gj6pD9io1PjJbUrcE7gyBmDethawZmMm',
     poolWithdrawQueue: '74XearZM2yiRJtYujkf2wgL1wXojp9mEefDJfrULUaPk',
     poolTempLpTokenAccount: '6P2ui2BoYQvciTEUzuz3CCv7Wwzof7WESoMSi4zhvPW2',
