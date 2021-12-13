@@ -1130,6 +1130,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'CH74tuRLTYcxG7qNJCsV9rghfLXJCQJbsu7i52a8F1Gn',
     decimals: 9,
     tags: ['raydium']
+  },
+  CHICKS: {
+    symbol: 'CHICKS',
+    name: 'CHICKS',
+    mintAddress: 'cxxShYRVcepDudXhe7U62QHvw8uBJoKFifmzggGKVC2',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
