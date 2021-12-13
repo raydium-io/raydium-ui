@@ -19,7 +19,7 @@
               $emit('onClose')
             }
           "
-          >Confirm</Button
+          >Confirm And Swap</Button
         >
       </div>
     </div>

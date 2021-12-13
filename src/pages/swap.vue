@@ -100,6 +100,8 @@
         () => {
           checkCoinAmountModelFlag = false
           toCoinAmountOld = toCoinAmount
+          needCheckCoinAmountModelFlag = false
+          placeOrder(swapMsgCache)
         }
       "
     />
@@ -759,7 +761,9 @@ export default Vue.extend({
 
       fromCoinAmountOld: undefined as string | undefined,
       toCoinAmountOld: undefined as string | undefined,
-      checkCoinAmountModelFlag: false
+      needCheckCoinAmountModelFlag: false,
+      checkCoinAmountModelFlag: false,
+      swapMsgCache: ''
     }
   },
 
@@ -778,8 +782,9 @@ export default Vue.extend({
       if (this.fromCoinAmount !== this.fromCoinAmountOld) {
         this.fromCoinAmountOld = this.fromCoinAmount
         this.toCoinAmountOld = newAmount
+        this.needCheckCoinAmountModelFlag = false
       } else if (newAmount !== this.toCoinAmountOld) {
-        this.checkCoinAmountModelFlag = true
+        this.needCheckCoinAmountModelFlag = true
       }
     },
 
@@ -1387,6 +1392,7 @@ export default Vue.extend({
     },
 
     updateAmounts() {
+      if (this.swaping) return
       let toCoinAmount = ''
       let toCoinWithSlippage = null
 
@@ -1602,6 +1608,12 @@ export default Vue.extend({
     },
 
     placeOrder(loadingName: string) {
+      if (this.needCheckCoinAmountModelFlag) {
+        this.swapMsgCache = loadingName
+        this.checkCoinAmountModelFlag = true
+        return
+      }
+
       this.swaping = true
       if (this.loadingArr[loadingName] !== undefined) this.loadingArr[loadingName] = true
 
