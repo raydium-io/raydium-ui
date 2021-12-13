@@ -92,20 +92,6 @@
       @onSelect="onUserCheckUnofficialSelect"
     />
 
-    <ToAmountConfrim
-      v-if="checkCoinAmountModelFlag"
-      :confirm-amount="toCoinAmount"
-      :confirm-amount-old="toCoinAmountOld"
-      @onClose="
-        () => {
-          checkCoinAmountModelFlag = false
-          toCoinAmountOld = toCoinAmount
-          needCheckCoinAmountModelFlag = false
-          placeOrder(swapMsgCache)
-        }
-      "
-    />
-
     <div class="card">
       <div class="card-body">
         <CoinInput
@@ -224,6 +210,27 @@
               {{ priceImpact.toFixed(2) === '0.00' ? '&lt; 0.01' : priceImpact.toFixed(2) }}%
             </span>
           </div>
+        </div>
+        <div v-if="checkCoinAmountModelFlag" class="fs-container price-update">
+          <span class="name" style="opacity: 1">
+            Price Updated
+            <Tooltip placement="right">
+              <template slot="title"> balabala </template>
+              <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
+          ></span>
+          <span>
+            <Button
+              size="small"
+              ghost
+              @click="
+                () => {
+                  checkCoinAmountModelFlag = false
+                  toCoinAmountOld = toCoinAmount
+                }
+              "
+              >Accept</Button
+            >
+          </span>
         </div>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -363,6 +370,7 @@
           size="large"
           ghost
           :disabled="
+            checkCoinAmountModelFlag ||
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
@@ -761,9 +769,7 @@ export default Vue.extend({
 
       fromCoinAmountOld: undefined as string | undefined,
       toCoinAmountOld: undefined as string | undefined,
-      needCheckCoinAmountModelFlag: false,
-      checkCoinAmountModelFlag: false,
-      swapMsgCache: ''
+      checkCoinAmountModelFlag: false
     }
   },
 
@@ -782,9 +788,9 @@ export default Vue.extend({
       if (this.fromCoinAmount !== this.fromCoinAmountOld) {
         this.fromCoinAmountOld = this.fromCoinAmount
         this.toCoinAmountOld = newAmount
-        this.needCheckCoinAmountModelFlag = false
+        this.checkCoinAmountModelFlag = false
       } else if (newAmount !== this.toCoinAmountOld) {
-        this.needCheckCoinAmountModelFlag = true
+        this.checkCoinAmountModelFlag = true
       }
     },
 
@@ -1227,11 +1233,11 @@ export default Vue.extend({
     },
 
     changeCoinAmountPosition() {
-      const tempFromCoinAmount = this.fromCoinAmount
-      const tempToCoinAmount = this.toCoinAmount
+      // const tempFromCoinAmount = this.fromCoinAmount
+      // const tempToCoinAmount = this.toCoinAmount
 
-      this.fromCoinAmount = tempToCoinAmount
-      this.toCoinAmount = tempFromCoinAmount
+      this.fromCoinAmount = this.toCoinAmount
+      // this.toCoinAmount = tempFromCoinAmount
     },
 
     updateCoinInfo(tokenAccounts: any) {
@@ -1608,12 +1614,6 @@ export default Vue.extend({
     },
 
     placeOrder(loadingName: string) {
-      if (this.needCheckCoinAmountModelFlag) {
-        this.swapMsgCache = loadingName
-        this.checkCoinAmountModelFlag = true
-        return
-      }
-
       this.swaping = true
       if (this.loadingArr[loadingName] !== undefined) this.loadingArr[loadingName] = true
 
@@ -2120,5 +2120,10 @@ export default Vue.extend({
       }
     }
   }
+}
+.price-update {
+  border-radius: 10px;
+  background: rgb(5, 20, 62);
+  padding: 10px;
 }
 </style>
