@@ -92,6 +92,18 @@
       @onSelect="onUserCheckUnofficialSelect"
     />
 
+    <ToAmountConfrim
+      v-if="checkCoinAmountModelFlag"
+      :confirm-amount="toCoinAmount"
+      :confirm-amount-old="toCoinAmountOld"
+      @onClose="
+        () => {
+          checkCoinAmountModelFlag = false
+          toCoinAmountOld = toCoinAmount
+        }
+      "
+    />
+
     <div class="card">
       <div class="card-body">
         <CoinInput
@@ -743,7 +755,11 @@ export default Vue.extend({
 
       showMarket: undefined as string | undefined,
 
-      solBalanceTips: undefined as string | undefined
+      solBalanceTips: undefined as string | undefined,
+
+      fromCoinAmountOld: undefined as string | undefined,
+      toCoinAmountOld: undefined as string | undefined,
+      checkCoinAmountModelFlag: false
     }
   },
 
@@ -756,6 +772,17 @@ export default Vue.extend({
   },
 
   watch: {
+    toCoinAmount(newAmount: string) {
+      if (this.fromCoinAmount === '' || this.toCoinAmount === '') return
+
+      if (this.fromCoinAmount !== this.fromCoinAmountOld) {
+        this.fromCoinAmountOld = this.fromCoinAmount
+        this.toCoinAmountOld = newAmount
+      } else if (newAmount !== this.toCoinAmountOld) {
+        this.checkCoinAmountModelFlag = true
+      }
+    },
+
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
