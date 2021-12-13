@@ -1,6 +1,6 @@
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep } from 'lodash-es';
 
-import { TokenAmount } from '@/utils/safe-math'
+import { TokenAmount } from '@/utils/safe-math';
 
 export interface TokenInfo {
   symbol: string
@@ -2535,10 +2535,17 @@ function addUserLocalCoinMint() {
   }
 }
 
+// fake
+const BLACK_LIST = ['3pX59cis3ZXnX6ZExPoUQjpvJVspmj4YavtUmpTpkB33']
+
+function blockBlackList(tokens: { address: string }[]) {
+  return tokens.filter((item) => !BLACK_LIST.includes(item.address))
+}
+
 function addTokensSolana() {
   fetch('https://api.raydium.io/cache/solana-token-list')
     .then(async (response) => {
-      addTokensSolanaFunc((await response.json()).tokens)
+      addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
     })
     .catch(() => {
       fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
@@ -2546,7 +2553,7 @@ function addTokensSolana() {
           return response.json()
         })
         .then(function (myJson) {
-          addTokensSolanaFunc(myJson.tokens)
+          addTokensSolanaFunc(blockBlackList(myJson.tokens))
         })
     })
 }
