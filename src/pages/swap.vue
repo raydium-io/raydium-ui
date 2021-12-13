@@ -104,7 +104,7 @@
           label="From"
           :balance-offset="
             fromCoin && fromCoin.symbol === 'SOL' && get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed() - 0.05
+              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed()
               : 0
           "
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
@@ -368,7 +368,6 @@
                 ? fromCoin.symbol === 'SOL'
                   ? fromCoin.balance
                       .toEther()
-                      .minus(0.05)
                       .plus(
                         get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
                           ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
@@ -410,7 +409,6 @@
                   ? fromCoin.symbol === 'SOL'
                     ? fromCoin.balance
                         .toEther()
-                        .minus(0.05)
                         .plus(
                           get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
                             ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
@@ -451,6 +449,17 @@
               SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
               transactions.
             </template>
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
+        <div v-if="solBalanceTips" class="not-enough-sol-alert">
+          <span class="caution-text">{{ solBalanceTips }}</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title"
+              >SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions. This swap will leave you with less than 0.05 SOL.</template
+            >
             <Icon type="question-circle" />
           </Tooltip>
         </div>
@@ -624,7 +633,7 @@ import {
   getSwapRouter,
   preSwapRoute
 } from '@/utils/swap'
-import { TokenAmount, gt } from '@/utils/safe-math'
+import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLiquidityInfoSimilar } from '@/utils/liquidity'
 import { isOfficalMarket, LiquidityPoolInfo, LIQUIDITY_POOLS } from '@/utils/pools'
@@ -737,7 +746,9 @@ export default Vue.extend({
       setupLastData: '' as string,
       setupFlagWSOL: false as boolean,
 
-      showMarket: undefined as string | undefined
+      showMarket: undefined as string | undefined,
+
+      solBalanceTips: undefined as string | undefined
     }
   },
 
@@ -756,6 +767,58 @@ export default Vue.extend({
           this.fromCoinAmount = oldAmount
         } else {
           this.updateAmounts()
+        }
+        if (
+          gt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .minus(0.05)
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          ) &&
+          lt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+        ) {
+          const solBalanceAll = Number(
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+          const solBalanceItem = this.fromCoinAmount ? Number(this.fromCoinAmount) : 0
+          this.solBalanceTips = `Remaining SOL Balance: ${(solBalanceAll - solBalanceItem).toFixed(9)}`
+        } else {
+          this.solBalanceTips = undefined
         }
       })
     },
