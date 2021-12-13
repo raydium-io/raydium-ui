@@ -129,7 +129,9 @@ export default Vue.extend({
       // can't send negative balance
       if (availableBalance < 0) return
 
-      const inputValue = (availableBalance * percent).toFixed(this.balance.decimals)
+      const offset = this.coinName === 'SOL' ? 0.05 : 0
+
+      const inputValue = (availableBalance * percent - offset).toFixed(this.balance.decimals)
       this.focusInput()
       this.$emit('onInput', inputValue)
     }

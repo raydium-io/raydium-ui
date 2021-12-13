@@ -238,6 +238,17 @@
           </template>
           <template v-else>Supply</template>
         </Button>
+        <div v-if="solBalanceTips" class="not-enough-sol-alert">
+          <span class="caution-text">{{ solBalanceTips }}</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title"
+              >SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions. This swap will leave you with less than 0.05 SOL.</template
+            >
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
       </div>
     </div>
 
@@ -266,7 +277,7 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getOutAmount, addLiquidity, getLiquidityInfoSimilar, getOutAmountStable } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
-import { gt } from '@/utils/safe-math'
+import { gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLpListByTokenMintAddresses, LiquidityPoolInfo } from '@/utils/pools'
 import AmmIdSelect from '@/components/AmmIdSelect.vue'
@@ -317,7 +328,9 @@ export default Vue.extend({
 
       userNeedAmmIdOrMarket: undefined as string | undefined,
 
-      setCoinFromMintLoading: false
+      setCoinFromMintLoading: false,
+
+      solBalanceTips: undefined as string | undefined
     }
   },
 
@@ -336,6 +349,59 @@ export default Vue.extend({
           this.fromCoinAmount = oldAmount
         } else {
           this.updateAmounts()
+        }
+
+        if (
+          gt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .minus(0.05)
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          ) &&
+          lt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+        ) {
+          const solBalanceAll = Number(
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+          const solBalanceItem = this.fromCoinAmount ? Number(this.fromCoinAmount) : 0
+          this.solBalanceTips = `Remaining SOL Balance: ${(solBalanceAll - solBalanceItem).toFixed(9)}`
+        } else {
+          this.solBalanceTips = undefined
         }
       })
     },
@@ -849,5 +915,14 @@ export default Vue.extend({
   .anticon-close {
     color: #fff;
   }
+}
+
+.not-enough-sol-alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -18px;
+  margin-top: 4px;
 }
 </style>
