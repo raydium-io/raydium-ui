@@ -17,12 +17,7 @@
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
             :class="loading ? 'disabled' : ''"
-            @click="
-              () => {
-                getOrderBooks()
-                $accessor.wallet.getTokenAccounts()
-              }
-            "
+            @click="flushData"
           />
         </Tooltip>
         <Tooltip placement="bottomRight">
@@ -832,6 +827,7 @@ export default Vue.extend({
         }
         this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
         if (this.toCoin) this.needUserCheckUnofficialShow()
+        this.updateAmounts()
       },
       deep: true
     },
@@ -1357,6 +1353,12 @@ export default Vue.extend({
       }
     },
 
+    flushData() {
+      this.getOrderBooks()
+      this.$accessor.liquidity.requestInfos()
+      this.$accessor.wallet.getTokenAccounts()
+    },
+
     updateAmounts() {
       let toCoinAmount = ''
       let toCoinWithSlippage = null
@@ -1565,7 +1567,7 @@ export default Vue.extend({
             this.countdown += 1
 
             if (this.countdown === this.autoRefreshTime) {
-              this.getOrderBooks()
+              this.flushData()
             }
           }
         }
