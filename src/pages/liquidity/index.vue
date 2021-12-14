@@ -721,6 +721,8 @@ export default Vue.extend({
     },
 
     updateAmounts() {
+      if (this.suppling) return
+
       if (this.fromCoin && this.toCoin && this.lpMintAddress) {
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
