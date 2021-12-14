@@ -30,19 +30,14 @@
 
     <div class="card">
       <div class="card-body">
-        <div style="text-align: center; width: 100%">
-          <div style="width: 40%; display: inline-block">
-            <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
-              <Icon slot="prefix" type="search" />
-            </Input>
-          </div>
-          <div style="width: 5%; display: inline-block"></div>
-          <div style="width: 40%; display: inline-block">
-            <RadioGroup v-model="poolType" style="display: inline-block; width: 100%; margin: 0 auto">
-              <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
-              <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
-            </RadioGroup>
-          </div>
+        <div class="pool-filters">
+          <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
+            <Icon slot="prefix" type="search" />
+          </Input>
+          <RadioGroup v-model="poolType">
+            <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
+            <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
+          </RadioGroup>
         </div>
         <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
           <span slot="name" slot-scope="text, row" class="lp-icons">
@@ -58,7 +53,7 @@
               v-else-if="pool"
               :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
             >
-              {{ pool.name }}
+              {{ pool.name }}=
             </NuxtLink>
             <span v-else>{{ text }}</span>
           </span>
@@ -261,6 +256,44 @@ export default class Pools extends Vue {
 }
 .card-body {
   padding-top: 25px;
+  display: block;
+  .pool-filters {
+    text-align: center;
+    .input-search {
+      width: 40%;
+      display: inline-block;
+    }
+
+    .ant-radio-group {
+      display: inline-block;
+      width: 40%;
+      margin-left: 5%;
+    }
+  }
+
+  /deep/ .ant-table-body {
+    overflow-x: scroll;
+  }
+}
+
+@media (max-width: 1000px) {
+  .card-body .pool-filters {
+    .input-search {
+      display: block;
+      width: auto;
+    }
+    .ant-radio-button-wrapper {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ant-radio-group {
+      display: block;
+      width: auto;
+      margin-left: 0;
+      margin-top: 1em;
+    }
+  }
 }
 </style>
 
