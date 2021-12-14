@@ -17,12 +17,7 @@
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
             :class="loading ? 'disabled' : ''"
-            @click="
-              () => {
-                getOrderBooks()
-                $accessor.wallet.getTokenAccounts()
-              }
-            "
+            @click="flushData"
           />
         </Tooltip>
         <Tooltip placement="bottomRight">
@@ -216,6 +211,27 @@
             </span>
           </div>
         </div>
+        <div v-if="checkCoinAmountModelFlag" class="fs-container price-update">
+          <span class="name" style="opacity: 1">
+            Price Updated
+            <Tooltip placement="right">
+              <template slot="title">Price has changed since your swap amount was entered.</template>
+              <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
+          ></span>
+          <span>
+            <Button
+              size="small"
+              ghost
+              @click="
+                () => {
+                  checkCoinAmountModelFlag = false
+                  toCoinAmountOld = toCoinAmount
+                }
+              "
+              >Accept</Button
+            >
+          </span>
+        </div>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
@@ -354,6 +370,7 @@
           size="large"
           ghost
           :disabled="
+            checkCoinAmountModelFlag ||
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
@@ -748,7 +765,11 @@ export default Vue.extend({
 
       showMarket: undefined as string | undefined,
 
-      solBalanceTips: undefined as string | undefined
+      solBalanceTips: undefined as string | undefined,
+
+      fromCoinAmountOld: undefined as string | undefined,
+      toCoinAmountOld: undefined as string | undefined,
+      checkCoinAmountModelFlag: false
     }
   },
 
@@ -761,6 +782,16 @@ export default Vue.extend({
   },
 
   watch: {
+    toCoinAmount(newAmount: string) {
+      if (this.fromCoinAmount !== this.fromCoinAmountOld) {
+        this.fromCoinAmountOld = this.fromCoinAmount
+        this.toCoinAmountOld = newAmount
+        this.checkCoinAmountModelFlag = false
+      } else if (newAmount !== this.toCoinAmountOld) {
+        this.checkCoinAmountModelFlag = true
+      }
+    },
+
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
@@ -832,6 +863,7 @@ export default Vue.extend({
         }
         this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
         if (this.toCoin) this.needUserCheckUnofficialShow()
+        this.updateAmounts()
       },
       deep: true
     },
@@ -887,11 +919,12 @@ export default Vue.extend({
 
     'liquidity.infos': {
       handler(_newInfos: any) {
-        this.updateAmounts()
         const { from, to, ammId } = this.$route.query
         // @ts-ignore
         this.setCoinFromMint(from, to, ammId)
         this.findMarket()
+
+        this.updateAmounts()
       },
       deep: true
     },
@@ -1199,11 +1232,11 @@ export default Vue.extend({
     },
 
     changeCoinAmountPosition() {
-      const tempFromCoinAmount = this.fromCoinAmount
-      const tempToCoinAmount = this.toCoinAmount
+      // const tempFromCoinAmount = this.fromCoinAmount
+      // const tempToCoinAmount = this.toCoinAmount
 
-      this.fromCoinAmount = tempToCoinAmount
-      this.toCoinAmount = tempFromCoinAmount
+      this.fromCoinAmount = this.toCoinAmount
+      // this.toCoinAmount = tempFromCoinAmount
     },
 
     updateCoinInfo(tokenAccounts: any) {
@@ -1357,7 +1390,14 @@ export default Vue.extend({
       }
     },
 
+    flushData() {
+      this.getOrderBooks()
+      this.$accessor.liquidity.requestInfos()
+      this.$accessor.wallet.getTokenAccounts()
+    },
+
     updateAmounts() {
+      if (this.swaping) return
       let toCoinAmount = ''
       let toCoinWithSlippage = null
 
@@ -1565,7 +1605,7 @@ export default Vue.extend({
             this.countdown += 1
 
             if (this.countdown === this.autoRefreshTime) {
-              this.getOrderBooks()
+              this.flushData()
             }
           }
         }
@@ -2079,5 +2119,10 @@ export default Vue.extend({
       }
     }
   }
+}
+.price-update {
+  border-radius: 10px;
+  background: #000829;
+  padding: 10px;
 }
 </style>
