@@ -215,7 +215,7 @@
           <span class="name" style="opacity: 1">
             Price Updated
             <Tooltip placement="right">
-              <template slot="title"> balabala </template>
+              <template slot="title">Price has changed since your swap amount was entered.</template>
               <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
           ></span>
           <span>
@@ -783,8 +783,6 @@ export default Vue.extend({
 
   watch: {
     toCoinAmount(newAmount: string) {
-      if (this.fromCoinAmount === '' || this.toCoinAmount === '') return
-
       if (this.fromCoinAmount !== this.fromCoinAmountOld) {
         this.fromCoinAmountOld = this.fromCoinAmount
         this.toCoinAmountOld = newAmount
@@ -921,11 +919,12 @@ export default Vue.extend({
 
     'liquidity.infos': {
       handler(_newInfos: any) {
-        this.updateAmounts()
         const { from, to, ammId } = this.$route.query
         // @ts-ignore
         this.setCoinFromMint(from, to, ammId)
         this.findMarket()
+
+        this.updateAmounts()
       },
       deep: true
     },
@@ -2123,7 +2122,7 @@ export default Vue.extend({
 }
 .price-update {
   border-radius: 10px;
-  background: rgb(5, 20, 62);
+  background: #000829;
   padding: 10px;
 }
 </style>
