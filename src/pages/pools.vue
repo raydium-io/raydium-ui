@@ -53,7 +53,7 @@
               v-else-if="pool"
               :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
             >
-              {{ pool.name }}=
+              {{ pool.name }}
             </NuxtLink>
             <span v-else>{{ text }}</span>
           </span>
