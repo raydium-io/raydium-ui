@@ -330,7 +330,12 @@ export const actions = actionTree(
                   if (version === 5) {
                     parsed = AMM_INFO_LAYOUT_STABLE.decode(data)
                     poolInfo.currentK = getBigNumber(parsed.currentK)
-                  } else parsed = AMM_INFO_LAYOUT_V4.decode(data)
+                  } else {
+                    parsed = AMM_INFO_LAYOUT_V4.decode(data)
+                    if (getBigNumber(parsed.status) === 7) {
+                      poolInfo.poolOpenTime = getBigNumber(parsed.poolOpenTime)
+                    }
+                  }
 
                   const { swapFeeNumerator, swapFeeDenominator } = parsed
                   poolInfo.fees = {

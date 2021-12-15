@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="isMobile ? 'create-pool-mobile' : 'create-pool'">
+  <div class="container create-pool" :class="isMobile ? 'create-pool-mobile' : 'create-pool'">
     <div class="page-head fs-container">
       <span class="title">Create Pool</span>
     </div>
@@ -171,6 +171,17 @@
                 style="width: 100%"
               />
             </div>
+            <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Open Amm Pool Time:
+            </div>
+            <div style="width: 30%; display: inline-block">
+              <DatePicker
+                v-model="inputStartTime"
+                show-time
+                style="color: #000"
+                dropdown-class-name="create-pool-date-picker"
+              />
+            </div>
             <Col :span="24" style="padding-top: 10px">
               <Button
                 v-if="!wallet.connected"
@@ -255,7 +266,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Steps, Row, Col, Button, Tooltip, Icon } from 'ant-design-vue'
+import { Steps, Row, Col, Button, Tooltip, Icon, DatePicker } from 'ant-design-vue'
 import { PublicKey } from '@solana/web3.js'
 import { getMarket, createAmm, clearLocal } from '@/utils/market'
 import BigNumber from '@/../node_modules/bignumber.js/bignumber'
@@ -277,7 +288,8 @@ const Step = Steps.Step
     Button,
     Step,
     Tooltip,
-    Icon
+    Icon,
+    DatePicker
   }
 })
 export default class CreatePool extends Vue {
@@ -288,6 +300,7 @@ export default class CreatePool extends Vue {
   inputQuoteValue: number | null = null
   inputBaseValue: number | null = null
   inputPrice: number | null = null
+  inputStartTime: any = null
   marketMsg: any | null = null
   getMarketLoading: boolean = false
   marketError: null | string = null
@@ -467,7 +480,8 @@ export default class CreatePool extends Vue {
       this.inputPrice === null ||
       this.inputQuoteValue <= 0 ||
       this.inputBaseValue <= 0 ||
-      this.inputPrice <= 0
+      this.inputPrice <= 0 ||
+      this.inputStartTime === null
     ) {
       this.stepTitleMarketInfo = 'Please input coin value'
       this.stepsStatus = 'error'
@@ -479,7 +493,14 @@ export default class CreatePool extends Vue {
 
     this.createAmmFlag = true
 
-    createAmm(this.$web3, this.$wallet, this.marketMsg, this.inputBaseValue, this.inputQuoteValue)
+    createAmm(
+      this.$web3,
+      this.$wallet,
+      this.marketMsg,
+      this.inputBaseValue,
+      this.inputQuoteValue,
+      this.inputStartTime.unix()
+    )
       .then(async (data) => {
         this.current = 3
         this.stepsStatus = 'process'
@@ -510,6 +531,7 @@ export default class CreatePool extends Vue {
   }
 }
 </script>
+
 <style lang="less" scoped>
 .create-pool {
   max-width: 570px;
@@ -546,5 +568,25 @@ div {
 }
 .msgClass div {
   line-height: 30px;
+}
+</style>
+
+<style>
+.create-pool .ant-calendar-picker-input {
+  border: none;
+  border-bottom: 1px solid #fff;
+}
+.create-pool-date-picker .ant-calendar {
+  background-color: rgb(0 0 0 / 15%);
+  backdrop-filter: blur(24px);
+}
+.create-pool-date-picker .ant-calendar-time-picker-inner {
+  background-color: rgb(19 26 53 / 93%);
+}
+.create-pool-date-picker .ant-calendar-time-picker-select-option-selected {
+  background-color: rgb(32 76 111 / 93%);
+}
+.create-pool-date-picker .ant-calendar-input {
+  background: rgb(0 0 0 / 15%);
 }
 </style>

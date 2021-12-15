@@ -1260,9 +1260,9 @@ export default Vue.extend({
         this.amms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
           (p: any) =>
             p.version === 4 &&
-            [1, 5].includes(p.status) &&
             ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
-              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
+              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress)) &&
+            ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
         )
 
         this.routeInfos = getSwapRouter(
@@ -1417,7 +1417,7 @@ export default Vue.extend({
 
         if (this.amms) {
           for (const poolInfo of this.amms) {
-            if (poolInfo.status !== 1) continue
+            if (poolInfo.status !== undefined && ![1, 7].includes(poolInfo.status)) continue
             const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
               poolInfo,
               this.fromCoin.mintAddress,

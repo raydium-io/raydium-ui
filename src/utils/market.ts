@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { struct, u8 } from 'buffer-layout'
+import { struct, u8, nu64 } from 'buffer-layout'
 
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { Market as MarketSerum } from '@project-serum/serum'
@@ -119,7 +119,8 @@ export async function createAmm(
   wallet: any,
   market: any,
   userInputBaseValue: number,
-  userInputQuoteValue: number
+  userInputQuoteValue: number,
+  startTime: number
 ) {
   const transaction = new Transaction()
   const signers: any = []
@@ -256,7 +257,8 @@ export async function createAmm(
       userInputQuoteValue,
       poolCoinTokenAccount,
       poolPcTokenAccount,
-      lpMintAddress
+      lpMintAddress,
+      startTime
     )
   }
 
@@ -275,7 +277,8 @@ async function initAmm(
   userInputQuoteValue: number,
   poolCoinTokenAccount: PublicKey,
   poolPcTokenAccount: PublicKey,
-  lpMintAddress: PublicKey
+  lpMintAddress: PublicKey,
+  startTime: number
 ) {
   const baseMintDecimals = new BigNumber(await getMintDecimals(conn, market.baseMintAddress as PublicKey))
   const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
@@ -423,7 +426,8 @@ async function initAmm(
 
       owner,
 
-      ammKeys.nonce
+      ammKeys.nonce,
+      startTime
     )
   )
 
@@ -472,9 +476,10 @@ export function initialize(
   serumProgramId: PublicKey,
   serumMarket: PublicKey,
   owner: PublicKey,
-  nonce: number
+  nonce: number,
+  startTime: number
 ): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), u8('nonce')])
+  const dataLayout = struct([u8('instruction'), u8('nonce'), nu64('startTime')])
 
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -501,7 +506,8 @@ export function initialize(
   dataLayout.encode(
     {
       instruction: 0,
-      nonce
+      nonce,
+      startTime
     },
     data
   )
