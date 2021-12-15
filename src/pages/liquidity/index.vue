@@ -188,22 +188,17 @@
           </div>
         </div> -->
         <div v-if="showConfirmLp" class="confirm-lp">
-          I verify that I have read
+          I have read
           <b
             ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
-              >Raydium's Pools Guide</a
+              >Raydium's Liqudity Guide</a
             ></b
           >
-          and understand the risks of providing liquidity, including impermanent loss.
+          and understand the risks involved with providing liquidity and impermanent loss.
           <br />
-          <label style="color: red"
-            ><input v-model="userConfirmLp" type="checkbox" style="margin-right: 10px" />I understand</label
-          >
+          <Checkbox v-model="userConfirmLp"> I confirm </Checkbox>
           <br />
-          <label style="color: red"
-            ><input v-model="userConfirmLpNever" type="checkbox" style="margin-right: 10px" />Do not warn again for this
-            pool</label
-          >
+          <Checkbox v-model="userConfirmLpNever"> Do not warn again for this pool </Checkbox>
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
@@ -282,7 +277,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Checkbox } from 'ant-design-vue'
 import {
   PublicKey,
   // types
@@ -309,11 +304,13 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress,
-    AmmIdSelect
+    AmmIdSelect,
+    Checkbox
   },
 
   data() {
     return {
+      tt: false,
       TOKENS,
       // supply ing
       suppling: false,
