@@ -171,17 +171,50 @@
                 style="width: 100%"
               />
             </div>
+            <div
+              style="width: 90%; display: inline-block; word-wrap: break-word"
+              :class="isMobile ? 'item-title-mobile' : 'item-title'"
+            >
+              Set the date and time when the AMM pool should open, after which the pool will go live and users will be
+              able to swap. Times are in your device's local time.
+              <br />
+              IMPORTANT: Open time can not be changed after pool initialization is confirmed and completed. Make sure to
+              double check and plan accordingly.
+            </div>
             <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
-              Amm Pool Start Time (Local Time):
+              Open AMM Pool Date:
             </div>
             <div style="width: 30%; display: inline-block">
               <DatePicker
                 v-model="inputStartTime"
-                show-time
-                style="color: #000"
+                style="color: #000; width: 100%"
                 dropdown-class-name="create-pool-date-picker"
               />
             </div>
+            <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Open AMM Pool Time:
+            </div>
+            <div style="width: 30%; display: inline-block">
+              <TimePicker
+                v-model="inputStartTime"
+                style="color: #000; width: 100%"
+                popup-class-name="create-pool-date-picker"
+                format="HH:mm"
+              />
+            </div>
+
+            <Col :span="24" style="margin-top: 20px" class="confirm-amm">
+              I have read
+              <b
+                ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
+                  >Raydium's Liqudity Guide</a
+                ></b
+              >
+              and understand the risks involved with providing liquidity and impermanent loss.
+              <br />
+              <Checkbox v-model="userConfirmAmm"> I confirm </Checkbox>
+              <br />
+            </Col>
             <Col :span="24" style="padding-top: 10px">
               <Button
                 v-if="!wallet.connected"
@@ -228,7 +261,14 @@
                   style="z-index: 999; width: 70%"
                   :loading="createAmmFlag"
                   :disabled="
-                    createAmmFlag || !(inputPrice !== null && inputBaseValue !== null && inputQuoteValue !== null)
+                    createAmmFlag ||
+                    !(
+                      inputPrice !== null &&
+                      inputBaseValue !== null &&
+                      inputQuoteValue !== null &&
+                      inputStartTime !== null
+                    ) ||
+                    !userConfirmAmm
                   "
                   @click="createKey"
                 >
@@ -266,7 +306,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Steps, Row, Col, Button, Tooltip, Icon, DatePicker } from 'ant-design-vue'
+import { Steps, Row, Col, Button, Tooltip, Icon, DatePicker, TimePicker, Checkbox } from 'ant-design-vue'
 import { PublicKey } from '@solana/web3.js'
 import { getMarket, createAmm, clearLocal } from '@/utils/market'
 import BigNumber from '@/../node_modules/bignumber.js/bignumber'
@@ -289,7 +329,9 @@ const Step = Steps.Step
     Step,
     Tooltip,
     Icon,
-    DatePicker
+    DatePicker,
+    TimePicker,
+    Checkbox
   }
 })
 export default class CreatePool extends Vue {
@@ -325,6 +367,8 @@ export default class CreatePool extends Vue {
   userLocalAmmIdList: string[] = []
 
   expectAmmId: undefined | string
+
+  userConfirmAmm: boolean = false
 
   get isMobile() {
     return this.$accessor.isMobile
@@ -588,5 +632,26 @@ div {
 }
 .create-pool-date-picker .ant-calendar-input {
   background: rgb(0 0 0 / 15%);
+}
+
+.create-pool .ant-time-picker-input {
+  border: none;
+  border-bottom: 1px solid #fff;
+  background-color: rgb(0 0 0 / 15%);
+  backdrop-filter: blur(24px);
+}
+.create-pool-date-picker .ant-time-picker-panel-inner {
+  background-color: rgb(19 26 53 / 93%);
+}
+.create-pool-date-picker .ant-time-picker-panel-input {
+  background: rgb(0 0 0 / 15%);
+}
+.create-pool-date-picker .ant-time-picker-panel-select-option-selected {
+  background-color: rgb(32 76 111 / 93%);
+}
+.confirm-amm {
+  border-radius: 10px;
+  background: #000829;
+  padding: 10px;
 }
 </style>
