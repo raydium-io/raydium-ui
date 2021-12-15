@@ -34,28 +34,27 @@
           <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
             <Icon slot="prefix" type="search" />
           </Input>
-          <RadioGroup v-model="poolType">
+          <!-- <RadioGroup v-model="poolType">
             <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
             <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
-          </RadioGroup>
+          </RadioGroup> -->
         </div>
         <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
           <span slot="name" slot-scope="text, row" class="lp-icons">
-            {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
-              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.coin.mintAddress : ''" />
-              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.pc.mintAddress : ''" />
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
             </div>
-            <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
-              {{ pool.name }}
+            <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
+              {{ row.name }}
+              <Tooltip v-if="row.liquidity < 100000" placement="right">
+                <template slot="title"
+                  >This pool has relatively low liquidity. Always check the quoted price and that the pool has
+                  sufficient liquidity before trading.</template
+                >
+                <Icon type="exclamation-circle" />
+              </Tooltip>
             </NuxtLink>
-            <NuxtLink
-              v-else-if="pool"
-              :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
-            >
-              {{ pool.name }}
-            </NuxtLink>
-            <span v-else>{{ text }}</span>
           </span>
           <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
@@ -185,16 +184,11 @@ export default class Pools extends Vue {
     const pool = []
     for (const item of this.pools) {
       if (
-        (this.poolType === 'RaydiumPools' && (item.official === undefined || item.official)) ||
-        (this.poolType !== 'RaydiumPools' && item.official !== undefined && !item.official)
+        !item.name.includes('unknown') &&
+        item.liquidity !== 0 &&
+        (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
       ) {
-        if (
-          !item.name.includes('unknown') &&
-          item.liquidity !== 0 &&
-          (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
-        ) {
-          pool.push(item)
-        }
+        pool.push(item)
       }
     }
     this.poolsShow = pool
@@ -260,7 +254,7 @@ export default class Pools extends Vue {
   .pool-filters {
     text-align: center;
     .input-search {
-      width: 40%;
+      width: 100%;
       display: inline-block;
     }
 

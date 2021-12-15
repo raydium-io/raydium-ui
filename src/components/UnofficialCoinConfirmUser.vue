@@ -9,8 +9,13 @@
     @cancel="$emit('onClose')"
   >
     <div class="select-token">
-      This token does not appear on the default token list. Take extra caution to confirm token addresses and that the
-      minimum amount of tokens received for your trade is acceptable.
+      This token does not appear on the detault token list. Anyone can create an SPL token on Solana, which may include
+      fake versions of existing tokens or tokens that claim to represent projects that do not have a token. Take extra
+      caution to confirm token addresses.
+      <br />
+      <br />
+      Always check the quoted price and that the pool has sufficient liquidity before trading.
+      <br />
       <br />
       <label style="color: red"
         ><input v-model="userCheckUnofficial" type="checkbox" style="margin-right: 10px" />I understand</label
