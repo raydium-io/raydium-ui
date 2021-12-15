@@ -40,6 +40,7 @@
           </RadioGroup> -->
         </div>
         <Table
+          v-if="!isMobile"
           :columns="columns"
           :data-source="poolsShow"
           :pagination="false"
@@ -47,6 +48,34 @@
           :scroll="{ x: '100%', y: '80vh' }"
         >
           <span slot="name" slot-scope="text, row" class="lp-icons">
+            <div class="icons">
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
+            </div>
+            <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
+              {{ row.name }}
+              <Tooltip v-if="row.liquidity < 100000" placement="right">
+                <template slot="title"
+                  >This pool has relatively low liquidity. Always check the quoted price and that the pool has
+                  sufficient liquidity before trading.</template
+                >
+                <Icon type="exclamation-circle" />
+              </Tooltip>
+            </NuxtLink>
+          </span>
+          <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="volume_7d" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="fee_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="apy" slot-scope="text"> {{ new TokenAmount(text, 2, false).format() }}% </span>
+        </Table>
+        <Table v-else :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
+          <span
+            slot="name"
+            slot-scope="text, row"
+            class="lp-icons"
+            style="display: flex !important; align-items: center; flex-direction: column"
+          >
             <div class="icons">
               <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
               <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
@@ -163,6 +192,10 @@ export default class Pools extends Vue {
 
   get liquidity() {
     return this.$accessor.liquidity
+  }
+
+  get isMobile() {
+    return this.$accessor.isMobile
   }
 
   @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
