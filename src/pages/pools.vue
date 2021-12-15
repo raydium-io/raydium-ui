@@ -39,7 +39,13 @@
             <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
           </RadioGroup> -->
         </div>
-        <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
+        <Table
+          :columns="columns"
+          :data-source="poolsShow"
+          :pagination="false"
+          row-key="lp_mint"
+          :scroll="{ x: '100%', y: '80vh' }"
+        >
           <span slot="name" slot-scope="text, row" class="lp-icons">
             <div class="icons">
               <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
@@ -292,6 +298,12 @@ export default class Pools extends Vue {
 </style>
 
 <style lang="less">
+.card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body {
+  background: transparent;
+}
+.card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body::-webkit-scrollbar {
+  display: unset;
+}
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }

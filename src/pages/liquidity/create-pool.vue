@@ -172,7 +172,7 @@
               />
             </div>
             <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
-              Open Amm Pool Time:
+              Amm Pool Start Time (Local Time):
             </div>
             <div style="width: 30%; display: inline-block">
               <DatePicker
