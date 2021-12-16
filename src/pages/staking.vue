@@ -420,7 +420,7 @@ export default Vue.extend({
       const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
-      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
