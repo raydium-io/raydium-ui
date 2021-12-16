@@ -1,6 +1,6 @@
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash-es'
 
-import { TokenAmount } from '@/utils/safe-math';
+import { TokenAmount } from '@/utils/safe-math'
 
 export interface TokenInfo {
   symbol: string
@@ -2556,9 +2556,22 @@ function addTokensSolana() {
           addTokensSolanaFunc(blockBlackList(myJson.tokens))
         })
     })
+
+  fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
+    flushTokenIcon(Object.values((await response.json()).spl))
+  })
 }
 
 const notUseSolanaPicMint: string[] = [TOKENS.TTT.mintAddress]
+
+function flushTokenIcon(tokens: any[]) {
+  tokens.forEach((itemToken: any) => {
+    const token = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.mint)
+    if (token) {
+      token.picUrl = `https://sdk.raydium.io/icons/${token.mintAddress}.png`
+    }
+  })
+}
 
 function addTokensSolanaFunc(tokens: any[]) {
   tokens.forEach((itemToken: any) => {
