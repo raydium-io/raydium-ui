@@ -40,42 +40,15 @@
           </RadioGroup> -->
         </div>
         <Table
-          v-if="!isMobile"
+          :loading="loading"
           :columns="columns"
           :data-source="poolsShow"
           :pagination="false"
           row-key="lp_mint"
-          :scroll="{ x: '100%', y: '80vh' }"
+          style="height: 80vh; overflow-y: auto"
+          class="show-table"
         >
           <span slot="name" slot-scope="text, row" class="lp-icons">
-            <div class="icons">
-              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
-              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
-            </div>
-            <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
-              {{ row.name }}
-              <Tooltip v-if="row.liquidity < 100000" placement="right">
-                <template slot="title"
-                  >This pool has relatively low liquidity. Always check the quoted price and that the pool has
-                  sufficient liquidity before trading.</template
-                >
-                <Icon type="exclamation-circle" />
-              </Tooltip>
-            </NuxtLink>
-          </span>
-          <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="volume_7d" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="fee_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="apy" slot-scope="text"> {{ new TokenAmount(text, 2, false).format() }}% </span>
-        </Table>
-        <Table v-else :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
-          <span
-            slot="name"
-            slot-scope="text, row"
-            class="lp-icons"
-            style="display: flex !important; align-items: center; flex-direction: column"
-          >
             <div class="icons">
               <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
               <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
@@ -106,8 +79,8 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Table, Radio, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
-import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
+import { PairData } from '@/types/api'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
@@ -125,11 +98,6 @@ const RadioButton = Radio.Button
     Button,
     Input,
     Icon
-  },
-
-  async asyncData({ $api }) {
-    const pools = await $api.getPairs()
-    return { pools }
   }
 })
 export default class Pools extends Vue {
@@ -178,16 +146,14 @@ export default class Pools extends Vue {
     }
   ]
 
-  pools: any = []
+  pools: PairData[] = []
   poolsShow: any = []
-  poolType: string = 'RaydiumPools'
 
   autoRefreshTime: number = 60
   countdown: number = 0
   timer: any = null
   loading: boolean = false
 
-  searchButton = true
   searchName = ''
 
   get liquidity() {
@@ -198,30 +164,25 @@ export default class Pools extends Vue {
     return this.$accessor.isMobile
   }
 
-  @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
-  refreshThePage() {
-    this.showPool()
-  }
-
-  @Watch('$accessor.liquidity.info', { immediate: true, deep: true })
-  async onLiquidityChanged() {
-    this.pools = await this.$api.getPairs()
-    this.showPool()
-  }
-
-  @Watch('poolType')
-  onPoolTypeChanged() {
-    this.showPool()
-  }
-
   @Watch('searchName')
   onSearchNameChanged() {
     this.showPool()
   }
 
-  showPool() {
+  async showPool(firstLoading = false) {
+    let pools: PairData[]
+    try {
+      if (firstLoading) this.loading = true
+      pools = await this.$api.getPairs()
+      this.pools = pools
+    } catch (e) {
+      pools = this.pools
+    } finally {
+      this.loading = false
+    }
+
     const pool = []
-    for (const item of this.pools) {
+    for (const item of pools) {
       if (
         !item.name.includes('unknown') &&
         item.liquidity > 0 &&
@@ -235,6 +196,7 @@ export default class Pools extends Vue {
 
   mounted() {
     this.setTimer()
+    this.showPool(true)
   }
 
   setTimer() {
@@ -252,14 +214,10 @@ export default class Pools extends Vue {
   }
 
   async flush() {
-    this.loading = true
-    this.pools = await this.$api.getPairs()
-    this.showPool()
-    this.loading = false
+    await this.showPool()
     this.countdown = 0
   }
 
-  getPoolByLpMintAddress = getPoolByLpMintAddress
   TokenAmount = TokenAmount
 }
 </script>
@@ -334,7 +292,7 @@ export default class Pools extends Vue {
 .card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body {
   background: transparent;
 }
-.card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body::-webkit-scrollbar {
+.card-body .show-table::-webkit-scrollbar {
   display: unset;
 }
 ::-webkit-scrollbar {
