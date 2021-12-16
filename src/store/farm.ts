@@ -9,7 +9,8 @@ import logger from '@/utils/logger';
 import { lt, TokenAmount } from '@/utils/safe-math';
 import {
   STAKE_INFO_LAYOUT, STAKE_INFO_LAYOUT_V4, USER_STAKE_INFO_ACCOUNT_LAYOUT,
-  USER_STAKE_INFO_ACCOUNT_LAYOUT_V4, USER_STAKE_INFO_ACCOUNT_LAYOUT_V5
+  USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1, USER_STAKE_INFO_ACCOUNT_LAYOUT_V4,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT_V5
 } from '@/utils/stake';
 import {
   commitment, findAssociatedStakeInfoAddress, getFilteredProgramAccounts, getMultipleAccounts
@@ -208,7 +209,13 @@ async function stakeProgramIdAccount(stakeAccounts: any, auxiliaryStakeAccounts:
     const stakeAccountAddress = stakeAccountInfo.publicKey.toBase58()
     const { data } = stakeAccountInfo.accountInfo
 
-    const userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+    let userStakeInfo = {} as any
+
+    if (data.length === USER_STAKE_INFO_ACCOUNT_LAYOUT.span) {
+      userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT.decode(data)
+    } else if (data.length === USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1.span) {
+      userStakeInfo = USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1.decode(data)
+    }
 
     const poolId = userStakeInfo.poolId.toBase58()
 

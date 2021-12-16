@@ -976,6 +976,15 @@ export const USER_STAKE_INFO_ACCOUNT_LAYOUT = struct([
   u64('rewardDebt')
 ])
 
+export const USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1 = struct([
+  u64('state'),
+  publicKey('poolId'),
+  publicKey('stakerOwner'),
+  u64('depositBalance'),
+  u128('rewardDebt'),
+  seq(u64(), 17)
+])
+
 export const USER_STAKE_INFO_ACCOUNT_LAYOUT_V4 = struct([
   u64('state'),
   publicKey('poolId'),
