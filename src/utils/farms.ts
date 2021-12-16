@@ -1823,6 +1823,44 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'DrMvUqiHEqnBTZe5eeWWfGVcZeuWW5kVRmkGfJ8WK3eZ',
     poolRewardTokenAccount: '3MYDn6i8WpCd7FpLuD8c8HeJXfmrhDeHifSF97cS2iUg',
     poolRewardTokenAccountB: 'Ag5tg5mbAhKdECEKfSTuyw4C47CHQfVxp4CmpKj6U9zW'
+  },
+  {
+    name: 'BLOCK-USDC',
+    lp: { ...LP_TOKENS['BLOCK-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.BLOCK },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'ELovJ3jDKMiWhCUCdZzPfTeVmQwhj4cvYuGwS8FfhEtJ',
+    poolAuthority: '3wvnrh5VaiARSfkwhiLy7pakrxXJSPBEjmAA77sr2xd3',
+    poolLpTokenAccount: '3hikNL4yh7kBusYs6hQ5roNrg3D4874N1nqupvjP2WwT',
+    poolRewardTokenAccount: '9hdU4MgrLNJcBf85ZjM54hpsM6x9xaZX4eMTtpU52Skh',
+    poolRewardTokenAccountB: '3Ch1odoQHrDLPtshdcYBhuSexuA8JnoqS53UE7LSfoMY'
+  },
+  {
+    name: 'FRKT-USDC',
+    lp: { ...LP_TOKENS['FRKT-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.FRKT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'HXpQJeAcBCKfGY6YhZgBocZGgV4xApPVK7r8CPXfvCin',
+    poolAuthority: 'RuSifGR29nd7TyDHjWzJgzz2wyfTd9W3DoMADzUQPX9',
+    poolLpTokenAccount: '5GAWXBDQtdyzf32yEHP1fhm3jHU6JNjDgLK3G4txVnXH',
+    poolRewardTokenAccount: 'DPfj6jE34t3s5EhL5qrmos4S2amJHLWAj13ef5BvSz89',
+    poolRewardTokenAccountB: '5TPJHNJ4ZeJ6BSbZ83R4ZdA7R3Tsf3icgxQVaWjEExn7'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 

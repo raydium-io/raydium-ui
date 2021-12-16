@@ -2501,6 +2501,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'EN43tp8xdkcM8RYSJ4msFHMPTJRXKhUteVYBDJLwTvr3',
     decimals: TOKENS.REAL.decimals
+  },
+  'FRKT-USDC-V4': {
+    symbol: 'FRKT-USDC',
+    name: 'FRKT-USDC LP',
+    coin: { ...TOKENS.FRKT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7MgzqVTGeA4wENme81QPTrPy45NJMKVL9XGwxmNT87cG',
+    decimals: TOKENS.FRKT.decimals
   }
 }
 
