@@ -619,6 +619,7 @@ div {
 .create-pool .ant-calendar-picker-input {
   border: none;
   border-bottom: 1px solid #fff;
+  background: #131a35 !important;
 }
 .create-pool-date-picker .ant-calendar {
   background-color: rgb(0 0 0 / 15%);
@@ -637,7 +638,7 @@ div {
 .create-pool .ant-time-picker-input {
   border: none;
   border-bottom: 1px solid #fff;
-  background-color: rgb(0 0 0 / 15%);
+  background: #131a35 !important;
   backdrop-filter: blur(24px);
 }
 .create-pool-date-picker .ant-time-picker-panel-inner {
