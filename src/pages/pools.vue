@@ -45,7 +45,7 @@
           :data-source="poolsShow"
           :pagination="false"
           row-key="lp_mint"
-          style="height: 80vh; overflow-y: auto"
+          style="max-height: 80vh; overflow-y: auto"
           class="show-table"
         >
           <span slot="name" slot-scope="text, row" class="lp-icons">
@@ -289,6 +289,13 @@ export default class Pools extends Vue {
 </style>
 
 <style lang="less">
+.card-body .ant-table-placeholder {
+  background: transparent;
+}
+.card-body .ant-empty-description {
+  color: #fff;
+}
+
 .card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body {
   background: transparent;
 }
