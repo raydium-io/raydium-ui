@@ -324,7 +324,7 @@ import {
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { depositV4, depositV5, withdrawV4, withdrawV5 } from '@/utils/stake'
+import { deposit, depositV5, withdraw, withdrawV5 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -665,7 +665,7 @@ export default Vue.extend({
               auxiliaryAccounts,
               amount
             )
-          : depositV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+          : deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
 
       depositPromise
         .then((txid) => {
@@ -743,7 +743,7 @@ export default Vue.extend({
               auxiliaryAccounts,
               amount
             )
-          : withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
+          : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
 
       withdrawPromise
         .then((txid) => {
@@ -814,7 +814,7 @@ export default Vue.extend({
               auxiliaryAccounts,
               '0'
             )
-          : depositV4(conn, wallet, farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, '0')
+          : deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, '0')
 
       depositPromise
         .then((txid) => {
