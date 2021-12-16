@@ -305,6 +305,7 @@ export default Vue.extend({
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -314,7 +315,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+      deposit(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
         .then((txid) => {
           this.$notify.info({
             key,
@@ -366,6 +367,7 @@ export default Vue.extend({
       const lpAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${this.farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${this.farmInfo.poolId}.stakeAccountAddress`)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -375,7 +377,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, amount)
+      withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
         .then((txid) => {
           this.$notify.info({
             key,
@@ -418,6 +420,7 @@ export default Vue.extend({
       const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
       const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
       const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
+      const auxiliaryAccounts = get(this.farm.auxiliaryStakeAccounts, `${this.farmInfo.poolId}`) || []
 
       const key = getUnixTs().toString()
       this.$notify.info({
@@ -427,7 +430,7 @@ export default Vue.extend({
         duration: 0
       })
 
-      deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, '0')
+      deposit(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, '0')
         .then((txid) => {
           this.$notify.info({
             key,
