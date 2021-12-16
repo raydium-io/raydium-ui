@@ -347,7 +347,6 @@ export default Vue.extend({
     },
 
     async findMint(keyword = '', clearIndex = false) {
-      console.time('findMint')
       if (keyword.length > 40) {
         const hasTokenKey = Object.keys(TOKENS).find(
           (item) => TOKENS[item].mintAddress === keyword && TOKENS[item].cache === true
@@ -386,12 +385,10 @@ export default Vue.extend({
         this.showTokenListIndex = 0
       }
 
-      console.timeEnd('findMint')
       this.flushShowTokenList()
     },
 
     createTokenList(keyword = '') {
-      console.time('create token list')
       keyword = keyword.trim()
       let tokenList = []
 
@@ -467,8 +464,6 @@ export default Vue.extend({
         }
       }
       this.tokenList = cloneDeep(showToken)
-
-      console.timeEnd('create token list')
     },
 
     setDesc() {
