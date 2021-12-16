@@ -171,18 +171,15 @@
                 style="width: 100%"
               />
             </div>
-            <div
-              style="width: 90%; display: inline-block; word-wrap: break-word"
-              :class="isMobile ? 'item-title-mobile' : 'item-title'"
-            >
-              Set the date and time when the AMM pool should open, after which the pool will go live and users will be
-              able to swap. Times are in your device's local time.
-              <br />
-              IMPORTANT: Open time can not be changed after pool initialization is confirmed and completed. Make sure to
-              double check and plan accordingly.
-            </div>
+            <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              Start Time: Set the date and time for the pool to go live, after which users will be able to swap and the
+              AMM will market make on Serum.
+            </p>
+            <p style="padding-top: 10px; padding-bottom: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              Select according to local time, then check the UTC conversion.
+            </p>
             <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
-              Open AMM Pool Date:
+              Pool Start Date:
             </div>
             <div style="width: 30%; display: inline-block">
               <DatePicker
@@ -192,7 +189,7 @@
               />
             </div>
             <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
-              Open AMM Pool Time:
+              Pool Start Time:
             </div>
             <div style="width: 30%; display: inline-block">
               <TimePicker
@@ -202,16 +199,38 @@
                 format="HH:mm"
               />
             </div>
+            <div style="width: 40%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Start Time in UTC:
+            </div>
+            <div style="width: 50%; display: inline-block; text-align: right">
+              {{
+                inputStartTime
+                  ? inputStartTime
+                      .toJSON()
+                      .replace('T', ' ')
+                      .replace('Z', '')
+                      .split('.')[0]
+                      .split(':')
+                      .slice(0, 2)
+                      .join(':') + ':00'
+                  : ''
+              }}
+            </div>
+
+            <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              IMPORTANT: Start time can not be changed after pool initialization is confirmed.
+            </p>
 
             <Col :span="24" style="margin-top: 20px" class="confirm-amm">
-              I have read
-              <b
-                ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
-                  >Raydium's Liqudity Guide</a
-                ></b
-              >
-              and understand the risks involved with providing liquidity and impermanent loss.
-              <br />
+              <p style="padding-bottom: 10px; word-break: break-word; line-height: 20px; margin: 0">
+                I have read
+                <b
+                  ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
+                    >Raydium's Liqudity Guide</a
+                  ></b
+                >
+                and understand the risks involved with providing liquidity and impermanent loss.
+              </p>
               <Checkbox v-model="userConfirmAmm"> I confirm </Checkbox>
               <br />
             </Col>
@@ -276,7 +295,7 @@
                 </Button>
 
                 <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
-                  After clicking 'Confirm' you will need to approve three transactions in your wallet to initialize the
+                  After clicking 'Confirm' you will need to approve two transactions in your wallet to initialize the
                   pool, create the AMM account, and add liquidity.
                 </p>
               </div>
