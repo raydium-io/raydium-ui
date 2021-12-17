@@ -16,8 +16,8 @@
       "tasks": "Task",
       "points": "Points",
       "task": {
-        "huobi": {
-          "title": "Trade on OKEX",
+        "UID": {
+          "title": "Trade on",
           "point": "+5 POINTS"
         },
         "swap": {
@@ -68,7 +68,7 @@
       "sub-btn": "SUBMIT",
       "sub-btn-loading": "SUBMITING...",
       "sub-btn-placeholder": "Enter OKEX UID",
-      "sub-huobiUID": "OKEX UID:"
+      "sub-UID": "OKEX UID:"
     },
 
     "swap": {
@@ -178,8 +178,11 @@
       "qualified": {
         "title": "Qualified Referrals",
         "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
-      }
-    }
+      },
+      "referral-list": "Referral Leaderboard",
+      "referral-list-end": "Top 5: $2,000 Each"
+    },
+    "exchange-name-huobi": "HUOBI"
   },
   "connect-wallet": "CONNECT WALLET"
 }

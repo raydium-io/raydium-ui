@@ -724,6 +724,7 @@ export default class Airdrop extends Vue {
         this.initBackendResponse = response?.data ?? {}
         this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
         if (!this.isActivityEnd) {
+          // @ts-ignore
           this.winners = await this.$api.getCompaignWinners()
         }
       } catch (err) {}
@@ -737,6 +738,7 @@ export default class Airdrop extends Vue {
       data = this.cachedWinnerList[targetFileName]
     } else {
       try {
+        // @ts-ignore
         const freshRawData = await this.$api.getCompaignWinnerList({ type })
         const parsedData = freshRawData.join('\n')
         this.cachedWinnerList[targetFileName] = parsedData

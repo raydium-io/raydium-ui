@@ -14,8 +14,7 @@ const apiPlugin: Plugin = (ctx, inject) => {
       ctx.$axios.get(`https://api.raydium.io/campaign/${campaignId}`, { params: { address, referral } }),
     postCompaign: ({ campaignId = 2, address, task, result = '', sign = '' }) =>
       ctx.$axios.post(`https://api.raydium.io/campaign/${campaignId}`, { address, task, result, sign }),
-    getCompaignWinners: () => ctx.$axios.get(`https://api.raydium.io/campaign`),
-    getCompaignWinnerList: ({ type }) => ctx.$axios.get(`https://api.raydium.io/campaign`, { params: { type } }) // TEMP mock backend response // deprecated
+    getCompaignWinners: ({ campaignId }) => ctx.$axios.get(`https://api.raydium.io/campaign-winner/${campaignId}`)
   }
 
   ctx.$api = api
