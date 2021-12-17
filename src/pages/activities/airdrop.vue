@@ -566,7 +566,7 @@ import { mapState } from 'vuex'
 import { Tooltip, Input, Icon, Table, Checkbox } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
-const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
+// const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
 @Component({
   components: {
@@ -591,9 +591,9 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
       const storedItem = window.localStorage.getItem('airdrop:referral')
       if (storedItem) location.href = `${window.location.origin}/airdrop/?referral=${storedItem}`
     }
-    const winnerList = await getWinnerList()
+    // const winnerList = await getWinnerList()
 
-    return { winnerList }
+    // return { winnerList }
   },
 
   computed: {
@@ -724,6 +724,7 @@ export default class Airdrop extends Vue {
         this.initBackendResponse = response?.data ?? {}
         this.isActivityEnd = new Date(response?.campaign_info?.end).getTime() < Date.now()
         if (!this.isActivityEnd) {
+          // @ts-ignore
           this.winners = await this.$api.getCompaignWinners()
         }
       } catch (err) {}
@@ -737,6 +738,7 @@ export default class Airdrop extends Vue {
       data = this.cachedWinnerList[targetFileName]
     } else {
       try {
+        // @ts-ignore
         const freshRawData = await this.$api.getCompaignWinnerList({ type })
         const parsedData = freshRawData.join('\n')
         this.cachedWinnerList[targetFileName] = parsedData

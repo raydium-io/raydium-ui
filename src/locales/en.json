@@ -1,0 +1,201 @@
+{
+  "airdrop": {
+    "title": "$100k Raydium Bounty Airdrop",
+    "pre-title": "Learn, Trade, Follow, Refer and Earn RAY",
+    "pending-reward": "Events end and Pending rewards",
+    "reward": [
+      "The Airdrop is ",
+      "complete!",
+      "Rewards have been sent to winners, connect your wallet to see results!"
+    ],
+    "reflush": "Please refresh the page to see the winner list",
+    "coming-soon": "Coming Soon",
+    "end-time": "Airdrop Ends on 2021-12-24 10:00:00 UTC",
+
+    "introduction-activities": {
+      "title": "Earn up to $3,010 in RAY in 4 easy steps",
+      "tasks": "Task",
+      "points": "Points",
+      "task": [
+        {
+          "title": "Swap on Raydium",
+          "point": "+5 POINTS",
+          "index": "1"
+        },
+        {
+          "title": "Trade RAY on OKEx & provide OKEx UID",
+          "point": "+1 POINTS",
+          "index": "2"
+        },
+        {
+          "title": "Follow Raydium on Twitter",
+          "point": "+1 POINT / REFERRAL",
+          "index": "3"
+        },
+        {
+          "title": "Refer Friends",
+          "point": "+1 POINT / REFERRAL",
+          "index": "4"
+        }
+      ]
+    },
+
+    "step1": {
+      "step": "STEP 1"
+    },
+
+    "step2": {
+      "step": "STEP 2"
+    },
+    "step3": {
+      "step": "STEP 3",
+      "title": "Try Raydium’s Light Speed Swaps",
+      "point": "Total Points +5"
+    },
+    "step4": {
+      "step": "EARN BONUS POINTS",
+      "title": "Join Forces With Raydium",
+      "point": "+1 Point for Following & +1 Point for Each Successful Referral"
+    },
+
+    "video": {
+      "title": "Get Started on Raydium",
+      "video-title": "Watch how to create a wallet on Solana and make your first Swap on Raydium.",
+      "connect-wallet": "Connect wallet to recieve airdrop rewards",
+      "download": "Download",
+      "phantom": "Phantom (desktop)",
+      "try-sollet": "On mobile? Try",
+      "sollet": "SLOPE"
+    },
+
+    "huobiID": {
+      "title": ["1. Trade at least $20 in RAY on OKEx", "2. Enter your valid OKEx User ID"],
+      "sub-btn": "SUBMIT",
+      "input-placeholder": "Enter a valid OKEx login",
+      "sub-btn-loading": "SUBMITTING...",
+      "sub-btn-placeholder": "Enter OKEx UID",
+      "sub-UID": "OKEx UID:"
+    },
+
+    "swap": {
+      "title": "Make a swap of at least $20 on Raydium",
+      "completed": "Congratulations! You completed this task.",
+      "pending": "Points pending. Please check again in 30 minutes.",
+      "notDoneTask": "you have not done this task",
+      "btn": "GO TO SWAP"
+    },
+
+    "twitter": {
+      "title": "Share to Twitter",
+      "completed": "Congratulations! You completed this task.",
+      "pending": "Points pending. Please check again in 30 minutes.",
+      "notDoneTask": "you have not done this task",
+      "btn": "TWEET NOW",
+      "point-msg": "BONUS +1 POINT / REFERRAL",
+      "prompt": "Tweet must include referral code for API tracking"
+    },
+
+    "follow": {
+      "title": "Follow Raydium",
+      "completed": "Congratulations! You completed this task.",
+      "pending": "Points pending. Please check again in 24 hour.",
+      "notDoneTask": "you have not done this task",
+      "btn": "FOLLOW NOW",
+      "point-msg": "+1 POINT",
+      "prompt": "Tweet must include referral code for API tracking"
+    },
+
+    "refer": {
+      "title": "Refer now with your customized link below",
+      "point-msg": "+1 POINT / REFERRAL",
+      "prompt": "Your referral link"
+    },
+
+    "reward-details": {
+      "link-name": "REWARD DETAILS",
+      "title": "REWARD DETAILS",
+      "words": [
+        "To be qualified for the Lucky Draw Pool (details below) users must 1) connect a wallet to this airdrop page 2) complete a swap with a value of at least $20 on Raydium 3) trade at least $20 worth of RAY on OKEx during the event period, and 4) provide a valid OKEx User ID. Qualified users will receive a minimum of 5 points for the Lucky Draw Pool and a chance to receive an airdrop of up to $1,000 in RAY tokens.",
+        "The first 4,000 users to connect a wallet, swap, and successfully refer at least 1 user, who is qualified based on the definition in detail 1, are guaranteed to win $10 in RAY tokens each. Users in the first 4,000 to complete these steps will also be eligible for the Lucky Draw Pool for a chance at up to $1,000 in RAY tokens.",
+        "Qualified users can earn extra points for the Lucky Draw Pool by completing bonus tasks; 1) Following Raydium on Twitter and 2) successfully referring new users, worth 1 point each.",
+        "The top 5 finishers on the referral leaderboard will win $2,000 in RAY tokens each. Referrals count as extra points for the lucky draw pool.",
+        "Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, 250 winners of $50, and 1,000 winners of $20). Winners are ineligible to win multiple prizes from the lucky draw pool."
+      ],
+      "table": {
+        "head": ["Requirements", "Number of Winners", "Airdrop Amounts", "Airdrop Eligibility"],
+        "R1": {
+          "requirements": ["First 4,000", "to Swap on Raydium, Trade on OKEx, & Successfully Refer at least 1 Friend"],
+          "winners": "4,000 Winners",
+          "amount": "$10 of RAY tokens",
+          "eligibility": "Guaranteed $10 airdrop + Lucky Draw Pool"
+        },
+        "R2": {
+          "requirements": [
+            "Lucky Draw Pool",
+            "Swap on Raydium, Trade on OKEx & Provide Valid OKEx User ID (Worth 5 Entries)",
+            "Earn Bonus Entries!",
+            "Follow Raydium and refer friends"
+          ],
+          "winners": ["3 Winners", "15 Winners", "100 Winners", "250 Winners", "1000 Winners"],
+          "amount": [
+            "$1,000 of RAY tokens",
+            "$300 of RAY tokens",
+            "$100 of RAY tokens",
+            "$50 of RAY tokens",
+            "$20 of RAY tokens"
+          ],
+          "eligibility": "All users who complete a swap and provide a valid OKEx Login are eligible"
+        },
+        "R3": {
+          "requirements": "Top 5 on the referral leaderboard",
+          "winners": "5 Winners",
+          "amount": "$2,000 of RAY tokens",
+          "eligibility": "Guaranteed $2,000 airdrop"
+        }
+      }
+    },
+
+    "terms-conditions": {
+      "title": "TERMS & CONDITIONS",
+      "words": [
+        "Users that qualify for a guaranteed airdrop of the equivalent of $10 in RAY tokens are also eligible for the Lucky Draw Pool detailed above. However, participants will not be able to win multiple lucky draws.",
+        "Users will need to verify their completion of tasks via the Raydium Airdrop Page in order to qualify for the lucky draw. Lucky draw winners will be selected at random by Raydium.",
+        "Raydium reserves the right to cancel or amend any Activity Rules at our sole discretion, as well as the final interpretation of user task completion.",
+        "Rewards will be distributed to eligible participants via the wallet address linked to the account they used to swap.",
+        "The airdrop campaign will ends on 2021-12-24 10:00:00 UTC. All tasks must be completed before this time."
+      ]
+    },
+
+    "user": {
+      "title": "Airdrop Points",
+      "not-connect": "Connect wallet to view your current points",
+
+      "finish": {
+        "winner-list": "Check Winners",
+        "prompt": "Rewards have already been sent to winning addresses"
+      },
+      "calculating": "Calculating...",
+
+      "your-reward": "Your reward",
+      "reward-info": ["Top 5", "First 4,000", "Lucky Draw Pool"],
+
+      "total-points": "Total Points",
+      "eligible": {
+        "title": "Eligible for Lucky Draw?",
+        "tips": "Qualified users are defined as having connected a wallet, completed a swap, made a trade on OKEx and submitted a valid OKEx UID."
+      },
+      "point": {
+        "title": "Points for Lucky Draw",
+        "tips": "1 point = 1 entry. Prizes for the lucky draw will be issued in descending order (ie: 3 winners of $1,000, 15 winners of $300, 100 winners of $100, etc). Winners are ineligible to win multiple prizes from the lucky draw pool."
+      },
+      "qualified": {
+        "title": "Qualified Referrals",
+        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
+      },
+      "referral-list": "Referral Leaderboard",
+      "referral-list-end": "Top 5: $2,000 Each"
+    },
+    "exchange-name-OKEx": "OKEx"
+  },
+  "connect-wallet": "CONNECT WALLET"
+}

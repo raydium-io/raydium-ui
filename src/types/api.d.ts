@@ -99,7 +99,5 @@ export interface NuxtApiInstance {
     result?: string
     sign?: string
   }) => Promise<CampaignInfo>
-  getCompaignWinners: () => Promise<CampaignWinners>
-  getCompaignWinnerList: (queryInfo: { type: 'luck' | 'valid' }) => Promise<CampaignWinnerList> // deprecated
-  getRouter: (mintIn: string, mintOut: string) => Promise<RouterInfo>
+  getCompaignWinners: (param: { campaignId: number }) => Promise<CampaignWinners>
 }

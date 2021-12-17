@@ -63,7 +63,6 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
 
   async asyncData() {
     const winnerList = await getWinnerList()
-
     return { winnerList }
   }
 })
