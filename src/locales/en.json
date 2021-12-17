@@ -17,7 +17,7 @@
       "points": "Points",
       "task": {
         "UID": {
-          "title": "Trade on",
+          "title": "Trade on OKEx",
           "point": "+5 POINTS"
         },
         "swap": {
@@ -67,8 +67,8 @@
       "title": "Trade XXX $RAY on OKEx and enter OKEx UID",
       "sub-btn": "SUBMIT",
       "sub-btn-loading": "SUBMITING...",
-      "sub-btn-placeholder": "Enter OKEX UID",
-      "sub-UID": "OKEX UID:"
+      "sub-btn-placeholder": "Enter OKEx UID",
+      "sub-UID": "OKEx UID:"
     },
 
     "swap": {

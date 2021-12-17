@@ -172,7 +172,7 @@
             <td class="td order">1</td>
             <td class="td">
               {{ $t('airdrop.introduction-activities.task.UID.title') }}
-              {{ $t(`airdrop.exchange-name-${campaignLocalesName}`) }}
+              <!-- {{ $t(`airdrop.exchange-name-${campaignLocalesName}`) }} -->
             </td>
             <td class="td">
               <div class="point-label">{{ $t('airdrop.introduction-activities.task.UID.point') }}</div>
@@ -515,7 +515,7 @@ export default class Airdrop extends Vue {
   campaignTaskName = 'huobi'
   campaignLocalesName = 'huobi'
 
-  comingSoon = true
+  comingSoon = false
   showWinnerList = false
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true

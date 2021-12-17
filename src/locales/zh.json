@@ -13,7 +13,7 @@
       "points": "奖励点数",
       "task": {
         "UID": {
-          "title": "在OKEX交易所交易",
+          "title": "在OKEx交易所交易",
           "point": "+5个点数"
         },
         "swap": {
@@ -63,8 +63,8 @@
       "title": "在OKEx交易所交易 xxx $RAY 并且输入OKEx UID",
       "sub-btn": "提交",
       "sub-btn-loading": "提交中....",
-      "sub-btn-placeholder": "请输入OKEX的UID",
-      "sub-UID": "OKEX UID:"
+      "sub-btn-placeholder": "请输入OKEx的UID",
+      "sub-UID": "OKEx UID:"
     },
 
     "swap": {
