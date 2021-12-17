@@ -189,7 +189,8 @@
         "tips": "用您的推荐链接推广的有效用户个数"
       },
       "referral-list": "推荐排行榜",
-      "referral-list-end": "前五名：每人$2000"
+      "referral-list-end": "前五名：每人$2000",
+      "waiting-confirmation": "积分及幸运抽奖资格将在OKEx确认交易后显示"
     },
     "exchange-name-OKEx": "OKEx"
   },

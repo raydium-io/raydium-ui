@@ -193,7 +193,8 @@
         "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
       },
       "referral-list": "Referral Leaderboard",
-      "referral-list-end": "Top 5: $2,000 Each"
+      "referral-list-end": "Top 5: $2,000 Each",
+      "waiting-confirmation": "Eligibility and points will be visible when OKEx confirms UID and transaction history"
     },
     "exchange-name-OKEx": "OKEx"
   },

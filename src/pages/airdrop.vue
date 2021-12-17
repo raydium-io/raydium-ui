@@ -44,7 +44,7 @@
         </div>
 
         <template v-if="$accessor.wallet.connected">
-          <template v-if="isActivityEnd && showWinnerList">
+          <!-- <template v-if="isActivityEnd && showWinnerList">
             <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
               {{ $t('airdrop.user.your-reward')
               }}<span v-if="rewardIsOut && rewardInfos"
@@ -148,7 +148,8 @@
               </tr>
             </tbody>
           </table>
-          <div v-else>{{ $t('airdrop.user.calculating') }}</div>
+          <div v-else>{{ $t('airdrop.user.calculating') }}</div> -->
+          <div>{{ $t('airdrop.user.waiting-confirmation') }}</div>
         </template>
         <template v-else>
           <div class="subtitle">{{ $t('airdrop.user.not-connect') }}</div>
@@ -1134,7 +1135,7 @@ a.disabled {
     padding: 2px 24px 4px 0;
   }
   &.has-result {
-    height: 634px;
+    // height: 634px;
   }
 }
 
