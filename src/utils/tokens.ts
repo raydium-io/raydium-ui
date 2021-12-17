@@ -2545,7 +2545,11 @@ function addUserLocalCoinMint() {
 }
 
 // fake
-const BLACK_LIST = ['3pX59cis3ZXnX6ZExPoUQjpvJVspmj4YavtUmpTpkB33']
+const BLACK_LIST = [
+  '3pX59cis3ZXnX6ZExPoUQjpvJVspmj4YavtUmpTpkB33',
+  'EUjf7vzZsWjR3eGo5jEASxYyqt7ALqdmE87bDbURUWWV',
+  '2bXBmaYJwJfj5Cu8TDqLLrW1b9L7dK6sLgKoBBYRBzTH'
+]
 
 function blockBlackList(tokens: { address: string }[]) {
   return tokens.filter((item) => !BLACK_LIST.includes(item.address))

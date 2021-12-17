@@ -27,6 +27,12 @@ import {
 
 const AUTO_REFRESH_TIME = 60
 
+// fake
+const BLACK_LIST: string[] = [
+  'DHgHX6eqZQTcRY5xixV5sM68NZBpJLLvnM9riG7i5FHz',
+  '5uN8CdpKxKFTkobBnqdv8bx6c7coGNSJgWX6AJLnyKxW'
+]
+
 export const state = () => ({
   initialized: false,
   loading: false,
@@ -137,6 +143,7 @@ export const actions = actionTree(
         tokenMintData[itemToken.mintAddress] = itemToken
       }
       for (let indexAmmInfo = 0; indexAmmInfo < ammAll.length; indexAmmInfo += 1) {
+        if (BLACK_LIST.includes(ammAll[indexAmmInfo].publicKey.toString())) continue
         const ammInfo = AMM_INFO_LAYOUT_V4.decode(Buffer.from(ammAll[indexAmmInfo].accountInfo.data))
         if (
           !Object.keys(lpMintListDecimls).includes(ammInfo.lpMintAddress.toString()) ||
