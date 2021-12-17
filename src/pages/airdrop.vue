@@ -1,16 +1,23 @@
 <template>
-  <div class="airdrop">
-    <section class="page-title">
-      <img
-        class="icon"
-        src="../assets/background/okex.png"
-        style="margin-bottom: 40px; width: 100%; max-width: 400px"
-      />
-      <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
-      <div class="page-main-title">{{ $t('airdrop.title') }}</div>
+  <div>
+    <div class="lang">
+      <RadioGroup :default-value="$i18n.locale" button-style="solid" @change="changeLocal">
+        <RadioButton value="en"> English </RadioButton>
+        <RadioButton value="zh"> 中文 </RadioButton>
+      </RadioGroup>
+    </div>
+    <div class="airdrop">
+      <section class="page-title">
+        <img
+          class="icon"
+          src="../assets/background/okex-airdrop.svg"
+          style="margin-bottom: 40px; width: 100%; max-width: 400px"
+        />
+        <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
+        <div class="page-main-title">{{ $t('airdrop.title') }}</div>
 
-      <div v-if="!comingSoon">
-        <div v-if="!rewardIsOut && isActivityEnd" class="page-additional-description">
+        <div v-if="!comingSoon" class="page-additional-description">{{ $t('airdrop.end-time') }}</div>
+        <div v-if="comingSoon && !rewardIsOut && isActivityEnd" class="page-additional-description">
           {{ $t('airdrop.pending-reward') }}
         </div>
 
@@ -19,19 +26,12 @@
           {{ $t('airdrop.reward[2]') }}
         </div>
         <div v-if="rewardIsOut && !showWinnerList" class="page-additional-description">{{ $t('airdrop.reflush') }}</div>
-      </div>
-    </section>
+      </section>
 
-    <div v-if="!comingSoon">
       <section v-if="isWinningPanelOpen" :class="`box winner-panel ${$accessor.wallet.connected ? 'has-result' : ''}`">
         <div class="close-btn" @click="isWinningPanelOpen = false">
           <div class="icon minimize" />
         </div>
-
-        <Select :show-arrow="false" :default-value="$i18n.locale" class="select-language" @change="$i18n.setLocale">
-          <Option value="en">EN</Option>
-          <Option value="zh">中文</Option>
-        </Select>
 
         <a v-if="rewardIsOut && showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
           {{ $t('airdrop.user.finish.winner-list') }}
@@ -108,7 +108,7 @@
                 {{ $t('airdrop.user.qualified.title') }}
                 <Tooltip placement="left">
                   <template slot="title">
-                    {{ $t('airdrop.user.qualified.title') }}
+                    {{ $t('airdrop.user.qualified.tips') }}
                   </template>
                   <Icon type="question-circle" style="cursor: pointer; margin-left: 8px" />
                 </Tooltip>
@@ -168,35 +168,13 @@
             <th class="th">{{ $t('airdrop.introduction-activities.tasks') }}</th>
             <th class="th">{{ $t('airdrop.introduction-activities.points') }}</th>
           </tr>
-          <tr>
-            <td class="td order">1</td>
+          <tr v-for="(item, index) of $t('airdrop.introduction-activities.task')" :key="index">
+            <td class="td order">{{ item.index }}</td>
             <td class="td">
-              {{ $t('airdrop.introduction-activities.task.UID.title') }}
-              <!-- {{ $t(`airdrop.exchange-name-${campaignLocalesName}`) }} -->
+              {{ item.title }}
             </td>
             <td class="td">
-              <div class="point-label">{{ $t('airdrop.introduction-activities.task.UID.point') }}</div>
-            </td>
-          </tr>
-          <tr>
-            <td class="td order">2</td>
-            <td class="td">{{ $t('airdrop.introduction-activities.task.swap.title') }}</td>
-            <td class="td">
-              <div class="point-label">{{ $t('airdrop.introduction-activities.task.swap.point') }}</div>
-            </td>
-          </tr>
-          <tr>
-            <td class="td order">3</td>
-            <td class="td">{{ $t('airdrop.introduction-activities.task.earn-bonus.title') }}</td>
-            <td class="td">
-              <div class="point-label">{{ $t('airdrop.introduction-activities.task.earn-bonus.point') }}</div>
-            </td>
-          </tr>
-          <tr>
-            <td class="td order">4</td>
-            <td class="td">{{ $t('airdrop.introduction-activities.task.refer.title') }}</td>
-            <td class="td">
-              <div class="point-label">{{ $t('airdrop.introduction-activities.task.refer.point') }}</div>
+              <div class="point-label">{{ item.point }}</div>
             </td>
           </tr>
         </table>
@@ -253,7 +231,7 @@
             </div>
             <div>
               {{ $t('airdrop.video.try-sollet') }}
-              <a href="https://sollet.io" rel="nofollow noopener noreferrer" target="_blank">{{
+              <a href="https://slope.finance/" rel="nofollow noopener noreferrer" target="_blank">{{
                 $t('airdrop.video.sollet')
               }}</a>
             </div>
@@ -275,32 +253,6 @@
 
       <section class="step-game">
         <div class="task-level">{{ $t('airdrop.step2.step') }}</div>
-
-        <div class="box form">
-          <div class="box-title">{{ $t('airdrop.huobiID.title') }}</div>
-          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-UID') }}{{ huobiUID }}</div>
-          <div v-else>
-            <div class="input-box">
-              <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.sub-btn-loading')" />
-            </div>
-            <button
-              :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
-              @click="submitUID(campaignTaskName, huobiUID)"
-            >
-              {{
-                $accessor.wallet.connected
-                  ? isHuobiUIDing
-                    ? $t('airdrop.huobiID.sub-btn-loading')
-                    : $t('airdrop.huobiID.sub-btn')
-                  : $t('connect-wallet')
-              }}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section class="connect-wallet">
-        <div class="task-level">{{ $t('airdrop.step3.step') }}</div>
         <div class="title">{{ $t('airdrop.step3.title') }}</div>
         <div class="subtitle">{{ $t('airdrop.step3.point') }}</div>
         <div class="box-grid">
@@ -323,6 +275,32 @@
             <a href="/swap/" target="_blank" style="align-self: end"
               ><button>{{ $t('airdrop.swap.btn') }}</button></a
             >
+          </div>
+        </div>
+      </section>
+
+      <section class="connect-wallet">
+        <div class="task-level">{{ $t('airdrop.step3.step') }}</div>
+
+        <div class="box form">
+          <div v-for="item of $t('airdrop.huobiID.title')" :key="item" class="box-title">{{ item }}</div>
+          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-UID') }}{{ huobiUID }}</div>
+          <div v-else>
+            <div class="input-box">
+              <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.input-placeholder')" />
+            </div>
+            <button
+              :disabled="$accessor.wallet.connected && (!canSubmitHuobiUID || isHuobiUIDing)"
+              @click="submitUID(campaignTaskName, huobiUID)"
+            >
+              {{
+                $accessor.wallet.connected
+                  ? isHuobiUIDing
+                    ? $t('airdrop.huobiID.sub-btn-loading')
+                    : $t('airdrop.huobiID.sub-btn')
+                  : $t('connect-wallet')
+              }}
+            </button>
           </div>
         </div>
       </section>
@@ -350,8 +328,6 @@
               </div>
             </div>
 
-            <div class="box-text red">*{{ $t('airdrop.twitter.prompt') }}</div>
-
             <div class="btn-row">
               <a
                 v-if="$accessor.wallet.connected"
@@ -377,19 +353,58 @@
             </div>
           </div>
 
+          <div class="twitter">
+            <div class="box social-media">
+              <div class="box-title">
+                {{ $t('airdrop.follow.title') }}
+                <div>
+                  <div
+                    :class="`icon-reward ${haveFollow ? 'finished' : isFollowPending ? 'pending' : 'muted'}`"
+                    :title="`${
+                      haveFollow
+                        ? $t('airdrop.follow.completed')
+                        : isTweetPending
+                        ? $t('airdrop.follow.pending')
+                        : $t('airdrop.follow.notDoneTask')
+                    }`"
+                  />
+                  <div class="point-label">{{ $t('airdrop.follow.point-msg') }}</div>
+                </div>
+              </div>
+              <div class="btn-row">
+                <a
+                  :href="`https://twitter.com/RaydiumProtocol`"
+                  class="link"
+                  rel="nofollow noopener noreferrer"
+                  target="_blank"
+                >
+                  <button
+                    @click="
+                      () => {
+                        !isActivityEnd && submit({ task: 'twitter', result: '' })
+                      }
+                    "
+                  >
+                    <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.follow.btn') }}
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div class="box">
             <div class="box-title">
               {{ $t('airdrop.refer.title') }}
               <div class="point-label">{{ $t('airdrop.refer.point-msg') }}</div>
             </div>
 
-            <div class="box-text small">
+            <div v-if="$accessor.wallet.connected" class="box-text small">
               {{ $t('airdrop.refer.prompt') }}:
               <br />
               {{ referralLink }}
             </div>
 
-            <div class="icon-btns">
+            <div v-if="$accessor.wallet.connected" class="icon-btns">
               <button
                 class="icon-btn"
                 title="click here to copy it"
@@ -465,7 +480,6 @@
         </ul>
       </section>
     </div>
-    <div v-else style="text-align: center; font-size: 40px">{{ $t('airdrop.coming-soon') }}</div>
   </div>
 </template>
 
@@ -477,10 +491,11 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { mapState } from 'vuex'
 
-import { Tooltip, Input, Icon, Table, Checkbox, Select } from 'ant-design-vue'
+import { Tooltip, Input, Icon, Table, Checkbox, Radio } from 'ant-design-vue'
 import { CampaignInfo, CampaignWinners } from '@/types/api'
 
-const Option = Select.Option
+const RadioGroup = Radio.Group
+const RadioButton = Radio.Button
 
 const getWinnerList = () => import('static/winner-list.json' as any).then((m) => m.default || m)
 
@@ -491,8 +506,8 @@ const getWinnerList = () => import('static/winner-list.json' as any).then((m) =>
     Icon,
     Table,
     Checkbox,
-    Select,
-    Option
+    RadioGroup,
+    RadioButton
   },
 
   head: {
@@ -663,6 +678,10 @@ export default class Airdrop extends Vue {
   //   tempA.click()
   // }
 
+  changeLocal({ target }: { target: { value: string } }) {
+    this.$i18n.setLocale(target.value)
+  }
+
   async submit({ task, result, sign }: { task: string; result?: string; sign?: string }) {
     if (this.isActivityEnd) return
     const response = await this.$api.postCompaign({
@@ -694,13 +713,20 @@ export default class Airdrop extends Vue {
   }
 
   getDefaultText() {
-    const defaultText = `Did you hear about the @RaydiumProtocol $100k Bounty Airdrop?😎
+    let defaultText
+    if (this.$i18n.locale === 'zh') {
+      defaultText = `你听说@RaydiumProtocol与@OKEx合作进行10万美元的悬赏空投了吗？
 
-Learn, swap, and refer for a chance at up to $2k in $RAY!
+随着$RAY现在在OKEx上市，不要错过这个机会，交换，交易和推荐，有机会获得高达3千美元的RAY! 😎
 
-#SolanaSummer
+现在就加入： ${window.location.origin}/airdrop/?referral=${this.initBackendResponse.user?.referral ?? ''}`
+    } else {
+      defaultText = `Did you hear @RaydiumProtocol is partnering with @OKEx for a $100k Bounty Airdrop? 
+
+With $RAY now listed on OKEx, don't miss this opportunity to swap, trade, and refer for a chance at up to $3k in RAY! 😎
 
 Join now: ${window.location.origin}/airdrop/?referral=${this.initBackendResponse.user?.referral ?? ''}`
+    }
     const encoded = encodeURIComponent(defaultText)
     return encoded
   }
@@ -718,9 +744,28 @@ Join now: ${window.location.origin}/airdrop/?referral=${this.initBackendResponse
 .airdrop .ant-select-selection {
   background: transparent;
 }
+
+.select-language-down .ant-select-dropdown-menu-item-selected {
+  background: #131a35;
+}
+.select-language-down .ant-select-dropdown-menu-item-active {
+  background: #39d0d8 !important;
+}
 </style>
 
 <style lang="less" scoped>
+.lang {
+  padding: 10px 50px;
+  text-align: right;
+
+  .select-language {
+    // position: absolute;
+    // left: 4%;
+    // top: 4%;
+    background: transparent;
+    color: aquamarine;
+  }
+}
 .airdrop {
   --primary: #141040;
   --secondary: #39d0d8;
@@ -1050,13 +1095,6 @@ a.disabled {
       mask-image: url('../assets/icons/minimize.svg');
     }
   }
-  .select-language {
-    position: absolute;
-    left: 4%;
-    top: 4%;
-    background: transparent;
-    color: aquamarine;
-  }
   .download-full-list {
     color: var(--secondary);
     padding: 2px 16px;
@@ -1140,7 +1178,7 @@ a.disabled {
   padding: 32px 48px;
 
   table.TLDR-table {
-    width: 60%;
+    // width: 60%;
     margin-bottom: 48px;
     th.th {
       padding: 12px 16px;
