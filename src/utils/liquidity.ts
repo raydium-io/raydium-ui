@@ -1,29 +1,22 @@
-import BigNumber from 'bignumber.js'
+import { publicKey, u128, u64 } from '@project-serum/borsh';
+import { closeAccount } from '@project-serum/serum/lib/token-instructions';
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import BigNumber from 'bignumber.js';
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout'
+import { nu64, struct, u8 } from 'buffer-layout';
 
-import { publicKey, u128, u64 } from '@project-serum/borsh'
-import { closeAccount } from '@project-serum/serum/lib/token-instructions'
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
-
-import { TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TOKEN_PROGRAM_ID } from '@/utils/ids';
 import {
-  getLpMintByTokenMintAddresses,
-  getPoolByLpMintAddress,
-  getPoolByTokenMintAddresses,
-  LIQUIDITY_POOLS,
-  LiquidityPoolInfo
-} from '@/utils/pools'
-import { TokenAmount } from '@/utils/safe-math'
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
+  getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS, LiquidityPoolInfo
+} from '@/utils/pools';
+import { TokenAmount } from '@/utils/safe-math';
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
 import {
-  commitment,
-  createAssociatedTokenAccountIfNotExist,
-  createTokenAccountIfNotExist,
-  getMultipleAccounts,
-  sendTransaction
-} from '@/utils/web3'
-import { getBigNumber, MINT_LAYOUT } from './layouts'
+  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
+  getMultipleAccounts, sendTransaction
+} from '@/utils/web3';
+import { getBigNumber, MINT_LAYOUT } from './layouts';
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
@@ -352,6 +345,8 @@ export async function removeLiquidity(
           newToTokenAccount,
           owner,
 
+          poolInfo,
+
           lpAmount
         )
       : removeLiquidityInstruction(
@@ -614,6 +609,8 @@ export function removeLiquidityInstructionV4(
   userPcTokenAccount: PublicKey,
   userOwner: PublicKey,
 
+  poolInfo: LiquidityPoolInfo,
+
   amount: number
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), nu64('amount')])
@@ -639,6 +636,16 @@ export function removeLiquidityInstructionV4(
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userOwner, isSigner: true, isWritable: false }
   ]
+
+  if (poolInfo.serumEventQueue) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumEventQueue), isSigner: false, isWritable: true })
+  }
+  if (poolInfo.serumBids) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumBids), isSigner: false, isWritable: true })
+  }
+  if (poolInfo.serumAsks) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumAsks), isSigner: false, isWritable: true })
+  }
 
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
