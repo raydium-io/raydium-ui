@@ -66,179 +66,24 @@
         </div>
       </div>
     </div>
-
-    <div class="page-head fs-container">
-      <span class="title">AMM-v3 to AMM-v4 Migration</span>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <p>
-          Raydium is upgrading remaining V3 pools to the newer V4 AMM contract. The affected pools are RAY-SOL, RAY-SRM,
-          RAY-USDC and RAY-ETH. As part of the upgrade, liquidity in legacy V3 pools must migrate to new pools. This
-          tool simplifies the process. For more info click
-          <a href="https://raydium.gitbook.io/raydium/updates/v4-migration" target="_blank">here</a>.
-        </p>
-
-        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-          Connect Wallet
-        </Button>
-        <div v-else>
-          <Steps direction="vertical" progress-dot :current="3">
-            <Step>
-              <div slot="title">Unstake</div>
-              <div slot="description" class="action">
-                All staked LP tokens will be unstaked from legacy pools
-                <template v-for="farm in farms">
-                  <div
-                    v-if="farm.farmInfo.version === 3 && farm.farmInfo.legacy && !farm.depositBalance.isNullOrZero()"
-                    :key="farm.farmInfo.poolId"
-                  >
-                    <h6 style="display: inline-block">
-                      {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
-                    </h6>
-
-                    <Button
-                      ghost
-                      size="small"
-                      :loading="unstaking"
-                      @click="unstakeV3(farm.farmInfo, farm.depositBalance.toEther())"
-                    >
-                      Harvest & Unstake
-                    </Button>
-                  </div>
-                </template>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Remove liquidity</div>
-              <div slot="description" class="action">
-                Remove liquidity for all legacy LP tokens
-
-                <template v-for="liquid in liquids">
-                  <h6 v-if="liquid.poolInfo.version === 3" :key="liquid.poolInfo.name" class="fs-container">
-                    <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
-
-                    <Button
-                      ghost
-                      size="small"
-                      :loading="removing"
-                      :disabled="liquids.filter((l) => l.poolInfo.version === 3).length === 0"
-                      @click="remove(liquid.poolInfo, liquid.userLpBalance)"
-                    >
-                      Remove liquidity
-                    </Button>
-                  </h6>
-                </template>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Add liquidity to new pools</div>
-              <div slot="description" class="action">
-                Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
-
-                <Button ghost @click="$router.push({ path: '/liquidity/' })">Go to AMM-v4 liquidity</Button>
-              </div>
-            </Step>
-          </Steps>
-        </div>
-      </div>
-    </div>
-
-    <div class="page-head fs-container">
-      <span class="title">DEX2 to DEX3 Migration</span>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <p>
-          Raydium is upgrading from Serum DEX2 to DEX3. As part of the upgrade, liquidity in legacy DEX2 pools must
-          migrate to new pools. This tool simplifies the process. For more info click
-          <a href="https://raydium.gitbook.io/raydium/updates/upgrading-to-serum-dex3" target="_blank">here</a>.
-        </p>
-
-        <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-          Connect Wallet
-        </Button>
-        <div v-else>
-          <Steps direction="vertical" progress-dot :current="3">
-            <Step>
-              <div slot="title">Unstake</div>
-              <div slot="description" class="action">
-                All staked LP tokens will be unstaked from legacy pools
-
-                <template v-for="farm in farms">
-                  <h6 v-if="farm.farmInfo.version === 2" :key="farm.farmInfo.poolId">
-                    {{ farm.depositBalance.format() }} {{ farm.farmInfo.lp.name }}
-                  </h6>
-                </template>
-
-                <Button
-                  ghost
-                  :loading="unstaking"
-                  :disabled="farms.filter((f) => f.farmInfo.version === 2).length === 0"
-                  @click="unstake"
-                >
-                  Unstake all
-                </Button>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Remove liquidity</div>
-              <div slot="description" class="action">
-                Remove liquidity for all legacy LP tokens
-
-                <template v-for="liquid in liquids">
-                  <h6 v-if="liquid.poolInfo.version === 2" :key="liquid.poolInfo.name" class="fs-container">
-                    <span> {{ liquid.userLpBalance.format() }} {{ liquid.poolInfo.lp.name }} </span>
-
-                    <Button
-                      ghost
-                      :loading="removing"
-                      :disabled="liquids.filter((l) => l.poolInfo.version === 2).length === 0"
-                      @click="remove(liquid.poolInfo, liquid.userLpBalance)"
-                    >
-                      Remove liquidity
-                    </Button>
-                  </h6>
-                </template>
-              </div>
-            </Step>
-            <Step>
-              <div slot="title">Add liquidity to new pools</div>
-              <div slot="description" class="action">
-                Continue earning RAY by adding liquidity to new pools, then staking LP tokens.
-
-                <Button ghost @click="$router.push({ path: '/liquidity/' })">Go to DEX3 liquidity</Button>
-              </div>
-            </Step>
-          </Steps>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Button, Steps, Icon } from 'ant-design-vue'
+import { Button, Icon } from 'ant-design-vue'
 
 import { get, cloneDeep } from 'lodash-es'
-import { unstakeAll, mergeTokens } from '@/utils/migrate'
-import { withdraw } from '@/utils/stake'
+import { mergeTokens } from '@/utils/migrate'
 import { TOKENS, getTokenSymbolByMint } from '@/utils/tokens'
 import { removeLiquidity } from '@/utils/liquidity'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
-const { Step } = Steps
-
 export default Vue.extend({
   components: {
     Button,
-    Steps,
-    Step,
     Icon
   },
 
@@ -327,51 +172,6 @@ export default Vue.extend({
         })
         .finally(() => {
           this.migrating = false
-        })
-    },
-
-    unstakeV3(farmInfo: any, amount: string) {
-      this.unstaking = true
-
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
-
-      const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
-      const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
-      const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
-
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
-
-      withdraw(conn, wallet, farmInfo, lpAccount, rewardAccount, infoAccount, amount)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
-
-          const description = `Unstake ${amount} ${farmInfo.lp.name}`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Stake failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.unstaking = false
         })
     },
 
@@ -486,64 +286,6 @@ export default Vue.extend({
     //       this.unstaking = false
     //     })
     // },
-
-    unstake() {
-      this.unstaking = true
-
-      const conn = this.$web3
-      const wallet = (this as any).$wallet
-
-      const farms = [] as any
-      this.farms.forEach((farm: any) => {
-        const { farmInfo, depositBalance } = farm
-
-        const lpAccount = get(this.wallet.tokenAccounts, `${farmInfo.lp.mintAddress}.tokenAccountAddress`)
-        const rewardAccount = get(this.wallet.tokenAccounts, `${farmInfo.reward.mintAddress}.tokenAccountAddress`)
-        const infoAccount = get(this.farm.stakeAccounts, `${farmInfo.poolId}.stakeAccountAddress`)
-
-        farms.push({
-          farmInfo,
-          lpAccount,
-          rewardAccount,
-          infoAccount,
-          amount: depositBalance
-        })
-      })
-
-      const key = getUnixTs().toString()
-      this.$notify.info({
-        key,
-        message: 'Making transaction...',
-        description: '',
-        duration: 0
-      })
-
-      unstakeAll(conn, wallet, farms)
-        .then((txid) => {
-          this.$notify.info({
-            key,
-            message: 'Transaction has been sent',
-            description: (h: any) =>
-              h('div', [
-                'Confirmation is in progress.  Check your transaction on ',
-                h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-              ])
-          })
-
-          const description = `Unstake all LP tokens`
-          this.$accessor.transaction.sub({ txid, description })
-        })
-        .catch((error) => {
-          this.$notify.error({
-            key,
-            message: 'Unstake all LP tokens failed',
-            description: error.message
-          })
-        })
-        .finally(() => {
-          this.unstaking = false
-        })
-    },
 
     updateLiquids() {
       const liquids = [] as any

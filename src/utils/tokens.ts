@@ -1053,6 +1053,90 @@ export const TOKENS: Tokens = {
     mintAddress: '333iHoRM2Awhf9uVZtSyTfU8AekdGrgQePZsKMFPgKmS',
     decimals: 6,
     tags: ['raydium']
+  },
+  RUN: {
+    symbol: 'RUN',
+    name: 'RUN',
+    mintAddress: '6F9XriABHfWhit6zmMUYAQBSy6XK5VF1cHXuW5LDpRtC',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/runnode-is-launching-on-acceleraytor-3ff7326864b0',
+    details:
+      'RunNode is a bridge from web 2.0 to 3.0 and powers the infrastructure of Solana through its RPC protocol. With a quick onboarding application to get an RPC endpoint in under 30 seconds, any project can launch, build and scale its Solana dApp — now.',
+    docs: {
+      website: 'https://runnode.com/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/RunNode',
+      Telegram: 'https://t.me/runnode',
+      Discord: 'https://discord.gg/V2f74X8Zrt'
+    },
+
+    tags: ['raydium']
+  },
+  REAL: {
+    symbol: 'REAL',
+    name: 'REAL',
+    mintAddress: 'AD27ov5fVU2XzwsbvnFvb1JpCBaCB5dRXrczV9CqSVGb',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/realy-is-launching-on-acceleraytor-b6d6a63d69d8',
+    details:
+      'Realy Metaverse will be the 1st Live-to-Earn metaverse on Solana. Developed via Unreal Engine, Realy is a virtual city with AAA graphics that seamlessly integrates virtual and reality.',
+    docs: {
+      website: 'https://realy.pro/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/RealyOfficial',
+      Telegram: 'https://t.me/realyofficial',
+      Discord: 'https://discord.gg/realy'
+    },
+
+    tags: ['raydium']
+  },
+  CRWNY: {
+    symbol: 'CRWNY',
+    name: 'CRWNY',
+    mintAddress: 'CRWNYkqdgvhGGae9CKfNka58j6QQkaD5bLhKXvUYqnc1',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  BLOCK: {
+    symbol: 'BLOCK',
+    name: 'BLOCK',
+    mintAddress: 'NFTUkR4u7wKxy9QLaX2TGvd9oZSWoMo4jqSJqdMb7Nk',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  SOLAR: {
+    symbol: 'SOLAR',
+    name: 'SOLAR',
+    mintAddress: '2wmKXX1xsxLfrvjEPrt2UHiqj8Gbzwxvffr9qmNjsw8g',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  BASIS: {
+    symbol: 'BASIS',
+    name: 'BASIS',
+    mintAddress: 'Basis9oJw9j8cw53oMV7iqsgo6ihi9ALw4QR31rcjUJa',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  SOLX: {
+    symbol: 'SOLX',
+    name: 'SOLX',
+    mintAddress: 'CH74tuRLTYcxG7qNJCsV9rghfLXJCQJbsu7i52a8F1Gn',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  CHICKS: {
+    symbol: 'CHICKS',
+    name: 'CHICKS',
+    mintAddress: 'cxxShYRVcepDudXhe7U62QHvw8uBJoKFifmzggGKVC2',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2363,6 +2447,69 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GCEQbLg4ik5YJ4CMcbtuVqEc4sjLdSGy34rFk1CtGjdg',
     decimals: TOKENS.XTAG.decimals
+  },
+  'TTT-USDC-V4': {
+    symbol: 'TTT-USDC',
+    name: 'TTT-USDC LP',
+    coin: { ...TOKENS.TTT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '84fmrerHGohoRf4iLPDQ1KG4CjSjCRksYWGzjWfCRM8a',
+    decimals: TOKENS.TTT.decimals
+  },
+  'RUN-USDC-V4': {
+    symbol: 'RUN-USDC',
+    name: 'RUN-USDC LP',
+    coin: { ...TOKENS.RUN },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'CjTLvvKSQdEujcSzeZRYgk4w1DpuXBbMppLHaxZyz11Y',
+    decimals: TOKENS.RUN.decimals
+  },
+  'CRWNY-USDC-V4': {
+    symbol: 'CRWNY-USDC',
+    name: 'CRWNY-USDC LP',
+    coin: { ...TOKENS.CRWNY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'H3D9Gyi4frRLW6bS9vBthDVDJyzyRJ6XhhpP6PJGWaDC',
+    decimals: TOKENS.CRWNY.decimals
+  },
+  'CRWNY-RAY-V4': {
+    symbol: 'CRWNY-RAY',
+    name: 'CRWNY-RAY LP',
+    coin: { ...TOKENS.CRWNY },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: '5Cz9wGStNjiUg81q8t6sJJeckuT2C14CYSfyQbtYirSX',
+    decimals: TOKENS.CRWNY.decimals
+  },
+  'BLOCK-USDC-V4': {
+    symbol: 'BLOCK-USDC',
+    name: 'BLOCK-USDC LP',
+    coin: { ...TOKENS.BLOCK },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '8i44Y23GkkwDYZ5iSkVEqmrXUfwNmwo9grguTDWKM8wg',
+    decimals: TOKENS.BLOCK.decimals
+  },
+  'REAL-USDC-V4': {
+    symbol: 'REAL-USDC',
+    name: 'REAL-USDC LP',
+    coin: { ...TOKENS.REAL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'EN43tp8xdkcM8RYSJ4msFHMPTJRXKhUteVYBDJLwTvr3',
+    decimals: TOKENS.REAL.decimals
+  },
+  'FRKT-USDC-V4': {
+    symbol: 'FRKT-USDC',
+    name: 'FRKT-USDC LP',
+    coin: { ...TOKENS.FRKT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7MgzqVTGeA4wENme81QPTrPy45NJMKVL9XGwxmNT87cG',
+    decimals: TOKENS.FRKT.decimals
   }
 }
 
@@ -2397,10 +2544,21 @@ function addUserLocalCoinMint() {
   }
 }
 
+// fake
+const BLACK_LIST = [
+  '3pX59cis3ZXnX6ZExPoUQjpvJVspmj4YavtUmpTpkB33',
+  'EUjf7vzZsWjR3eGo5jEASxYyqt7ALqdmE87bDbURUWWV',
+  '2bXBmaYJwJfj5Cu8TDqLLrW1b9L7dK6sLgKoBBYRBzTH'
+]
+
+function blockBlackList(tokens: { address: string }[]) {
+  return tokens.filter((item) => !BLACK_LIST.includes(item.address))
+}
+
 function addTokensSolana() {
   fetch('https://api.raydium.io/cache/solana-token-list')
     .then(async (response) => {
-      addTokensSolanaFunc((await response.json()).tokens)
+      addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
     })
     .catch(() => {
       fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
@@ -2408,12 +2566,25 @@ function addTokensSolana() {
           return response.json()
         })
         .then(function (myJson) {
-          addTokensSolanaFunc(myJson.tokens)
+          addTokensSolanaFunc(blockBlackList(myJson.tokens))
         })
     })
+
+  fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
+    flushTokenIcon(Object.values((await response.json()).spl))
+  })
 }
 
 const notUseSolanaPicMint: string[] = [TOKENS.TTT.mintAddress]
+
+function flushTokenIcon(tokens: any[]) {
+  tokens.forEach((itemToken: any) => {
+    const token = Object.values(TOKENS).find((item) => item.mintAddress === itemToken.mint)
+    if (token) {
+      token.picUrl = `https://sdk.raydium.io/icons/${token.mintAddress}.png`
+    }
+  })
+}
 
 function addTokensSolanaFunc(tokens: any[]) {
   tokens.forEach((itemToken: any) => {

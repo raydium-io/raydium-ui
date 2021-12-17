@@ -114,11 +114,11 @@
       @onSelect="onAmmIdSelect"
     />
 
-    <UnofficialPoolConfirmUser
+    <!-- <UnofficialPoolConfirmUser
       v-if="userCheckUnofficialShow"
       @onClose="() => (userCheckUnofficialShow = false)"
       @onSelect="onUserCheckUnofficialSelect"
-    />
+    /> -->
 
     <InputAmmIdOrMarket
       v-if="ammIdOrMarketSearchShow"
@@ -177,7 +177,7 @@
         />
 
         <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
-        <div v-if="officialPool === false">
+        <!-- <div v-if="officialPool === false">
           <div style="margin: 10px">
             <div>AMM ID:</div>
             <div>
@@ -186,25 +186,39 @@
               {{ ammId.substr(ammId.length - 14, 14) }}
             </div>
           </div>
+        </div> -->
+        <div v-if="showConfirmLp" class="confirm-lp">
+          I have read
+          <b
+            ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
+              >Raydium's Liqudity Guide</a
+            ></b
+          >
+          and understand the risks involved with providing liquidity and impermanent loss.
+          <br />
+          <Checkbox v-model="userConfirmLp"> I confirm </Checkbox>
+          <br />
+          <Checkbox v-model="userConfirmLpNever"> Do not warn again for this pool </Checkbox>
         </div>
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
           Connect Wallet
         </Button>
 
-        <Button
+        <!-- <Button
           v-else-if="!(officialPool || (!officialPool && userCheckUnofficial))"
           size="large"
           ghost
           @click="userCheckUnofficialShow = true"
         >
           Confirm Risk Warning
-        </Button>
+        </Button> -->
 
         <Button
           v-else
           size="large"
           ghost
           :disabled="
+            (showConfirmLp && !userConfirmLp) ||
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
@@ -238,6 +252,17 @@
           </template>
           <template v-else>Supply</template>
         </Button>
+        <div v-if="solBalanceTips" class="not-enough-sol-alert">
+          <span class="caution-text">{{ solBalanceTips }}</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title"
+              >SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions. This swap will leave you with less than 0.05 SOL.</template
+            >
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
       </div>
     </div>
 
@@ -252,7 +277,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState } from 'vuex'
-import { Icon, Tooltip, Button, Progress } from 'ant-design-vue'
+import { Icon, Tooltip, Button, Progress, Checkbox } from 'ant-design-vue'
 import {
   PublicKey,
   // types
@@ -266,7 +291,7 @@ import { inputRegex, escapeRegExp } from '@/utils/regex'
 import { getOutAmount, addLiquidity, getLiquidityInfoSimilar, getOutAmountStable } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { commitment } from '@/utils/web3'
-import { gt } from '@/utils/safe-math'
+import { gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLpListByTokenMintAddresses, LiquidityPoolInfo } from '@/utils/pools'
 import AmmIdSelect from '@/components/AmmIdSelect.vue'
@@ -279,11 +304,13 @@ export default Vue.extend({
     Tooltip,
     Button,
     Progress,
-    AmmIdSelect
+    AmmIdSelect,
+    Checkbox
   },
 
   data() {
     return {
+      tt: false,
       TOKENS,
       // supply ing
       suppling: false,
@@ -302,10 +329,10 @@ export default Vue.extend({
       poolListenerId: null as number | null,
       lastSubBlock: 0,
 
-      officialPool: true,
-      userCheckUnofficial: false,
-      userCheckUnofficialMint: undefined as string | undefined,
-      userCheckUnofficialShow: false,
+      // officialPool: true,
+      // userCheckUnofficial: false,
+      // userCheckUnofficialMint: undefined as string | undefined,
+      // userCheckUnofficialShow: false,
       findUrlAmmId: false,
 
       ammId: undefined as string | undefined,
@@ -317,7 +344,13 @@ export default Vue.extend({
 
       userNeedAmmIdOrMarket: undefined as string | undefined,
 
-      setCoinFromMintLoading: false
+      setCoinFromMintLoading: false,
+
+      solBalanceTips: undefined as string | undefined,
+
+      showConfirmLp: false,
+      userConfirmLp: false,
+      userConfirmLpNever: false
     }
   },
 
@@ -337,6 +370,59 @@ export default Vue.extend({
         } else {
           this.updateAmounts()
         }
+
+        if (
+          gt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .minus(0.05)
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          ) &&
+          lt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+        ) {
+          const solBalanceAll = Number(
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+          const solBalanceItem = this.fromCoinAmount ? Number(this.fromCoinAmount) : 0
+          this.solBalanceTips = `Remaining SOL Balance: ${(solBalanceAll - solBalanceItem).toFixed(9)}`
+        } else {
+          this.solBalanceTips = undefined
+        }
       })
     },
 
@@ -354,9 +440,9 @@ export default Vue.extend({
       handler(newTokenAccounts: any) {
         this.updateCoinInfo(newTokenAccounts)
         this.findLiquidityPool()
-        if (this.ammId) {
-          this.needUserCheckUnofficialShow(this.ammId)
-        }
+        // if (this.ammId) {
+        //   this.needUserCheckUnofficialShow(this.ammId)
+        // }
       },
       deep: true
     },
@@ -400,6 +486,10 @@ export default Vue.extend({
         this.findLiquidityPool()
       },
       deep: true
+    },
+
+    ammId(newAmmId, oldAmmId) {
+      this.flushUserConfirmLp(newAmmId, oldAmmId)
     }
   },
 
@@ -415,6 +505,21 @@ export default Vue.extend({
   methods: {
     gt,
 
+    flushUserConfirmLp(newAmmId: string | undefined, oldAmmId: string | undefined) {
+      if (newAmmId !== undefined && newAmmId !== oldAmmId) {
+        let notShowConfirmLp = []
+        try {
+          notShowConfirmLp = JSON.parse(window.localStorage.getItem('liquidity-not-confirm-lp') ?? '[]')
+        } catch (e) {}
+        this.showConfirmLp = !notShowConfirmLp.includes(this.lpMintAddress)
+        this.userConfirmLp = false
+        this.userConfirmLpNever = false
+      } else if (newAmmId === undefined) {
+        this.showConfirmLp = false
+        this.userConfirmLp = false
+        this.userConfirmLpNever = false
+      }
+    },
     openFromCoinSelect() {
       this.selectFromCoin = true
       this.coinSelectShow = true
@@ -496,7 +601,7 @@ export default Vue.extend({
             this.toCoin = toCoin
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         this.$notify.warning({
           message: error.message,
           description: ''
@@ -507,38 +612,38 @@ export default Vue.extend({
       }, 1)
     },
 
-    needUserCheckUnofficialShow(ammId: string) {
-      if (!this.wallet.connected) {
-        return
-      }
-      if (this.officialPool) {
-        return
-      }
+    // needUserCheckUnofficialShow(ammId: string) {
+    //   if (!this.wallet.connected) {
+    //     return
+    //   }
+    //   if (this.officialPool) {
+    //     return
+    //   }
 
-      const localCheckStr = localStorage.getItem(`${this.wallet.address}--checkAmmId`)
-      const localCheckAmmIdList = localCheckStr ? localCheckStr.split('---') : []
-      if (localCheckAmmIdList.includes(ammId)) {
-        this.userCheckUnofficial = true
-        this.userCheckUnofficialMint = ammId
-        this.userCheckUnofficialShow = false
-        return
-      }
-      if (this.userCheckUnofficialMint === ammId) {
-        this.userCheckUnofficial = true
-        this.userCheckUnofficialShow = false
-        return
-      }
-      this.userCheckUnofficial = false
-      this.coinSelectShow = false
-      this.userCheckUnofficialShow = true
-    },
+    //   const localCheckStr = localStorage.getItem(`${this.wallet.address}--checkAmmId`)
+    //   const localCheckAmmIdList = localCheckStr ? localCheckStr.split('---') : []
+    //   if (localCheckAmmIdList.includes(ammId)) {
+    //     this.userCheckUnofficial = true
+    //     this.userCheckUnofficialMint = ammId
+    //     this.userCheckUnofficialShow = false
+    //     return
+    //   }
+    //   if (this.userCheckUnofficialMint === ammId) {
+    //     this.userCheckUnofficial = true
+    //     this.userCheckUnofficialShow = false
+    //     return
+    //   }
+    //   this.userCheckUnofficial = false
+    //   this.coinSelectShow = false
+    //   this.userCheckUnofficialShow = true
+    // },
 
     onAmmIdSelect(liquidityInfo: LiquidityPoolInfo) {
       this.lpMintAddress = liquidityInfo.lp.mintAddress
       this.ammId = liquidityInfo.ammId
       this.userNeedAmmIdOrMarket = this.ammId
       this.ammIdSelectShow = false
-      this.officialPool = liquidityInfo.official
+      // this.officialPool = liquidityInfo.official
       this.findLiquidityPool()
     },
 
@@ -548,24 +653,24 @@ export default Vue.extend({
       this.findLiquidityPool()
     },
 
-    onUserCheckUnofficialSelect(userSelect: boolean, userSelectAll: boolean) {
-      this.userCheckUnofficialShow = false
-      if (userSelect) {
-        this.userCheckUnofficial = true
-        this.userCheckUnofficialMint = this.ammId
-        if (userSelectAll) {
-          const localCheckStr = localStorage.getItem(`${this.wallet.address}--checkAmmId`)
-          if (localCheckStr) {
-            localStorage.setItem(`${this.wallet.address}--checkAmmId`, localCheckStr + `---${this.ammId}`)
-          } else {
-            localStorage.setItem(`${this.wallet.address}--checkAmmId`, `${this.ammId}`)
-          }
-        }
-      } else {
-        this.fromCoin = null
-        this.toCoin = null
-      }
-    },
+    // onUserCheckUnofficialSelect(userSelect: boolean, userSelectAll: boolean) {
+    //   this.userCheckUnofficialShow = false
+    //   if (userSelect) {
+    //     this.userCheckUnofficial = true
+    //     this.userCheckUnofficialMint = this.ammId
+    //     if (userSelectAll) {
+    //       const localCheckStr = localStorage.getItem(`${this.wallet.address}--checkAmmId`)
+    //       if (localCheckStr) {
+    //         localStorage.setItem(`${this.wallet.address}--checkAmmId`, localCheckStr + `---${this.ammId}`)
+    //       } else {
+    //         localStorage.setItem(`${this.wallet.address}--checkAmmId`, `${this.ammId}`)
+    //       }
+    //     }
+    //   } else {
+    //     this.fromCoin = null
+    //     this.toCoin = null
+    //   }
+    // },
 
     changeCoinAmountPosition() {
       const tempFromCoinAmount = this.fromCoinAmount
@@ -604,17 +709,17 @@ export default Vue.extend({
         )
         let lpMintAddress
         let ammId
-        let officialPool = true
+        // let officialPool = true
         if (liquidityList.length === 1 && liquidityList[0].official) {
           // official
           lpMintAddress = liquidityList[0].lp.mintAddress
           ammId = liquidityList[0].ammId
-          officialPool = liquidityList[0].official
-          this.userCheckUnofficialMint = undefined
+          // officialPool = liquidityList[0].official
+          // this.userCheckUnofficialMint = undefined
         } else if (liquidityList.length === 1 && InputAmmIdOrMarket) {
           ammId = liquidityList[0].ammId
           lpMintAddress = liquidityList[0].lp.mintAddress
-          officialPool = liquidityList[0].official
+          // officialPool = liquidityList[0].official
         } else if (liquidityList.length > 0) {
           this.coinSelectShow = false
           setTimeout(() => {
@@ -628,10 +733,10 @@ export default Vue.extend({
         }
 
         this.ammId = ammId
-        this.officialPool = officialPool
-        if (ammId) {
-          this.needUserCheckUnofficialShow(ammId)
-        }
+        // this.officialPool = officialPool
+        // if (ammId) {
+        //   this.needUserCheckUnofficialShow(ammId)
+        // }
         if (lpMintAddress) {
           if (this.lpMintAddress !== lpMintAddress) {
             this.lpMintAddress = lpMintAddress
@@ -640,21 +745,23 @@ export default Vue.extend({
           }
         } else {
           this.lpMintAddress = ''
-          this.officialPool = true
+          // this.officialPool = true
           this.unsubPoolChange()
         }
         this.updateUrl()
       } else {
         this.lpMintAddress = ''
-        this.officialPool = true
+        // this.officialPool = true
         this.unsubPoolChange()
 
         this.ammId = undefined
-        this.officialPool = true
+        // this.officialPool = true
       }
     },
 
     updateAmounts() {
+      if (this.suppling) return
+
       if (this.fromCoin && this.toCoin && this.lpMintAddress) {
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
@@ -804,6 +911,17 @@ export default Vue.extend({
 
           const description = `Add liquidity for ${this.fromCoinAmount} ${this.fromCoin?.symbol} and ${this.toCoinAmount} ${this.toCoin?.symbol}`
           this.$accessor.transaction.sub({ txid, description })
+
+          if (this.showConfirmLp && this.userConfirmLpNever) {
+            const userConfirmLpNeverList: string[] = JSON.parse(
+              window.localStorage.getItem('liquidity-not-confirm-lp') ?? '[]'
+            )
+            if (!userConfirmLpNeverList.includes(this.lpMintAddress)) {
+              userConfirmLpNeverList.push(this.lpMintAddress)
+              window.localStorage.setItem('liquidity-not-confirm-lp', JSON.stringify(userConfirmLpNeverList))
+            }
+          }
+          this.flushUserConfirmLp(this.ammId, '')
         })
         .catch((error) => {
           this.$notify.error({
@@ -849,5 +967,20 @@ export default Vue.extend({
   .anticon-close {
     color: #fff;
   }
+}
+
+.not-enough-sol-alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -18px;
+  margin-top: 4px;
+}
+
+.confirm-lp {
+  border-radius: 10px;
+  background: #000829;
+  padding: 10px;
 }
 </style>

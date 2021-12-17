@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="isMobile ? 'create-pool-mobile' : 'create-pool'">
+  <div class="container create-pool" :class="isMobile ? 'create-pool-mobile' : 'create-pool'">
     <div class="page-head fs-container">
       <span class="title">Create Pool</span>
     </div>
@@ -171,6 +171,69 @@
                 style="width: 100%"
               />
             </div>
+            <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              Start Time: Set the date and time for the pool to go live, after which users will be able to swap and the
+              AMM will market make on Serum.
+            </p>
+            <p style="padding-top: 10px; padding-bottom: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              Select according to local time, then check the UTC conversion.
+            </p>
+            <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Pool Start Date:
+            </div>
+            <div style="width: 30%; display: inline-block">
+              <DatePicker
+                v-model="inputStartTime"
+                style="color: #000; width: 100%"
+                dropdown-class-name="create-pool-date-picker"
+              />
+            </div>
+            <div style="width: 60%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Pool Start Time:
+            </div>
+            <div style="width: 30%; display: inline-block">
+              <TimePicker
+                v-model="inputStartTime"
+                style="color: #000; width: 100%"
+                popup-class-name="create-pool-date-picker"
+                format="HH:mm"
+              />
+            </div>
+            <div style="width: 40%; display: inline-block" :class="isMobile ? 'item-title-mobile' : 'item-title'">
+              Start Time in UTC:
+            </div>
+            <div style="width: 50%; display: inline-block; text-align: right">
+              {{
+                inputStartTime
+                  ? inputStartTime
+                      .toJSON()
+                      .replace('T', ' ')
+                      .replace('Z', '')
+                      .split('.')[0]
+                      .split(':')
+                      .slice(0, 2)
+                      .join(':') + ':00'
+                  : ''
+              }}
+            </div>
+
+            <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
+              IMPORTANT: Start time can not be changed after pool initialization is confirmed.
+            </p>
+
+            <Col :span="24" style="margin-top: 20px" class="confirm-amm">
+              <p style="padding-bottom: 10px; word-break: break-word; line-height: 20px; margin: 0">
+                I have read
+                <b
+                  ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
+                    >Raydium's Liqudity Guide</a
+                  ></b
+                >
+                and understand the risks involved with providing liquidity and impermanent loss.
+              </p>
+              <Checkbox v-model="userConfirmAmm"> I confirm </Checkbox>
+              <br />
+            </Col>
             <Col :span="24" style="padding-top: 10px">
               <Button
                 v-if="!wallet.connected"
@@ -217,7 +280,14 @@
                   style="z-index: 999; width: 70%"
                   :loading="createAmmFlag"
                   :disabled="
-                    createAmmFlag || !(inputPrice !== null && inputBaseValue !== null && inputQuoteValue !== null)
+                    createAmmFlag ||
+                    !(
+                      inputPrice !== null &&
+                      inputBaseValue !== null &&
+                      inputQuoteValue !== null &&
+                      inputStartTime !== null
+                    ) ||
+                    !userConfirmAmm
                   "
                   @click="createKey"
                 >
@@ -225,7 +295,7 @@
                 </Button>
 
                 <p style="padding-top: 20px; word-break: break-word; line-height: 20px; margin: 0">
-                  After clicking 'Confirm' you will need to approve three transactions in your wallet to initialize the
+                  After clicking 'Confirm' you will need to approve two transactions in your wallet to initialize the
                   pool, create the AMM account, and add liquidity.
                 </p>
               </div>
@@ -255,7 +325,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
-import { Steps, Row, Col, Button, Tooltip, Icon } from 'ant-design-vue'
+import { Steps, Row, Col, Button, Tooltip, Icon, DatePicker, TimePicker, Checkbox } from 'ant-design-vue'
 import { PublicKey } from '@solana/web3.js'
 import { getMarket, createAmm, clearLocal } from '@/utils/market'
 import BigNumber from '@/../node_modules/bignumber.js/bignumber'
@@ -277,7 +347,10 @@ const Step = Steps.Step
     Button,
     Step,
     Tooltip,
-    Icon
+    Icon,
+    DatePicker,
+    TimePicker,
+    Checkbox
   }
 })
 export default class CreatePool extends Vue {
@@ -288,6 +361,7 @@ export default class CreatePool extends Vue {
   inputQuoteValue: number | null = null
   inputBaseValue: number | null = null
   inputPrice: number | null = null
+  inputStartTime: any = null
   marketMsg: any | null = null
   getMarketLoading: boolean = false
   marketError: null | string = null
@@ -312,6 +386,8 @@ export default class CreatePool extends Vue {
   userLocalAmmIdList: string[] = []
 
   expectAmmId: undefined | string
+
+  userConfirmAmm: boolean = false
 
   get isMobile() {
     return this.$accessor.isMobile
@@ -467,7 +543,8 @@ export default class CreatePool extends Vue {
       this.inputPrice === null ||
       this.inputQuoteValue <= 0 ||
       this.inputBaseValue <= 0 ||
-      this.inputPrice <= 0
+      this.inputPrice <= 0 ||
+      this.inputStartTime === null
     ) {
       this.stepTitleMarketInfo = 'Please input coin value'
       this.stepsStatus = 'error'
@@ -479,7 +556,14 @@ export default class CreatePool extends Vue {
 
     this.createAmmFlag = true
 
-    createAmm(this.$web3, this.$wallet, this.marketMsg, this.inputBaseValue, this.inputQuoteValue)
+    createAmm(
+      this.$web3,
+      this.$wallet,
+      this.marketMsg,
+      this.inputBaseValue,
+      this.inputQuoteValue,
+      this.inputStartTime.unix()
+    )
       .then(async (data) => {
         this.current = 3
         this.stepsStatus = 'process'
@@ -510,6 +594,7 @@ export default class CreatePool extends Vue {
   }
 }
 </script>
+
 <style lang="less" scoped>
 .create-pool {
   max-width: 570px;
@@ -546,5 +631,47 @@ div {
 }
 .msgClass div {
   line-height: 30px;
+}
+</style>
+
+<style>
+.create-pool .ant-calendar-picker-input {
+  border: none;
+  border-bottom: 1px solid #fff;
+  background: #131a35 !important;
+}
+.create-pool-date-picker .ant-calendar {
+  background-color: rgb(0 0 0 / 15%);
+  backdrop-filter: blur(24px);
+}
+.create-pool-date-picker .ant-calendar-time-picker-inner {
+  background-color: rgb(19 26 53 / 93%);
+}
+.create-pool-date-picker .ant-calendar-time-picker-select-option-selected {
+  background-color: rgb(32 76 111 / 93%);
+}
+.create-pool-date-picker .ant-calendar-input {
+  background: rgb(0 0 0 / 15%);
+}
+
+.create-pool .ant-time-picker-input {
+  border: none;
+  border-bottom: 1px solid #fff;
+  background: #131a35 !important;
+  backdrop-filter: blur(24px);
+}
+.create-pool-date-picker .ant-time-picker-panel-inner {
+  background-color: rgb(19 26 53 / 93%);
+}
+.create-pool-date-picker .ant-time-picker-panel-input {
+  background: rgb(0 0 0 / 15%);
+}
+.create-pool-date-picker .ant-time-picker-panel-select-option-selected {
+  background-color: rgb(32 76 111 / 93%);
+}
+.confirm-amm {
+  border-radius: 10px;
+  background: #000829;
+  padding: 10px;
 }
 </style>

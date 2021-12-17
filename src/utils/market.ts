@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { struct, u8 } from 'buffer-layout'
+import { struct, u8, nu64 } from 'buffer-layout'
 
 // import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
 import { Market as MarketSerum } from '@project-serum/serum'
@@ -119,7 +119,8 @@ export async function createAmm(
   wallet: any,
   market: any,
   userInputBaseValue: number,
-  userInputQuoteValue: number
+  userInputQuoteValue: number,
+  startTime: number
 ) {
   const transaction = new Transaction()
   const signers: any = []
@@ -204,21 +205,6 @@ export async function createAmm(
     )
   )
 
-  const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
-  const destLpTokenInfo = await conn.getAccountInfo(destLpToken)
-  if (!destLpTokenInfo) {
-    transaction.add(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        lpMintAddress,
-        destLpToken,
-        owner,
-        owner
-      )
-    )
-  }
-
   if (!accountSuccessFlag) {
     const txid = await sendTransaction(conn, wallet, transaction, signers)
     console.log('txid', txid)
@@ -255,7 +241,6 @@ export async function createAmm(
     ammTargetOrders,
     poolWithdrawQueue,
     poolTempLpTokenAccount,
-    destLpToken,
     nonce
   }
 
@@ -271,7 +256,9 @@ export async function createAmm(
       userInputBaseValue,
       userInputQuoteValue,
       poolCoinTokenAccount,
-      poolPcTokenAccount
+      poolPcTokenAccount,
+      lpMintAddress,
+      startTime
     )
   }
 
@@ -289,7 +276,9 @@ async function initAmm(
   userInputBaseValue: number,
   userInputQuoteValue: number,
   poolCoinTokenAccount: PublicKey,
-  poolPcTokenAccount: PublicKey
+  poolPcTokenAccount: PublicKey,
+  lpMintAddress: PublicKey,
+  startTime: number
 ) {
   const baseMintDecimals = new BigNumber(await getMintDecimals(conn, market.baseMintAddress as PublicKey))
   const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
@@ -331,6 +320,21 @@ async function initAmm(
     (quoteToken === null && market.quoteMintAddress.toString() !== TOKENS.WSOL.mintAddress)
   ) {
     throw new Error('no money')
+  }
+
+  const destLpToken = await findAssociatedTokenAddress(owner, lpMintAddress)
+  const destLpTokenInfo = await conn.getAccountInfo(destLpToken)
+  if (!destLpTokenInfo) {
+    transaction.add(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        lpMintAddress,
+        destLpToken,
+        owner,
+        owner
+      )
+    )
   }
 
   if (market.baseMintAddress.toString() === TOKENS.WSOL.mintAddress) {
@@ -415,14 +419,15 @@ async function initAmm(
       ammKeys.poolPcTokenAccount,
       ammKeys.poolWithdrawQueue,
       ammKeys.ammTargetOrders,
-      ammKeys.destLpToken,
+      destLpToken,
       ammKeys.poolTempLpTokenAccount,
       dexProgramId,
       market.address,
 
       owner,
 
-      ammKeys.nonce
+      ammKeys.nonce,
+      startTime
     )
   )
 
@@ -471,9 +476,10 @@ export function initialize(
   serumProgramId: PublicKey,
   serumMarket: PublicKey,
   owner: PublicKey,
-  nonce: number
+  nonce: number,
+  startTime: number
 ): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), u8('nonce')])
+  const dataLayout = struct([u8('instruction'), u8('nonce'), nu64('startTime')])
 
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -500,7 +506,8 @@ export function initialize(
   dataLayout.encode(
     {
       instruction: 0,
-      nonce
+      nonce,
+      startTime
     },
     data
   )

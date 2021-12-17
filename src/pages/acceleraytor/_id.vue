@@ -958,6 +958,21 @@ export default class AcceleRaytor extends Vue {
 
 .top-box {
   display: flex;
+  flex-wrap: wrap;
+}
+@media (max-width: 768px) {
+  .top-box {
+    border-radius: 16px;
+    overflow: hidden;
+
+    > .preview {
+      border-radius: 0;
+    }
+
+    > .purchase {
+      border-radius: 0;
+    }
+  }
 }
 .accele-raytor-project.container {
   max-width: 1200px;

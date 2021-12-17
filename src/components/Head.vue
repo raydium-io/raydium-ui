@@ -52,6 +52,12 @@ export default Vue.extend({
 <style lang="less" scoped>
 @import '../styles/variables';
 
+@media (min-width: 900px) and (max-width: 1200px) {
+  .nuxt-link-active {
+    display: none;
+  }
+}
+
 .header {
   border-bottom: 2px solid @modal-header-bg;
 

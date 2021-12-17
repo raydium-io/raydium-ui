@@ -17,12 +17,7 @@
             :percent="(100 / autoRefreshTime) * countdown"
             :show-info="false"
             :class="loading ? 'disabled' : ''"
-            @click="
-              () => {
-                getOrderBooks()
-                $accessor.wallet.getTokenAccounts()
-              }
-            "
+            @click="flushData"
           />
         </Tooltip>
         <Tooltip placement="bottomRight">
@@ -104,7 +99,7 @@
           label="From"
           :balance-offset="
             fromCoin && fromCoin.symbol === 'SOL' && get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed() - 0.05
+              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed()
               : 0
           "
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
@@ -215,6 +210,27 @@
               {{ priceImpact.toFixed(2) === '0.00' ? '&lt; 0.01' : priceImpact.toFixed(2) }}%
             </span>
           </div>
+        </div>
+        <div v-if="checkCoinAmountModelFlag" class="fs-container price-update">
+          <span class="name" style="opacity: 1">
+            Price Updated
+            <Tooltip placement="right">
+              <template slot="title">Price has changed since your swap amount was entered.</template>
+              <Icon type="question-circle" style="cursor: pointer" /> </Tooltip
+          ></span>
+          <span>
+            <Button
+              size="small"
+              ghost
+              @click="
+                () => {
+                  checkCoinAmountModelFlag = false
+                  toCoinAmountOld = toCoinAmount
+                }
+              "
+              >Accept</Button
+            >
+          </span>
         </div>
 
         <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
@@ -354,6 +370,7 @@
           size="large"
           ghost
           :disabled="
+            checkCoinAmountModelFlag ||
             !fromCoin ||
             !fromCoinAmount ||
             !toCoin ||
@@ -368,7 +385,6 @@
                 ? fromCoin.symbol === 'SOL'
                   ? fromCoin.balance
                       .toEther()
-                      .minus(0.05)
                       .plus(
                         get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
                           ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
@@ -410,7 +426,6 @@
                   ? fromCoin.symbol === 'SOL'
                     ? fromCoin.balance
                         .toEther()
-                        .minus(0.05)
                         .plus(
                           get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
                             ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
@@ -451,6 +466,17 @@
               SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
               transactions.
             </template>
+            <Icon type="question-circle" />
+          </Tooltip>
+        </div>
+        <div v-if="solBalanceTips" class="not-enough-sol-alert">
+          <span class="caution-text">{{ solBalanceTips }}</span>
+
+          <Tooltip placement="bottomLeft">
+            <template slot="title"
+              >SOL is needed for Solana network fees. A minimum balance of 0.05 SOL is recommended to avoid failed
+              transactions. This swap will leave you with less than 0.05 SOL.</template
+            >
             <Icon type="question-circle" />
           </Tooltip>
         </div>
@@ -624,7 +650,7 @@ import {
   getSwapRouter,
   preSwapRoute
 } from '@/utils/swap'
-import { TokenAmount, gt } from '@/utils/safe-math'
+import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLiquidityInfoSimilar } from '@/utils/liquidity'
 import { isOfficalMarket, LiquidityPoolInfo, LIQUIDITY_POOLS } from '@/utils/pools'
@@ -737,7 +763,13 @@ export default Vue.extend({
       setupLastData: '' as string,
       setupFlagWSOL: false as boolean,
 
-      showMarket: undefined as string | undefined
+      showMarket: undefined as string | undefined,
+
+      solBalanceTips: undefined as string | undefined,
+
+      fromCoinAmountOld: undefined as string | undefined,
+      toCoinAmountOld: undefined as string | undefined,
+      checkCoinAmountModelFlag: false
     }
   },
 
@@ -750,12 +782,74 @@ export default Vue.extend({
   },
 
   watch: {
+    toCoinAmount(newAmount: string) {
+      if (this.fromCoinAmount !== this.fromCoinAmountOld) {
+        this.fromCoinAmountOld = this.fromCoinAmount
+        this.toCoinAmountOld = newAmount
+        this.checkCoinAmountModelFlag = false
+      } else if (newAmount !== this.toCoinAmountOld) {
+        this.checkCoinAmountModelFlag = true
+      }
+    },
+
     fromCoinAmount(newAmount: string, oldAmount: string) {
       this.$nextTick(() => {
         if (!inputRegex.test(escapeRegExp(newAmount))) {
           this.fromCoinAmount = oldAmount
         } else {
           this.updateAmounts()
+        }
+        if (
+          gt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .minus(0.05)
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          ) &&
+          lt(
+            this.fromCoinAmount,
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+        ) {
+          const solBalanceAll = Number(
+            this.fromCoin && this.fromCoin.balance
+              ? this.fromCoin.symbol === 'SOL'
+                ? this.fromCoin.balance
+                    .toEther()
+                    .plus(
+                      get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
+                        ? get(this.wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).toEther()
+                        : 0
+                    )
+                    .toFixed(this.fromCoin.balance.decimals)
+                : this.fromCoin.balance.fixed()
+              : '0'
+          )
+          const solBalanceItem = this.fromCoinAmount ? Number(this.fromCoinAmount) : 0
+          this.solBalanceTips = `Remaining SOL Balance: ${(solBalanceAll - solBalanceItem).toFixed(9)}`
+        } else {
+          this.solBalanceTips = undefined
         }
       })
     },
@@ -769,6 +863,7 @@ export default Vue.extend({
         }
         this.solBalance = this.wallet.tokenAccounts[NATIVE_SOL.mintAddress]
         if (this.toCoin) this.needUserCheckUnofficialShow()
+        this.updateAmounts()
       },
       deep: true
     },
@@ -824,11 +919,12 @@ export default Vue.extend({
 
     'liquidity.infos': {
       handler(_newInfos: any) {
-        this.updateAmounts()
         const { from, to, ammId } = this.$route.query
         // @ts-ignore
         this.setCoinFromMint(from, to, ammId)
         this.findMarket()
+
+        this.updateAmounts()
       },
       deep: true
     },
@@ -1136,11 +1232,11 @@ export default Vue.extend({
     },
 
     changeCoinAmountPosition() {
-      const tempFromCoinAmount = this.fromCoinAmount
-      const tempToCoinAmount = this.toCoinAmount
+      // const tempFromCoinAmount = this.fromCoinAmount
+      // const tempToCoinAmount = this.toCoinAmount
 
-      this.fromCoinAmount = tempToCoinAmount
-      this.toCoinAmount = tempFromCoinAmount
+      this.fromCoinAmount = this.toCoinAmount
+      // this.toCoinAmount = tempFromCoinAmount
     },
 
     updateCoinInfo(tokenAccounts: any) {
@@ -1164,9 +1260,9 @@ export default Vue.extend({
         this.amms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
           (p: any) =>
             p.version === 4 &&
-            [1, 5].includes(p.status) &&
             ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
-              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress))
+              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress)) &&
+            ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
         )
 
         this.routeInfos = getSwapRouter(
@@ -1294,7 +1390,14 @@ export default Vue.extend({
       }
     },
 
+    flushData() {
+      this.getOrderBooks()
+      this.$accessor.liquidity.requestInfos()
+      this.$accessor.wallet.getTokenAccounts()
+    },
+
     updateAmounts() {
+      if (this.swaping) return
       let toCoinAmount = ''
       let toCoinWithSlippage = null
 
@@ -1314,7 +1417,7 @@ export default Vue.extend({
 
         if (this.amms) {
           for (const poolInfo of this.amms) {
-            if (poolInfo.status !== 1) continue
+            if (poolInfo.status !== undefined && ![1, 7].includes(poolInfo.status)) continue
             const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
               poolInfo,
               this.fromCoin.mintAddress,
@@ -1502,7 +1605,7 @@ export default Vue.extend({
             this.countdown += 1
 
             if (this.countdown === this.autoRefreshTime) {
-              this.getOrderBooks()
+              this.flushData()
             }
           }
         }
@@ -2016,5 +2119,10 @@ export default Vue.extend({
       }
     }
   }
+}
+.price-update {
+  border-radius: 10px;
+  background: #000829;
+  padding: 10px;
 }
 </style>

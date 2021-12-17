@@ -13,44 +13,6 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Pools open Dec 1, 12:00 UTC - Full details
-              <a
-                href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                here</a
-              >
-            </div>
-            <a
-              href="https://raydium.medium.com/tabtrader-is-launching-on-acceleraytor-bc570b6a9628"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <img class="carousel-image" src="../../assets/background/acceleraytor-placeholder2.webp" />
-            </a>
-          </div>
-          <div>
-            <div class="inner-decorator-words">
-              Pools open Dec 6, 12:00 UTC - Full details
-              <a
-                href="https://raydium.medium.com/runnode-is-launching-on-acceleraytor-3ff7326864b0"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                here</a
-              >
-            </div>
-            <a
-              href="https://raydium.medium.com/runnode-is-launching-on-acceleraytor-3ff7326864b0"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <img class="carousel-image" src="../../assets/background/acceleraytor-runnode.jpg" />
-            </a>
-          </div>
-          <div>
-            <div class="inner-decorator-words">
               Pools open Dec 9, 12:00 UTC - Full details
               <a
                 href="https://raydium.medium.com/realy-is-launching-on-acceleraytor-b6d6a63d69d8"
@@ -547,6 +509,16 @@ export default class AcceleRaytor extends Vue {
 
     .ant-empty {
       color: #f1f1f2bf;
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .banner {
+    display: block;
+    padding: 32px;
+    .text-part {
+      margin-bottom: 32px;
     }
   }
 }

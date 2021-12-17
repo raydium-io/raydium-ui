@@ -769,8 +769,12 @@ export const AMM_INFO_LAYOUT_V4 = struct([
   u64('needTakePnlPc'),
   u64('totalPnlPc'),
   u64('totalPnlCoin'),
-  u128('poolTotalDepositPc'),
-  u128('poolTotalDepositCoin'),
+
+  u64('poolOpenTime'),
+  u64('punishPcAmount'),
+  u64('punishCoinAmount'),
+  u64('orderbookToInitTime'),
+
   u128('swapCoinInAmount'),
   u128('swapPcOutAmount'),
   u64('swapCoin2PcFee'),

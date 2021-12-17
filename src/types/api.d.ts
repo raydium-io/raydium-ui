@@ -9,7 +9,10 @@ export interface InfoData {
   totalvolume: number
 }
 
-export interface PairData {}
+export interface PairData {
+  name: string
+  liquidity: number
+}
 
 export interface Rpc {
   url: string

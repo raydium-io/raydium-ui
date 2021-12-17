@@ -6,8 +6,8 @@
         <span class="title">Token name</span>
         <Icon :type="desc ? 'arrow-up' : 'arrow-down'" @click="setDesc" />
       </div>
-      <div v-if="!addUserCoin" class="token-list">
-        <template v-for="token of tokenList">
+      <div v-show="!addUserCoin" ref="tokenListUI" class="token-list" @scroll="flushShowTokenList">
+        <template v-for="token of showTokenList">
           <div
             v-if="token.cache !== true && token.mintAddress !== 'So11111111111111111111111111111111111111112'"
             :key="token.symbol + token.mintAddress"
@@ -141,6 +141,8 @@ export default Vue.extend({
       tokensTags: TOKENS_TAGS,
       keyword: '',
       tokenList: [] as Array<TokenInfo>,
+      showTokenList: [] as Array<TokenInfo>,
+      showTokenListIndex: 0,
       desc: false,
       addUserCoin: false,
       addUserCoinToken: null as any | null,
@@ -169,7 +171,7 @@ export default Vue.extend({
   watch: {
     keyword(newKeyword) {
       this.createTokenList(newKeyword)
-      this.findMint(newKeyword)
+      this.findMint(newKeyword, true)
     },
 
     'wallet.tokenAccounts': {
@@ -183,7 +185,7 @@ export default Vue.extend({
     tokensTags: {
       handler(_newTokenAccounts: any, _oldTokenAccounts: any) {
         this.createTokenList(this.keyword)
-        this.findMint(this.keyword)
+        this.findMint(this.keyword, true)
       },
       deep: true
     },
@@ -206,6 +208,23 @@ export default Vue.extend({
   },
 
   methods: {
+    flushShowTokenList() {
+      const itemLoadIndex = 30
+      try {
+        // @ts-ignore
+        const scrollTop = this.$refs.tokenListUI.scrollTop
+        // @ts-ignore
+        const windowHeitht = this.$refs.tokenListUI.clientHeight
+        // @ts-ignore
+        const scrollHeight = this.$refs.tokenListUI.scrollHeight
+        const total = scrollTop + windowHeitht
+        if (total + 100 > scrollHeight) {
+          this.showTokenListIndex++
+        }
+      } catch (e) {}
+
+      this.showTokenList = this.tokenList.slice(0, (this.showTokenListIndex + 1) * itemLoadIndex)
+    },
     get,
 
     tokenHover(token: any) {
@@ -327,7 +346,7 @@ export default Vue.extend({
       this.findMint(this.keyword)
     },
 
-    async findMint(keyword = '') {
+    async findMint(keyword = '', clearIndex = false) {
       if (keyword.length > 40) {
         const hasTokenKey = Object.keys(TOKENS).find(
           (item) => TOKENS[item].mintAddress === keyword && TOKENS[item].cache === true
@@ -362,6 +381,11 @@ export default Vue.extend({
       } else {
         this.addUserCoin = false
       }
+      if (clearIndex) {
+        this.showTokenListIndex = 0
+      }
+
+      this.flushShowTokenList()
     },
 
     createTokenList(keyword = '') {
@@ -491,9 +515,10 @@ export default Vue.extend({
   }
 
   .token-list {
+    overflow-y: scroll;
     max-height: 50vh;
     padding-right: 10px;
-    overflow: auto;
+    // overflow: auto;
     direction: ltr;
     will-change: transform;
 

@@ -30,37 +30,39 @@
 
     <div class="card">
       <div class="card-body">
-        <div style="text-align: center; width: 100%">
-          <div style="width: 40%; display: inline-block">
-            <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
-              <Icon slot="prefix" type="search" />
-            </Input>
-          </div>
-          <div style="width: 5%; display: inline-block"></div>
-          <div style="width: 40%; display: inline-block">
-            <RadioGroup v-model="poolType" style="display: inline-block; width: 100%; margin: 0 auto">
-              <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
-              <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
-            </RadioGroup>
-          </div>
+        <div class="pool-filters">
+          <Input v-model="searchName" size="large" class="input-search" placeholder="Search by token symbol">
+            <Icon slot="prefix" type="search" />
+          </Input>
+          <!-- <RadioGroup v-model="poolType">
+            <RadioButton class="radioButtonStyle" value="RaydiumPools"> Raydium Pools </RadioButton>
+            <RadioButton class="radioButtonStyle" value="PermissionlessPools"> Permissionless Pools </RadioButton>
+          </RadioGroup> -->
         </div>
-        <Table :columns="columns" :data-source="poolsShow" :pagination="false" row-key="lp_mint">
+        <Table
+          :loading="loading"
+          :columns="columns"
+          :data-source="poolsShow"
+          :pagination="false"
+          row-key="lp_mint"
+          style="max-height: 80vh; overflow-y: auto"
+          class="show-table"
+        >
           <span slot="name" slot-scope="text, row" class="lp-icons">
-            {{ void (pool = getPoolByLpMintAddress(text)) }}
             <div class="icons">
-              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.coin.mintAddress : ''" />
-              <CoinIcon :mint-address="pool ? getPoolByLpMintAddress(text).lp.pc.mintAddress : ''" />
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
+              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
             </div>
-            <NuxtLink v-if="row.amm_id && pool" :to="`/liquidity/?ammId=${row.amm_id}`">
-              {{ pool.name }}
+            <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
+              {{ row.name }}
+              <Tooltip v-if="row.liquidity < 100000" placement="right">
+                <template slot="title"
+                  >This pool has relatively low liquidity. Always check the quoted price and that the pool has
+                  sufficient liquidity before trading.</template
+                >
+                <Icon type="exclamation-circle" />
+              </Tooltip>
             </NuxtLink>
-            <NuxtLink
-              v-else-if="pool"
-              :to="`/liquidity/?from=${pool.lp.coin.mintAddress}&to=${pool.lp.pc.mintAddress}`"
-            >
-              {{ pool.name }}
-            </NuxtLink>
-            <span v-else>{{ text }}</span>
           </span>
           <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
@@ -77,8 +79,8 @@
 import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import { Table, Radio, Progress, Tooltip, Button, Input, Icon } from 'ant-design-vue'
 
-import { getPoolByLpMintAddress } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
+import { PairData } from '@/types/api'
 
 const RadioGroup = Radio.Group
 const RadioButton = Radio.Button
@@ -96,11 +98,6 @@ const RadioButton = Radio.Button
     Button,
     Input,
     Icon
-  },
-
-  async asyncData({ $api }) {
-    const pools = await $api.getPairs()
-    return { pools }
   }
 })
 export default class Pools extends Vue {
@@ -149,36 +146,22 @@ export default class Pools extends Vue {
     }
   ]
 
-  pools: any = []
+  pools: PairData[] = []
   poolsShow: any = []
-  poolType: string = 'RaydiumPools'
 
   autoRefreshTime: number = 60
   countdown: number = 0
   timer: any = null
   loading: boolean = false
 
-  searchButton = true
   searchName = ''
 
   get liquidity() {
     return this.$accessor.liquidity
   }
 
-  @Watch('$accessor.liquidity.initialized', { immediate: true, deep: true })
-  refreshThePage() {
-    this.showPool()
-  }
-
-  @Watch('$accessor.liquidity.info', { immediate: true, deep: true })
-  async onLiquidityChanged() {
-    this.pools = await this.$api.getPairs()
-    this.showPool()
-  }
-
-  @Watch('poolType')
-  onPoolTypeChanged() {
-    this.showPool()
+  get isMobile() {
+    return this.$accessor.isMobile
   }
 
   @Watch('searchName')
@@ -186,20 +169,26 @@ export default class Pools extends Vue {
     this.showPool()
   }
 
-  showPool() {
+  async showPool(firstLoading = false) {
+    let pools: PairData[]
+    try {
+      if (firstLoading) this.loading = true
+      pools = await this.$api.getPairs()
+      this.pools = pools
+    } catch (e) {
+      pools = this.pools
+    } finally {
+      this.loading = false
+    }
+
     const pool = []
-    for (const item of this.pools) {
+    for (const item of pools) {
       if (
-        (this.poolType === 'RaydiumPools' && (item.official === undefined || item.official)) ||
-        (this.poolType !== 'RaydiumPools' && item.official !== undefined && !item.official)
+        !item.name.includes('unknown') &&
+        item.liquidity > 0 &&
+        (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
       ) {
-        if (
-          !item.name.includes('unknown') &&
-          item.liquidity !== 0 &&
-          (this.searchName === '' || item.name.toLowerCase().includes(this.searchName.toLowerCase().trim()))
-        ) {
-          pool.push(item)
-        }
+        pool.push(item)
       }
     }
     this.poolsShow = pool
@@ -207,6 +196,7 @@ export default class Pools extends Vue {
 
   mounted() {
     this.setTimer()
+    this.showPool(true)
   }
 
   setTimer() {
@@ -224,14 +214,10 @@ export default class Pools extends Vue {
   }
 
   async flush() {
-    this.loading = true
-    this.pools = await this.$api.getPairs()
-    this.showPool()
-    this.loading = false
+    await this.showPool()
     this.countdown = 0
   }
 
-  getPoolByLpMintAddress = getPoolByLpMintAddress
   TokenAmount = TokenAmount
 }
 </script>
@@ -261,10 +247,61 @@ export default class Pools extends Vue {
 }
 .card-body {
   padding-top: 25px;
+  display: block;
+  .pool-filters {
+    text-align: center;
+    .input-search {
+      width: 100%;
+      display: inline-block;
+    }
+
+    .ant-radio-group {
+      display: inline-block;
+      width: 40%;
+      margin-left: 5%;
+    }
+  }
+
+  /deep/ .ant-table-body {
+    overflow-x: scroll;
+  }
+}
+
+@media (max-width: 1000px) {
+  .card-body .pool-filters {
+    .input-search {
+      display: block;
+      width: auto;
+    }
+    .ant-radio-button-wrapper {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ant-radio-group {
+      display: block;
+      width: auto;
+      margin-left: 0;
+      margin-top: 1em;
+    }
+  }
 }
 </style>
 
 <style lang="less">
+.card-body .ant-table-placeholder {
+  background: transparent;
+}
+.card-body .ant-empty-description {
+  color: #fff;
+}
+
+.card-body .ant-table-fixed-header .ant-table-content .ant-table-scroll .ant-table-body {
+  background: transparent;
+}
+.card-body .show-table::-webkit-scrollbar {
+  display: unset;
+}
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }

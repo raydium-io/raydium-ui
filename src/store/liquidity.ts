@@ -17,7 +17,7 @@ import {
 import logger from '@/utils/logger'
 import { getAddressForWhat, LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
-import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens'
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import {
   commitment,
   createAmmAuthority,
@@ -26,6 +26,12 @@ import {
 } from '@/utils/web3'
 
 const AUTO_REFRESH_TIME = 60
+
+// fake
+const BLACK_LIST: string[] = [
+  'DHgHX6eqZQTcRY5xixV5sM68NZBpJLLvnM9riG7i5FHz',
+  '5uN8CdpKxKFTkobBnqdv8bx6c7coGNSJgWX6AJLnyKxW'
+]
 
 export const state = () => ({
   initialized: false,
@@ -132,7 +138,12 @@ export const actions = actionTree(
       })
       const lpMintListDecimls = await getLpMintListDecimals(conn, lpMintAddressList)
 
+      const tokenMintData: { [mintAddress: string]: TokenInfo } = {}
+      for (const itemToken of Object.values(TOKENS)) {
+        tokenMintData[itemToken.mintAddress] = itemToken
+      }
       for (let indexAmmInfo = 0; indexAmmInfo < ammAll.length; indexAmmInfo += 1) {
+        if (BLACK_LIST.includes(ammAll[indexAmmInfo].publicKey.toString())) continue
         const ammInfo = AMM_INFO_LAYOUT_V4.decode(Buffer.from(ammAll[indexAmmInfo].accountInfo.data))
         if (
           !Object.keys(lpMintListDecimls).includes(ammInfo.lpMintAddress.toString()) ||
@@ -150,7 +161,7 @@ export const actions = actionTree(
           ammInfo.pcMintAddress.toString() === TOKENS.WSOL.mintAddress
             ? NATIVE_SOL.mintAddress
             : ammInfo.pcMintAddress.toString()
-        let coin = Object.values(TOKENS).find((item) => item.mintAddress === fromCoin)
+        let coin = tokenMintData[fromCoin]
         if (!coin && fromCoin !== NATIVE_SOL.mintAddress) {
           TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`] = {
             symbol: 'unknown',
@@ -161,6 +172,7 @@ export const actions = actionTree(
             tags: []
           }
           coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
+          tokenMintData[ammInfo.coinMintAddress.toString()] = coin
         } else if (fromCoin === NATIVE_SOL.mintAddress) {
           coin = NATIVE_SOL
         }
@@ -168,7 +180,7 @@ export const actions = actionTree(
           coin.tags.push('unofficial')
         }
 
-        let pc = Object.values(TOKENS).find((item) => item.mintAddress === toCoin)
+        let pc = tokenMintData[toCoin]
         if (!pc && toCoin !== NATIVE_SOL.mintAddress) {
           TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`] = {
             symbol: 'unknown',
@@ -179,6 +191,7 @@ export const actions = actionTree(
             tags: []
           }
           pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
+          tokenMintData[ammInfo.pcMintAddress.toString()] = pc
         } else if (toCoin === NATIVE_SOL.mintAddress) {
           pc = NATIVE_SOL
         }
@@ -324,7 +337,12 @@ export const actions = actionTree(
                   if (version === 5) {
                     parsed = AMM_INFO_LAYOUT_STABLE.decode(data)
                     poolInfo.currentK = getBigNumber(parsed.currentK)
-                  } else parsed = AMM_INFO_LAYOUT_V4.decode(data)
+                  } else {
+                    parsed = AMM_INFO_LAYOUT_V4.decode(data)
+                    if (getBigNumber(parsed.status) === 7) {
+                      poolInfo.poolOpenTime = getBigNumber(parsed.poolOpenTime)
+                    }
+                  }
 
                   const { swapFeeNumerator, swapFeeDenominator } = parsed
                   poolInfo.fees = {

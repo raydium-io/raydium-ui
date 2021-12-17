@@ -23,6 +23,7 @@ export async function deposit(
   lpAccount: string | undefined | null,
   rewardAccount: string | undefined | null,
   infoAccount: string | undefined | null,
+  auxiliaryInfoAccounts: string[],
   amount: string | undefined | null
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
@@ -54,17 +55,14 @@ export async function deposit(
   )
 
   // if no userinfo account, create new one
+
+  const poolId = new PublicKey(farmInfo.poolId)
   const programId = new PublicKey(farmInfo.programId)
-  const userInfoAccount = await createProgramAccountIfNotExist(
-    connection,
-    infoAccount,
-    owner,
-    programId,
-    null,
-    USER_STAKE_INFO_ACCOUNT_LAYOUT,
-    transaction,
-    signers
-  )
+  const pda = await findAssociatedStakeInfoAddress(poolId, wallet.publicKey, programId)
+  // if no associated userinfo account, create new one
+  if (pda.toBase58() !== infoAccount) {
+    transaction.add(createAssociatedLedgerAccountInstruction(programId, poolId, pda, wallet.publicKey))
+  }
 
   const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
@@ -73,7 +71,8 @@ export async function deposit(
       programId,
       new PublicKey(farmInfo.poolId),
       new PublicKey(farmInfo.poolAuthority),
-      userInfoAccount,
+      pda,
+      auxiliaryInfoAccounts.map((k) => new PublicKey(k)),
       wallet.publicKey,
       userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
@@ -261,6 +260,7 @@ export async function withdraw(
   lpAccount: string | undefined | null,
   rewardAccount: string | undefined | null,
   infoAccount: string | undefined | null,
+  auxiliaryInfoAccounts: string[],
   amount: string | undefined | null
 ): Promise<string> {
   if (!connection || !wallet) throw new Error('Miss connection')
@@ -292,7 +292,14 @@ export async function withdraw(
     atas
   )
 
+  const poolId = new PublicKey(farmInfo.poolId)
   const programId = new PublicKey(farmInfo.programId)
+  const pda = await findAssociatedStakeInfoAddress(poolId, wallet.publicKey, programId)
+  // if no associated userinfo account, create new one
+  if (pda.toBase58() !== infoAccount) {
+    transaction.add(createAssociatedLedgerAccountInstruction(programId, poolId, pda, wallet.publicKey))
+  }
+
   const value = getBigNumber(new TokenAmount(amount, farmInfo.lp.decimals, false).wei)
 
   transaction.add(
@@ -300,7 +307,8 @@ export async function withdraw(
       programId,
       new PublicKey(farmInfo.poolId),
       new PublicKey(farmInfo.poolAuthority),
-      new PublicKey(infoAccount),
+      pda,
+      auxiliaryInfoAccounts.map((k) => new PublicKey(k)),
       wallet.publicKey,
       userLpAccount,
       new PublicKey(farmInfo.poolLpTokenAccount),
@@ -517,7 +525,8 @@ export function depositInstruction(
   poolId: PublicKey,
   poolAuthority: PublicKey,
   // user
-  userInfoAccount: PublicKey,
+  userAssociatedInfoAccount: PublicKey,
+  userInfoAccounts: PublicKey[],
   userOwner: PublicKey,
   userLpTokenAccount: PublicKey,
   poolLpTokenAccount: PublicKey,
@@ -531,7 +540,7 @@ export function depositInstruction(
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
     { pubkey: poolAuthority, isSigner: false, isWritable: false },
-    { pubkey: userInfoAccount, isSigner: false, isWritable: true },
+    { pubkey: userAssociatedInfoAccount, isSigner: false, isWritable: true },
     { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
@@ -541,10 +550,14 @@ export function depositInstruction(
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
   ]
 
+  for (const userInfoAccount of userInfoAccounts) {
+    keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
+  }
+
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: 1,
+      instruction: 10,
       amount
     },
     data
@@ -642,7 +655,7 @@ export function depositInstructionV5(
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]
 
-  for (const userInfoAccount of userInfoAccounts) {
+  for (const userInfoAccount of userInfoAccounts.slice(0, 5)) {
     keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
   }
 
@@ -668,7 +681,8 @@ export function withdrawInstruction(
   poolId: PublicKey,
   poolAuthority: PublicKey,
   // user
-  userInfoAccount: PublicKey,
+  userAssociatedInfoAccount: PublicKey,
+  userInfoAccounts: PublicKey[],
   userOwner: PublicKey,
   userLpTokenAccount: PublicKey,
   poolLpTokenAccount: PublicKey,
@@ -682,7 +696,7 @@ export function withdrawInstruction(
   const keys = [
     { pubkey: poolId, isSigner: false, isWritable: true },
     { pubkey: poolAuthority, isSigner: false, isWritable: false },
-    { pubkey: userInfoAccount, isSigner: false, isWritable: true },
+    { pubkey: userAssociatedInfoAccount, isSigner: false, isWritable: true },
     { pubkey: userOwner, isSigner: true, isWritable: false },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolLpTokenAccount, isSigner: false, isWritable: true },
@@ -692,10 +706,14 @@ export function withdrawInstruction(
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
   ]
 
+  for (const userInfoAccount of userInfoAccounts) {
+    keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
+  }
+
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: 2,
+      instruction: 11,
       amount
     },
     data
@@ -793,7 +811,7 @@ export function withdrawInstructionV5(
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]
 
-  for (const userInfoAccount of userInfoAccounts) {
+  for (const userInfoAccount of userInfoAccounts.slice(0, 5)) {
     keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
   }
 
@@ -840,6 +858,39 @@ export function emergencyWithdrawInstructionV4(
   dataLayout.encode(
     {
       instruction: 7
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function createAssociatedLedgerAccountInstruction(
+  programId: PublicKey,
+  // staking pool
+  poolId: PublicKey,
+  // user
+  associatedLedgerAccount: PublicKey,
+  userOwner: PublicKey
+) {
+  const dataLayout = struct([u8('instruction')])
+
+  const keys = [
+    { pubkey: poolId, isSigner: false, isWritable: true },
+    { pubkey: associatedLedgerAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false },
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 9
     },
     data
   )
@@ -923,6 +974,15 @@ export const USER_STAKE_INFO_ACCOUNT_LAYOUT = struct([
   publicKey('stakerOwner'),
   u64('depositBalance'),
   u64('rewardDebt')
+])
+
+export const USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1 = struct([
+  u64('state'),
+  publicKey('poolId'),
+  publicKey('stakerOwner'),
+  u64('depositBalance'),
+  u128('rewardDebt'),
+  seq(u64(), 17)
 ])
 
 export const USER_STAKE_INFO_ACCOUNT_LAYOUT_V4 = struct([
