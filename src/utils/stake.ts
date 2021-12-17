@@ -655,7 +655,7 @@ export function depositInstructionV5(
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]
 
-  for (const userInfoAccount of userInfoAccounts) {
+  for (const userInfoAccount of userInfoAccounts.slice(0, 5)) {
     keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
   }
 
@@ -811,7 +811,7 @@ export function withdrawInstructionV5(
     { pubkey: poolRewardTokenAccountB, isSigner: false, isWritable: true }
   ]
 
-  for (const userInfoAccount of userInfoAccounts) {
+  for (const userInfoAccount of userInfoAccounts.slice(0, 5)) {
     keys.push({ pubkey: userInfoAccount, isSigner: false, isWritable: true })
   }
 

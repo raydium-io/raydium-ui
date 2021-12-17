@@ -310,6 +310,9 @@ export default class Wallet extends Vue {
 
     this.$accessor.wallet.closeModal().then(() => {
       if (adapter && adapter.publicKey) {
+        Vue.prototype.$wallet = adapter
+        this.$accessor.wallet.setConnected(adapter.publicKey.toBase58())
+
         // mock wallet
         // const address = new PublicKey('')
         // Vue.prototype.$wallet = {
@@ -317,12 +320,12 @@ export default class Wallet extends Vue {
         //   publicKey: address,
         //   signTransaction: (transaction: any) => {
         //     console.log(transaction)
+        //   },
+        //   sendTransaction: (transaction: any) => {
+        //     console.log(transaction)
         //   }
         // }
         // this.$accessor.wallet.setConnected(address.toBase58())
-
-        Vue.prototype.$wallet = adapter
-        this.$accessor.wallet.setConnected(adapter.publicKey.toBase58())
 
         this.subWallet()
         this.$notify.success({
