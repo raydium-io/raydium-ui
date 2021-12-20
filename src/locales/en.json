@@ -182,7 +182,7 @@
       "total-points": "Total Points",
       "eligible": {
         "title": "Eligible for Lucky Draw?",
-        "tips": "Qualified users are defined as having connected a wallet, completed a swap, made a trade on OKEx and submitted a valid OKEx UID."
+        "tips": "Qualified users are defined as having connected a wallet, completed a swap, made a trade on OKEx and submitted a valid OKEx UID. Current results are pending OKEx confirmation."
       },
       "point": {
         "title": "Points for Lucky Draw",
@@ -190,11 +190,12 @@
       },
       "qualified": {
         "title": "Qualified Referrals",
-        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, and complete Twitter verification."
+        "tips": "Referral points are earned from users who used your code to connect a wallet, complete a swap, trade on OKEx, and submit a valid OKEx UID. Current referrals are pending OKEx confirmation."
       },
       "referral-list": "Referral Leaderboard",
       "referral-list-end": "Top 5: $2,000 Each",
-      "waiting-confirmation": "Eligibility and points will be visible when OKEx confirms UID and transaction history"
+      "waiting-confirmation": "Eligibility and points will be visible when OKEx confirms UID and transaction history",
+      "referral-list-tips": "Rankings are tentative and will be finalized when OKEx confirms UID and transaction history"
     },
     "exchange-name-OKEx": "OKEx"
   },
