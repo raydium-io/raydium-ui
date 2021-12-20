@@ -1217,25 +1217,6 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '8jGJ3ST1j9eemfC6N2qQevtUdwxT7TpXW1NmvWyvLLVs' // reward vault B
   },
   {
-    name: 'FRKT-SOL',
-    lp: { ...LP_TOKENS['FRKT-SOL-V4'] },
-    reward: { ...TOKENS.RAY },
-    rewardB: { ...TOKENS.FRKT },
-    isStake: false,
-
-    fusion: true,
-    legacy: false,
-    dual: false,
-    version: 5,
-    programId: STAKE_PROGRAM_ID_V5,
-
-    poolId: '36Rf8dzq5gy4Ew2bLQEgKoCKVTku4EJPLqFYG6mzFrkr',
-    poolAuthority: 'GwXKptwrXvFQ2VjcjXc9JwVzmAeGvPH9ogtq54AaDZcm',
-    poolLpTokenAccount: '46WoMBPtrzD6rJVF8Znu5RGsCpjRvNUKCCe87eaedmQm', // lp vault
-    poolRewardTokenAccount: '6GWBHRbqtT5qsn234yfqhC7zvtHnR5pNq53rDJDAWDn4', // reward vault A
-    poolRewardTokenAccountB: 'CaGvtrQj71GkY9RXHzDerhp7iKdBD8iVr6uWEhVuMcm' // reward vault B
-  },
-  {
     name: 'STARS-USDC',
     lp: { ...LP_TOKENS['STARS-USDC-V4'] },
     reward: { ...TOKENS.RAY },
@@ -1842,6 +1823,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '3hikNL4yh7kBusYs6hQ5roNrg3D4874N1nqupvjP2WwT',
     poolRewardTokenAccount: '9hdU4MgrLNJcBf85ZjM54hpsM6x9xaZX4eMTtpU52Skh',
     poolRewardTokenAccountB: '3Ch1odoQHrDLPtshdcYBhuSexuA8JnoqS53UE7LSfoMY'
+  },
+  {
+    name: 'FRKT-SOL',
+    lp: { ...LP_TOKENS['FRKT-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.FRKT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '36Rf8dzq5gy4Ew2bLQEgKoCKVTku4EJPLqFYG6mzFrkr',
+    poolAuthority: 'GwXKptwrXvFQ2VjcjXc9JwVzmAeGvPH9ogtq54AaDZcm',
+    poolLpTokenAccount: '46WoMBPtrzD6rJVF8Znu5RGsCpjRvNUKCCe87eaedmQm', // lp vault
+    poolRewardTokenAccount: '6GWBHRbqtT5qsn234yfqhC7zvtHnR5pNq53rDJDAWDn4', // reward vault A
+    poolRewardTokenAccountB: 'CaGvtrQj71GkY9RXHzDerhp7iKdBD8iVr6uWEhVuMcm' // reward vault B
   },
   {
     name: 'FRKT-USDC',
