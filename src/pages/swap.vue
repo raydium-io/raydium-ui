@@ -291,7 +291,7 @@
               </template>
               <Button
                 style="width: 100%"
-                :disabled="!(needCreateTokens() || needWrapSol())"
+                :disabled="!(needCreateTokens() || needWrapSol()) || checkCoinAmountModelFlag"
                 size="large"
                 :loading="loadingArr['setup']"
                 :class="`${
@@ -319,7 +319,7 @@
           <div style="width: 45%; float: right">
             <Button
               style="width: 100%"
-              :disabled="!(!needCreateTokens() && !needWrapSol())"
+              :disabled="!(!needCreateTokens() && !needWrapSol()) || checkCoinAmountModelFlag"
               size="large"
               :loading="loadingArr['swap']"
               :class="`${
@@ -757,7 +757,7 @@ export default Vue.extend({
       loadingArr: {
         setup: false,
         swap: false
-      } as { [key: string]: boolean },
+      } as { setup: boolean; swap: boolean },
 
       setupFlag: false as boolean,
       setupLastData: '' as string,
@@ -1398,6 +1398,7 @@ export default Vue.extend({
 
     updateAmounts() {
       if (this.swaping) return
+      if (this.loadingArr.setup || this.loadingArr.swap) return
       let toCoinAmount = ''
       let toCoinWithSlippage = null
 
@@ -1612,7 +1613,7 @@ export default Vue.extend({
       }, 1000)
     },
 
-    placeOrder(loadingName: string) {
+    placeOrder(loadingName: 'swap' | 'setup') {
       this.swaping = true
       if (this.loadingArr[loadingName] !== undefined) this.loadingArr[loadingName] = true
 
