@@ -1144,6 +1144,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB',
     decimals: 9,
     tags: ['raydium']
+  },
+  MBS: {
+    symbol: 'MBS',
+    name: 'MBS',
+    mintAddress: 'Fm9rHUTF5v3hwMLbStjZXqNBBoZyGriQaFM6sTFz3K8A',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
