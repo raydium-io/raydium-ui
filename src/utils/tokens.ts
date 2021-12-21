@@ -1137,6 +1137,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'cxxShYRVcepDudXhe7U62QHvw8uBJoKFifmzggGKVC2',
     decimals: 9,
     tags: ['raydium']
+  },
+  GST: {
+    symbol: 'GST',
+    name: 'GST',
+    mintAddress: 'AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
