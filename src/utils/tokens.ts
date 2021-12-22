@@ -1144,6 +1144,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'AFbX8oGjGpmVFywbVouvhQSRmiW2aR1mohfahi4Y2AdB',
     decimals: 9,
     tags: ['raydium']
+  },
+  MBS: {
+    symbol: 'MBS',
+    name: 'MBS',
+    mintAddress: 'Fm9rHUTF5v3hwMLbStjZXqNBBoZyGriQaFM6sTFz3K8A',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2517,6 +2524,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7MgzqVTGeA4wENme81QPTrPy45NJMKVL9XGwxmNT87cG',
     decimals: TOKENS.FRKT.decimals
+  },
+  'MBS-USDC-V4': {
+    symbol: 'MBS-USDC',
+    name: 'MBS-USDC LP',
+    coin: { ...TOKENS.MBS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'BAgSWaPZpsQKyZJdvB5KyvmCNj6hzczzentt5FhDCVHb',
+    decimals: TOKENS.MBS.decimals
   }
 }
 
