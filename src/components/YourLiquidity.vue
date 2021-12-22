@@ -26,7 +26,8 @@
                 <CoinIcon :mint-address="info.coin.mintAddress" />
                 <CoinIcon :mint-address="info.pc.mintAddress" />
               </div>
-              {{ info.lp.symbol }} {{ info.poolInfo.official ? '' : '(Permissionless)' }}
+              {{ info.lp.symbol }}
+              <!-- {{ info.poolInfo.official ? '' : '(Permissionless)' }} -->
               <Tag v-if="![4, 5].includes(info.poolInfo.version)" color="pink">Legacy</Tag>
             </div>
             <div class="fs-container">

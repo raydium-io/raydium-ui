@@ -721,15 +721,26 @@ export default Vue.extend({
           lpMintAddress = liquidityList[0].lp.mintAddress
           // officialPool = liquidityList[0].official
         } else if (liquidityList.length > 0) {
+          const poolListTemp = (Object.values(this.liquidity.infos) as LiquidityPoolInfo[]).filter(
+            (item: LiquidityPoolInfo) => liquidityList.find((liquidityItem) => liquidityItem.ammId === item.ammId)
+          )
+
+          const firstPool = poolListTemp.sort((a, b) =>
+            (a.coin.balance ? a.coin.balance.toEther() : 0) < (b.coin.balance ? b.coin.balance.toEther() : 0) ? 1 : -1
+          )[0]
+
+          ammId = firstPool.ammId
+          lpMintAddress = firstPool.lp.mintAddress
+
           this.coinSelectShow = false
-          setTimeout(() => {
-            this.ammIdSelectShow = true
-            // @ts-ignore
-            this.ammIdSelectList = Object.values(this.liquidity.infos).filter((item: LiquidityPoolInfo) =>
-              liquidityList.find((liquidityItem) => liquidityItem.ammId === item.ammId)
-            )
-          }, 1)
-          return
+          // setTimeout(() => {
+          //   this.ammIdSelectShow = true
+          //   // @ts-ignore
+          //   this.ammIdSelectList = Object.values(this.liquidity.infos).filter((item: LiquidityPoolInfo) =>
+          //     liquidityList.find((liquidityItem) => liquidityItem.ammId === item.ammId)
+          //   )
+          // }, 1)
+          // return
         }
 
         this.ammId = ammId
