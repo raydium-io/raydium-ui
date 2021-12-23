@@ -1880,6 +1880,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '3v1jXd65H8cJUAYyDxxgMVpnDzRwcnfNHd1fApD1s96q',
     poolRewardTokenAccount: 'HoX6ZJT3CC349M2Tv47D4oX985z6MXi1waJMbqRY8mBY',
     poolRewardTokenAccountB: '2M7pceDDkap8TTV5AeEr7KeV7cG1WkyBVT1TGcevV1wj'
+  },
+  {
+    name: 'PRISM-USDC',
+    lp: { ...LP_TOKENS['PRISM-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.PRISM },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'DtU5pZB99rVtxe5qe5hQa2rRpw7poFiqaHvMAbPgT2TM',
+    poolAuthority: 'AghczE5LjWbWWBJXJNZoqPdGKeZdTWgNqrthFKiJVx9C',
+    poolLpTokenAccount: '3NU6ELNjmu9fmgbbYaoy6iTMmQ1wzQ4rTGK6gur715eH',
+    poolRewardTokenAccount: 'AdUSKhjwuApXwFmKfnXg3a3iKZQVSRVKSscU9QJ3QF6P',
+    poolRewardTokenAccountB: 'L82H7Lct65UEYv96bxDnevrqoMREPLgHA8Hk94QT2cN'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
