@@ -70,7 +70,8 @@
       "input-placeholder": "输入一个有效的OKEx UID",
       "sub-btn-loading": "提交中....",
       "sub-btn-placeholder": "请输入OKEx的UID",
-      "sub-UID": "OKEx UID:"
+      "sub-UID": "OKEx UID:",
+      "sub-end": "活动已结束"
     },
 
     "swap": {

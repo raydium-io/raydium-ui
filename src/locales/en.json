@@ -74,7 +74,8 @@
       "input-placeholder": "Enter a valid OKEx login",
       "sub-btn-loading": "SUBMITTING...",
       "sub-btn-placeholder": "Enter OKEx UID",
-      "sub-UID": "OKEx UID:"
+      "sub-UID": "OKEx UID:",
+      "sub-end": "The airdrop is closed"
     },
 
     "swap": {

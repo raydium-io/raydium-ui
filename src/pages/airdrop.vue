@@ -292,8 +292,8 @@
 
         <div class="box form">
           <div v-for="item of $t('airdrop.huobiID.title')" :key="item" class="box-title">{{ item }}</div>
-          <div v-if="!canSubmitHuobiUID">{{ $t('airdrop.huobiID.sub-UID') }}{{ huobiUID }}</div>
-          <div v-else>
+          <div v-if="!canSubmitHuobiUID && !isActivityEnd">{{ $t('airdrop.huobiID.sub-UID') }}{{ huobiUID }}</div>
+          <div v-else-if="canSubmitHuobiUID && !isActivityEnd">
             <div class="input-box">
               <input v-model="huobiUID" :placeholder="$t('airdrop.huobiID.input-placeholder')" />
             </div>
@@ -310,6 +310,7 @@
               }}
             </button>
           </div>
+          <div v-else>{{ $t('airdrop.huobiID.sub-end') }}</div>
         </div>
       </section>
 
