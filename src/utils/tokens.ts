@@ -1151,6 +1151,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'Fm9rHUTF5v3hwMLbStjZXqNBBoZyGriQaFM6sTFz3K8A',
     decimals: 6,
     tags: ['raydium']
+  },
+  PRISM: {
+    symbol: 'PRISM',
+    name: 'PRISM',
+    mintAddress: 'PRSMNsEPqhGVCH1TtWiJqPjJyh2cKrLostPZTNy1o5x',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2533,6 +2540,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'BAgSWaPZpsQKyZJdvB5KyvmCNj6hzczzentt5FhDCVHb',
     decimals: TOKENS.MBS.decimals
+  },
+  'PRISM-USDC-V4': {
+    symbol: 'PRISM-USDC',
+    name: 'PRISM-USDC LP',
+    coin: { ...TOKENS.PRISM },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '3baYkTcudvSFMe25UpZcBfdp4FA5kL2E4pfaeJ8AiYJB',
+    decimals: TOKENS.PRISM.decimals
   }
 }
 
