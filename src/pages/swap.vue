@@ -99,7 +99,7 @@
           label="From"
           :balance-offset="
             fromCoin && fromCoin.symbol === 'SOL' && get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`)
-              ? get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed()
+              ? Number(get(wallet.tokenAccounts, `${TOKENS.WSOL.mintAddress}.balance`).fixed())
               : 0
           "
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
