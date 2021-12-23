@@ -4420,7 +4420,7 @@ export const LIQUIDITY_POOLS: LiquidityPoolInfo[] = [
     name: 'PRISM-USDC',
     coin: { ...TOKENS.PRISM },
     pc: { ...TOKENS.USDC },
-    lp: { ...LP_TOKENS['REAL-USDC-V4'] },
+    lp: { ...LP_TOKENS['PRISM-USDC-V4'] },
 
     version: 4,
     programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
