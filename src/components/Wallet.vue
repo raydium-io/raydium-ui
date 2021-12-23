@@ -67,7 +67,7 @@ import type { AccountInfo, Context } from '@solana/web3.js'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 import { SolongWalletAdapter } from '@solana/wallet-adapter-solong'
-import { MathWalletWalletAdapter } from '@solana/wallet-adapter-mathwallet'
+import { MathWalletAdapter } from '@solana/wallet-adapter-mathwallet'
 import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
 import { LedgerWalletAdapter, getDerivationPath } from '@solana/wallet-adapter-ledger'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
@@ -149,7 +149,7 @@ export default class Wallet extends Vue {
       website: 'https://mathwallet.org',
       chromeUrl: 'https://chrome.google.com/webstore/detail/math-wallet/afbcbjpbpfadlkmhmclhkeeodmamcflc',
       getAdapter() {
-        return new MathWalletWalletAdapter()
+        return new MathWalletAdapter()
       }
     },
     Solong: {

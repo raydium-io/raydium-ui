@@ -1,5 +1,33 @@
 <template>
-  <div class="staking container">
+  <div class="staking container" style="margin-top: 20px">
+    <div class="card">
+      <div class="card-body">
+        <Row style="padding: 24px 32px">
+          <Col :span="isMobile ? 24 : 12" :style="isMobile ? '' : 'height:100%'">
+            <img
+              src="../assets/background/holiday.jpeg"
+              width="100%"
+              style="border-radius: 20px"
+              :style="isMobile ? '' : 'height:100%'"
+            />
+          </Col>
+          <Col :span="isMobile ? 24 : 12" style="padding: 0 24px">
+            <div style="text-align: center">
+              <h1>Raydium X Magic Eden Holiday NFT Mint</h1>
+              <p>Users with at least 1 RAY staked before Dec 23, 10:00 UTC <br />are eligible to mint for 0.01 SOL.</p>
+              <p>All proceeds go to the FTX Foundation!</p>
+            </div>
+            <div
+              id="mint-button"
+              ref="mintButton"
+              data-mint-button="mainnet-beta"
+              data-symbol="ray_x_me_holiday_drop_21"
+            />
+          </Col>
+        </Row>
+      </div>
+    </div>
+
     <div class="page-head fs-container">
       <span class="title">Staking</span>
       <div class="buttons">
@@ -45,87 +73,91 @@
       @onCancel="cancelUnstake"
     />
 
-    <div v-if="farm.initialized" class="card">
-      <div class="card-body">
-        <Collapse expand-icon-position="right">
-          <CollapsePanel v-for="farm in farms" :key="farm.farmInfo.poolId">
-            <Row slot="header" class="farm-head" :gutter="0">
-              <Col class="lp-icons" :span="8">
-                <div class="icons">
-                  <CoinIcon :mint-address="farm.farmInfo.lp.mintAddress" />
-                </div>
-                {{ farm.farmInfo.lp.symbol }}
-              </Col>
-              <Col class="state" :span="isMobile ? 8 : 4">
-                <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
-                <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Staked</div>
-                <div class="value">
-                  {{ farm.userInfo.depositBalance.format() }}
-                </div>
-              </Col>
-              <Col class="state" :span="isMobile ? 8 : 4">
-                <div class="title">Apr</div>
-                <div class="value">{{ farm.farmInfo.apr }}%</div>
-              </Col>
-              <Col v-if="!isMobile" class="state" :span="4">
-                <div class="title">Liquidity</div>
-                <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
-              </Col>
-            </Row>
+    <div v-if="farm.initialized">
+      <div class="card">
+        <div class="card-body">
+          <Collapse expand-icon-position="right">
+            <CollapsePanel v-for="farm in farms" :key="farm.farmInfo.poolId">
+              <Row slot="header" class="farm-head" :gutter="0">
+                <Col class="lp-icons" :span="8">
+                  <div class="icons">
+                    <CoinIcon :mint-address="farm.farmInfo.lp.mintAddress" />
+                  </div>
+                  {{ farm.farmInfo.lp.symbol }}
+                </Col>
+                <Col class="state" :span="isMobile ? 8 : 4">
+                  <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
+                  <div class="value">{{ farm.userInfo.pendingReward.format() }}</div>
+                </Col>
+                <Col v-if="!isMobile" class="state" :span="4">
+                  <div class="title">Staked</div>
+                  <div class="value">
+                    {{ farm.userInfo.depositBalance.format() }}
+                  </div>
+                </Col>
+                <Col class="state" :span="isMobile ? 8 : 4">
+                  <div class="title">Apr</div>
+                  <div class="value">{{ farm.farmInfo.apr }}%</div>
+                </Col>
+                <Col v-if="!isMobile" class="state" :span="4">
+                  <div class="title">Liquidity</div>
+                  <div class="value">{{ farm.farmInfo.lp.balance.format() }}</div>
+                </Col>
+              </Row>
 
-            <Row :class="isMobile ? 'is-mobile' : ''" :gutter="16">
-              <Col :span="isMobile ? 24 : 12">
-                <div class="harvest">
-                  <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
-                  <div class="pending fs-container">
-                    <div class="reward">
-                      <div class="token">
-                        {{
-                          farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
-                        }}
+              <Row :class="isMobile ? 'is-mobile' : ''" :gutter="16">
+                <Col :span="isMobile ? 24 : 12">
+                  <div class="harvest">
+                    <div class="title">Pending {{ farm.farmInfo.reward.symbol }} Reward</div>
+                    <div class="pending fs-container">
+                      <div class="reward">
+                        <div class="token">
+                          {{
+                            farm.userInfo.pendingReward.format().includes('-')
+                              ? 0
+                              : farm.userInfo.pendingReward.format()
+                          }}
+                        </div>
                       </div>
+                      <Button
+                        size="large"
+                        ghost
+                        :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
+                        :loading="harvesting"
+                        @click="harvest(farm.farmInfo)"
+                      >
+                        Harvest
+                      </Button>
                     </div>
-                    <Button
-                      size="large"
-                      ghost
-                      :disabled="!wallet.connected || harvesting || farm.userInfo.pendingReward.isNullOrZero()"
-                      :loading="harvesting"
-                      @click="harvest(farm.farmInfo)"
-                    >
-                      Harvest
-                    </Button>
                   </div>
-                </div>
-              </Col>
+                </Col>
 
-              <Col :span="isMobile ? 24 : 12">
-                <div class="start">
-                  <div class="title">Start staking</div>
-                  <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
-                    Connect Wallet
-                  </Button>
-                  <div v-else class="fs-container">
-                    <Button
-                      v-if="!farm.userInfo.depositBalance.isNullOrZero()"
-                      class="unstake"
-                      size="large"
-                      ghost
-                      @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
-                    >
-                      <Icon type="minus" />
+                <Col :span="isMobile ? 24 : 12">
+                  <div class="start">
+                    <div class="title">Start staking</div>
+                    <Button v-if="!wallet.connected" size="large" ghost @click="$accessor.wallet.openModal">
+                      Connect Wallet
                     </Button>
-                    <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
-                      Stake {{ farm.farmInfo.lp.symbol }}
-                    </Button>
+                    <div v-else class="fs-container">
+                      <Button
+                        v-if="!farm.userInfo.depositBalance.isNullOrZero()"
+                        class="unstake"
+                        size="large"
+                        ghost
+                        @click="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                      >
+                        <Icon type="minus" />
+                      </Button>
+                      <Button size="large" ghost @click="openStakeModal(farm.farmInfo, farm.farmInfo.lp)">
+                        Stake {{ farm.farmInfo.lp.symbol }}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Col>
-            </Row>
-          </CollapsePanel>
-        </Collapse>
+                </Col>
+              </Row>
+            </CollapsePanel>
+          </Collapse>
+        </div>
       </div>
     </div>
 
@@ -166,8 +198,6 @@ export default Vue.extend({
 
   data() {
     return {
-      isMobile: false,
-
       farms: [] as any,
 
       lp: null,
@@ -185,7 +215,7 @@ export default Vue.extend({
   },
 
   computed: {
-    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity'])
+    ...mapState(['app', 'wallet', 'farm', 'url', 'price', 'liquidity', 'isMobile'])
   },
 
   watch: {
@@ -194,6 +224,17 @@ export default Vue.extend({
         this.updateCurrentLp(newTokenAccounts)
       },
       deep: true
+    },
+
+    'wallet.address': {
+      handler(newAddress: string) {
+        console.log('wallet.address', newAddress)
+        if (newAddress && this.$wallet && this.$wallet.connected) {
+          console.log('this.$wallet', this.$wallet)
+          // @ts-ignore
+          window.setMintButtonWallet(this.$wallet)
+        }
+      }
     },
 
     'farm.infos': {
@@ -213,6 +254,30 @@ export default Vue.extend({
 
   mounted() {
     this.updateFarms()
+
+    // @ts-ignore
+    window.onMintButtonStatusChange = (event: any) => {
+      if (event.tx) {
+        const txid = event.tx
+
+        this.$notify.info({
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Mint Holiday NFT`
+        this.$accessor.transaction.sub({ txid, description })
+      }
+
+      console.log(event)
+    }
+
+    // @ts-ignore
+    window.installMintButton(this.$refs.mintButton)
   },
 
   methods: {
@@ -564,6 +629,15 @@ export default Vue.extend({
 </style>
 
 <style lang="less">
+#mint-button {
+  text-align: center;
+
+  .container {
+    padding: 0 !important;
+    justify-content: center;
+  }
+}
+
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }

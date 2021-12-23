@@ -1,9 +1,9 @@
-import { NuxtWeb3Instance } from './web3'
-import { NuxtApiInstance } from './api'
-import { NuxtNotifyInstance } from './notify'
-import { WalletAdapter } from '@/wallets/types'
+import { WalletAdapter } from '@solana/wallet-adapter-base';
 
-import { accessorType } from '@/store'
+import { accessorType } from '@/store';
+import { NuxtApiInstance } from './api';
+import { NuxtNotifyInstance } from './notify';
+import { NuxtWeb3Instance } from './web3';
 
 // Nuxt 2.9+
 declare module '@nuxt/types' {

@@ -85,7 +85,8 @@ export default {
     '@nuxtjs/gtm',
     // '@nuxtjs/sentry'
     '@/modules/alexa',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@/modules/mintbutton'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
