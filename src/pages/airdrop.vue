@@ -21,7 +21,7 @@
           {{ $t('airdrop.pending-reward') }}
         </div>
 
-        <div v-if="rewardIsOut" class="page-additional-description">
+        <div v-if="rewardIsOut || showWinnerList" class="page-additional-description">
           {{ $t('airdrop.reward[0]') }} <span class="alert"> {{ $t('airdrop.reward[1]') }} </span>
           {{ $t('airdrop.reward[2]') }}
         </div>
@@ -33,13 +33,17 @@
           <div class="icon minimize" />
         </div>
 
-        <a v-if="rewardIsOut && showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
+        <a v-if="showWinnerList" class="download-full-list" href="/winner-list/" target="_blank">
           {{ $t('airdrop.user.finish.winner-list') }}
         </a>
 
         <div class="title">{{ $t('airdrop.user.title') }}</div>
 
-        <div v-if="rewardIsOut && showWinnerList" class="note" style="text-align: center; margin-top: 12px">
+        <div
+          v-if="showWinnerList && $accessor.wallet.connected"
+          class="note"
+          style="text-align: center; margin-top: 12px"
+        >
           {{ $t('airdrop.user.finish.prompt') }}
         </div>
 
@@ -65,7 +69,8 @@
                 </td>
               </tr>
             </table>
-            <div v-if="!rewardIsOut">{{ $t('airdrop.user.calculating') }}</div>
+            <div v-if="!rewardIsOut && !showWinnerList">{{ $t('airdrop.user.calculating') }}</div>
+            <div v-if="!rewardIsOut && showWinnerList">You did not participate in the airdrop</div>
           </template>
           <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">{{ $t('airdrop.user.total-points') }}</h1>
           <table class="your-table">
@@ -124,7 +129,9 @@
           </table>
 
           <h1 :class="`table-caption ${rewardIsOut ? 'have-reward' : ''}`">
-            {{ rewardIsOut ? $t('airdrop.user.referral-list-end') : $t('airdrop.user.referral-list') }}
+            {{
+              !rewardIsOut && !showWinnerList ? $t('airdrop.user.referral-list') : $t('airdrop.user.referral-list-end')
+            }}
 
             <Tooltip placement="left">
               <template slot="title">
@@ -145,7 +152,7 @@
               </tr>
             </tbody>
           </table>
-          <table v-else-if="rewardIsOut" class="winner-table">
+          <table v-else-if="rewardIsOut || showWinnerList" class="winner-table">
             <tbody>
               <tr v-for="winnerInfo in winnerList['top 5']" :key="winnerInfo.owner">
                 <td class="td address">{{ winnerInfo.owner }}</td>
