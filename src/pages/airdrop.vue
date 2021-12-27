@@ -540,7 +540,7 @@ export default class Airdrop extends Vue {
   campaignLocalesName = 'huobi'
 
   comingSoon = false
-  showWinnerList = false
+  showWinnerList = true
   initBackendResponse = {} as CampaignInfo['data'] // info from backend
   isActivityEnd = true
   huobiUID = ''
