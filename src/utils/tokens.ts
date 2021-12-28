@@ -1158,6 +1158,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'PRSMNsEPqhGVCH1TtWiJqPjJyh2cKrLostPZTNy1o5x',
     decimals: 6,
     tags: ['raydium']
+  },
+  MEAN: {
+    symbol: 'MEAN',
+    name: 'MEAN',
+    mintAddress: 'MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
