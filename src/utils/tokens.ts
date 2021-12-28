@@ -2549,6 +2549,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '3baYkTcudvSFMe25UpZcBfdp4FA5kL2E4pfaeJ8AiYJB',
     decimals: TOKENS.PRISM.decimals
+  },
+  'CHICKS-USDC-V4': {
+    symbol: 'CHICKS-USDC',
+    name: 'CHICKS-USDC LP',
+    coin: { ...TOKENS.CHICKS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'CPzmcw81a6PDasSXhVLfDRKuTJXZPUqocS9VFf5zCFhs',
+    decimals: TOKENS.CHICKS.decimals
   }
 }
 
