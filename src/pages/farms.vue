@@ -367,7 +367,7 @@ export default Vue.extend({
       unstaking: false,
       poolType: true,
       endedFarmsPoolId: [] as string[],
-      endedFarmsPoolIdWhiteList: ['Gue2c9J2aRtY3aJ1HEwabQznwg2MUt9d9kUyr6otujR'] as string[],
+      endedFarmsPoolIdWhiteList: ['Ej7iBkW79EdF26RxaRQfGo58PqRdzHzRmE4C2e3z3dPY'] as string[],
       showCollapse: [] as any[]
     }
   },

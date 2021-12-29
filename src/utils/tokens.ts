@@ -2565,6 +2565,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'CPzmcw81a6PDasSXhVLfDRKuTJXZPUqocS9VFf5zCFhs',
     decimals: TOKENS.CHICKS.decimals
+  },
+  'MEAN-RAY-V4': {
+    symbol: 'MEAN-RAY',
+    name: 'MEAN-RAY LP',
+    coin: { ...TOKENS.MEAN },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'H9wUyrxpAErmdNVPitpHSXgwoomoh91ggJKPWtQQoCn1',
+    decimals: TOKENS.MEAN.decimals
   }
 }
 

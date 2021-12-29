@@ -1918,6 +1918,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'EVB51MPoAcrg6wtmSXFtURzQYYVEMbwZuyV6PqXCKFT3',
     poolRewardTokenAccount: 'CWfUsYr2nWu7gA8CUV7G4E9i18LVJ4t89wLFRsEKpt1E',
     poolRewardTokenAccountB: '8Xgp3bLeT1xu9z9CtoXu4JNBfNhuNDgvkHi4i5huaUkC'
+  },
+  {
+    name: 'MEAN-RAY',
+    lp: { ...LP_TOKENS['MEAN-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.MEAN },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'Ej7iBkW79EdF26RxaRQfGo58PqRdzHzRmE4C2e3z3dPY',
+    poolAuthority: 'D5JdXMkTHRrUqTfmPxJLeuaCkxqkC9FCN2j8aet9npFC',
+    poolLpTokenAccount: 'AHSbgdUJnWiRVWqrUbq88RQB6zMFAvXhC5U9jsdX55RK',
+    poolRewardTokenAccount: 'CmjoCE7MtgTSbtsvUXYHiYynVcmQUEBLiNu8ns76eZnk',
+    poolRewardTokenAccountB: 'BieoMwUt4SGfF2huQpW1uZi4DSxLpiR62BYgEhPqmfiM'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
