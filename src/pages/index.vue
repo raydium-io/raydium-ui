@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <HeadChip />
     <nav class="home-navbar">
       <NuxtLink to="/swap/">
         <img src="../assets/icons/logo-text.svg" width="148" height="40" />
@@ -608,7 +607,7 @@ export default class Index extends Vue {
   top: 0;
   left: 0;
   right: 0;
-  margin: 128px 165px 50px; /* banner will change space of this */
+  padding: 50px 165px;
   justify-content: space-between;
   z-index: 1;
 }

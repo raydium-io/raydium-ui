@@ -1,33 +1,5 @@
 <template>
   <div class="staking container" style="margin-top: 20px">
-    <div class="card">
-      <div class="card-body">
-        <Row style="padding: 24px 32px">
-          <Col :span="isMobile ? 24 : 12" :style="isMobile ? '' : 'height:100%'">
-            <img
-              src="../assets/background/holiday.jpeg"
-              width="100%"
-              style="border-radius: 20px"
-              :style="isMobile ? '' : 'height:100%'"
-            />
-          </Col>
-          <Col :span="isMobile ? 24 : 12" style="padding: 0 24px">
-            <div style="text-align: center">
-              <h1>Raydium X Magic Eden Holiday NFT Mint</h1>
-              <p>Users with at least 1 RAY staked before Dec 23, 10:00 UTC <br />are eligible to mint for 0.01 SOL.</p>
-              <p>All proceeds go to the FTX Foundation!</p>
-            </div>
-            <div
-              id="mint-button"
-              ref="mintButton"
-              data-mint-button="mainnet-beta"
-              data-symbol="ray_x_me_holiday_drop_21"
-            />
-          </Col>
-        </Row>
-      </div>
-    </div>
-
     <div class="page-head fs-container">
       <span class="title">Staking</span>
       <div class="buttons">
@@ -226,17 +198,6 @@ export default Vue.extend({
       deep: true
     },
 
-    'wallet.address': {
-      handler(newAddress: string) {
-        console.log('wallet.address', newAddress)
-        if (newAddress && this.$wallet && this.$wallet.connected) {
-          console.log('this.$wallet', this.$wallet)
-          // @ts-ignore
-          window.setMintButtonWallet(this.$wallet)
-        }
-      }
-    },
-
     'farm.infos': {
       handler() {
         this.updateFarms()
@@ -254,30 +215,6 @@ export default Vue.extend({
 
   mounted() {
     this.updateFarms()
-
-    // @ts-ignore
-    window.onMintButtonStatusChange = (event: any) => {
-      if (event.tx) {
-        const txid = event.tx
-
-        this.$notify.info({
-          message: 'Transaction has been sent',
-          description: (h: any) =>
-            h('div', [
-              'Confirmation is in progress.  Check your transaction on ',
-              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
-            ])
-        })
-
-        const description = `Mint Holiday NFT`
-        this.$accessor.transaction.sub({ txid, description })
-      }
-
-      console.log(event)
-    }
-
-    // @ts-ignore
-    window.installMintButton(this.$refs.mintButton)
   },
 
   methods: {
