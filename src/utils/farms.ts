@@ -1937,6 +1937,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'AHSbgdUJnWiRVWqrUbq88RQB6zMFAvXhC5U9jsdX55RK',
     poolRewardTokenAccount: 'CmjoCE7MtgTSbtsvUXYHiYynVcmQUEBLiNu8ns76eZnk',
     poolRewardTokenAccountB: 'BieoMwUt4SGfF2huQpW1uZi4DSxLpiR62BYgEhPqmfiM'
+  },
+  {
+    name: 'TINY-USDC',
+    lp: { ...LP_TOKENS['TINY-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.TINY },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'Bd1hAsMAghtCjK38Ut4m938Ep7zyEp2TydQ7G35nPvUj',
+    poolAuthority: 'AGQ8Ks91ywQrtYdTRDDgS5Ey1qXUo6fcTSMhet2M9zfb',
+    poolLpTokenAccount: 'EBrY4H9FL3SD8FGtkBEYQByUu8ZRoyVqX1PFmhhDqrNn',
+    poolRewardTokenAccount: '8E4GhEuKWYU79npxJ6MXSPhJoSdBqnQqiSBA2UjU4Qpj',
+    poolRewardTokenAccountB: '2c8jWP6S1jnrdBAcfmssN6P2j3yuS67i5Ei3vNBMXRgP'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 

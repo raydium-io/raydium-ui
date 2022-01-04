@@ -1165,6 +1165,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'MEANeD3XDdUmNMsRGjASkSWdC8prLYsoRJ61pPeHctD',
     decimals: 6,
     tags: ['raydium']
+  },
+  TINY: {
+    symbol: 'TINY',
+    name: 'TINY',
+    mintAddress: 'HKfs24UEDQpHS5hUyKYkHd9q7GY5UQ679q2bokeL2whu',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2574,6 +2581,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'H9wUyrxpAErmdNVPitpHSXgwoomoh91ggJKPWtQQoCn1',
     decimals: TOKENS.MEAN.decimals
+  },
+  'TINY-USDC-V4': {
+    symbol: 'TINY-USDC',
+    name: 'TINY-USDC LP',
+    coin: { ...TOKENS.TINY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Hho6ZzRDj49L4z6zog8nQZFaxMSz6FX6wNzVpMeAMen',
+    decimals: TOKENS.TINY.decimals
   }
 }
 
