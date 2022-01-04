@@ -10,7 +10,7 @@
       <section class="page-title">
         <img
           class="icon"
-          src="../assets/background/okex-airdrop.svg"
+          src="../../assets/background/okex-airdrop.svg"
           style="margin-bottom: 40px; width: 100%; max-width: 400px"
         />
         <div class="page-sub-leading">{{ $t('airdrop.pre-title') }}</div>
@@ -362,7 +362,7 @@
                     }
                   "
                 >
-                  <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.twitter.btn') }}
+                  <img class="icon" src="../../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.twitter.btn') }}
                 </button>
               </a>
               <button v-else @click="$accessor.wallet.openModal()">{{ $t('connect-wallet') }}</button>
@@ -401,7 +401,7 @@
                       }
                     "
                   >
-                    <img class="icon" src="../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.follow.btn') }}
+                    <img class="icon" src="../../assets/icons/guide-twitter-icon.svg" />{{ $t('airdrop.follow.btn') }}
                   </button>
                 </a>
               </div>
@@ -434,7 +434,7 @@
                   }
                 "
               >
-                <img class="icon" src="../assets/icons/guide-share-icon.svg" />
+                <img class="icon" src="../../assets/icons/guide-share-icon.svg" />
               </button>
             </div>
           </div>
@@ -866,7 +866,7 @@ a.disabled {
   width: 24px;
   height: 24px;
   background-color: gray;
-  mask-image: url('../assets/icons/reward.svg');
+  mask-image: url('../../assets/icons/reward.svg');
 }
 .icon-reward.finished {
   background-color: aquamarine;
@@ -1108,7 +1108,7 @@ a.disabled {
       height: 24px;
       background-size: 100% 100%;
       background-color: aquamarine;
-      mask-image: url('../assets/icons/minimize.svg');
+      mask-image: url('../../assets/icons/minimize.svg');
     }
   }
   .download-full-list {
@@ -1177,11 +1177,11 @@ a.disabled {
     height: 40px;
     background-size: 100% 100%;
     background-color: aquamarine;
-    mask-image: url('../assets/icons/reward.svg');
+    mask-image: url('../../assets/icons/reward.svg');
     &:hover {
       width: 32px;
       height: 32px;
-      mask-image: url('../assets/icons/maximize.svg');
+      mask-image: url('../../assets/icons/maximize.svg');
     }
   }
 }
