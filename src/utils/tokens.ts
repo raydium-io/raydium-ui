@@ -1179,6 +1179,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y',
     decimals: 9,
     tags: ['raydium']
+  },
+  SCY: {
+    symbol: 'SCY',
+    name: 'SCY',
+    mintAddress: 'SCYfrGCw8aDiqdgcpdGjV6jp4UVVQLuphxTDLNWu36f',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
