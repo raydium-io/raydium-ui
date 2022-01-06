@@ -2604,6 +2604,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Hho6ZzRDj49L4z6zog8nQZFaxMSz6FX6wNzVpMeAMen',
     decimals: TOKENS.TINY.decimals
+  },
+  'SCY-USDC-V4': {
+    symbol: 'SCY-USDC',
+    name: 'SCY-USDC LP',
+    coin: { ...TOKENS.SCY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'EcYk7t6Vw59HDnY2u6H1KDPkk8juMeA1NpGpHiGk1LDf',
+    decimals: TOKENS.SCY.decimals
   }
 }
 
