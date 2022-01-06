@@ -105,7 +105,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     const baseMintDecimals = new BigNumber(await getMintDecimals(conn, market.baseMintAddress as PublicKey))
     const quoteMintDecimals = new BigNumber(await getMintDecimals(conn, market.quoteMintAddress as PublicKey))
     return { market, price, msg: '', baseMintDecimals, quoteMintDecimals }
-  } catch (error) {
+  } catch (error: any) {
     if (error.message === 'Non-base58 character') {
       return { market: null, price: null, msg: 'market input error', baseMintDecimals: 0, quoteMintDecimals: 0 }
     } else {
