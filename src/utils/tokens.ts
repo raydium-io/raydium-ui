@@ -2620,6 +2620,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'EcYk7t6Vw59HDnY2u6H1KDPkk8juMeA1NpGpHiGk1LDf',
     decimals: TOKENS.SCY.decimals
+  },
+  'SLC-USDC-V4': {
+    symbol: 'SLC-USDC',
+    name: 'SLC-USDC LP',
+    coin: { ...TOKENS.SLC },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4A3kqZBJu581eFePXL1dTLfxEkjZPWJFgj4tJmP6mQQp',
+    decimals: TOKENS.SLC.decimals
   }
 }
 
