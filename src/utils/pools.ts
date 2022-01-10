@@ -45,6 +45,11 @@ export interface LiquidityPoolInfo {
 
   status?: number
   currentK?: number
+
+  fees?: {
+    swapFeeNumerator: number
+    swapFeeDenominator: number
+  }
 }
 
 /**
