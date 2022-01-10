@@ -8,22 +8,7 @@ const path = require('path')
   const regex =
     /export const TOKENS: Tokens = ([\s\S]+)export const LP_TOKENS: Tokens = ([\s\S]+)function addUserLocalCoinMint/g
   regex.test(js)
-  const tokenResult = RegExp.$1
   let lpResult = RegExp.$2
-
-  const tokens = eval(`(${tokenResult})`)
-  for (const { symbol, name, mintAddress, decimals } of Object.values(tokens)) {
-    console.log(`  ${symbol}: {
-    symbol: "${symbol}",
-    name: "${name}",
-    mint: "${mintAddress}",
-    decimals: ${decimals},
-    extensions: {
-    },
-  },`)
-  }
-
-  console.log('------------------------------')
 
   lpResult = lpResult.replace(/coin:[\S ]+,/g, '')
   lpResult = lpResult.replace(/pc:[\S ]+,/g, '')

@@ -37,6 +37,6 @@ const path = require('path')
   id: "${poolId}",
   lp: ${lpName},
   version: ${programId},
-},`)
+  },`)
   }
 })()
