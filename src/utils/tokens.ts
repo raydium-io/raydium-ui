@@ -1193,6 +1193,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'METAmTMXwdb8gYzyCPfXXFmZZw4rUsXX58PNsDg7zjL',
     decimals: 6,
     tags: ['raydium']
+  },
+  NOS: {
+    symbol: 'NOS',
+    name: 'NOS',
+    mintAddress: 'nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
