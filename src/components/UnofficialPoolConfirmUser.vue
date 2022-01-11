@@ -3,21 +3,21 @@
     title="This is a Permissionless Pool"
     :visible="true"
     :footer="null"
-    @cancel="$emit('onClose')"
-    :maskClosable="false"
+    :mask-closable="false"
     :closable="false"
+    @cancel="$emit('onClose')"
   >
     <div class="select-token">
       Anyone can create an SPL token on Solana, which may include fake versions of existing tokens or tokens that claim
       to represent projects that do not have a token. Take extra caution to confirm token addresses are for the token
       you want to trade.
       <br /><br />
-      Always check the quoted price and that the pool has sufficient liqudity before trading.
+      Always check the quoted price and that the pool has sufficient liquidity before trading.
       <label style="color: red"
-        ><input type="checkbox" v-model="userCheckUnofficial" style="margin-right: 10px" />I understand</label
+        ><input v-model="userCheckUnofficial" type="checkbox" style="margin-right: 10px" />I understand</label
       >
       <label style="color: red"
-        ><input type="checkbox" v-model="userCheckUnofficialAll" style="margin-right: 10px" />Do not warn again for this
+        ><input v-model="userCheckUnofficialAll" type="checkbox" style="margin-right: 10px" />Do not warn again for this
         pool</label
       >
       <span>
@@ -37,8 +37,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Modal } from 'ant-design-vue'
-import { Button } from 'ant-design-vue'
+import { Modal, Button } from 'ant-design-vue'
 
 Vue.use(Modal)
 

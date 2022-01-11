@@ -191,7 +191,7 @@
           I have read
           <b
             ><a href="https://raydium.gitbook.io/raydium/exchange-trade-and-swap/liquidity-pools" target="_block"
-              >Raydium's Liqudity Guide</a
+              >Raydium's Liquidity Guide</a
             ></b
           >
           and understand the risks involved with providing liquidity and impermanent loss.
