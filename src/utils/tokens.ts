@@ -1193,6 +1193,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'METAmTMXwdb8gYzyCPfXXFmZZw4rUsXX58PNsDg7zjL',
     decimals: 6,
     tags: ['raydium']
+  },
+  $WOOD: {
+    symbol: '$WOOD',
+    name: '$WOOD',
+    mintAddress: '674PmuiDtgKx3uKuJ1B16f9m5L84eFvNwj3xDMvHcbo7',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
