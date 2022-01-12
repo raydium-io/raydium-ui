@@ -1200,6 +1200,13 @@ export const TOKENS: Tokens = {
     mintAddress: '674PmuiDtgKx3uKuJ1B16f9m5L84eFvNwj3xDMvHcbo7',
     decimals: 9,
     tags: ['raydium']
+  },
+  AART: {
+    symbol: 'AART',
+    name: 'AART',
+    mintAddress: 'F3nefJBcejYbtdREjui1T9DPh5dBgpkKq7u2GAAMXs5B',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
