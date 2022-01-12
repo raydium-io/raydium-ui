@@ -54,7 +54,9 @@
     "nuxt": "^2.15.8",
     "nuxt-clipboard": "^0.0.6",
     "nuxt-property-decorator": "^2.9.1",
-    "nuxt-typed-vuex": "^0.2.0"
+    "nuxt-typed-vuex": "^0.2.0",
+    "postcss-html": "^1.3.0",
+    "stylelint-config-recommended-vue": "^1.1.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",

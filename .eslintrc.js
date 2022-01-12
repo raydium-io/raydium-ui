@@ -7,7 +7,7 @@ module.exports = {
   extends: [
     '@nuxtjs/eslint-config-typescript',
     'prettier',
-    'prettier/vue',
+    // 'prettier/vue',
     // 'plugin:prettier/recommended',
     'plugin:nuxt/recommended'
   ],
@@ -16,5 +16,13 @@ module.exports = {
   rules: {
     'import/named': 0,
     'import/order': 0
-  }
+  },
+  overrides: [
+    {
+      files: ['src/pages/**/*.vue'],
+      rules: {
+        'vue/multi-word-component-names': 0
+      }
+    }
+  ]
 }
