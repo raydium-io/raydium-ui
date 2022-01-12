@@ -69,7 +69,16 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     } = market
     let coinOrPcInTokenFlag = false
 
-    for (const item of [TOKENS.USDT, TOKENS.USDC, TOKENS.RAY, TOKENS.WSOL, TOKENS.SRM, TOKENS.PAI, TOKENS.mSOL]) {
+    for (const item of [
+      TOKENS.USDT,
+      TOKENS.USDC,
+      TOKENS.RAY,
+      TOKENS.WSOL,
+      TOKENS.SRM,
+      TOKENS.PAI,
+      TOKENS.mSOL,
+      TOKENS.stSOL
+    ]) {
       if (quoteMint?.toBase58() === item.mintAddress) {
         coinOrPcInTokenFlag = true
         break
@@ -77,7 +86,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     }
     if (!coinOrPcInTokenFlag) {
       throw new Error(
-        'Only markets that contain USDC, USDT, SOL, RAY, SRM, PAI or mSOL as the Quote Token are currently supported.'
+        'Only markets that contain USDC, USDT, SOL, RAY, SRM, PAI, mSOL or stSOL as the Quote Token are currently supported.'
       )
     }
     const asks: number[] = []
