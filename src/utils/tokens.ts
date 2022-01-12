@@ -79,7 +79,7 @@ export const TOKENS_TAGS: { [key: string]: { mustShow: boolean; show: boolean; o
   raydium: { mustShow: true, show: true, outName: 'Raydium Default List' },
   userAdd: { mustShow: true, show: true, outName: 'User Added Tokens' },
   solana: { mustShow: false, show: false, outName: 'Solana Token List' },
-  unofficial: { mustShow: false, show: false, outName: 'Permissionless Pool Tokens' }
+  unofficial: { mustShow: false, show: true, outName: 'Permissionless Pool Tokens' }
 }
 
 export const NATIVE_SOL: TokenInfo = {
