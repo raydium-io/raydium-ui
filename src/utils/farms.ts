@@ -1996,6 +1996,25 @@ export const FARMS: FarmInfo[] = [
     poolRewardTokenAccountB: '2wXg1vL7cPGXFmPW9nZS4BtpAHqpWuTqvYW1YNBUaJtV'
   },
   {
+    name: 'SVT-USDC',
+    lp: { ...LP_TOKENS['SVT-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SVT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7uXi2jif5VhhTEKfqkU2ANNVCpggEDXWR94rdXuvLeSZ',
+    poolAuthority: '7qK4Qb1aTgQ7mGcG23JNLZyArijcS2MwMtMM9NNCQfYv',
+    poolLpTokenAccount: 'Esr3HgcYkjidTj8LDf6FUhE1nhG14naeWBbLuDB4PPf7',
+    poolRewardTokenAccount: 'Hm56yr9FkGGX37nuwWK3K8ijT6DG4Yztwn2KdqJRuZy5',
+    poolRewardTokenAccountB: '3tUZ2tT2DqsmMfdJ7qZYSGz64tcoWr1v173iBaJ9LBAT'
+  },
+  {
     name: 'AART-USDC',
     lp: { ...LP_TOKENS['AART-USDC-V4'] },
     reward: { ...TOKENS.RAY },
