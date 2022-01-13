@@ -1994,6 +1994,63 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '7URFH2mBh6uL7Bmg1zMV99CrrTkGFizXmTHiXUwtikvh',
     poolRewardTokenAccount: 'EVfzrqg7HJfeNZBRK1TvXcgvFrmh6qeKNPKShKKpu6XZ',
     poolRewardTokenAccountB: '2wXg1vL7cPGXFmPW9nZS4BtpAHqpWuTqvYW1YNBUaJtV'
+  },
+  {
+    name: 'SVT-USDC',
+    lp: { ...LP_TOKENS['SVT-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.SVT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '7uXi2jif5VhhTEKfqkU2ANNVCpggEDXWR94rdXuvLeSZ',
+    poolAuthority: '7qK4Qb1aTgQ7mGcG23JNLZyArijcS2MwMtMM9NNCQfYv',
+    poolLpTokenAccount: 'Esr3HgcYkjidTj8LDf6FUhE1nhG14naeWBbLuDB4PPf7',
+    poolRewardTokenAccount: 'Hm56yr9FkGGX37nuwWK3K8ijT6DG4Yztwn2KdqJRuZy5',
+    poolRewardTokenAccountB: '3tUZ2tT2DqsmMfdJ7qZYSGz64tcoWr1v173iBaJ9LBAT'
+  },
+  {
+    name: 'AART-USDC',
+    lp: { ...LP_TOKENS['AART-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.AART },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'F7WCjhJzbZsc16n7c9PxzBqrjQC1ToX649LqBBFP3Cq3',
+    poolAuthority: 'CLtMzHKwewpiZY8LgURkiESGb3QquLBJ9mtSNMXFMc9c',
+    poolLpTokenAccount: '5ncSUzeyWXoE9nLHxWXLMraowt7WPz1TfaLTrwa2do2V',
+    poolRewardTokenAccount: '2nuPETZ75bp2DVFhUzkVPV6qf7ANbxTTr3mRa5zAfu37',
+    poolRewardTokenAccountB: 'FH7KXeSoV8qFxwLWLTLQg3LLKoCsmHZHKmMajUvxrZbG'
+  },
+  {
+    name: 'AART-RAY',
+    lp: { ...LP_TOKENS['AART-RAY-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.AART },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'HgAtaA7mtd2x42gtWrBYaTscoCkdjXMT7dbH3h1815AA',
+    poolAuthority: 'Gi2spoWuivxVQQV4JEUyCyd9BVYbSKwJUZugA3DnnmG4',
+    poolLpTokenAccount: 'D2Cstxk2HyqqCzDYRPSBpxBwKCgFgTE32yeXZbdducB1',
+    poolRewardTokenAccount: 'HuH1HcfiF4sExGLGo9ZRD8csKfreiNHjHMcyvcB6pRuq',
+    poolRewardTokenAccountB: 'HrnTLDhmZnEEK1NZYW9kGBmkyrNwDT5MCvAGq1RsiCb8'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
