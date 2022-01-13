@@ -2657,6 +2657,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4A3kqZBJu581eFePXL1dTLfxEkjZPWJFgj4tJmP6mQQp',
     decimals: TOKENS.SLC.decimals
+  },
+  'SVT-USDC-V4': {
+    symbol: 'SVT-USDC',
+    name: 'SVT-USDC LP',
+    coin: { ...TOKENS.SVT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'HXLkojxGWSUwjagzRXMFRgmnNxkcKrFHvq4ZCZeNvBJL',
+    decimals: TOKENS.SVT.decimals
+  },
+  'BOT-USDC-V4': {
+    symbol: 'BOT-USDC',
+    name: 'BOT-USDC LP',
+    coin: { ...TOKENS.BOT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '6o4gmzih4Xr36UAd1NdJg8BunYGY4Dde32eJ1TMh74N4',
+    decimals: TOKENS.BOT.decimals
   }
 }
 
