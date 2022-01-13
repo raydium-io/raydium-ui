@@ -1221,6 +1221,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'AkhdZGVbJXPuQZ53u2LrimCjkRP6ZyxG1SoM85T98eE1',
     decimals: 8,
     tags: ['raydium']
+  },
+  FANT: {
+    symbol: 'FANT',
+    name: 'FANT',
+    mintAddress: 'FANTafPFBAt93BNJVpdu25pGPmca3RfwdsDsRrT3LX1r',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2675,6 +2682,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '6o4gmzih4Xr36UAd1NdJg8BunYGY4Dde32eJ1TMh74N4',
     decimals: TOKENS.BOT.decimals
+  },
+  'AART-USDC-V4': {
+    symbol: 'AART-USDC',
+    name: 'AART-USDC LP',
+    coin: { ...TOKENS.AART },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'BYkCfYGDqmmeD9nRGY2QuHpVLpEfH4JaQEFA77C13rGY',
+    decimals: TOKENS.AART.decimals
+  },
+  'FANT-USDC-V4': {
+    symbol: 'FANT-USDC',
+    name: 'FANT-USDC LP',
+    coin: { ...TOKENS.FANT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GdAhnP6fwhQUmQC1Pw1NvvWFwNqz8Pt4TWeH7DwkGzpB',
+    decimals: TOKENS.FANT.decimals
   }
 }
 
