@@ -2700,6 +2700,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'GdAhnP6fwhQUmQC1Pw1NvvWFwNqz8Pt4TWeH7DwkGzpB',
     decimals: TOKENS.FANT.decimals
+  },
+  'AART-RAY-V4': {
+    symbol: 'AART-RAY',
+    name: 'AART-RAY LP',
+    coin: { ...TOKENS.AART },
+    pc: { ...TOKENS.RAY },
+
+    mintAddress: 'CuRZaiwYqFqQRehoiUK1KEeThXEGo5UysD2kzNhc7H2H',
+    decimals: TOKENS.AART.decimals
   }
 }
 
