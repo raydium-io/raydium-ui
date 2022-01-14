@@ -2709,6 +2709,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'CuRZaiwYqFqQRehoiUK1KEeThXEGo5UysD2kzNhc7H2H',
     decimals: TOKENS.AART.decimals
+  },
+  'stSOL-USDT-V4': {
+    symbol: 'stSOL-USDT',
+    name: 'stSOL-USDT LP',
+    coin: { ...TOKENS.stSOL },
+    pc: { ...TOKENS.USDT },
+
+    mintAddress: '2pdg9vAH8GsTTWSSP3Za6j5ts4Nzs6tEbNterVe9H62H',
+    decimals: TOKENS.stSOL.decimals
+  },
+  'wLDO-stSOL-V4': {
+    symbol: 'wLDO-stSOL',
+    name: 'wLDO-stSOL LP',
+    coin: { ...TOKENS.wLDO },
+    pc: { ...TOKENS.stSOL },
+
+    mintAddress: '7vff6hQtbAC8v2i7mAGqK1HLQs9DWJ6A7GHsbovzxCNr',
+    decimals: TOKENS.wLDO.decimals
   }
 }
 

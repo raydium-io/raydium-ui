@@ -2051,6 +2051,63 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'D2Cstxk2HyqqCzDYRPSBpxBwKCgFgTE32yeXZbdducB1',
     poolRewardTokenAccount: 'HuH1HcfiF4sExGLGo9ZRD8csKfreiNHjHMcyvcB6pRuq',
     poolRewardTokenAccountB: 'HrnTLDhmZnEEK1NZYW9kGBmkyrNwDT5MCvAGq1RsiCb8'
+  },
+  {
+    name: 'stSOL-USDT',
+    lp: { ...LP_TOKENS['stSOL-USDT-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.wLDO },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'BoB7TtQ6fgVceh1JMtwgL1CqfC9hKWDHfQ3QPsM7d17M',
+    poolAuthority: 'Dw6aduBVBxp425wfSWdPFD1N17PZgsDABbeD5LNVQBDa',
+    poolLpTokenAccount: 'G9E9XKrDTHRHcX68uGxSCkY54NYtQ1D9rJSFePGySPMC',
+    poolRewardTokenAccount: 'BunXUabRBaYi8t9bE4KLcaVWwxZpN8gbVu1irxfCvyQg',
+    poolRewardTokenAccountB: '2WQpLs1rmqqaRUZjKpvALev1VaytsmuPsixkNTe42jey'
+  },
+  {
+    name: 'wLDO-stSOL',
+    lp: { ...LP_TOKENS['wLDO-stSOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.wLDO },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '4TfPXqf62NUQJw1QCNwmS7a2vzX9vF8BxYtYtnsPqNb3',
+    poolAuthority: '8STqYGKEf7tzm7CFBTtBJ8yBHHse59kVE4DCm8kbzb6m',
+    poolLpTokenAccount: '75MnkYDrRZoEEv3GLSq8aR3ttBkZoXa8qmBPtQzi2fcw',
+    poolRewardTokenAccount: 'D7jgiCWcj5NpGAZB6Qy7sAve2NBhgTcdMHz76DDDCveS',
+    poolRewardTokenAccountB: '45fiPUGHzx4smYBT7ErapRdxFXJRp47KhKJpzoLRwDM6'
+  },
+  {
+    name: 'BOT-USDC',
+    lp: { ...LP_TOKENS['BOT-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.BOT },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: true,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '2exV3w3G3yNEyvGKSv3pVQmGzMZxHUY2mw2uwVBKWTZ1',
+    poolAuthority: 'Cv6FMXrcznHY7yhgyhM5FyP5ZRKRX6jBKWAZEa5vD3WY',
+    poolLpTokenAccount: 'Dj7o9z3AemjyUrp3BHNMcfvbpKMwmsPunEF6gQ9chbbG',
+    poolRewardTokenAccount: '7Tjz7twXNasnnNxTZ8Tq5kAh4vHV682sbuUZckijdUqo',
+    poolRewardTokenAccountB: '46zQSbBRePTzouqFPFHcG7mkP9ysWaZmpMEBq7FTKxcs'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
