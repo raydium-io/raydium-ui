@@ -1228,6 +1228,20 @@ export const TOKENS: Tokens = {
     mintAddress: 'FANTafPFBAt93BNJVpdu25pGPmca3RfwdsDsRrT3LX1r',
     decimals: 6,
     tags: ['raydium']
+  },
+  NOS: {
+    symbol: 'NOS',
+    name: 'NOS',
+    mintAddress: 'nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  SB: {
+    symbol: 'SB',
+    name: 'SB',
+    mintAddress: 'SuperbZyz7TsSdSoFAZ6RYHfAWe9NmjXBLVQpS8hqdx',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2727,6 +2741,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7vff6hQtbAC8v2i7mAGqK1HLQs9DWJ6A7GHsbovzxCNr',
     decimals: TOKENS.wLDO.decimals
+  },
+  'NOS-USDC-V4': {
+    symbol: 'NOS-USDC',
+    name: 'NOS-USDC LP',
+    coin: { ...TOKENS.NOS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7HwjdFEyGu7tQia33GFB4iFEa5dA7k4gr6BWUGS7tyyq',
+    decimals: TOKENS.NOS.decimals
   }
 }
 
