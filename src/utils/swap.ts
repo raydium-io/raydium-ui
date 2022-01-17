@@ -1,27 +1,33 @@
-import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import {
-  Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction
-} from '@solana/web3.js';
+import { _OPEN_ORDERS_LAYOUT_V2, Market, OpenOrders } from '@project-serum/serum/lib/market'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Account, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8 } from 'buffer-layout'
 
-import { RouterInfoItem } from '@/types/api';
+import { RouterInfoItem } from '@/types/api'
 // eslint-disable-next-line
-import { TokenAmount } from '@/utils/safe-math';
+import { TokenAmount } from '@/utils/safe-math'
 import {
-  createAssociatedTokenAccountIfNotExist, createAtaSolIfNotExistAndWrap,
-  createProgramAccountIfNotExist, createTokenAccountIfNotExist, findProgramAddress,
-  mergeTransactions, sendTransaction
-} from '@/utils/web3';
+  createAssociatedTokenAccountIfNotExist,
+  createAtaSolIfNotExistAndWrap,
+  createProgramAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  findProgramAddress,
+  mergeTransactions,
+  sendTransaction
+} from '@/utils/web3'
 import {
-  LIQUIDITY_POOL_PROGRAM_ID_V4, MEMO_PROGRAM_ID, ROUTE_SWAP_PROGRAM_ID, SERUM_PROGRAM_ID_V3,
-  SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
-} from './ids';
-import { getBigNumber } from './layouts';
-import { LiquidityPoolInfo } from './pools';
+  LIQUIDITY_POOL_PROGRAM_ID_V4,
+  MEMO_PROGRAM_ID,
+  ROUTE_SWAP_PROGRAM_ID,
+  SERUM_PROGRAM_ID_V3,
+  SYSTEM_PROGRAM_ID,
+  TOKEN_PROGRAM_ID
+} from './ids'
+import { getBigNumber } from './layouts'
+import { LiquidityPoolInfo } from './pools'
 // eslint-disable-next-line
-import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens';
+import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
 
 export function getOutAmount(
   market: any,
@@ -225,7 +231,7 @@ export function getSwapOutAmountStable(
 }
 
 export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: string, toCoinMint: string) {
-  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL', 'mSOL', 'PAI']
+  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL', 'mSOL', 'PAI', 'stSOL']
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
   for (const p of poolInfos) {
