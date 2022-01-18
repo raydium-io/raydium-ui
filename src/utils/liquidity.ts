@@ -1045,7 +1045,7 @@ export const AMM_INFO_LAYOUT_STABLE = struct([
   publicKey('coinMintAddress'),
   publicKey('pcMintAddress'),
   publicKey('lpMintAddress'),
-  publicKey('modelDataKey'),
+  publicKey('modelDataAccount'),
   publicKey('ammOpenOrders'),
   publicKey('serumMarket'),
   publicKey('serumProgramId'),

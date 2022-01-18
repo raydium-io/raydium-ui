@@ -336,7 +336,6 @@ export const actions = actionTree(
                 } else {
                   if (version === 5) {
                     parsed = AMM_INFO_LAYOUT_STABLE.decode(data)
-                    poolInfo.currentK = getBigNumber(parsed.currentK)
                   } else {
                     parsed = AMM_INFO_LAYOUT_V4.decode(data)
                     if (getBigNumber(parsed.status) === 7) {
