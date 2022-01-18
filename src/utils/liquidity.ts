@@ -23,6 +23,7 @@ import {
   sendTransaction
 } from '@/utils/web3'
 import { getBigNumber, MINT_LAYOUT } from './layouts'
+import { stableConfig } from '@/store/liquidity'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
@@ -34,13 +35,32 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   }
 
   if (poolInfo.version === 5) {
-    const { currentK = 1 } = poolInfo
-    const systemDecimal = Math.max(coin.decimals, pc.decimals)
-    const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
-    const y = parseFloat(coin.balance.fixed())
-    let price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
-    if (!coinBase) price = 1 / price
-    return new BigNumber(price)
+    const currentK = poolInfo.currentK
+    const x = poolInfo.coin.balance?.toEther()
+    const y = poolInfo.pc.balance?.toEther()
+    if (currentK === undefined || !(x && y)) return new BigNumber(0)
+
+    let price
+    if (x.lte(y)) {
+      price = new BigNumber(stableConfig.n)
+        .multipliedBy(x)
+        .multipliedBy(x)
+        .minus(currentK)
+        .dividedBy(new BigNumber(stableConfig.n).minus(1).multipliedBy(x).multipliedBy(x))
+        .sqrt()
+    } else {
+      price = new BigNumber(stableConfig.n)
+        .minus(1)
+        .multipliedBy(y)
+        .multipliedBy(y)
+        .dividedBy(new BigNumber(stableConfig.n).multipliedBy(x).multipliedBy(x).minus(currentK))
+        .sqrt()
+    }
+    if (coinBase) {
+      return price
+    } else {
+      return new BigNumber(1).dividedBy(price)
+    }
   } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())
   } else {

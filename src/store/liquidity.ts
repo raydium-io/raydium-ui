@@ -24,8 +24,14 @@ import {
   getFilteredProgramAccountsAmmOrMarketCache,
   getMultipleAccounts
 } from '@/utils/web3'
+import BigNumber from 'bignumber.js'
 
 const AUTO_REFRESH_TIME = 60
+
+export const stableConfig = {
+  n: 150,
+  eps: new BigNumber(10 ** -15)
+}
 
 // fake
 const BLACK_LIST: string[] = [
@@ -268,8 +274,8 @@ export const actions = actionTree(
         }
       }
 
-      const liquidityPools = {} as any
-      const publicKeys = [] as any
+      const liquidityPools: { [lp: string]: LiquidityPoolInfo } = {}
+      const publicKeys: PublicKey[] = []
 
       LIQUIDITY_POOLS.forEach((pool) => {
         const { poolCoinTokenAccount, poolPcTokenAccount, ammOpenOrders, ammId, coin, pc, lp } = pool
@@ -300,7 +306,7 @@ export const actions = actionTree(
           const { key, lpMintAddress, version } = getAddressForWhat(address)
 
           if (key && lpMintAddress) {
-            const poolInfo = liquidityPools[lpMintAddress]
+            const poolInfo: any = liquidityPools[lpMintAddress]
 
             switch (key) {
               case 'poolCoinTokenAccount': {
@@ -370,6 +376,34 @@ export const actions = actionTree(
         }
       })
 
+      for (const poolInfo of Object.values(liquidityPools)) {
+        if (poolInfo.version !== 5) continue
+
+        const x = poolInfo.coin.balance?.toEther()
+        const y = poolInfo.pc.balance?.toEther()
+        const n = new BigNumber(stableConfig.n)
+        if (x === undefined || y === undefined) continue
+
+        let max = new BigNumber(x > y ? x : y)
+        let min = new BigNumber(x < y ? x : y)
+        let mid = new BigNumber(max).plus(min).dividedBy(2)
+        let left = getCurKLeft(mid, y)
+        let right = getCurKRight(n, x, y, mid)
+
+        while (left.minus(right).abs().gt(stableConfig.eps)) {
+          if (left > right) {
+            max = mid
+          } else {
+            min = mid
+          }
+          mid = new BigNumber(max).plus(min).dividedBy(2)
+          left = getCurKLeft(mid, y)
+          right = getCurKRight(n, x, y, mid)
+        }
+
+        poolInfo.currentK = mid.multipliedBy(mid)
+      }
+
       commit('setInfos', liquidityPools)
       logger('Liquidity pool infomations updated')
 
@@ -378,3 +412,16 @@ export const actions = actionTree(
     }
   }
 )
+
+function getCurKLeft(mid: BigNumber, y: BigNumber) {
+  return new BigNumber(mid).multipliedBy(mid).dividedBy(y).dividedBy(y)
+}
+function getCurKRight(n: BigNumber, x: BigNumber, y: BigNumber, mid: BigNumber) {
+  const data = new BigNumber(n)
+    .minus(1)
+    .multipliedBy(new BigNumber(y).minus(mid))
+    .multipliedBy(new BigNumber(y).minus(mid))
+    .dividedBy(new BigNumber(x).minus(mid))
+    .dividedBy(new BigNumber(x).minus(mid))
+  return new BigNumber(n).minus(data)
+}

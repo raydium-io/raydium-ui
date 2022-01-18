@@ -12,6 +12,7 @@ import {
   SERUM_PROGRAM_ID_V3
 } from './ids'
 import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from './tokens'
+import BigNumber from 'bignumber.js'
 
 export interface LiquidityPoolInfo {
   name: string
@@ -45,7 +46,7 @@ export interface LiquidityPoolInfo {
   official: boolean
 
   status?: number
-  currentK?: number
+  currentK?: BigNumber
 
   fees?: {
     swapFeeNumerator: number
