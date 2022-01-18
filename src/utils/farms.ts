@@ -2108,6 +2108,44 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'Dj7o9z3AemjyUrp3BHNMcfvbpKMwmsPunEF6gQ9chbbG',
     poolRewardTokenAccount: '7Tjz7twXNasnnNxTZ8Tq5kAh4vHV682sbuUZckijdUqo',
     poolRewardTokenAccountB: '46zQSbBRePTzouqFPFHcG7mkP9ysWaZmpMEBq7FTKxcs'
+  },
+  {
+    name: 'PRMS-USDC',
+    lp: { ...LP_TOKENS['PRMS-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.PRMS },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'EzMrueTeCQwTFB2KTpvR6jHpZo4Zn2P1rCLFHZiMoLDy',
+    poolAuthority: 'AuTfjTvKw3FKP3VRxoKQqKa2ySUxg3pRyLkMkcNsWmZ9',
+    poolLpTokenAccount: 'd2AWY1FgpKx37uNjrFnh2xGb3VKv9Qdmeqq57gG54Wz',
+    poolRewardTokenAccount: 'GSrVvy32RHMojQByTXK84B8MWMqMZr5ko6tDnCnaA4M6',
+    poolRewardTokenAccountB: 'BnhyEWdd3d8wkAm9fPkKodsVR5wuGGkNyi55puyVwP5R'
+  },
+  {
+    name: '$WOOD-USDC',
+    lp: { ...LP_TOKENS['$WOOD-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.$WOOD },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'CJ4GdUHJztug77M2JdGgZ689mitsKysFZFi8h1MDHBaj',
+    poolAuthority: 'E9aSa4Rejv98MCWyTPJgzHJgX2Gfy1UakHAG9ashyDUB',
+    poolLpTokenAccount: '25XopGuuvrFJE2zwNjSJ2RSaQFAnvUZRZ3VZhEafGTXK',
+    poolRewardTokenAccount: 'BHXhWpNMtyUBGM6cHUBHnDhvwtikxUxtNR4yU4DhKsCk',
+    poolRewardTokenAccountB: 'D7vwP5UNqiCsiEHhwxtqCuCSKXXgM8nJjZ6XhdwnPoGY'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 

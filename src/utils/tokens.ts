@@ -1242,6 +1242,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'SuperbZyz7TsSdSoFAZ6RYHfAWe9NmjXBLVQpS8hqdx',
     decimals: 6,
     tags: ['raydium']
+  },
+  PRMS: {
+    symbol: 'PRMS',
+    name: 'PRMS',
+    mintAddress: 'A98UDy7z8MfmWnTQt6cKjje7UfqV3pTLf4yEbuwL2HrH',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2750,6 +2757,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7HwjdFEyGu7tQia33GFB4iFEa5dA7k4gr6BWUGS7tyyq',
     decimals: TOKENS.NOS.decimals
+  },
+  'PRMS-USDC-V4': {
+    symbol: 'PRMS-USDC',
+    name: 'PRMS-USDC LP',
+    coin: { ...TOKENS.PRMS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '6K3EbDKd9VCR7YdFHZSdd5MfzjWZY79EqprVphrN75gf',
+    decimals: TOKENS.PRMS.decimals
+  },
+  '$WOOD-USDC-V4': {
+    symbol: '$WOOD-USDC',
+    name: '$WOOD-USDC LP',
+    coin: { ...TOKENS.$WOOD },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2e9vCgqAhxAJ8zLtmaitu8Go3hT5vozMtAtCwgAN83Yu',
+    decimals: TOKENS.$WOOD.decimals
   }
 }
 
