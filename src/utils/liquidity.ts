@@ -1,22 +1,28 @@
-import { publicKey, u128, u64 } from '@project-serum/borsh';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-import BigNumber from 'bignumber.js';
+import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8, seq } from 'buffer-layout'
 
-import { TOKEN_PROGRAM_ID } from '@/utils/ids';
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import {
-  getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
-  LIQUIDITY_POOLS, LiquidityPoolInfo
-} from '@/utils/pools';
-import { TokenAmount } from '@/utils/safe-math';
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
+  getLpMintByTokenMintAddresses,
+  getPoolByLpMintAddress,
+  getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS,
+  LiquidityPoolInfo
+} from '@/utils/pools'
+import { TokenAmount } from '@/utils/safe-math'
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import {
-  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
-  getMultipleAccounts, sendTransaction
-} from '@/utils/web3';
-import { getBigNumber, MINT_LAYOUT } from './layouts';
+  commitment,
+  createAssociatedTokenAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
+import { getBigNumber, MINT_LAYOUT } from './layouts'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
@@ -805,8 +811,8 @@ export const AMM_INFO_LAYOUT_V4 = struct([
 ])
 
 export const AMM_INFO_LAYOUT_STABLE = struct([
+  u64('accountType'),
   u64('status'),
-  publicKey('own_address'),
   u64('nonce'),
   u64('orderNum'),
   u64('depth'),
@@ -822,11 +828,9 @@ export const AMM_INFO_LAYOUT_STABLE = struct([
   u64('minPriceMultiplier'),
   u64('maxPriceMultiplier'),
   u64('systemDecimalsValue'),
-
-  u64('ammMaxPrice'),
-  u64('ammMiddlePrice'),
-  u64('ammPriceMultiplier'),
-
+  u64('abortTradeFactor'),
+  u64('priceTickMultiplier'),
+  u64('priceTick'),
   // Fees
   u64('minSeparateNumerator'),
   u64('minSeparateDenominator'),
@@ -841,32 +845,29 @@ export const AMM_INFO_LAYOUT_STABLE = struct([
   u64('needTakePnlPc'),
   u64('totalPnlPc'),
   u64('totalPnlCoin'),
-  u128('poolTotalDepositPc'),
-  u128('poolTotalDepositCoin'),
+  u64('poolOpenTime'),
+  u64('punishPcAmount'),
+  u64('punishCoinAmount'),
+  u64('orderbookToInitTime'),
   u128('swapCoinInAmount'),
   u128('swapPcOutAmount'),
   u128('swapPcInAmount'),
   u128('swapCoinOutAmount'),
-  u64('swapPcFee'),
-  u64('swapCoinFee'),
+  u64('swapCoin2PcFee'),
+  u64('swapPc2CoinFee'),
 
   publicKey('poolCoinTokenAccount'),
   publicKey('poolPcTokenAccount'),
   publicKey('coinMintAddress'),
   publicKey('pcMintAddress'),
   publicKey('lpMintAddress'),
+  publicKey('modelDataKey'),
   publicKey('ammOpenOrders'),
   publicKey('serumMarket'),
   publicKey('serumProgramId'),
   publicKey('ammTargetOrders'),
-  publicKey('poolWithdrawQueue'),
-  publicKey('poolTempLpTokenAccount'),
   publicKey('ammOwner'),
-  publicKey('pnlOwner'),
-
-  u128('currentK'),
-  u128('padding1'),
-  publicKey('padding2')
+  seq(u64('padding'), 64, 'padding')
 ])
 
 export async function getLpMintInfo(conn: any, mintAddress: string, coin: any, pc: any): Promise<TokenInfo> {
