@@ -87,30 +87,32 @@ export function getOutAmountStable(
   toCoinMint: string,
   slippage: number
 ) {
-  const { coin, pc, currentK } = poolInfo
-  const systemDecimal = Math.max(coin.decimals, pc.decimals)
-  const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
-  const y = parseFloat(coin.balance.fixed())
-  const price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+  console.log('todo', poolInfo, amount, fromCoinMint, toCoinMint, slippage)
+  // const { coin, pc, currentK } = poolInfo
+  // const systemDecimal = Math.max(coin.decimals, pc.decimals)
+  // const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
+  // const y = parseFloat(coin.balance.fixed())
+  // const price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
 
-  const amountIn = parseFloat(amount)
-  let amountOut = 1
-  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
-    // outcoin is pc
-    amountOut = amountIn * price
-  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
-    // outcoin is coin
-    amountOut = amountIn / price
-  }
+  // const amountIn = parseFloat(amount)
+  // let amountOut = 1
+  // if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+  //   // outcoin is pc
+  //   amountOut = amountIn * price
+  // } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
+  //   // outcoin is coin
+  //   amountOut = amountIn / price
+  // }
 
-  const amountOutWithSlippage = amountOut / (1 - slippage / 100)
+  // const amountOutWithSlippage = amountOut / (1 - slippage / 100)
 
-  // const price = Math.sqrt((10 - 1) * y * y /(10 * y * y - k))
-  // const afterY = y - amountOut
-  // const afterPrice = Math.sqrt((10 - 1) * afterY  * afterY /(10 * afterY * afterY - k))
-  // const priceImpact = (beforePrice - afterPrice) / beforePrice * 100
+  // // const price = Math.sqrt((10 - 1) * y * y /(10 * y * y - k))
+  // // const afterY = y - amountOut
+  // // const afterPrice = Math.sqrt((10 - 1) * afterY  * afterY /(10 * afterY * afterY - k))
+  // // const priceImpact = (beforePrice - afterPrice) / beforePrice * 100
 
-  return new BigNumber(amountOutWithSlippage)
+  // return new BigNumber(amountOutWithSlippage)
+  return new BigNumber(0)
 }
 
 /* eslint-disable */
@@ -189,7 +191,28 @@ export async function addLiquidity(
   )
 
   transaction.add(
-    [4, 5].includes(poolInfo.version)
+    poolInfo.version === 5
+      ? addLiquidityInstructionStable(
+          new PublicKey(poolInfo.programId),
+          new PublicKey(poolInfo.ammId),
+          new PublicKey(poolInfo.ammAuthority),
+          new PublicKey(poolInfo.ammOpenOrders),
+          new PublicKey(poolInfo.ammTargetOrders),
+          new PublicKey(poolInfo.lp.mintAddress),
+          new PublicKey(poolInfo.poolCoinTokenAccount),
+          new PublicKey(poolInfo.poolPcTokenAccount),
+          new PublicKey(poolInfo.modelDataAccount ?? ''),
+          new PublicKey(poolInfo.serumMarket),
+          wrappedCoinSolAccount ? wrappedCoinSolAccount : userCoinTokenAccount,
+          wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
+          userLpTokenAccount,
+          owner,
+
+          coinAmount,
+          pcAmount,
+          fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
+        )
+      : poolInfo.version === 4
       ? addLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -326,7 +349,34 @@ export async function removeLiquidity(
   }
 
   transaction.add(
-    [4, 5].includes(poolInfo.version)
+    poolInfo.version === 5
+      ? removeLiquidityInstructionStable(
+          new PublicKey(poolInfo.programId),
+
+          new PublicKey(poolInfo.ammId),
+          new PublicKey(poolInfo.ammAuthority),
+          new PublicKey(poolInfo.ammOpenOrders),
+          new PublicKey(poolInfo.ammTargetOrders),
+          new PublicKey(poolInfo.lp.mintAddress),
+          new PublicKey(poolInfo.poolCoinTokenAccount),
+          new PublicKey(poolInfo.poolPcTokenAccount),
+          new PublicKey(poolInfo.modelDataAccount ?? ''),
+          new PublicKey(poolInfo.serumProgramId),
+          new PublicKey(poolInfo.serumMarket),
+          new PublicKey(poolInfo.serumCoinVaultAccount),
+          new PublicKey(poolInfo.serumPcVaultAccount),
+          new PublicKey(poolInfo.serumVaultSigner),
+
+          new PublicKey(lpAccount),
+          newFromTokenAccount,
+          newToTokenAccount,
+          owner,
+
+          poolInfo,
+
+          lpAmount
+        )
+      : poolInfo.version === 4
       ? removeLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -650,6 +700,140 @@ export function removeLiquidityInstructionV4(
     keys.push({ pubkey: new PublicKey(poolInfo.serumBids), isSigner: false, isWritable: true })
   }
   if (poolInfo.serumAsks) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumAsks), isSigner: false, isWritable: true })
+  }
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 4,
+      amount: amount
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function addLiquidityInstructionStable(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammTargetOrders: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumMarket: PublicKey,
+  // user
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userLpTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  maxCoinAmount: number,
+  maxPcAmount: number,
+  fixedFromCoin: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: false },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 3,
+      maxCoinAmount,
+      maxPcAmount,
+      fixedFromCoin
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function removeLiquidityInstructionStable(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammTargetOrders: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userLpTokenAccount: PublicKey,
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  poolInfo: LiquidityPoolInfo,
+
+  amount: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: false },
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  if (poolInfo.serumEventQueue && poolInfo.serumBids && poolInfo.serumAsks) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumEventQueue), isSigner: false, isWritable: true })
+    keys.push({ pubkey: new PublicKey(poolInfo.serumBids), isSigner: false, isWritable: true })
     keys.push({ pubkey: new PublicKey(poolInfo.serumAsks), isSigner: false, isWritable: true })
   }
 

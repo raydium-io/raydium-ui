@@ -648,7 +648,8 @@ import {
   settleFund,
   swapRoute,
   getSwapRouter,
-  preSwapRoute
+  preSwapRoute,
+  getSwapOutAmountStable
 } from '@/utils/swap'
 import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
@@ -753,6 +754,7 @@ export default Vue.extend({
 
       amms: [] as LiquidityPoolInfo[],
       routeInfos: [] as [LiquidityPoolInfo, LiquidityPoolInfo][],
+      stableAmms: [] as LiquidityPoolInfo[],
 
       loadingArr: {
         setup: false,
@@ -1265,6 +1267,14 @@ export default Vue.extend({
             ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
         )
 
+        this.stableAmms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
+          (p: any) =>
+            p.version === 5 &&
+            ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
+              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress)) &&
+            ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
+        )
+
         this.routeInfos = getSwapRouter(
           Object.values(this.$accessor.liquidity.infos),
           this.fromCoin.mintAddress,
@@ -1439,6 +1449,40 @@ export default Vue.extend({
             }
             console.log(
               'amm -> ',
+              this.fromCoin.symbol,
+              '>',
+              this.toCoin.symbol,
+              poolInfo.ammId,
+              amountOut.fixed(),
+              amountOutWithSlippage.fixed(),
+              priceImpact / 100
+            )
+          }
+        }
+
+        if (this.stableAmms) {
+          for (const poolInfo of this.stableAmms) {
+            if (poolInfo.status !== undefined && ![1, 7].includes(poolInfo.status)) continue
+            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmountStable(
+              poolInfo,
+              this.fromCoin.mintAddress,
+              this.toCoin.mintAddress,
+              this.fromCoinAmount,
+              this.setting.slippage
+            )
+            const fAmountOut = parseFloat(amountOut.fixed())
+            if (fAmountOut > maxAmountOut) {
+              maxAmountOut = fAmountOut
+              toCoinAmount = amountOut.fixed()
+              toCoinWithSlippage = amountOutWithSlippage
+              impact = priceImpact
+              // price = fAmountOut
+              usedAmmId = poolInfo.ammId
+              endpoint = `stable ${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              showMarket = poolInfo.serumMarket
+            }
+            console.log(
+              'amm stable -> ',
               this.fromCoin.symbol,
               '>',
               this.toCoin.symbol,
@@ -1627,8 +1671,10 @@ export default Vue.extend({
       let description = 'Swap'
 
       if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
-        const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
-        description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+        const poolInfo: any = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
+        description = `Swap ${poolInfo.version === 5 ? 'Stable' : ''} ${this.fromCoinAmount} ${
+          this.fromCoin?.symbol
+        } to ${this.toCoinAmount} ${this.toCoin?.symbol}`
 
         swap(
           this.$web3,

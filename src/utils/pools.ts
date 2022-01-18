@@ -50,6 +50,8 @@ export interface LiquidityPoolInfo {
     swapFeeNumerator: number
     swapFeeDenominator: number
   }
+
+  modelDataAccount?: string
 }
 
 /**
@@ -144,7 +146,7 @@ export function getLpListByTokenMintAddresses(
   ammIdOrMarket: string | undefined,
   version = [4, 5]
 ): LiquidityPoolInfo[] {
-  const pool = LIQUIDITY_POOLS.filter((pool) => {
+  let pool = LIQUIDITY_POOLS.filter((pool) => {
     if (coinMintAddress && pcMintAddress) {
       if (
         ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
@@ -159,10 +161,8 @@ export function getLpListByTokenMintAddresses(
     }
     return false
   })
-  if (pool.length > 0) {
-    return pool
-  } else {
-    return LIQUIDITY_POOLS.filter((pool) => {
+  if (pool.length === 0) {
+    pool = LIQUIDITY_POOLS.filter((pool) => {
       if (coinMintAddress && pcMintAddress) {
         if (
           ((pool.coin.mintAddress === coinMintAddress && pool.pc.mintAddress === pcMintAddress) ||
@@ -177,6 +177,12 @@ export function getLpListByTokenMintAddresses(
       return false
     })
   }
+
+  if (pool.find((item) => item.version === 5)) {
+    pool = pool.filter((item) => item.version === 5)
+  }
+
+  return pool
 }
 
 export function getPoolByLpMintAddress(lpMintAddress: string): LiquidityPoolInfo | undefined {
