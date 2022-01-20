@@ -28,6 +28,8 @@ import { getBigNumber } from './layouts'
 import { LiquidityPoolInfo } from './pools'
 // eslint-disable-next-line
 import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
+import { cK, getDxByDy, getDyByDx, getStablePrice } from './stable'
+import BigNumber from 'bignumber.js'
 
 export function getOutAmount(
   market: any,
@@ -193,47 +195,75 @@ export function getSwapOutAmountStable(
   amount: string,
   slippage: number
 ) {
-  console.log('todo', poolInfo, fromCoinMint, toCoinMint, amount, slippage)
-  // const { coin, pc, fees, currentK } = poolInfo
-  // const { swapFeeNumerator, swapFeeDenominator } = fees
+  const { coin, pc, fees, currentK } = poolInfo
+  const { swapFeeNumerator, swapFeeDenominator } = fees
+  console.log(2222, slippage, amount, swapFeeNumerator, swapFeeDenominator)
 
-  // const systemDecimal = Math.max(coin.decimals, pc.decimals)
-  // const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
+  const amountIn = new TokenAmount(amount, coin.decimals, false)
+    .toEther()
+    .multipliedBy(swapFeeDenominator - swapFeeNumerator)
+    .dividedBy(swapFeeDenominator)
 
-  // const amountIn = parseFloat(amount) * (1 - swapFeeNumerator / swapFeeDenominator)
+  const coinBalance: BigNumber = coin.balance.toEther()
+  const pcBalance: BigNumber = pc.balance.toEther()
 
-  // let amountOut = 1
-  // const y = parseFloat(coin.balance.fixed())
-  // const ammX = k / y
+  let inDecimals
+  let outDecimals
+  let amountOut = new BigNumber(0)
 
-  // // (x+delta_x)*(y+delta_y)=x*y
-  // if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
-  //   // coin2pc
-  //   amountOut = ammX - k / (y + amountIn)
-  // } else {
-  //   // pc2coin
-  //   amountOut = y - k / (ammX + amountIn)
-  // }
-  // const beforePrice = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+  let beforePrice, afterPrice
+  if (fromCoinMint === coin.mintAddress) {
+    amountOut = amountIn.isNaN() ? new BigNumber(0) : getDyByDx(coinBalance, pcBalance, amountIn, currentK, true).abs()
+    inDecimals = coin.decimals
+    outDecimals = pc.decimals
+    console.log(
+      'from to',
+      amountIn.toFixed(),
+      amountOut.toFixed(),
+      getBigNumber(coinBalance),
+      getBigNumber(pcBalance),
+      getBigNumber(amountIn),
+      getBigNumber(currentK)
+    )
 
-  // const amountOutWithSlippage = amountOut / (1 + slippage / 100)
+    beforePrice = getStablePrice(currentK, coinBalance, pcBalance, true)
+    const afterCoinBalance = coinBalance.plus(amountIn)
+    const afterPcBalance = pcBalance.minus(amountOut)
+    const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
+    afterPrice = getStablePrice(afterCurrentK, afterCoinBalance, afterPcBalance, true)
+  } else if (toCoinMint === coin.mintAddress) {
+    amountOut = getDxByDy(coinBalance, pcBalance, amountIn, currentK, true)
+    inDecimals = pc.decimals
+    outDecimals = coin.decimals
+    console.log(
+      'to from',
+      amountIn.toFixed(),
+      amountOut.toFixed(),
+      getBigNumber(coinBalance),
+      getBigNumber(pcBalance),
+      getBigNumber(amountIn),
+      getBigNumber(currentK)
+    )
 
-  // const afterY = y - amountOut
-  // const afterPrice = Math.sqrt(((10 - 1) * afterY * afterY) / (10 * afterY * afterY - k))
+    beforePrice = getStablePrice(currentK, coinBalance, pcBalance, false)
+    const afterCoinBalance = coinBalance.plus(amountIn)
+    const afterPcBalance = pcBalance.minus(amountOut)
+    const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
+    afterPrice = getStablePrice(afterCurrentK, afterCoinBalance, afterPcBalance, false)
+  }
 
-  // const priceImpact = ((beforePrice - afterPrice) / beforePrice) * 100
+  const amountOutWithSlippage = getBigNumber(amountOut) / (1 + slippage / 100)
 
-  // return {
-  //   amountIn: new TokenAmount(amountIn * 10 ** 6, 6),
-  //   amountOut: new TokenAmount(amountOut * 10 ** 6, 6),
-  //   amountOutWithSlippage: new TokenAmount(amountOutWithSlippage * 10 ** pc.decimals, pc.decimals),
-  //   priceImpact
-  // }
+  if (!beforePrice) beforePrice = new BigNumber(0)
+  if (!afterPrice) afterPrice = new BigNumber(0)
+
+  const priceImpact = beforePrice.minus(afterPrice).dividedBy(beforePrice).multipliedBy(100).toNumber()
+
   return {
-    amountIn: new TokenAmount(0),
-    amountOut: new TokenAmount(0),
-    amountOutWithSlippage: new TokenAmount(0),
-    priceImpact: 0
+    amountIn: new TokenAmount(amountIn.multipliedBy(10 ** inDecimals), inDecimals),
+    amountOut: new TokenAmount(amountOut.multipliedBy(10 ** outDecimals), outDecimals),
+    amountOutWithSlippage: new TokenAmount(amountOutWithSlippage * 10 ** pc.decimals, pc.decimals),
+    priceImpact
   }
 }
 

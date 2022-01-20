@@ -23,7 +23,7 @@ import {
   sendTransaction
 } from '@/utils/web3'
 import { getBigNumber, MINT_LAYOUT } from './layouts'
-import { stableConfig } from '@/store/liquidity'
+import { getStablePrice } from './stable'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
@@ -38,28 +38,12 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
     const currentK = poolInfo.currentK
     const x = poolInfo.coin.balance?.toEther()
     const y = poolInfo.pc.balance?.toEther()
-    if (currentK === undefined || !(x && y)) return new BigNumber(0)
+    if (!currentK || !x || !y) return new BigNumber(0)
 
-    let price
-    if (x.lte(y)) {
-      price = new BigNumber(stableConfig.n)
-        .multipliedBy(x)
-        .multipliedBy(x)
-        .minus(currentK)
-        .dividedBy(new BigNumber(stableConfig.n).minus(1).multipliedBy(x).multipliedBy(x))
-        .sqrt()
-    } else {
-      price = new BigNumber(stableConfig.n)
-        .minus(1)
-        .multipliedBy(y)
-        .multipliedBy(y)
-        .dividedBy(new BigNumber(stableConfig.n).multipliedBy(x).multipliedBy(x).minus(currentK))
-        .sqrt()
-    }
     if (coinBase) {
-      return price
+      return getStablePrice(currentK, x, y, true)
     } else {
-      return new BigNumber(1).dividedBy(price)
+      return getStablePrice(currentK, x, y, false)
     }
   } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())
@@ -107,32 +91,33 @@ export function getOutAmountStable(
   toCoinMint: string,
   slippage: number
 ) {
-  console.log('todo', poolInfo, amount, fromCoinMint, toCoinMint, slippage)
-  // const { coin, pc, currentK } = poolInfo
-  // const systemDecimal = Math.max(coin.decimals, pc.decimals)
-  // const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
-  // const y = parseFloat(coin.balance.fixed())
-  // const price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+  const { coin, pc, currentK } = poolInfo
 
-  // const amountIn = parseFloat(amount)
-  // let amountOut = 1
-  // if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
-  //   // outcoin is pc
-  //   amountOut = amountIn * price
-  // } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
-  //   // outcoin is coin
-  //   amountOut = amountIn / price
-  // }
+  const x = poolInfo.coin.balance?.toEther()
+  const y = poolInfo.pc.balance?.toEther()
+  if (!currentK || !x || !y) return new BigNumber(0)
 
-  // const amountOutWithSlippage = amountOut / (1 - slippage / 100)
+  const price = getStablePrice(currentK, x, y, true)
+  const fromAmount = new BigNumber(amount)
+  let outAmount = new BigNumber(0)
 
-  // // const price = Math.sqrt((10 - 1) * y * y /(10 * y * y - k))
-  // // const afterY = y - amountOut
-  // // const afterPrice = Math.sqrt((10 - 1) * afterY  * afterY /(10 * afterY * afterY - k))
-  // // const priceImpact = (beforePrice - afterPrice) / beforePrice * 100
+  const percent = new BigNumber(100).plus(slippage).dividedBy(100)
 
-  // return new BigNumber(amountOutWithSlippage)
-  return new BigNumber(0)
+  if (!coin.balance || !pc.balance) {
+    return outAmount
+  }
+
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // outcoin is pc
+    outAmount = fromAmount.multipliedBy(price)
+    outAmount = outAmount.multipliedBy(percent)
+  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
+    // outcoin is coin
+    outAmount = fromAmount.dividedBy(price)
+    outAmount = outAmount.multipliedBy(percent)
+  }
+
+  return outAmount
 }
 
 /* eslint-disable */

@@ -397,7 +397,7 @@
             amms.length + routeInfos.length + Object.keys(market) === 0 ||
             (get(liquidity.infos, `${lpMintAddress}.status`) &&
               get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
-            (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
+            (amms.length + routeInfos.length + stableAmms.length === 0 && Object.keys(market).length !== 0)
           "
           :loading="swaping"
           style="width: 100%"
@@ -443,7 +443,7 @@
             v-else-if="
               (get(liquidity.infos, `${lpMintAddress}.status`) &&
                 get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
-              (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
+              (amms.length + routeInfos.length + stableAmms.length === 0 && Object.keys(market).length !== 0)
             "
           >
             Pool coming soon
