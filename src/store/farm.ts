@@ -1,20 +1,28 @@
-import { PublicKey } from '@solana/web3.js';
-import { cloneDeep } from 'lodash-es';
-import { actionTree, getterTree, mutationTree } from 'typed-vuex';
+import { PublicKey } from '@solana/web3.js'
+import { cloneDeep } from 'lodash-es'
+import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
-import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms';
-import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V5 } from '@/utils/ids';
-import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts';
-import logger from '@/utils/logger';
-import { lt, TokenAmount } from '@/utils/safe-math';
+import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
+import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
+import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
+import logger from '@/utils/logger'
+import { lt, TokenAmount } from '@/utils/safe-math'
 import {
-  STAKE_INFO_LAYOUT, STAKE_INFO_LAYOUT_V4, USER_STAKE_INFO_ACCOUNT_LAYOUT,
-  USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1, USER_STAKE_INFO_ACCOUNT_LAYOUT_V4,
+  STAKE_INFO_LAYOUT,
+  STAKE_INFO_LAYOUT_V4,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT_V3_1,
+  USER_STAKE_INFO_ACCOUNT_LAYOUT_V4,
   USER_STAKE_INFO_ACCOUNT_LAYOUT_V5
-} from '@/utils/stake';
+} from '@/utils/stake'
 import {
-  commitment, findAssociatedStakeInfoAddress, getFilteredProgramAccounts, getMultipleAccounts
-} from '@/utils/web3';
+  commitment,
+  findAssociatedStakeInfoAddress,
+  getSlot,
+  getFilteredProgramAccounts,
+  getMultipleAccounts
+} from '@/utils/web3'
+import BigNumber from 'bignumber.js'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -133,6 +141,55 @@ export const actions = actionTree(
           }
         }
       })
+
+      const currentSlot = await getSlot(conn)
+      console.log('currentSlot', currentSlot)
+      const versionConfig: { [version: number]: number } = { 3: 9, 4: 9, 5: 15 }
+      for (const poolId of Object.keys(farms)) {
+        const farmInfo = farms[poolId]
+
+        if (new BigNumber(currentSlot).gt(farmInfo.poolInfo.lastBlock)) {
+          if (farmInfo.version === 3) {
+            const spread = currentSlot.minus(farmInfo.poolInfo.lastBlock)
+            let rewardA = farmInfo.poolInfo.rewardPerBlock.isZero()
+              ? new BigNumber(0)
+              : spread.multipliedBy(farmInfo.poolInfo.rewardPerBlock)
+
+            if (farmInfo.lp.balance.wei.gt(0)) {
+              farmInfo.poolInfo.rewardPerShareNet = new BigNumber(farmInfo.poolInfo.rewardPerShareNet).plus(
+                rewardA.multipliedBy(10 ** versionConfig[farmInfo.poolInfo.version]).dividedBy(farmInfo.lp.balance.wei)
+              )
+            } else {
+              rewardA = new BigNumber(0)
+            }
+
+            farmInfo.poolInfo.totalReward = new BigNumber(farmInfo.poolInfo.totalReward).plus(rewardA)
+          } else if (farmInfo.version === 4 || farmInfo.version === 5) {
+            const spread = currentSlot.minus(farmInfo.poolInfo.lastBlock)
+            let rewardA = farmInfo.poolInfo.perBlock.isZero()
+              ? new BigNumber(0)
+              : spread.multipliedBy(farmInfo.poolInfo.perBlock)
+            let rewardB = farmInfo.poolInfo.perBlockB.isZero()
+              ? new BigNumber(0)
+              : spread.multipliedBy(farmInfo.poolInfo.perBlockB)
+
+            if (farmInfo.lp.balance.wei.gt(0)) {
+              farmInfo.poolInfo.perShare = new BigNumber(farmInfo.poolInfo.perShare).plus(
+                rewardA.multipliedBy(10 ** versionConfig[farmInfo.version]).dividedBy(farmInfo.lp.balance.wei)
+              )
+              farmInfo.poolInfo.perShareB = new BigNumber(farmInfo.poolInfo.perShareB).plus(
+                rewardB.multipliedBy(10 ** versionConfig[farmInfo.version]).dividedBy(farmInfo.lp.balance.wei)
+              )
+            } else {
+              rewardA = new BigNumber(0)
+              rewardB = new BigNumber(0)
+            }
+
+            farmInfo.poolInfo.totalReward = new BigNumber(farmInfo.poolInfo.totalReward).plus(rewardA)
+            farmInfo.poolInfo.totalRewardB = new BigNumber(farmInfo.poolInfo.totalRewardB).plus(rewardB)
+          }
+        }
+      }
 
       commit('setInfos', farms)
       logger('Farm&Stake pool infomations updated')

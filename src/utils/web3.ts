@@ -1,16 +1,22 @@
-import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
+import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 // @ts-ignore without ts ignore, yarn build will failed
-import { Token } from '@solana/spl-token';
+import { Token } from '@solana/spl-token'
 import {
-  Account, AccountInfo, Commitment, Connection, PublicKey, SystemProgram, Transaction,
-  TransactionInstruction, TransactionSignature
-} from '@solana/web3.js';
+  Account,
+  AccountInfo,
+  Commitment,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+  TransactionSignature
+} from '@solana/web3.js'
 
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID
-} from '@/utils/ids';
-import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts';
-import { TOKENS } from '@/utils/tokens';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from '@/utils/layouts'
+import { TOKENS } from '@/utils/tokens'
+import BigNumber from 'bignumber.js'
 
 export const web3Config = {
   strategy: 'speed',
@@ -461,4 +467,10 @@ export async function getFilteredTokenAccountsByOwner(
     throw new Error(resp.error.message)
   }
   return resp.result
+}
+
+export async function getSlot(connection: Connection) {
+  // @ts-ignore
+  const resp = await connection._rpcRequest('getSlot')
+  return new BigNumber(resp.result ?? 0)
 }
