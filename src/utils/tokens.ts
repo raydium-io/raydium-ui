@@ -1249,7 +1249,28 @@ export const TOKENS: Tokens = {
     mintAddress: 'A98UDy7z8MfmWnTQt6cKjje7UfqV3pTLf4yEbuwL2HrH',
     decimals: 9,
     tags: ['raydium']
-  }
+  },
+  FCON: {
+    symbol: 'FCON',
+    name: 'FCON',
+    mintAddress: 'HovGjrBGTfna4dvg6exkMxXuexB3tUfEZKcut8AWowXj',
+    decimals: 4,
+
+    detailLink: 'https://raydium.medium.com/space-falcon-is-launching-on-acceleraytor-e32dedd8378b',
+    details:
+      'Space Falcon is the world’s first next-gen intergalactic P2E metaverse, featuring a classic space shooter game with premium sci-fi NFTs throughout the universe. Space Falcon’s virtual gaming metaverse emerges from the confluence of state-of-the-art blockchain technology, real-time graphics, classic immersive multiplayer video games, and decentralized financial technologies.',
+    docs: {
+      website: 'https://spacefalcon.io/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/SpaceFalconIO',
+      Telegram: 'https://t.me/spacefalconIO',
+      Discord: 'https://discord.gg/q5pupzKTaX'
+    },
+
+    tags: ['raydium']
+  },
 }
 
 export const LP_TOKENS: Tokens = {
