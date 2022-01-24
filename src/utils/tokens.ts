@@ -1271,6 +1271,13 @@ export const TOKENS: Tokens = {
 
     tags: ['raydium']
   },
+  CMFI: {
+    symbol: 'CMFI',
+    name: 'CMFI',
+    mintAddress: '5Wsd311hY8NXQhkt9cWHwTnqafk7BGEbLu8Py3DSnPAr',
+    decimals: 6,
+    tags: ['raydium']
+  }
 }
 
 export const LP_TOKENS: Tokens = {
@@ -2796,6 +2803,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '2e9vCgqAhxAJ8zLtmaitu8Go3hT5vozMtAtCwgAN83Yu',
     decimals: TOKENS.$WOOD.decimals
+  },
+  'CMFI-USDC-V4': {
+    symbol: 'CMFI-USDC',
+    name: 'CMFI-USDC LP',
+    coin: { ...TOKENS.CMFI },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7HnBaMZwUA8FKhsiHu1xsxvwpxcGMoDj7XFqgmFnw6ft',
+    decimals: TOKENS.CMFI.decimals
   }
 }
 

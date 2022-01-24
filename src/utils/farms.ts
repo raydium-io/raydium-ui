@@ -2146,6 +2146,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '25XopGuuvrFJE2zwNjSJ2RSaQFAnvUZRZ3VZhEafGTXK',
     poolRewardTokenAccount: 'BHXhWpNMtyUBGM6cHUBHnDhvwtikxUxtNR4yU4DhKsCk',
     poolRewardTokenAccountB: 'D7vwP5UNqiCsiEHhwxtqCuCSKXXgM8nJjZ6XhdwnPoGY'
+  },
+  {
+    name: 'CMFI-USDC',
+    lp: { ...LP_TOKENS['CMFI-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.CMFI },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: 'FAJX3gVHKfiuT2AWU3CPfv3DJksQJtn4QrLuBo1zjoBp',
+    poolAuthority: '8U95TuJd2h7uycPd6ktD9WdLVKHZW5MYz6htnTeqQcXq',
+    poolLpTokenAccount: 'FN7BB1p3JJj1yR55RUV37cen9JcsMFgLtwjCbTrVxHcX',
+    poolRewardTokenAccount: 'ux3AoAoxqQpmuZgnncayerYMRNNWB96fPv5gUCMrXAK',
+    poolRewardTokenAccountB: '7BmHRKAeWjyVZPUWHjiS7yq1C7vkzrkHDNU3MquPTFb'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
