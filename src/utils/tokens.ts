@@ -2812,6 +2812,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7HnBaMZwUA8FKhsiHu1xsxvwpxcGMoDj7XFqgmFnw6ft',
     decimals: TOKENS.CMFI.decimals
+  },
+  'FCON-USDC-V4': {
+    symbol: 'FCON-USDC',
+    name: 'FCON-USDC LP',
+    coin: { ...TOKENS.FCON },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'ExkuW75SbEGPm6i4uFv7Rnncd3hY5whirtRPTujC1Yoe',
+    decimals: TOKENS.FCON.decimals
   }
 }
 
