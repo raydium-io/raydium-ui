@@ -413,7 +413,7 @@
           "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="amms.length + routeInfos.length + Object.keys(market).length === 0">
+          <template v-else-if="amms.length + routeInfos.length + stableAmms.length + Object.keys(market).length === 0">
             Pool Not Found
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>

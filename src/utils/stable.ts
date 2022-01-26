@@ -74,10 +74,11 @@ function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
   let rightMid = 0
   let rightRight = 0
 
+  let tempEps = Geps + 1
+
   let count = 0
-  while (Math.abs(Math.abs(left) - Math.abs(rightMid)) > Geps && min !== max) {
-    console.log('temp', k, dx, x, y, flag)
-    if (count++ > 3000) return 0
+  while (tempEps > Geps && min !== max) {
+    count++
     mid = (min + max) / 2
     let temp = Gn - k / (flag ? y + min : y) ** 2
     temp = temp > 0 ? temp : 0
@@ -85,12 +86,16 @@ function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
     rightMid = -mid * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + mid : y) ** 2))
     rightRight = -max * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + max : y) ** 2))
 
-    // console.log('--', count++, rightLeft, rightMid, rightRight, Math.abs(Math.abs(left) - Math.abs(rightMid)))
     if ((rightLeft < left && left < rightMid) || (rightLeft > left && left > rightMid)) {
       max = mid
     } else if ((rightMid < left && left < rightRight) || (rightMid > left && left > rightRight)) {
       min = mid
     }
+    if (Math.abs(Math.abs(left) - Math.abs(rightMid)) === tempEps) {
+      console.log('last while -> ', count)
+      break
+    }
+    tempEps = Math.abs(Math.abs(left) - Math.abs(rightMid))
   }
   return mid
 }
