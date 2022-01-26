@@ -214,6 +214,7 @@ export function getSwapOutAmountStable(
   let beforePrice, afterPrice
   if (fromCoinMint === coin.mintAddress) {
     amountOut = amountIn.isNaN() ? new BigNumber(0) : getDyByDx(coinBalance, pcBalance, amountIn, currentK, true).abs()
+    amountOut = amountOut.gt(pcBalance) ? pcBalance : amountOut
     inDecimals = coin.decimals
     outDecimals = pc.decimals
     console.log(
@@ -232,7 +233,8 @@ export function getSwapOutAmountStable(
     const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
     afterPrice = getStablePrice(afterCurrentK, afterCoinBalance, afterPcBalance, true)
   } else if (toCoinMint === coin.mintAddress) {
-    amountOut = getDxByDy(coinBalance, pcBalance, amountIn, currentK, true)
+    amountOut = amountIn.isNaN() ? new BigNumber(0) : getDxByDy(coinBalance, pcBalance, amountIn, currentK, true)
+    amountOut = amountOut.gt(coinBalance) ? coinBalance : amountOut
     inDecimals = pc.decimals
     outDecimals = coin.decimals
     console.log(
