@@ -1332,18 +1332,19 @@ export default Vue.extend({
           }
         }
 
-        Promise.all(
-          marketAddress
-            .filter((itemMarket) => !Object.keys(this.market).includes(itemMarket))
-            .map((itemMarketAddress) =>
-              Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3))
-            )
-        ).then((marketList) => {
-          marketList.forEach((itemMarket) => {
-            this.market[itemMarket.address.toString()] = { market: itemMarket }
-          })
-          this.getOrderBooks()
-        })
+        console.log(SERUM_PROGRAM_ID_V3)
+        // Promise.all(
+        //   marketAddress
+        //     .filter((itemMarket) => !Object.keys(this.market).includes(itemMarket))
+        //     .map((itemMarketAddress) =>
+        //       Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3))
+        //     )
+        // ).then((marketList) => {
+        //   marketList.forEach((itemMarket) => {
+        //     this.market[itemMarket.address.toString()] = { market: itemMarket }
+        //   })
+        //   this.getOrderBooks()
+        // })
       } else {
         this.market = {}
       }

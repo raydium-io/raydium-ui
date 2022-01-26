@@ -197,7 +197,6 @@ export function getSwapOutAmountStable(
 ) {
   const { coin, pc, fees, currentK } = poolInfo
   const { swapFeeNumerator, swapFeeDenominator } = fees
-  console.log(2222, slippage, amount, swapFeeNumerator, swapFeeDenominator)
 
   const amountIn = new TokenAmount(amount, coin.decimals, false)
     .toEther()
@@ -209,12 +208,14 @@ export function getSwapOutAmountStable(
 
   let inDecimals
   let outDecimals
-  let amountOut = new BigNumber(0)
+  let amountOut = 0
 
   let beforePrice, afterPrice
   if (fromCoinMint === coin.mintAddress) {
-    amountOut = amountIn.isNaN() ? new BigNumber(0) : getDyByDx(coinBalance, pcBalance, amountIn, currentK, true).abs()
-    amountOut = amountOut.gt(pcBalance) ? pcBalance : amountOut
+    amountOut = amountIn.isNaN()
+      ? 0
+      : Math.abs(getDyByDx(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+    amountOut = amountOut > pcBalance.toNumber() ? pcBalance.toNumber() : amountOut
     inDecimals = coin.decimals
     outDecimals = pc.decimals
     console.log(
@@ -227,14 +228,16 @@ export function getSwapOutAmountStable(
       getBigNumber(currentK)
     )
 
-    beforePrice = getStablePrice(currentK, coinBalance, pcBalance, true)
+    beforePrice = getStablePrice(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), true)
     const afterCoinBalance = coinBalance.plus(amountIn)
     const afterPcBalance = pcBalance.minus(amountOut)
     const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
-    afterPrice = getStablePrice(afterCurrentK, afterCoinBalance, afterPcBalance, true)
+    afterPrice = getStablePrice(afterCurrentK.toNumber(), afterCoinBalance.toNumber(), afterPcBalance.toNumber(), true)
   } else if (toCoinMint === coin.mintAddress) {
-    amountOut = amountIn.isNaN() ? new BigNumber(0) : getDxByDy(coinBalance, pcBalance, amountIn, currentK, true)
-    amountOut = amountOut.gt(coinBalance) ? coinBalance : amountOut
+    amountOut = amountIn.isNaN()
+      ? 0
+      : Math.abs(getDxByDy(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+    amountOut = amountOut > coinBalance.toNumber() ? coinBalance.toNumber() : amountOut
     inDecimals = pc.decimals
     outDecimals = coin.decimals
     console.log(
@@ -247,23 +250,23 @@ export function getSwapOutAmountStable(
       getBigNumber(currentK)
     )
 
-    beforePrice = getStablePrice(currentK, coinBalance, pcBalance, false)
+    beforePrice = getStablePrice(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), false)
     const afterCoinBalance = coinBalance.plus(amountIn)
     const afterPcBalance = pcBalance.minus(amountOut)
     const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
-    afterPrice = getStablePrice(afterCurrentK, afterCoinBalance, afterPcBalance, false)
+    afterPrice = getStablePrice(afterCurrentK.toNumber(), afterCoinBalance.toNumber(), afterPcBalance.toNumber(), false)
   }
 
   const amountOutWithSlippage = getBigNumber(amountOut) / (1 + slippage / 100)
 
-  if (!beforePrice) beforePrice = new BigNumber(0)
-  if (!afterPrice) afterPrice = new BigNumber(0)
+  if (!beforePrice) beforePrice = 0
+  if (!afterPrice) afterPrice = 0
 
-  const priceImpact = beforePrice.minus(afterPrice).dividedBy(beforePrice).multipliedBy(100).toNumber()
+  const priceImpact = Math.abs(((beforePrice - afterPrice) / beforePrice) * 100)
 
   return {
     amountIn: new TokenAmount(amountIn.multipliedBy(10 ** inDecimals), inDecimals),
-    amountOut: new TokenAmount(amountOut.multipliedBy(10 ** outDecimals), outDecimals),
+    amountOut: new TokenAmount(new BigNumber(amountOut).multipliedBy(10 ** outDecimals), outDecimals),
     amountOutWithSlippage: new TokenAmount(amountOutWithSlippage * 10 ** pc.decimals, pc.decimals),
     priceImpact
   }

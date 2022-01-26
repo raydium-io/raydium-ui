@@ -272,7 +272,7 @@ export const actions = actionTree(
       const liquidityPools: { [lp: string]: LiquidityPoolInfo } = {}
       const publicKeys: PublicKey[] = []
 
-      LIQUIDITY_POOLS.forEach((pool) => {
+      LIQUIDITY_POOLS.filter((item) => item.version === 5).forEach((pool) => {
         const { poolCoinTokenAccount, poolPcTokenAccount, ammOpenOrders, ammId, coin, pc, lp } = pool
 
         publicKeys.push(

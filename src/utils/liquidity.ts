@@ -41,9 +41,9 @@ export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
     if (!currentK || !x || !y) return new BigNumber(0)
 
     if (coinBase) {
-      return getStablePrice(currentK, x, y, true)
+      return getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
     } else {
-      return getStablePrice(currentK, x, y, false)
+      return getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), false)
     }
   } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())
@@ -97,7 +97,7 @@ export function getOutAmountStable(
   const y = poolInfo.pc.balance?.toEther()
   if (!currentK || !x || !y) return new BigNumber(0)
 
-  const price = getStablePrice(currentK, x, y, true)
+  const price = getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
 

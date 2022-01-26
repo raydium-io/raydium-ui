@@ -1,12 +1,10 @@
 import BigNumber from 'bignumber.js'
 
-export const stableConfig = {
-  n: 150,
-  eps: new BigNumber(10 ** -15)
-}
+const Gn = 150
+const Geps = 10 ** -6
 
 export function cK(xBase: BigNumber, yBase: BigNumber) {
-  const n = new BigNumber(stableConfig.n)
+  const n = new BigNumber(Gn)
   const x = new BigNumber(xBase.gt(yBase) ? xBase : yBase)
   const y = new BigNumber(xBase.lt(yBase) ? xBase : yBase)
 
@@ -17,7 +15,7 @@ export function cK(xBase: BigNumber, yBase: BigNumber) {
   let right = getCurKRight(n, x, y, mid)
   let count = 0
 
-  while (left.minus(right).abs().gt(stableConfig.eps)) {
+  while (left.minus(right).abs().gt(Geps)) {
     if (left.gt(right)) {
       max = mid
     } else {
@@ -26,7 +24,7 @@ export function cK(xBase: BigNumber, yBase: BigNumber) {
     mid = new BigNumber(max).plus(min).dividedBy(2)
     left = getCurKLeft(mid, y)
     right = getCurKRight(n, x, y, mid)
-    if (count++ > 100) break
+    if (count++ > 1000) break
   }
 
   return mid.multipliedBy(mid)
@@ -45,144 +43,92 @@ function getCurKRight(n: BigNumber, x: BigNumber, y: BigNumber, mid: BigNumber) 
   return new BigNumber(n).minus(data)
 }
 
-export function getStablePrice(currentK: BigNumber, x: BigNumber, y: BigNumber, baseIn: boolean) {
+export function getStablePrice(k: number, x: number, y: number, baseIn: boolean) {
   let price
-  if (x.lte(y)) {
-    price = new BigNumber(stableConfig.n)
-      .multipliedBy(x)
-      .multipliedBy(x)
-      .minus(currentK)
-      .dividedBy(new BigNumber(stableConfig.n - 1).multipliedBy(x).multipliedBy(x))
-      .sqrt()
+  if (x <= y) {
+    price = Math.sqrt((10 * x ** 2 - k) / ((10 - 1) * x ** 2))
   } else {
-    price = new BigNumber(stableConfig.n - 1)
-      .multipliedBy(y)
-      .multipliedBy(y)
-      .dividedBy(new BigNumber(stableConfig.n).multipliedBy(x).multipliedBy(x).minus(currentK))
-      .sqrt()
+    price = Math.sqrt(((10 - 1) * y ** 2) / (10 * y ** 2 - k))
   }
   if (baseIn) {
     return price
   } else {
-    return new BigNumber(1).dividedBy(price)
+    return 1 / price
   }
 }
 
-export function getDxByDy(
-  xBase: BigNumber,
-  yBase: BigNumber,
-  dy: BigNumber,
-  k: BigNumber,
-  baseInSide: boolean
-): BigNumber {
-  const x = new BigNumber(xBase.gt(yBase) ? xBase : yBase)
-  let y = new BigNumber(xBase.lt(yBase) ? xBase : yBase)
-  if (xBase.lt(yBase)) {
-    console.log('getDxByDy to getDyByDx')
-    return getDyByDx(x, y, dy, k, baseInSide)
-  }
-  if (dy.lt(new BigNumber(0))) {
-    if (dy.abs().gte(y)) return new BigNumber(0) // Error
+function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
+  let maxFlag = x > y ? x : y
+  maxFlag = maxFlag > dx ? maxFlag : dx
 
-    return dy
-      .multipliedBy(-1)
-      .multipliedBy(
-        new BigNumber(stableConfig.n - 1)
-          .dividedBy(
-            new BigNumber(stableConfig.n).minus(
-              k.dividedBy(new BigNumber(y).plus(dy).multipliedBy(new BigNumber(y).plus(dy)))
-            )
-          )
-          .sqrt()
-      )
-  } else if (y.minus(dy).lte(k.sqrt())) {
-    y = y.plus(dy)
-    dy = dy.multipliedBy(-1)
-    let dx = dy
-      .multipliedBy(-1)
-      .multipliedBy(
-        new BigNumber(stableConfig.n - 1)
-          .dividedBy(new BigNumber(stableConfig.n).minus(k.dividedBy(y.plus(dy)).dividedBy(y.plus(dy))))
-          .sqrt()
-      )
-    dx = dx.multipliedBy(-1)
-    return dx
-  } else {
-    const dx1 = k.sqrt().minus(x)
-    const dy2 = dy.minus(k.sqrt().minus(y))
-    const dx2 = getDyByDx(k.sqrt(), k.sqrt(), dy2, k, baseInSide)
-    return dx1.plus(dx2)
+  let min = -maxFlag
+  if (flag) {
+    const temp = Math.sqrt(k / Gn) - y
+    min = min > temp ? min : temp
   }
-}
+  let max = maxFlag
+  let mid = (min + max) / 2
 
-export function getDyByDx(
-  xBase: BigNumber,
-  yBase: BigNumber,
-  dx: BigNumber,
-  k: BigNumber,
-  baseInSide: boolean
-): BigNumber {
-  let x = new BigNumber(xBase.gt(yBase) ? xBase : yBase)
-  const y = new BigNumber(xBase.lt(yBase) ? xBase : yBase)
-  if (xBase.lt(yBase)) {
-    return getDxByDy(x, y, dx, k, baseInSide)
-  }
-
-  if (dx.gt(new BigNumber(0))) {
-    const dy = computerD(x, y, k, dx, true)
-    return dy
-  } else if (x.plus(dx).gte(k.sqrt())) {
-    x = x.plus(dx)
-    dx = dx.multipliedBy(-1)
-    let dy = computerD(x, y, k, dx, false)
-    dy = dy.dividedBy(-1)
-    return dy
-  } else {
-    const dy1 = k.sqrt().minus(y)
-    const dx2 = dx.minus(k.sqrt().minus(x))
-    const dy2 = getDxByDy(k.sqrt(), k.sqrt(), dx2, k, baseInSide)
-    return dy1.plus(dy2)
-  }
-}
-
-function computerD(xBase: BigNumber, yBase: BigNumber, k: BigNumber, di: BigNumber, positive: boolean): BigNumber {
-  // const x = new BigNumber(xBase.gte(yBase) ? xBase : yBase)
-  const y = new BigNumber(xBase.lt(yBase) ? xBase : yBase)
-  let max = new BigNumber(y)
-  let min = new BigNumber(0)
-  let mid = new BigNumber(max).plus(min).dividedBy(2)
-  let diTemp = new BigNumber(0)
+  const left = dx
+  let rightLeft = 0
+  let rightMid = 0
+  let rightRight = 0
 
   let count = 0
+  while (Math.abs(Math.abs(left) - Math.abs(rightMid)) > Geps && min !== max) {
+    console.log('temp', k, dx, x, y, flag)
+    if (count++ > 3000) return 0
+    mid = (min + max) / 2
+    let temp = Gn - k / (flag ? y + min : y) ** 2
+    temp = temp > 0 ? temp : 0
+    rightLeft = -min * Math.sqrt((Gn - 1) / temp)
+    rightMid = -mid * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + mid : y) ** 2))
+    rightRight = -max * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + max : y) ** 2))
 
-  while (di.abs().minus(diTemp.abs()).abs().gt(stableConfig.eps) && !min.eq(max)) {
-    mid = new BigNumber(max).plus(min).dividedBy(2)
-    console.log(
-      'temp -> ',
-      count++,
-      min.toFixed(),
-      min.toFixed(),
-      max.toFixed(),
-      di.toFixed(),
-      diTemp.toFixed(),
-      di.abs().minus(diTemp.abs()).abs().toFixed()
-    )
-    const tempY = positive ? y.plus(mid) : y
-    const tempYPow = tempY.multipliedBy(tempY)
-    diTemp = new BigNumber(mid)
-      .multipliedBy(-1)
-      .multipliedBy(
-        new BigNumber(stableConfig.n - 1)
-          .dividedBy(new BigNumber(stableConfig.n).minus(new BigNumber(k).dividedBy(tempYPow)))
-          .sqrt()
-      )
-
-    if (diTemp.abs().gt(di.abs())) {
+    // console.log('--', count++, rightLeft, rightMid, rightRight, Math.abs(Math.abs(left) - Math.abs(rightMid)))
+    if ((rightLeft < left && left < rightMid) || (rightLeft > left && left > rightMid)) {
       max = mid
-    } else {
+    } else if ((rightMid < left && left < rightRight) || (rightMid > left && left > rightRight)) {
       min = mid
     }
   }
-
   return mid
+}
+
+export function getDxByDy(k: number, x: number, y: number, dy: number): number {
+  const y0 = Math.sqrt(k)
+  if (dy <= 0) {
+    if (-dy > y) return 0 // error
+    const dx = -dy * Math.sqrt((Gn - 1) / (Gn - k / (y + dy) ** 2))
+    return dx
+  } else if (y + dy <= y0) {
+    y = y + dy
+    dy = -dy
+    let dx = -dy * Math.sqrt((Gn - 1) / (Gn - k / (y + dy) ** 2))
+    dx = -dx
+    return dx
+  } else {
+    const dx1 = y0 - x
+    const dy2 = dy - (y0 - y)
+    const dx2 = getDyByDx(k, y0, y0, dy2)
+    return dx1 + dx2
+  }
+}
+
+export function getDyByDx(k: number, x: number, y: number, dx: number): number {
+  const y0 = Math.sqrt(k)
+  if (dx >= 0) {
+    const dy = cD(k, dx, x, y, true)
+    return dy
+  } else if (x + dx >= y0) {
+    x = x + dx
+    dx = -dx
+    const dy = -cD(k, dx, x, y, false)
+    return dy
+  } else {
+    const dy1 = y0 - y
+    const dx2 = dx - (y0 - x)
+    const dy2 = getDxByDy(k, y0, y0, dx2)
+    return dy1 + dy2
+  }
 }
