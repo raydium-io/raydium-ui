@@ -1284,6 +1284,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'HJbNXx2YMRxgfUJ6K4qeWtjatMK5KYQT1QnsCdDWywNv',
     decimals: 9,
     tags: ['raydium']
+  },
+  PSY: {
+    symbol: 'PSY',
+    name: 'PSY',
+    mintAddress: 'PsyFiqqjiv41G7o5SMRzDJCu4psptThNR2GtfeGHfSq',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2828,6 +2835,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'ExkuW75SbEGPm6i4uFv7Rnncd3hY5whirtRPTujC1Yoe',
     decimals: TOKENS.FCON.decimals
+  },
+  'PSY-USDC-V4': {
+    symbol: 'PSY-USDC',
+    name: 'PSY-USDC LP',
+    coin: { ...TOKENS.PSY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Hrip9d8f6iQ4JxfB85JyGGq3u2WgpmqRSXJZursm26hd',
+    decimals: TOKENS.PSY.decimals
   }
 }
 
