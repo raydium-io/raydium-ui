@@ -157,12 +157,11 @@ export const actions = actionTree(
 
             if (farmInfo.lp.balance.wei.gt(0)) {
               farmInfo.poolInfo.rewardPerShareNet = new BigNumber(farmInfo.poolInfo.rewardPerShareNet).plus(
-                rewardA.multipliedBy(10 ** versionConfig[farmInfo.poolInfo.version]).dividedBy(farmInfo.lp.balance.wei)
+                rewardA.multipliedBy(10 ** versionConfig[farmInfo.version]).dividedBy(farmInfo.lp.balance.wei)
               )
             } else {
               rewardA = new BigNumber(0)
             }
-
             farmInfo.poolInfo.totalReward = new BigNumber(farmInfo.poolInfo.totalReward).plus(rewardA)
           } else if (farmInfo.version === 4 || farmInfo.version === 5) {
             const spread = currentSlot.minus(farmInfo.poolInfo.lastBlock)
