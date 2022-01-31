@@ -1298,6 +1298,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'CKaKtYvz6dKPyMvYq9Rh3UBrnNqYZAyd7iF4hJtjUvks',
     decimals: 9,
     tags: ['raydium']
+  },
+  FLWR: {
+    symbol: 'FLWR',
+    name: 'FLWR',
+    mintAddress: 'FLWRna1gxehQ9pSyZMzxfp4UhewvLPwuKfdUTgdZuMBY',
+    decimals: 2,
+    tags: ['raydium']
   }
 }
 
