@@ -1305,6 +1305,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'FLWRna1gxehQ9pSyZMzxfp4UhewvLPwuKfdUTgdZuMBY',
     decimals: 2,
     tags: ['raydium']
+  },
+  ROLL: {
+    symbol: 'ROLL',
+    name: 'ROLL',
+    mintAddress: '76aYNHbDfHemxSS7vmh6eJGfjodK8m7srCxiYCrKxzY1',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2858,6 +2865,42 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Hrip9d8f6iQ4JxfB85JyGGq3u2WgpmqRSXJZursm26hd',
     decimals: TOKENS.PSY.decimals
+  },
+  'ATS-USDC-V4': {
+    symbol: 'ATS-USDC',
+    name: 'ATS-USDC LP',
+    coin: { ...TOKENS.ATS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GTy3TKmh3Ejrdh7iTALUG3PYv4VC7wgwM9vGgdLj6Rus',
+    decimals: TOKENS.ATS.decimals
+  },
+  'FLWR-USDC-V4': {
+    symbol: 'FLWR-USDC',
+    name: 'FLWR-USDC LP',
+    coin: { ...TOKENS.FLWR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '21rqpdZbZTMyzsfrvNNLzhQSz3oEC714EyiRfzNBXyUz',
+    decimals: TOKENS.FLWR.decimals
+  },
+  'ROLL-SOL-V4': {
+    symbol: 'ROLL-SOL',
+    name: 'ROLL-SOL LP',
+    coin: { ...TOKENS.ROLL },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '8YXJzgWrbnJDQytphH5BgDbz7ygoxQdD9aBRFZzVwJEJ',
+    decimals: TOKENS.ROLL.decimals
+  },
+  'ROLL-USDC-V4': {
+    symbol: 'ROLL-USDC',
+    name: 'ROLL-USDC LP',
+    coin: { ...TOKENS.ROLL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FTXsrept22Ub4MjDSPgXaAboRi13GmKJhuaauoAXWeZJ',
+    decimals: TOKENS.ROLL.decimals
   }
 }
 
