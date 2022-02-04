@@ -136,7 +136,7 @@
                       v-if="
                         farm.farmInfo.aprB !== '0.00' ||
                         farm.userInfo.pendingRewardB.toEther().gt(0) ||
-                        farm.userInfo.pendingReward.toEther().eq(0)
+                        !(farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0))
                       "
                     >
                       {{
@@ -266,7 +266,7 @@
                           v-if="
                             farm.farmInfo.aprB !== '0.00' ||
                             farm.userInfo.pendingRewardB.toEther().gt(0) ||
-                            farm.userInfo.pendingReward.toEther().eq(0)
+                            !(farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0))
                           "
                           class="token"
                         >
