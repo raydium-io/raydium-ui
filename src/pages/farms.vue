@@ -117,18 +117,28 @@
                     <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-                  <span v-if="farm.farmInfo.dual" class="dual-tag">DUAL YIELD</span>
+                  <span
+                    v-if="farm.farmInfo.fusion && farm.farmInfo.apr !== '0.00' && farm.farmInfo.aprB !== '0.00'"
+                    class="dual-tag"
+                    >DUAL YIELD</span
+                  >
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 5">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div v-if="farm.farmInfo.fusion" class="value">
-                    <div v-if="farm.farmInfo.dual">
+                    <div v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)">
                       {{
                         farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
                       }}
                       {{ farm.farmInfo.reward.symbol }}
                     </div>
-                    <div>
+                    <div
+                      v-if="
+                        farm.farmInfo.aprB !== '0.00' ||
+                        farm.userInfo.pendingRewardB.toEther().gt(0) ||
+                        farm.userInfo.pendingReward.toEther().eq(0)
+                      "
+                    >
                       {{
                         farm.userInfo.pendingRewardB.format().includes('-') ? 0 : farm.userInfo.pendingRewardB.format()
                       }}
@@ -148,10 +158,12 @@
                         <div v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
                           <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
                           <div class="value-s">
-                            <div v-if="farm.farmInfo.dual">
+                            <div v-if="farm.farmInfo.apr !== '0.00'">
                               {{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%
                             </div>
-                            <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                            <div v-if="farm.farmInfo.aprB !== '0.00'">
+                              {{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%
+                            </div>
                           </div>
                         </div>
                         <div v-else class="state" :span="isMobile ? 6 : 5">
@@ -201,6 +213,30 @@
                 </Col>
               </Row>
 
+              <Row
+                v-if="isMobile && !poolType"
+                slot="header"
+                class="farm-head"
+                :class="isMobile ? 'is-mobile' : ''"
+                :gutter="0"
+              >
+                <Col class="state" :span="24">
+                  <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
+                    Connect Wallet
+                  </Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
+                      size="large"
+                      ghost
+                      @click.stop="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                    >
+                      Harvest & Unstake
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+
               <Row v-if="poolType" :class="isMobile ? 'is-mobile' : ''" :gutter="48">
                 <Col :span="isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
@@ -216,10 +252,20 @@
                     <div class="title">Pending Rewards</div>
                     <div class="pending fs-container">
                       <div v-if="farm.farmInfo.fusion" class="reward">
-                        <div v-if="farm.farmInfo.dual" class="token">
+                        <div
+                          v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)"
+                          class="token"
+                        >
                           {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                         </div>
-                        <div class="token">
+                        <div
+                          v-if="
+                            farm.farmInfo.aprB !== '0.00' ||
+                            farm.userInfo.pendingRewardB.toEther().gt(0) ||
+                            farm.userInfo.pendingReward.toEther().eq(0)
+                          "
+                          class="token"
+                        >
                           {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
                         </div>
                       </div>
