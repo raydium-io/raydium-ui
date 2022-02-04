@@ -214,7 +214,11 @@
               </Row>
 
               <Row
-                v-if="isMobile && !poolType"
+                v-if="
+                  isMobile &&
+                  !poolType &&
+                  (farm.userInfo.pendingRewardB.toEther().gt(0) || farm.userInfo.pendingReward.toEther().gt(0))
+                "
                 slot="header"
                 class="farm-head"
                 :class="isMobile ? 'is-mobile' : ''"
