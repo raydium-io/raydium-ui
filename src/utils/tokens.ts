@@ -1312,6 +1312,13 @@ export const TOKENS: Tokens = {
     mintAddress: '76aYNHbDfHemxSS7vmh6eJGfjodK8m7srCxiYCrKxzY1',
     decimals: 6,
     tags: ['raydium']
+  },
+  OOGI: {
+    symbol: 'OOGI',
+    name: 'OOGI',
+    mintAddress: 'H7Qc9APCWWGDVxGD5fJHmLTmdEgT9GFatAKFNg6sHh8A',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
