@@ -46,9 +46,9 @@ function getCurKRight(n: BigNumber, x: BigNumber, y: BigNumber, mid: BigNumber) 
 export function getStablePrice(k: number, x: number, y: number, baseIn: boolean) {
   let price
   if (x <= y) {
-    price = Math.sqrt((10 * x ** 2 - k) / ((10 - 1) * x ** 2))
+    price = Math.sqrt((Gn * x ** 2 - k) / ((Gn - 1) * x ** 2))
   } else {
-    price = Math.sqrt(((10 - 1) * y ** 2) / (10 * y ** 2 - k))
+    price = Math.sqrt(((Gn - 1) * y ** 2) / (Gn * y ** 2 - k))
   }
   if (baseIn) {
     return price
