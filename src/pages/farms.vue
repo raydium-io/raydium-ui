@@ -118,7 +118,7 @@
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
                   <span
-                    v-if="farm.farmInfo.fusion && farm.farmInfo.apr !== '0.00' && farm.farmInfo.aprB !== '0.00'"
+                    v-if="farm.farmInfo.fusion && Number(farm.farmInfo.apr) > 0 && Number(farm.farmInfo.aprB) > 0"
                     class="dual-tag"
                     >DUAL YIELD</span
                   >
@@ -418,11 +418,8 @@ export default Vue.extend({
       poolType: true,
       endedFarmsPoolId: [] as string[],
       endedFarmsPoolIdWhiteList: [
-        'ABBtgVwJFHCbvNi9JoEBHwNBLcbHzf8kYCMAEd2xjze5',
-        '8QAZXSY99fCxp9FRG9W5JL4uTkicx2C7KAaMumVKLpVA',
-        '7jhxXfdepg7mxmRzU1T3Gpm4EKbmtgZ7oWBiGMh53Ykd',
-        'BYRs8rwnXBJYf23M4BJ4SYW2zjJvVrsgwDezWSF9qju9',
-        '7YoBkrmXJnUqrC54HK16mCavowFNCFf8hNiV7GwfVXQU'
+        'CmM9nTuYXkvMxAYptzfY8sdUSe9LUUoL2Pa6xaP4A6nG',
+        '7ubJHEDK5Uhqn9SgoauCTzMkGuA5kwvfuTpHNkAuF5y8'
       ] as string[],
       showCollapse: [] as any[]
     }

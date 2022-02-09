@@ -1319,6 +1319,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'H7Qc9APCWWGDVxGD5fJHmLTmdEgT9GFatAKFNg6sHh8A',
     decimals: 9,
     tags: ['raydium']
+  },
+  DOGO: {
+    symbol: 'DOGO',
+    name: 'DOGO',
+    mintAddress: '5LSFpvLDkcdV2a3Kiyzmg5YmJsj2XDLySaXvnfP1cgLT',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2908,6 +2915,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'FTXsrept22Ub4MjDSPgXaAboRi13GmKJhuaauoAXWeZJ',
     decimals: TOKENS.ROLL.decimals
+  },
+  'DOGO-SOL-V4': {
+    symbol: 'DOGO-SOL',
+    name: 'DOGO-SOL LP',
+    coin: { ...TOKENS.DOGO },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '23Ki3fss6htv8ZVGjobe4cYJffJP1UjwK1PyVmtxE1eh',
+    decimals: TOKENS.DOGO.decimals
+  },
+  'STR-SOL-V4': {
+    symbol: 'STR-SOL',
+    name: 'STR-SOL LP',
+    coin: { ...TOKENS.STR },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '8uDVKmVwNmbXHDB7rNKqtpcT9VAsFHTJ5pPYxjyoBbNg',
+    decimals: TOKENS.STR.decimals
   }
 }
 
