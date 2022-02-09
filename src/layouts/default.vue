@@ -18,7 +18,10 @@
       </div>
 
       <div
-        v-if="!['migrate'].includes(pageName) && $accessor.wallet.auxiliaryTokenAccounts.length > 0"
+        v-if="
+          !['migrate', 'acceleraytor', 'acceleraytor-id'].includes(pageName) &&
+          $accessor.wallet.auxiliaryTokenAccounts.length > 0
+        "
         class="fc-container"
       >
         <Alert type="warning" message="IMPORTANT" show-icon>

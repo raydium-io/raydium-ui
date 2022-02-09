@@ -117,18 +117,28 @@
                     <CoinIcon :mint-address="farm.farmInfo.lp.pc.mintAddress" />
                   </div>
                   {{ isMobile ? farm.farmInfo.lp.symbol : farm.farmInfo.lp.name }}
-                  <span v-if="farm.farmInfo.dual" class="dual-tag">DUAL YIELD</span>
+                  <span
+                    v-if="farm.farmInfo.fusion && Number(farm.farmInfo.apr) > 0 && Number(farm.farmInfo.aprB) > 0"
+                    class="dual-tag"
+                    >DUAL YIELD</span
+                  >
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 5">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div v-if="farm.farmInfo.fusion" class="value">
-                    <div v-if="farm.farmInfo.dual">
+                    <div v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)">
                       {{
                         farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
                       }}
                       {{ farm.farmInfo.reward.symbol }}
                     </div>
-                    <div>
+                    <div
+                      v-if="
+                        farm.farmInfo.aprB !== '0.00' ||
+                        farm.userInfo.pendingRewardB.toEther().gt(0) ||
+                        !(farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0))
+                      "
+                    >
                       {{
                         farm.userInfo.pendingRewardB.format().includes('-') ? 0 : farm.userInfo.pendingRewardB.format()
                       }}
@@ -148,10 +158,12 @@
                         <div v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
                           <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
                           <div class="value-s">
-                            <div v-if="farm.farmInfo.dual">
+                            <div v-if="farm.farmInfo.apr !== '0.00'">
                               {{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%
                             </div>
-                            <div>{{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%</div>
+                            <div v-if="farm.farmInfo.aprB !== '0.00'">
+                              {{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%
+                            </div>
                           </div>
                         </div>
                         <div v-else class="state" :span="isMobile ? 6 : 5">
@@ -201,6 +213,34 @@
                 </Col>
               </Row>
 
+              <Row
+                v-if="
+                  isMobile &&
+                  !poolType &&
+                  (farm.userInfo.pendingRewardB.toEther().gt(0) || farm.userInfo.pendingReward.toEther().gt(0))
+                "
+                slot="header"
+                class="farm-head"
+                :class="isMobile ? 'is-mobile' : ''"
+                :gutter="0"
+              >
+                <Col class="state" :span="24">
+                  <Button v-if="!wallet.connected" size="large" ghost @click.stop="$accessor.wallet.openModal">
+                    Connect Wallet
+                  </Button>
+                  <div v-else class="fs-container">
+                    <Button
+                      :disabled="!wallet.connected || farm.userInfo.depositBalance.isNullOrZero()"
+                      size="large"
+                      ghost
+                      @click.stop="openUnstakeModal(farm.farmInfo, farm.farmInfo.lp, farm.userInfo.depositBalance)"
+                    >
+                      Harvest & Unstake
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+
               <Row v-if="poolType" :class="isMobile ? 'is-mobile' : ''" :gutter="48">
                 <Col :span="isMobile ? 24 : 4">
                   <p>Add liquidity:</p>
@@ -216,10 +256,20 @@
                     <div class="title">Pending Rewards</div>
                     <div class="pending fs-container">
                       <div v-if="farm.farmInfo.fusion" class="reward">
-                        <div v-if="farm.farmInfo.dual" class="token">
+                        <div
+                          v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)"
+                          class="token"
+                        >
                           {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
                         </div>
-                        <div class="token">
+                        <div
+                          v-if="
+                            farm.farmInfo.aprB !== '0.00' ||
+                            farm.userInfo.pendingRewardB.toEther().gt(0) ||
+                            !(farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0))
+                          "
+                          class="token"
+                        >
                           {{ farm.userInfo.pendingRewardB.format() }} {{ farm.farmInfo.rewardB.symbol }}
                         </div>
                       </div>
@@ -324,7 +374,7 @@ import {
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { deposit, depositV5, withdraw, withdrawV5 } from '@/utils/stake'
+import { deposit, depositV5, withdraw, withdrawV4, withdrawV5 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -368,9 +418,8 @@ export default Vue.extend({
       poolType: true,
       endedFarmsPoolId: [] as string[],
       endedFarmsPoolIdWhiteList: [
-        'BoB7TtQ6fgVceh1JMtwgL1CqfC9hKWDHfQ3QPsM7d17M',
-        '4TfPXqf62NUQJw1QCNwmS7a2vzX9vF8BxYtYtnsPqNb3',
-        '2exV3w3G3yNEyvGKSv3pVQmGzMZxHUY2mw2uwVBKWTZ1'
+        'CmM9nTuYXkvMxAYptzfY8sdUSe9LUUoL2Pa6xaP4A6nG',
+        '7ubJHEDK5Uhqn9SgoauCTzMkGuA5kwvfuTpHNkAuF5y8'
       ] as string[],
       showCollapse: [] as any[]
     }
@@ -744,6 +793,8 @@ export default Vue.extend({
               auxiliaryAccounts,
               amount
             )
+          : this.farmInfo.version === 4
+          ? withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
           : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
 
       withdrawPromise

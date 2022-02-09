@@ -1242,6 +1242,90 @@ export const TOKENS: Tokens = {
     mintAddress: 'SuperbZyz7TsSdSoFAZ6RYHfAWe9NmjXBLVQpS8hqdx',
     decimals: 6,
     tags: ['raydium']
+  },
+  PRMS: {
+    symbol: 'PRMS',
+    name: 'PRMS',
+    mintAddress: 'A98UDy7z8MfmWnTQt6cKjje7UfqV3pTLf4yEbuwL2HrH',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  FCON: {
+    symbol: 'FCON',
+    name: 'FCON',
+    mintAddress: 'HovGjrBGTfna4dvg6exkMxXuexB3tUfEZKcut8AWowXj',
+    decimals: 4,
+
+    detailLink: 'https://raydium.medium.com/space-falcon-is-launching-on-acceleraytor-e32dedd8378b',
+    details:
+      'Space Falcon is the world’s first next-gen intergalactic P2E metaverse, featuring a classic space shooter game with premium sci-fi NFTs throughout the universe. Space Falcon’s virtual gaming metaverse emerges from the confluence of state-of-the-art blockchain technology, real-time graphics, classic immersive multiplayer video games, and decentralized financial technologies.',
+    docs: {
+      website: 'https://spacefalcon.io/'
+      // whitepaper: ''
+    },
+    socials: {
+      Twitter: 'https://twitter.com/SpaceFalconIO',
+      Telegram: 'https://t.me/spacefalconIO',
+      Discord: 'https://discord.gg/q5pupzKTaX'
+    },
+
+    tags: ['raydium']
+  },
+  CMFI: {
+    symbol: 'CMFI',
+    name: 'CMFI',
+    mintAddress: '5Wsd311hY8NXQhkt9cWHwTnqafk7BGEbLu8Py3DSnPAr',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  ATS: {
+    symbol: 'ATS',
+    name: 'ATS',
+    mintAddress: 'HJbNXx2YMRxgfUJ6K4qeWtjatMK5KYQT1QnsCdDWywNv',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  PSY: {
+    symbol: 'PSY',
+    name: 'PSY',
+    mintAddress: 'PsyFiqqjiv41G7o5SMRzDJCu4psptThNR2GtfeGHfSq',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  GARI: {
+    symbol: 'GARI',
+    name: 'GARI',
+    mintAddress: 'CKaKtYvz6dKPyMvYq9Rh3UBrnNqYZAyd7iF4hJtjUvks',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  FLWR: {
+    symbol: 'FLWR',
+    name: 'FLWR',
+    mintAddress: 'FLWRna1gxehQ9pSyZMzxfp4UhewvLPwuKfdUTgdZuMBY',
+    decimals: 2,
+    tags: ['raydium']
+  },
+  ROLL: {
+    symbol: 'ROLL',
+    name: 'ROLL',
+    mintAddress: '76aYNHbDfHemxSS7vmh6eJGfjodK8m7srCxiYCrKxzY1',
+    decimals: 6,
+    tags: ['raydium']
+  },
+  OOGI: {
+    symbol: 'OOGI',
+    name: 'OOGI',
+    mintAddress: 'H7Qc9APCWWGDVxGD5fJHmLTmdEgT9GFatAKFNg6sHh8A',
+    decimals: 9,
+    tags: ['raydium']
+  },
+  DOGO: {
+    symbol: 'DOGO',
+    name: 'DOGO',
+    mintAddress: '5LSFpvLDkcdV2a3Kiyzmg5YmJsj2XDLySaXvnfP1cgLT',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2750,6 +2834,105 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '7HwjdFEyGu7tQia33GFB4iFEa5dA7k4gr6BWUGS7tyyq',
     decimals: TOKENS.NOS.decimals
+  },
+  'PRMS-USDC-V4': {
+    symbol: 'PRMS-USDC',
+    name: 'PRMS-USDC LP',
+    coin: { ...TOKENS.PRMS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '6K3EbDKd9VCR7YdFHZSdd5MfzjWZY79EqprVphrN75gf',
+    decimals: TOKENS.PRMS.decimals
+  },
+  '$WOOD-USDC-V4': {
+    symbol: '$WOOD-USDC',
+    name: '$WOOD-USDC LP',
+    coin: { ...TOKENS.$WOOD },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2e9vCgqAhxAJ8zLtmaitu8Go3hT5vozMtAtCwgAN83Yu',
+    decimals: TOKENS.$WOOD.decimals
+  },
+  'CMFI-USDC-V4': {
+    symbol: 'CMFI-USDC',
+    name: 'CMFI-USDC LP',
+    coin: { ...TOKENS.CMFI },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '7HnBaMZwUA8FKhsiHu1xsxvwpxcGMoDj7XFqgmFnw6ft',
+    decimals: TOKENS.CMFI.decimals
+  },
+  'FCON-USDC-V4': {
+    symbol: 'FCON-USDC',
+    name: 'FCON-USDC LP',
+    coin: { ...TOKENS.FCON },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'ExkuW75SbEGPm6i4uFv7Rnncd3hY5whirtRPTujC1Yoe',
+    decimals: TOKENS.FCON.decimals
+  },
+  'PSY-USDC-V4': {
+    symbol: 'PSY-USDC',
+    name: 'PSY-USDC LP',
+    coin: { ...TOKENS.PSY },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Hrip9d8f6iQ4JxfB85JyGGq3u2WgpmqRSXJZursm26hd',
+    decimals: TOKENS.PSY.decimals
+  },
+  'ATS-USDC-V4': {
+    symbol: 'ATS-USDC',
+    name: 'ATS-USDC LP',
+    coin: { ...TOKENS.ATS },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'GTy3TKmh3Ejrdh7iTALUG3PYv4VC7wgwM9vGgdLj6Rus',
+    decimals: TOKENS.ATS.decimals
+  },
+  'FLWR-USDC-V4': {
+    symbol: 'FLWR-USDC',
+    name: 'FLWR-USDC LP',
+    coin: { ...TOKENS.FLWR },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '21rqpdZbZTMyzsfrvNNLzhQSz3oEC714EyiRfzNBXyUz',
+    decimals: TOKENS.FLWR.decimals
+  },
+  'ROLL-SOL-V4': {
+    symbol: 'ROLL-SOL',
+    name: 'ROLL-SOL LP',
+    coin: { ...TOKENS.ROLL },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '8YXJzgWrbnJDQytphH5BgDbz7ygoxQdD9aBRFZzVwJEJ',
+    decimals: TOKENS.ROLL.decimals
+  },
+  'ROLL-USDC-V4': {
+    symbol: 'ROLL-USDC',
+    name: 'ROLL-USDC LP',
+    coin: { ...TOKENS.ROLL },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'FTXsrept22Ub4MjDSPgXaAboRi13GmKJhuaauoAXWeZJ',
+    decimals: TOKENS.ROLL.decimals
+  },
+  'DOGO-SOL-V4': {
+    symbol: 'DOGO-SOL',
+    name: 'DOGO-SOL LP',
+    coin: { ...TOKENS.DOGO },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '23Ki3fss6htv8ZVGjobe4cYJffJP1UjwK1PyVmtxE1eh',
+    decimals: TOKENS.DOGO.decimals
+  },
+  'STR-SOL-V4': {
+    symbol: 'STR-SOL',
+    name: 'STR-SOL LP',
+    coin: { ...TOKENS.STR },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: '8uDVKmVwNmbXHDB7rNKqtpcT9VAsFHTJ5pPYxjyoBbNg',
+    decimals: TOKENS.STR.decimals
   },
   'USDT-USDC-V4': {
     symbol: 'USDT-USDC',
