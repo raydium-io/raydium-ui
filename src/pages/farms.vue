@@ -374,7 +374,7 @@ import {
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
 import { FarmInfo } from '@/utils/farms'
-import { deposit, depositV5, withdraw, withdrawV5 } from '@/utils/stake'
+import { deposit, depositV5, withdraw, withdrawV4, withdrawV5 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -796,6 +796,8 @@ export default Vue.extend({
               auxiliaryAccounts,
               amount
             )
+          : this.farmInfo.version === 4
+          ? withdrawV4(conn, wallet, this.farmInfo, lpAccount, rewardAccount, rewardAccountB, infoAccount, amount)
           : withdraw(conn, wallet, this.farmInfo, lpAccount, rewardAccount, infoAccount, auxiliaryAccounts, amount)
 
       withdrawPromise
