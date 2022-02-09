@@ -277,7 +277,7 @@ export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: stri
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
   for (const p of poolInfos) {
-    if (!(p.version === 4 && p.status === 1)) continue
+    if (!([4, 5].includes(p.version) && p.status === 1)) continue
     if ([fromCoinMint, toCoinMint].includes(p.coin.mintAddress) && routerCoinDefault.includes(p.pc.symbol)) {
       avaPools.push(p)
     } else if ([fromCoinMint, toCoinMint].includes(p.pc.mintAddress) && routerCoinDefault.includes(p.coin.symbol)) {
@@ -626,58 +626,120 @@ export async function swapRoute(
     [new PublicKey(poolInfoA.ammId).toBuffer(), new PublicKey(middleMint).toBuffer(), owner.toBuffer()],
     new PublicKey(ROUTE_SWAP_PROGRAM_ID)
   )
+  const pass = '11111111111111111111111111111111'
+  if (poolInfoA.version === 4)
+    transaction.add(
+      routeSwapInInstruction(
+        new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(poolInfoA.ammId),
+        new PublicKey(poolInfoB.ammId),
+        new PublicKey(poolInfoA.ammAuthority),
+        new PublicKey(poolInfoA.ammOpenOrders),
+        new PublicKey(poolInfoA.poolCoinTokenAccount),
+        new PublicKey(poolInfoA.poolPcTokenAccount),
+        new PublicKey(poolInfoA.serumProgramId),
+        new PublicKey(poolInfoA.serumMarket),
+        new PublicKey(poolInfoA.serumBids),
+        new PublicKey(poolInfoA.serumAsks),
+        new PublicKey(poolInfoA.serumEventQueue),
+        new PublicKey(poolInfoA.serumCoinVaultAccount),
+        new PublicKey(poolInfoA.serumPcVaultAccount),
+        new PublicKey(poolInfoA.serumVaultSigner),
 
-  transaction.add(
-    routeSwapInInstruction(
-      new PublicKey(ROUTE_SWAP_PROGRAM_ID),
-      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
-      new PublicKey(poolInfoA.ammId),
-      new PublicKey(poolInfoB.ammId),
-      new PublicKey(poolInfoA.ammAuthority),
-      new PublicKey(poolInfoA.ammOpenOrders),
-      new PublicKey(poolInfoA.ammTargetOrders),
-      new PublicKey(poolInfoA.poolCoinTokenAccount),
-      new PublicKey(poolInfoA.poolPcTokenAccount),
-      new PublicKey(poolInfoA.serumProgramId),
-      new PublicKey(poolInfoA.serumMarket),
-      new PublicKey(poolInfoA.serumBids),
-      new PublicKey(poolInfoA.serumAsks),
-      new PublicKey(poolInfoA.serumEventQueue),
-      new PublicKey(poolInfoA.serumCoinVaultAccount),
-      new PublicKey(poolInfoA.serumPcVaultAccount),
-      new PublicKey(poolInfoA.serumVaultSigner),
-
-      newFromTokenAccount,
-      newMiddleTokenAccount,
-      publicKey,
-      owner,
-      Math.floor(getBigNumber(amountIn.toWei()))
-    ),
-    routeSwapOutInstruction(
-      new PublicKey(ROUTE_SWAP_PROGRAM_ID),
-      new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
-      new PublicKey(poolInfoA.ammId),
-      new PublicKey(poolInfoB.ammId),
-      new PublicKey(poolInfoB.ammAuthority),
-      new PublicKey(poolInfoB.ammOpenOrders),
-      new PublicKey(poolInfoB.ammTargetOrders),
-      new PublicKey(poolInfoB.poolCoinTokenAccount),
-      new PublicKey(poolInfoB.poolPcTokenAccount),
-      new PublicKey(poolInfoB.serumProgramId),
-      new PublicKey(poolInfoB.serumMarket),
-      new PublicKey(poolInfoB.serumBids),
-      new PublicKey(poolInfoB.serumAsks),
-      new PublicKey(poolInfoB.serumEventQueue),
-      new PublicKey(poolInfoB.serumCoinVaultAccount),
-      new PublicKey(poolInfoB.serumPcVaultAccount),
-      new PublicKey(poolInfoB.serumVaultSigner),
-      newMiddleTokenAccount,
-      newToTokenAccount,
-      publicKey,
-      owner,
-      Math.floor(getBigNumber(amountOut.toWei()))
+        newFromTokenAccount,
+        newMiddleTokenAccount,
+        publicKey,
+        owner,
+        Math.floor(getBigNumber(amountIn.toWei())),
+        Math.floor(getBigNumber(amountOut.toWei()))
+      )
     )
-  )
+  if (poolInfoA.version === 5)
+    transaction.add(
+      routeStableSwapInInstruction(
+        new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(poolInfoA.ammId),
+        new PublicKey(poolInfoB.ammId),
+        new PublicKey(poolInfoA.ammAuthority),
+        new PublicKey(poolInfoA.ammOpenOrders),
+        new PublicKey(poolInfoA.poolCoinTokenAccount),
+        new PublicKey(poolInfoA.poolPcTokenAccount),
+        new PublicKey(poolInfoA.modelDataAccount),
+        new PublicKey(poolInfoA.serumProgramId),
+        new PublicKey(poolInfoA.serumMarket),
+        new PublicKey(poolInfoA.serumBids),
+        new PublicKey(poolInfoA.serumAsks),
+        new PublicKey(poolInfoA.serumEventQueue),
+        new PublicKey(pass),
+        new PublicKey(pass),
+        new PublicKey(pass),
+        // new PublicKey(poolInfoA.serumCoinVaultAccount),
+        // new PublicKey(poolInfoA.serumPcVaultAccount),
+        // new PublicKey(poolInfoA.serumVaultSigner),
+
+        newFromTokenAccount,
+        newMiddleTokenAccount,
+        publicKey,
+        owner,
+        Math.floor(getBigNumber(amountIn.toWei())),
+        Math.floor(getBigNumber(amountOut.toWei()))
+      )
+    )
+  if (poolInfoB.version === 4)
+    transaction.add(
+      routeSwapOutInstruction(
+        new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(poolInfoA.ammId),
+        new PublicKey(poolInfoB.ammId),
+        new PublicKey(poolInfoB.ammAuthority),
+        new PublicKey(poolInfoB.ammOpenOrders),
+        new PublicKey(poolInfoB.poolCoinTokenAccount),
+        new PublicKey(poolInfoB.poolPcTokenAccount),
+        new PublicKey(poolInfoB.serumProgramId),
+        new PublicKey(poolInfoB.serumMarket),
+        new PublicKey(poolInfoB.serumBids),
+        new PublicKey(poolInfoB.serumAsks),
+        new PublicKey(poolInfoB.serumEventQueue),
+        new PublicKey(poolInfoB.serumCoinVaultAccount),
+        new PublicKey(poolInfoB.serumPcVaultAccount),
+        new PublicKey(poolInfoB.serumVaultSigner),
+        newMiddleTokenAccount,
+        newToTokenAccount,
+        publicKey,
+        owner
+      )
+    )
+  if (poolInfoB.version === 5)
+    transaction.add(
+      routeSwapOutInstruction(
+        new PublicKey(ROUTE_SWAP_PROGRAM_ID),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(poolInfoA.ammId),
+        new PublicKey(poolInfoB.ammId),
+        new PublicKey(poolInfoB.ammAuthority),
+        new PublicKey(poolInfoB.ammOpenOrders),
+        new PublicKey(poolInfoB.poolCoinTokenAccount),
+        new PublicKey(poolInfoB.poolPcTokenAccount),
+        new PublicKey(poolInfoB.serumProgramId),
+        new PublicKey(poolInfoB.serumMarket),
+        new PublicKey(poolInfoB.serumBids),
+        new PublicKey(poolInfoB.serumAsks),
+        new PublicKey(poolInfoB.serumEventQueue),
+        new PublicKey(pass),
+        new PublicKey(pass),
+        new PublicKey(pass),
+        // new PublicKey(poolInfoB.serumCoinVaultAccount),
+        // new PublicKey(poolInfoB.serumPcVaultAccount),
+        // new PublicKey(poolInfoB.serumVaultSigner),
+        newMiddleTokenAccount,
+        newToTokenAccount,
+        publicKey,
+        owner
+      )
+    )
   return await sendTransaction(connection, wallet, transaction)
 }
 
@@ -1141,7 +1203,6 @@ export function routeSwapInInstruction(
   toAmmId: PublicKey,
   ammAuthority: PublicKey,
   ammOpenOrders: PublicKey,
-  _ammTargetOrders: PublicKey,
   poolCoinTokenAccount: PublicKey,
   poolPcTokenAccount: PublicKey,
   // serum
@@ -1160,9 +1221,10 @@ export function routeSwapInInstruction(
   userMiddleTokenAccount: PublicKey,
   userPdaAccount: PublicKey,
   userOwner: PublicKey,
-  amountIn: number
+  amountIn: number,
+  minimunAmountOut: number
 ): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), nu64('amountIn')])
+  const dataLayout = struct([u8('instruction'), nu64('amountIn'), nu64('minimunAmountOut')])
 
   const keys = [
     { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -1175,7 +1237,6 @@ export function routeSwapInInstruction(
     { pubkey: toAmmId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: false },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
-    // { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     // serum
@@ -1198,7 +1259,8 @@ export function routeSwapInInstruction(
   dataLayout.encode(
     {
       instruction: 0,
-      amountIn
+      amountIn,
+      minimunAmountOut
     },
     data
   )
@@ -1217,7 +1279,6 @@ export function routeSwapOutInstruction(
   toAmmId: PublicKey,
   ammAuthority: PublicKey,
   ammOpenOrders: PublicKey,
-  _ammTargetOrders: PublicKey,
   poolCoinTokenAccount: PublicKey,
   poolPcTokenAccount: PublicKey,
   // serum
@@ -1235,10 +1296,9 @@ export function routeSwapOutInstruction(
   userMiddleTokenAccount: PublicKey,
   userDestTokenAccount: PublicKey,
   userPdaAccount: PublicKey,
-  userOwner: PublicKey,
-  amountOut: number
+  userOwner: PublicKey
 ): TransactionInstruction {
-  const dataLayout = struct([u8('instruction'), nu64('amountOut')])
+  const dataLayout = struct([u8('instruction')])
 
   const keys = [
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -1249,7 +1309,6 @@ export function routeSwapOutInstruction(
     { pubkey: toAmmId, isSigner: false, isWritable: true },
     { pubkey: ammAuthority, isSigner: false, isWritable: false },
     { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
-    // { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
     { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
     // serum
@@ -1271,8 +1330,153 @@ export function routeSwapOutInstruction(
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: 1,
-      amountOut
+      instruction: 1
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function routeStableSwapInInstruction(
+  programId: PublicKey,
+  ammProgramId: PublicKey,
+  fromAmmId: PublicKey,
+  toAmmId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
+  serumEventQueue: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userSourceTokenAccount: PublicKey,
+  userMiddleTokenAccount: PublicKey,
+  userPdaAccount: PublicKey,
+  userOwner: PublicKey,
+  amountIn: number,
+  minimunAmountOut: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amountIn'), nu64('minimunAmountOut')])
+
+  const keys = [
+    { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
+    // spl token
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+
+    // amm
+    { pubkey: ammProgramId, isSigner: false, isWritable: false },
+    { pubkey: fromAmmId, isSigner: false, isWritable: true },
+    { pubkey: toAmmId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: true },
+    // serum
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumBids, isSigner: false, isWritable: true },
+    { pubkey: serumAsks, isSigner: false, isWritable: true },
+    { pubkey: serumEventQueue, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+
+    { pubkey: userSourceTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userMiddleTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPdaAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 2,
+      amountIn,
+      minimunAmountOut
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function routeStableSwapOutInstruction(
+  programId: PublicKey,
+  ammProgramId: PublicKey,
+  fromAmmId: PublicKey,
+  toAmmId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
+  serumEventQueue: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userMiddleTokenAccount: PublicKey,
+  userDestTokenAccount: PublicKey,
+  userPdaAccount: PublicKey,
+  userOwner: PublicKey
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+
+    // amm
+    { pubkey: ammProgramId, isSigner: false, isWritable: false },
+    { pubkey: fromAmmId, isSigner: false, isWritable: true },
+    { pubkey: toAmmId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: true },
+    // serum
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumBids, isSigner: false, isWritable: true },
+    { pubkey: serumAsks, isSigner: false, isWritable: true },
+    { pubkey: serumEventQueue, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+
+    { pubkey: userMiddleTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userDestTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPdaAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 3
     },
     data
   )

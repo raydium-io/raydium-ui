@@ -1332,19 +1332,18 @@ export default Vue.extend({
           }
         }
 
-        console.log(SERUM_PROGRAM_ID_V3)
-        // Promise.all(
-        //   marketAddress
-        //     .filter((itemMarket) => !Object.keys(this.market).includes(itemMarket))
-        //     .map((itemMarketAddress) =>
-        //       Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3))
-        //     )
-        // ).then((marketList) => {
-        //   marketList.forEach((itemMarket) => {
-        //     this.market[itemMarket.address.toString()] = { market: itemMarket }
-        //   })
-        //   this.getOrderBooks()
-        // })
+        Promise.all(
+          marketAddress
+            .filter((itemMarket) => !Object.keys(this.market).includes(itemMarket))
+            .map((itemMarketAddress) =>
+              Market.load(this.$web3, new PublicKey(itemMarketAddress), {}, new PublicKey(SERUM_PROGRAM_ID_V3))
+            )
+        ).then((marketList) => {
+          marketList.forEach((itemMarket) => {
+            this.market[itemMarket.address.toString()] = { market: itemMarket }
+          })
+          this.getOrderBooks()
+        })
       } else {
         this.market = {}
       }
@@ -1372,22 +1371,24 @@ export default Vue.extend({
         )
           .then((infos) => {
             infos.forEach((info) => {
-              if (info === null) return
+              try {
+                if (info === null) return
 
-              const address = info.publicKey.toString()
+                const address = info.publicKey.toString()
 
-              if (!asksAndBidsAddressToMarket[address]) return
-              const market = asksAndBidsAddressToMarket[address]
+                if (!asksAndBidsAddressToMarket[address]) return
+                const market = asksAndBidsAddressToMarket[address]
 
-              const orderbook = Orderbook.decode(this.market[market].market, info.account.data)
+                const orderbook = Orderbook.decode(this.market[market].market, info.account.data)
 
-              const { isBids, slab } = orderbook
+                const { isBids, slab } = orderbook
 
-              if (isBids) {
-                this.market[market].bids = slab
-              } else {
-                this.market[market].asks = slab
-              }
+                if (isBids) {
+                  this.market[market].bids = slab
+                } else {
+                  this.market[market].asks = slab
+                }
+              } catch (e) {}
             })
           })
           .finally(() => {
@@ -1506,21 +1507,13 @@ export default Vue.extend({
             } else {
               middleCoint = r[0].coin
             }
-            const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = getSwapOutAmount(
-              r[0],
-              this.fromCoin.mintAddress,
-              middleCoint.mintAddress,
-              this.fromCoinAmount,
-              slippage
-            )
+            const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = (
+              r[0].version === 4 ? getSwapOutAmount : getSwapOutAmountStable
+            )(r[0], this.fromCoin.mintAddress, middleCoint.mintAddress, this.fromCoinAmount, slippage)
 
-            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
-              r[1],
-              middleCoint.mintAddress,
-              this.toCoin.mintAddress,
-              amountOutWithSlippageA.fixed(),
-              slippage
-            )
+            const { amountOut, amountOutWithSlippage, priceImpact } = (
+              r[1].version === 4 ? getSwapOutAmount : getSwapOutAmountStable
+            )(r[1], middleCoint.mintAddress, this.toCoin.mintAddress, amountOutWithSlippageA.fixed(), slippage)
             const fAmountOut = parseFloat(amountOut.fixed())
             if (fAmountOut > maxAmountOut) {
               toCoinAmount = amountOut.fixed()
@@ -1551,11 +1544,14 @@ export default Vue.extend({
               usedAmmId = undefined
               middleCoinAmount = amountOutWithSlippageA.fixed()
               endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
+              if (r[0].version === 5 || r[1].version === 5) endpoint = 'stable ' + endpoint
               showMarket = undefined
             }
             console.log(
               'route -> ',
-              `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`,
+              `${r[0].version === 5 || r[1].version === 5 ? 'stable ' : ''}${this.fromCoin.symbol} > ${
+                middleCoint.symbol
+              } > ${this.toCoin.symbol}`,
               amountOut.fixed(),
               amountOutWithSlippage.fixed(),
               priceImpact / 100,

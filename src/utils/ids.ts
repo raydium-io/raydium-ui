@@ -17,7 +17,7 @@ export const LIQUIDITY_POOL_PROGRAM_ID_V5 = '5quBtoiQqxF9Jv6KYKctB59NT3gtJD2Y65k
 
 export const STABLE_POOL_PROGRAM_ID = '5quBtoiQqxF9Jv6KYKctB59NT3gtJD2Y65kdnB1Uev3h'
 
-export const ROUTE_SWAP_PROGRAM_ID = '93BgeoLHo5AdNbpqy9bD12dtfxtA5M2fh3rj72bE35Y3'
+export const ROUTE_SWAP_PROGRAM_ID = 'FmALuLTNk4PjLeNY2CnM55MyiK2Df9oJs5uSPwEsz8tv'
 
 export const STAKE_PROGRAM_ID = 'EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q'
 export const STAKE_PROGRAM_ID_V4 = 'CBuCnLe26faBpcBP2fktp4rp8abpcAnTWft6ZrP5Q4T'
