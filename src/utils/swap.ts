@@ -627,7 +627,6 @@ export async function swapRoute(
     [new PublicKey(poolInfoA.ammId).toBuffer(), new PublicKey(middleMint).toBuffer(), owner.toBuffer()],
     new PublicKey(ROUTE_SWAP_PROGRAM_ID)
   )
-  const pass = '11111111111111111111111111111111'
   if (poolInfoA.version === 4)
     transaction.add(
       routeSwapInInstruction(
@@ -673,9 +672,9 @@ export async function swapRoute(
         new PublicKey(poolInfoA.serumBids),
         new PublicKey(poolInfoA.serumAsks),
         new PublicKey(poolInfoA.serumEventQueue),
-        new PublicKey(pass),
-        new PublicKey(pass),
-        new PublicKey(pass),
+        PublicKey.default,
+        PublicKey.default,
+        PublicKey.default,
         // new PublicKey(poolInfoA.serumCoinVaultAccount),
         // new PublicKey(poolInfoA.serumPcVaultAccount),
         // new PublicKey(poolInfoA.serumVaultSigner),
@@ -729,9 +728,9 @@ export async function swapRoute(
         new PublicKey(poolInfoB.serumBids),
         new PublicKey(poolInfoB.serumAsks),
         new PublicKey(poolInfoB.serumEventQueue),
-        new PublicKey(pass),
-        new PublicKey(pass),
-        new PublicKey(pass),
+        PublicKey.default,
+        PublicKey.default,
+        PublicKey.default,
         // new PublicKey(poolInfoB.serumCoinVaultAccount),
         // new PublicKey(poolInfoB.serumPcVaultAccount),
         // new PublicKey(poolInfoB.serumVaultSigner),
