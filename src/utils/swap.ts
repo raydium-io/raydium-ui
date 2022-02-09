@@ -18,6 +18,7 @@ import {
 } from '@/utils/web3'
 import {
   LIQUIDITY_POOL_PROGRAM_ID_V4,
+  LIQUIDITY_POOL_PROGRAM_ID_V5,
   MEMO_PROGRAM_ID,
   ROUTE_SWAP_PROGRAM_ID,
   SERUM_PROGRAM_ID_V3,
@@ -659,7 +660,7 @@ export async function swapRoute(
     transaction.add(
       routeStableSwapInInstruction(
         new PublicKey(ROUTE_SWAP_PROGRAM_ID),
-        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V5),
         new PublicKey(poolInfoA.ammId),
         new PublicKey(poolInfoB.ammId),
         new PublicKey(poolInfoA.ammAuthority),
@@ -716,7 +717,7 @@ export async function swapRoute(
     transaction.add(
       routeSwapOutInstruction(
         new PublicKey(ROUTE_SWAP_PROGRAM_ID),
-        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
+        new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V5),
         new PublicKey(poolInfoA.ammId),
         new PublicKey(poolInfoB.ammId),
         new PublicKey(poolInfoB.ammAuthority),
