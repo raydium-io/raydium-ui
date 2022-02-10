@@ -714,7 +714,7 @@ export async function swapRoute(
     )
   if (poolInfoB.version === 5)
     transaction.add(
-      routeSwapOutInstruction(
+      routeStableSwapOutInstruction(
         new PublicKey(ROUTE_SWAP_PROGRAM_ID),
         new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V5),
         new PublicKey(poolInfoA.ammId),
@@ -723,6 +723,7 @@ export async function swapRoute(
         new PublicKey(poolInfoB.ammOpenOrders),
         new PublicKey(poolInfoB.poolCoinTokenAccount),
         new PublicKey(poolInfoB.poolPcTokenAccount),
+        new PublicKey(poolInfoA.modelDataAccount),
         new PublicKey(poolInfoB.serumProgramId),
         new PublicKey(poolInfoB.serumMarket),
         new PublicKey(poolInfoB.serumBids),
