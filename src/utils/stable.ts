@@ -101,6 +101,9 @@ function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
 }
 
 export function getDxByDy(k: number, x: number, y: number, dy: number): number {
+  if (x < y) {
+    return getDyByDx(k, y, x, dy)
+  }
   const y0 = Math.sqrt(k)
   if (dy <= 0) {
     if (-dy > y) return 0 // error
@@ -121,6 +124,9 @@ export function getDxByDy(k: number, x: number, y: number, dy: number): number {
 }
 
 export function getDyByDx(k: number, x: number, y: number, dx: number): number {
+  if (x < y) {
+    return getDxByDy(k, y, x, dx)
+  }
   const y0 = Math.sqrt(k)
   if (dx >= 0) {
     const dy = cD(k, dx, x, y, true)
