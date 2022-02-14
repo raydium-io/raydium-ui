@@ -1326,6 +1326,13 @@ export const TOKENS: Tokens = {
     mintAddress: '5LSFpvLDkcdV2a3Kiyzmg5YmJsj2XDLySaXvnfP1cgLT',
     decimals: 6,
     tags: ['raydium']
+  },
+  SEEDED: {
+    symbol: 'SEEDED',
+    name: 'SEEDED',
+    mintAddress: 'seedEDBqu63tJ7PFqvcbwvThrYUkQeqT6NLf81kLibs',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2933,6 +2940,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '8uDVKmVwNmbXHDB7rNKqtpcT9VAsFHTJ5pPYxjyoBbNg',
     decimals: TOKENS.STR.decimals
+  },
+  'SEEDED-USDC-V4': {
+    symbol: 'SEEDED-USDC',
+    name: 'SEEDED-USDC LP',
+    coin: { ...TOKENS.SEEDED },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '5XwLgkEZYuMai7D5tRv4kseYjvisqztdotuWGvyo3aBn',
+    decimals: TOKENS.SEEDED.decimals
   }
 }
 
