@@ -1336,19 +1336,9 @@ export const TOKENS: Tokens = {
   },
      FYFY: {
     symbol: 'FYFY',
-    name: 'FYFY',
+    name: 'FYFY Token',
     mintAddress: 'vkG3Qrz6vCWjzDt5yCLEKYMYZ8hFZ27dmKe92btaZE3',
     decimals: 9,
-    details:
-      'Fyfy is a B2B (Business to Business), B2C (Business to Customer), and P2P (Peer-to-peer) Solana blockchain-based ecosystem, which offers fast, low-cost, user-friendly, and secure transactions of digital assets.',
-    docs: {
-      website: 'https://www.fyfy.io/'
-    },
-    socials: {
-      Twitter: 'https://twitter.com/fyfy.io',
-      Medium: 'https://fyfy-io.medium.com',
-      Discord: 'https://discord.gg/mFHvP2e8'
-    },
     tags: ['raydium']
   },
   }
