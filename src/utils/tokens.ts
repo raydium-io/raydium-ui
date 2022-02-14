@@ -1339,7 +1339,6 @@ export const TOKENS: Tokens = {
     name: 'FYFY',
     mintAddress: 'vkG3Qrz6vCWjzDt5yCLEKYMYZ8hFZ27dmKe92btaZE3',
     decimals: 9,
-    referrer: 'CQzK6MWycRhYjrgdTjwzLRoQM3wWrHXzqY6D8JBrhrUu',
     details:
       'Fyfy is a B2B (Business to Business), B2C (Business to Customer), and P2P (Peer-to-peer) Solana blockchain-based ecosystem, which offers fast, low-cost, user-friendly, and secure transactions of digital assets.',
     docs: {
