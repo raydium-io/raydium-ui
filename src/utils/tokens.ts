@@ -1333,6 +1333,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'seedEDBqu63tJ7PFqvcbwvThrYUkQeqT6NLf81kLibs',
     decimals: 9,
     tags: ['raydium']
+  },
+  PUFF: {
+    symbol: 'PUFF',
+    name: 'PUFF',
+    mintAddress: 'G9tt98aYSznRk7jWsfuz9FnTdokxS6Brohdo9hSmjTRB',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -2949,6 +2956,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5XwLgkEZYuMai7D5tRv4kseYjvisqztdotuWGvyo3aBn',
     decimals: TOKENS.SEEDED.decimals
+  },
+  'PUFF-USDC-V4': {
+    symbol: 'PUFF-USDC',
+    name: 'PUFF-USDC LP',
+    coin: { ...TOKENS.PUFF },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'Aox49moN6MugLheGwqMBTLi7aFojfhtiLxtHsaQzJgoh',
+    decimals: TOKENS.PUFF.decimals
   }
 }
 
