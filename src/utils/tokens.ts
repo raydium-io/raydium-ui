@@ -1333,6 +1333,14 @@ export const TOKENS: Tokens = {
     mintAddress: 'seedEDBqu63tJ7PFqvcbwvThrYUkQeqT6NLf81kLibs',
     decimals: 9,
     tags: ['raydium']
+  },
+     FYFY: {
+    symbol: 'FYFY',
+    name: 'FYFY Token',
+    mintAddress: 'vkG3Qrz6vCWjzDt5yCLEKYMYZ8hFZ27dmKe92btaZE3',
+    decimals: 9,
+    tags: ['raydium']
+  },
   }
 }
 
