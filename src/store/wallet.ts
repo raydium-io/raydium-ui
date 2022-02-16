@@ -144,7 +144,7 @@ export const actions = actionTree(
                   balance
                 }
               } else if (parsedInfo.tokenAmount.uiAmount > 0) {
-                if (!noATAMint.includes(tokenAccountAddress)) {
+                if (!noATAMint.includes(mintAddress)) {
                   auxiliaryTokenAccounts.push(tokenAccountInfo)
                 }
               }
