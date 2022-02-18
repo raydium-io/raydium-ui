@@ -2374,6 +2374,26 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: 'HgYm9rYe2ge7tfBwCTW8tPALUiFvroKHmoT3uCr6gs1g',
     poolRewardTokenAccount: '9qjSAs3qTpwmp3o78hR9F7guE19XP5UW3beYZmf1RWkY',
     poolRewardTokenAccountB: '6Z1472qQwjCK8msDELY4ZVBcAFCbfwGtKyzZwHQCiAd8'
+  },
+  {
+    name: 'FUJI-SOL',
+    lp: { ...LP_TOKENS['FUJI-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.FUJI },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    lpMint: 'CugVqB1qaCtQ9ZNbRM153azxHtU9ueYyxWWQ3uG2NnP7',
+    poolId: '3r8spCbDiNeMxyru5CJCCo2sNX851pEzwAg5YioJsryT',
+    poolAuthority: '4cRonzFNe1cY4AfuB3peCjuBm5igFH3sRE4UPJbR3tiK',
+    poolLpTokenAccount: '3Lq22VxvF61wdwJ7GAPMhxCfvhAdbfB1LwSoAWhYnH3C',
+    poolRewardTokenAccount: 'GZ3ZpupSAodCjDpXBg2xq9uScA2iaXgPs5M4mckPf2E7',
+    poolRewardTokenAccountB: 'HdwutyRUYNUWumWnMNEN4TYooHnyijemMQeNZvukMFKg'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 

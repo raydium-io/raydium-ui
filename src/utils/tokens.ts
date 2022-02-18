@@ -1347,6 +1347,13 @@ export const TOKENS: Tokens = {
     mintAddress: '9LzCMqDgTKYz9Drzqnpgee3SGa89up3a247ypMj2xrqM',
     decimals: 8,
     tags: ['raydium']
+  },
+  FUJI: {
+    symbol: 'FUJI',
+    name: 'FUJI',
+    mintAddress: 'fujiCeCeP9AFDVCv27P5JRcKLoH7wfs2C9xmDECs24m',
+    decimals: 3,
+    tags: ['raydium']
   }
 }
 
@@ -2972,6 +2979,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'Aox49moN6MugLheGwqMBTLi7aFojfhtiLxtHsaQzJgoh',
     decimals: TOKENS.PUFF.decimals
+  },
+  'FUJI-SOL-V4': {
+    symbol: 'FUJI-SOL',
+    name: 'FUJI-SOL LP',
+    coin: { ...TOKENS.FUJI },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'CugVqB1qaCtQ9ZNbRM153azxHtU9ueYyxWWQ3uG2NnP7',
+    decimals: TOKENS.FUJI.decimals
   }
 }
 
