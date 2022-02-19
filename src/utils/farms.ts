@@ -2388,7 +2388,6 @@ export const FARMS: FarmInfo[] = [
     version: 5,
     programId: STAKE_PROGRAM_ID_V5,
 
-    lpMint: 'CugVqB1qaCtQ9ZNbRM153azxHtU9ueYyxWWQ3uG2NnP7',
     poolId: '3r8spCbDiNeMxyru5CJCCo2sNX851pEzwAg5YioJsryT',
     poolAuthority: '4cRonzFNe1cY4AfuB3peCjuBm5igFH3sRE4UPJbR3tiK',
     poolLpTokenAccount: '3Lq22VxvF61wdwJ7GAPMhxCfvhAdbfB1LwSoAWhYnH3C',
