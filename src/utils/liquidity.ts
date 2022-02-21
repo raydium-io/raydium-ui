@@ -97,7 +97,8 @@ export function getOutAmountStable(
   const y = poolInfo.pc.balance?.toEther()
   if (!currentK || !x || !y) return new BigNumber(0)
 
-  const price = getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
+  const price = y.dividedBy(x).toNumber()
+  //  getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
 
