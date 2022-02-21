@@ -1354,6 +1354,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'fujiCeCeP9AFDVCv27P5JRcKLoH7wfs2C9xmDECs24m',
     decimals: 3,
     tags: ['raydium']
+  },
+  NINJA: {
+    symbol: 'NINJA',
+    name: 'NINJA',
+    mintAddress: 'FgX1WD9WzMU3yLwXaFSarPfkgzjLb2DZCqmkx9ExpuvJ',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -2988,6 +2995,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'CugVqB1qaCtQ9ZNbRM153azxHtU9ueYyxWWQ3uG2NnP7',
     decimals: TOKENS.FUJI.decimals
+  },
+  'NINJA-USDC-V4': {
+    symbol: 'NINJA-USDC',
+    name: 'NINJA-USDC LP',
+    coin: { ...TOKENS.NINJA },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '4UTG7MGS7AgeRpGGZg9RmrPzByhQTnzZty9oVRt1SbdH',
+    decimals: TOKENS.NINJA.decimals
   }
 }
 

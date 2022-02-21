@@ -2393,6 +2393,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '3Lq22VxvF61wdwJ7GAPMhxCfvhAdbfB1LwSoAWhYnH3C',
     poolRewardTokenAccount: 'GZ3ZpupSAodCjDpXBg2xq9uScA2iaXgPs5M4mckPf2E7',
     poolRewardTokenAccountB: 'HdwutyRUYNUWumWnMNEN4TYooHnyijemMQeNZvukMFKg'
+  },
+  {
+    name: 'NINJA-USDC',
+    lp: { ...LP_TOKENS['NINJA-USDC-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.NINJA },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '5vkuK285fSgL3tjvNTYgiJnKA7MifVeQ5zSkUFEGXCJ3',
+    poolAuthority: 'DsKfKaQw4booMDdWFCQbidbqVwd87SUU2vWbYdSpLmnx',
+    poolLpTokenAccount: '9TepjQWuP5P4PsvvvULVMYJtPQ6NBMEPqikGPL6549nV',
+    poolRewardTokenAccount: 'PK5KVHsnadvVvKz4r2mta7FtPGVndx6TYjEbkBtENX5',
+    poolRewardTokenAccountB: 'Ae7VfWmYx8FBrZDx9xtbcD45L2D4MHZCiTbu7vTdWQdV'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
