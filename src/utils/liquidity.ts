@@ -30,20 +30,19 @@ export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMi
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo
 
-  if (!coin.balance || !pc.balance) {
+  if (!coin.balance || !pc.balance || !poolInfo.modelData) {
     return new BigNumber(0)
   }
 
   if (poolInfo.version === 5) {
-    const currentK = poolInfo.currentK
     const x = poolInfo.coin.balance?.toEther()
     const y = poolInfo.pc.balance?.toEther()
-    if (!currentK || !x || !y) return new BigNumber(0)
+    if (!x || !y) return new BigNumber(0)
 
     if (coinBase) {
-      return getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
+      return getStablePrice(poolInfo.modelData, x.toNumber(), y.toNumber(), true)
     } else {
-      return getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), false)
+      return getStablePrice(poolInfo.modelData, x.toNumber(), y.toNumber(), false)
     }
   } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())

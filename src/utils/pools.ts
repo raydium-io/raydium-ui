@@ -13,6 +13,7 @@ import {
 } from './ids'
 import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from './tokens'
 import BigNumber from 'bignumber.js'
+import { stableModelLayout } from './stable'
 
 export interface LiquidityPoolInfo {
   name: string
@@ -54,6 +55,8 @@ export interface LiquidityPoolInfo {
   }
 
   modelDataAccount?: string
+
+  modelData?: stableModelLayout
 }
 
 /**

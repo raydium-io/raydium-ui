@@ -1,175 +1,292 @@
-import BigNumber from 'bignumber.js'
+// @ts-ignore
+import { struct, seq } from 'buffer-layout'
+import { u64 } from '@project-serum/borsh'
 
-const Gn = 150
-const Geps = 10 ** -6
+const ELEMENT_SIZE = 50000
+export const DataElement: struct = struct([u64('x'), u64('y'), u64('price')])
 
-export function cK(xBase: BigNumber, yBase: BigNumber) {
-  const n = new BigNumber(Gn)
-  const x = new BigNumber(xBase.gt(yBase) ? xBase : yBase)
-  const y = new BigNumber(xBase.lt(yBase) ? xBase : yBase)
+export const ModelDataInfo = struct([
+  u64('accountType'),
+  u64('status'),
+  u64('multiplier'),
+  u64('validDataCount'),
+  seq(DataElement, ELEMENT_SIZE, 'DataElement')
+])
 
-  let max = new BigNumber(x)
-  let min = new BigNumber(y)
-  let mid = new BigNumber(max).plus(min).dividedBy(2)
-  let left = getCurKLeft(mid, y)
-  let right = getCurKRight(n, x, y, mid)
-  let count = 0
+export interface stableModelLayout {
+  accountType: number
+  status: number
+  multiplier: number
+  validDataCount: number
+  DataElement: { x: number; y: number; price: number }[]
+}
 
-  while (left.minus(right).abs().gt(Geps)) {
-    if (left.gt(right)) {
-      max = mid
+function estimateRangeByXyReal(_xReal: number, _yReal: number) {
+  return [0, ELEMENT_SIZE - 2]
+}
+
+function estimateRangeByX(_x: number) {
+  return [0, ELEMENT_SIZE - 2]
+}
+
+function estimateRangeByY(_y: number) {
+  return [0, ELEMENT_SIZE - 2]
+}
+
+function getMininumRangeByXyReal(
+  layoutData: stableModelLayout,
+  xReal: number,
+  yReal: number
+): [number, number, boolean] {
+  const [min, max] = estimateRangeByXyReal(xReal, yReal)
+  let minRangeIdx = min
+  let maxRangeIdx = max
+  let mid = 0
+  const target = (xReal * layoutData.multiplier) / yReal
+  while (minRangeIdx <= maxRangeIdx) {
+    mid = Math.floor((maxRangeIdx + minRangeIdx) / 2)
+    if (mid === 0 || mid >= ELEMENT_SIZE - 2) {
+      return [mid, mid, false]
+    }
+    const cur = (layoutData.DataElement[mid].x * layoutData.multiplier) / layoutData.DataElement[mid].y
+    const left = (layoutData.DataElement[mid - 1].x * layoutData.multiplier) / layoutData.DataElement[mid - 1].y
+    const right = (layoutData.DataElement[mid + 1].x * layoutData.multiplier) / layoutData.DataElement[mid + 1].y
+
+    if (target === cur) {
+      return [mid, mid, true]
+    } else if (target === left) {
+      return [mid - 1, mid - 1, true]
+    } else if (target === right) {
+      return [mid + 1, mid + 1, true]
+    } else if (target < left) {
+      maxRangeIdx = mid - 1
+    } else if (target > left && target < cur) {
+      return [mid - 1, mid, true]
+    } else if (target > cur && target < right) {
+      return [mid, mid + 1, true]
     } else {
-      min = mid
+      minRangeIdx = mid + 1
     }
-    mid = new BigNumber(max).plus(min).dividedBy(2)
-    left = getCurKLeft(mid, y)
-    right = getCurKRight(n, x, y, mid)
-    if (count++ > 1000) break
+  }
+  return [mid, mid, false]
+}
+function getRatio(layoutData: stableModelLayout, xReal: number, yReal: number) {
+  const [minRangeIdx, maxRangeIdx, find] = getMininumRangeByXyReal(layoutData, xReal, yReal)
+
+  if (!find) {
+    return 0
   }
 
-  return mid.multipliedBy(mid)
-}
-
-function getCurKLeft(mid: BigNumber, y: BigNumber) {
-  return new BigNumber(mid).multipliedBy(mid).dividedBy(y).dividedBy(y)
-}
-function getCurKRight(n: BigNumber, x: BigNumber, y: BigNumber, mid: BigNumber) {
-  const data = new BigNumber(n)
-    .minus(1)
-    .multipliedBy(new BigNumber(y).minus(mid))
-    .multipliedBy(new BigNumber(y).minus(mid))
-    .dividedBy(new BigNumber(x).minus(mid))
-    .dividedBy(new BigNumber(x).minus(mid))
-  return new BigNumber(n).minus(data)
-}
-
-export function getStablePrice(k: number, x: number, y: number, baseIn: boolean) {
-  let price
-  if (x <= y) {
-    price = Math.sqrt((Gn * x ** 2 - k) / ((Gn - 1) * x ** 2))
+  if (minRangeIdx === maxRangeIdx) {
+    const x = layoutData.DataElement[minRangeIdx].x
+    const ratio = (xReal * layoutData.multiplier) / x
+    return ratio
   } else {
-    price = Math.sqrt(((Gn - 1) * y ** 2) / (Gn * y ** 2 - k))
-  }
-  if (baseIn) {
-    return price
-  } else {
-    return 1 / price
+    const x1 = layoutData.DataElement[minRangeIdx].x
+    const y1 = layoutData.DataElement[minRangeIdx].y
+    const x2 = layoutData.DataElement[maxRangeIdx].x
+    const y2 = layoutData.DataElement[maxRangeIdx].y
+
+    const xDenominator = yReal * (x2 * y1 - x1 * y2)
+    const xNumerator1 = x1 * xDenominator
+    const xNumerator2 = (x2 - x1) * (xReal * y1 - x1 * yReal) * y2
+
+    const xNumerator = xNumerator1 + xNumerator2
+    const ratio = (xReal * layoutData.multiplier * xDenominator) / xNumerator
+    return ratio
   }
 }
 
-function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
-  let maxFlag = x > y ? x : y
-  maxFlag = maxFlag > dx ? maxFlag : dx
+function realToTable(layoutData: stableModelLayout, realValue: number, ratio: number): number {
+  return (realValue * layoutData.multiplier) / ratio
+}
 
-  let min = -maxFlag
-  if (flag) {
-    const temp = Math.sqrt(k / Gn) - y
-    min = min > temp ? min : temp
-  }
-  let max = maxFlag
-  let mid = (min + max) / 2
+function tableToReal(layoutData: stableModelLayout, tableValue: number, ratio: number): number {
+  return (tableValue * ratio) / layoutData.multiplier
+}
 
-  const left = dx
-  let rightLeft = 0
-  let rightMid = 0
-  let rightRight = 0
+function getMinimumRangeByX(layoutData: stableModelLayout, x: number): [number, number, boolean] {
+  const [min, max] = estimateRangeByX(x)
+  let minRangeIdx = min
+  let maxRangeIdx = max
+  let mid = 0
+  const target = x
+  while (minRangeIdx < maxRangeIdx) {
+    mid = Math.floor((maxRangeIdx + minRangeIdx) / 2)
 
-  let tempEps = Geps + 1
-
-  let count = 0
-  while (tempEps > Geps && min !== max) {
-    count++
-    mid = (min + max) / 2
-    let temp = Gn - k / (flag ? y + min : y) ** 2
-    temp = temp > 0 ? temp : 0
-    rightLeft = -min * Math.sqrt((Gn - 1) / temp)
-    rightMid = -mid * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + mid : y) ** 2))
-    rightRight = -max * Math.sqrt((Gn - 1) / (Gn - k / (flag ? y + max : y) ** 2))
-
-    if ((rightLeft < left && left < rightMid) || (rightLeft > left && left > rightMid)) {
-      max = mid
-    } else if ((rightMid < left && left < rightRight) || (rightMid > left && left > rightRight)) {
-      min = mid
+    if (mid <= 0 || mid > ELEMENT_SIZE - 2) {
+      return [mid, mid, false]
     }
-    if (Math.abs(Math.abs(left) - Math.abs(rightMid)) === tempEps) {
-      console.log('last while -> ', count)
-      break
+    const cur = layoutData.DataElement[mid].x
+    const left = layoutData.DataElement[mid - 1].x
+    const right = layoutData.DataElement[mid + 1].x
+
+    if (target === cur) return [mid, mid, true]
+    else if (target === left) return [mid - 1, mid - 1, true]
+    else if (target === right) return [mid + 1, mid + 1, true]
+    else if (target < left) maxRangeIdx = mid - 1
+    else if (target > left && target < cur) return [mid - 1, mid, true]
+    else if (target > cur && target < right) return [mid, mid + 1, true]
+    else minRangeIdx = mid + 1
+  }
+  return [mid, mid, false]
+}
+
+function getMinimumRangeByY(layoutData: stableModelLayout, y: number): [number, number, boolean] {
+  const [min, max] = estimateRangeByY(y)
+  let minRangeIdx = min
+  let maxRangeIdx = max
+  let mid = 0
+  const target = y
+  while (minRangeIdx <= maxRangeIdx) {
+    mid = Math.floor((maxRangeIdx + minRangeIdx) / 2)
+    if (mid <= 0 || mid >= ELEMENT_SIZE - 2) {
+      return [mid, mid, false]
     }
-    tempEps = Math.abs(Math.abs(left) - Math.abs(rightMid))
+
+    const cur = layoutData.DataElement[mid].y
+    const left = layoutData.DataElement[mid - 1].y
+    const right = layoutData.DataElement[mid + 1].y
+    if (target === cur) return [mid, mid, true]
+    else if (target === left) return [mid - 1, mid - 1, true]
+    else if (target === right) return [mid + 1, mid + 1, true]
+    else if (target < right) {
+      minRangeIdx = mid + 1
+    } else if (target < left && target > cur) return [mid - 1, mid, true]
+    else if (target < cur && target > right) return [mid, mid + 1, true]
+    else maxRangeIdx = mid - 1
   }
-  return mid
+  return [mid, mid, false]
 }
 
-function getDxByDy(k: number, x: number, y: number, dy: number): number {
-  if (x < y) {
-    return getDyByDx(k, y, x, dy)
+function getDataByX(
+  layoutData: stableModelLayout,
+  x: number,
+  dx: number,
+  priceUp: boolean
+): [number, number, boolean, boolean] {
+  const xWithDx = priceUp ? x + dx : x - dx
+  const [minIdx, maxIdx, find] = getMinimumRangeByX(layoutData, xWithDx)
+  if (!find) return [0, 0, false, find]
+
+  if (minIdx === maxIdx) return [layoutData.DataElement[maxIdx].price, layoutData.DataElement[maxIdx].y, false, find]
+  else {
+    const x1 = layoutData.DataElement[minIdx].x
+    const x2 = layoutData.DataElement[maxIdx].x
+    const p1 = layoutData.DataElement[minIdx].price
+    const p2 = layoutData.DataElement[maxIdx].price
+    const y1 = layoutData.DataElement[minIdx].y
+    const y2 = layoutData.DataElement[maxIdx].y
+
+    if (x >= x1 && x <= x2) {
+      if (priceUp) return [p2, y2, true, find]
+      else return [p1, y1, true, find]
+    } else {
+      let p, y
+      if (priceUp) {
+        p = p1 + ((p2 - p1) * (x - x1)) / (x2 - x1)
+        y = y1 - ((xWithDx - x1) * layoutData.multiplier) / p2
+      } else {
+        p = p1 + ((p2 - p1) * (x - x1)) / (x2 - x1)
+        y = y2 + ((x2 - xWithDx) * layoutData.multiplier) / p1
+      }
+      return [p, y, false, find]
+    }
   }
-  const y0 = Math.sqrt(k)
-  if (dy <= 0) {
-    if (-dy > y) return 0 // error
-    const dx = -dy * Math.sqrt((Gn - 1) / (Gn - k / (y + dy) ** 2))
-    return dx
-  } else if (y + dy <= y0) {
-    y = y + dy
-    dy = -dy
-    let dx = -dy * Math.sqrt((Gn - 1) / (Gn - k / (y + dy) ** 2))
-    dx = -dx
-    return dx
+}
+
+function getDataByY(
+  layoutData: stableModelLayout,
+  y: number,
+  dy: number,
+  priceUp: boolean
+): [number, number, boolean, boolean] {
+  const yWithDy = priceUp ? y - dy : y + dy
+  const [minIdx, maxIdx, find] = getMinimumRangeByY(layoutData, yWithDy)
+  if (!find) return [0, 0, false, find]
+  if (minIdx === maxIdx) return [layoutData.DataElement[maxIdx].price, layoutData.DataElement[maxIdx].x, false, find]
+  else {
+    const x1 = layoutData.DataElement[minIdx].x
+    const x2 = layoutData.DataElement[maxIdx].x
+    const p1 = layoutData.DataElement[minIdx].price
+    const p2 = layoutData.DataElement[maxIdx].price
+    const y1 = layoutData.DataElement[minIdx].y
+    const y2 = layoutData.DataElement[maxIdx].y
+
+    if (y >= y2 && y <= y1) {
+      return priceUp ? [p2, x2, true, find] : [p1, x1, true, find]
+    } else {
+      let p, x
+      if (priceUp) {
+        p = p1 + ((p2 - p1) * (y1 - y)) / (y1 - y2)
+        x = x1 + (p2 * (y1 - yWithDy)) / layoutData.multiplier
+      } else {
+        p = p1 + ((p2 - p1) * (y1 - y)) / (y1 - y2)
+        x = x2 - (p1 * (yWithDy - y2)) / layoutData.multiplier
+      }
+      return [p, x, false, find]
+    }
+  }
+}
+
+function getMidPrice(layoutData: stableModelLayout, x: number): number {
+  const ret = getDataByX(layoutData, x, 0, false)
+  if (ret[3]) return ret[0]
+  else return 0
+}
+
+export function getDyByDxBaseIn(layoutData: stableModelLayout, xReal: number, yReal: number, dxReal: number) {
+  const ratio = getRatio(layoutData, xReal, yReal)
+  const x = realToTable(layoutData, xReal, ratio)
+  const y = realToTable(layoutData, yReal, ratio)
+  const dx = realToTable(layoutData, dxReal, ratio)
+  const priceUp = true
+  const [p, y2, lessTrade, find] = getDataByX(layoutData, x, dx, priceUp)
+  if (!find) return 0
+  if (lessTrade) {
+    const dyReal = (dxReal * layoutData.multiplier) / p
+    return dyReal
   } else {
-    const dx1 = y0 - x
-    const dy2 = dy - (y0 - y)
-    const dx2 = getDyByDx(k, y0, y0, dy2)
-    return dx1 + dx2
+    const dy = y - y2
+    const dyReal = tableToReal(layoutData, dy, ratio)
+    return dyReal
   }
 }
 
-function getDyByDx(k: number, x: number, y: number, dx: number): number {
-  if (x < y) {
-    return getDxByDy(k, y, x, dx)
-  }
-  const y0 = Math.sqrt(k)
-  if (dx >= 0) {
-    const dy = cD(k, dx, x, y, true)
-    return dy
-  } else if (x + dx >= y0) {
-    x = x + dx
-    dx = -dx
-    const dy = -cD(k, dx, x, y, false)
-    return dy
+export function getDxByDyBaseIn(layoutData: stableModelLayout, xReal: number, yReal: number, dyReal: number) {
+  const ratio = getRatio(layoutData, xReal, yReal)
+  const x = realToTable(layoutData, xReal, ratio)
+  const y = realToTable(layoutData, yReal, ratio)
+  const dy = realToTable(layoutData, dyReal, ratio)
+  const priceUp = false
+  const [p, x2, lessTrade, find] = getDataByY(layoutData, y, dy, priceUp)
+  if (!find) return 0
+  if (lessTrade) {
+    const dxReal = (dyReal * p) / layoutData.multiplier
+    return dxReal
   } else {
-    const dy1 = y0 - y
-    const dx2 = dx - (y0 - x)
-    const dy2 = getDxByDy(k, y0, y0, dx2)
-    return dy1 + dy2
+    const dx = x - x2
+    const dxReal = tableToReal(layoutData, dx, ratio)
+    return dxReal
   }
 }
 
-export function getDxByDyOut(k: number, x: number, y: number, dy: number): number {
-  const itemMax = y / 1000
-  let totalOut = 0
-  while (dy > 0) {
-    const itemDy = dy < itemMax ? dy : itemMax
-    const dx1 = getDxByDy(k, x, y, itemDy)
-
-    dy -= itemDy
-    x += dx1
-    y += itemDy
-    totalOut += dx1
+export function formatLayout(buffer: Buffer): stableModelLayout {
+  const layoutInfo = ModelDataInfo.decode(buffer)
+  return {
+    accountType: layoutInfo.accountType.toNumber(),
+    status: layoutInfo.status.toNumber(),
+    multiplier: layoutInfo.multiplier.toNumber(),
+    validDataCount: layoutInfo.validDataCount.toNumber(),
+    DataElement: layoutInfo.DataElement.map((item: any) => ({
+      x: item.x.toNumber(),
+      y: item.y.toNumber(),
+      price: item.price.toNumber()
+    }))
   }
-  return totalOut
 }
 
-export function getDyByDxOut(k: number, x: number, y: number, dx: number): number {
-  const itemMax = x / 1000
-  let totalOut = 0
-  while (dx > 0) {
-    const itemDx = dx < itemMax ? dx : itemMax
-    const dy1 = getDyByDx(k, x, y, itemDx)
-
-    dx -= itemDx
-    x += itemDx
-    y += dy1
-    totalOut += dy1
-  }
-  return totalOut
+export function getStablePrice(layoutData: stableModelLayout, coinReal: number, pcReal: number, baseCoin: boolean) {
+  const price = getMidPrice(layoutData, realToTable(layoutData, coinReal, getRatio(layoutData, coinReal, pcReal)))
+  return baseCoin ? price : 1 / price
 }

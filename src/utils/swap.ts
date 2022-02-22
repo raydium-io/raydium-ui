@@ -29,7 +29,7 @@ import { getBigNumber } from './layouts'
 import { LiquidityPoolInfo } from './pools'
 // eslint-disable-next-line
 import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
-import { cK, getDxByDyOut, getDyByDxOut, getStablePrice } from './stable'
+import { getDyByDxBaseIn, getDxByDyBaseIn, getStablePrice } from './stable'
 import BigNumber from 'bignumber.js'
 
 export function getOutAmount(
@@ -196,6 +196,13 @@ export function getSwapOutAmountStable(
   amount: string,
   slippage: number
 ) {
+  if (poolInfo.modelData === undefined)
+    return {
+      amountIn: new TokenAmount(0),
+      amountOut: new TokenAmount(0),
+      amountOutWithSlippage: new TokenAmount(0),
+      priceImpact: 0
+    }
   const { coin, pc, fees, currentK } = poolInfo
   const { swapFeeNumerator, swapFeeDenominator } = fees
 
@@ -215,7 +222,7 @@ export function getSwapOutAmountStable(
   if (fromCoinMint === coin.mintAddress) {
     amountOut = amountIn.isNaN()
       ? 0
-      : Math.abs(getDyByDxOut(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+      : Math.abs(getDyByDxBaseIn(poolInfo.modelData, coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
     amountOut = amountOut > pcBalance.toNumber() ? pcBalance.toNumber() : amountOut
     inDecimals = coin.decimals
     outDecimals = pc.decimals
@@ -229,15 +236,14 @@ export function getSwapOutAmountStable(
       getBigNumber(currentK)
     )
 
-    beforePrice = getStablePrice(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), true)
+    beforePrice = getStablePrice(poolInfo.modelData, coinBalance.toNumber(), pcBalance.toNumber(), true)
     const afterCoinBalance = coinBalance.plus(amountIn)
     const afterPcBalance = pcBalance.minus(amountOut)
-    const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
-    afterPrice = getStablePrice(afterCurrentK.toNumber(), afterCoinBalance.toNumber(), afterPcBalance.toNumber(), true)
+    afterPrice = getStablePrice(poolInfo.modelData, afterCoinBalance.toNumber(), afterPcBalance.toNumber(), true)
   } else if (toCoinMint === coin.mintAddress) {
     amountOut = amountIn.isNaN()
       ? 0
-      : Math.abs(getDxByDyOut(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+      : Math.abs(getDxByDyBaseIn(poolInfo.modelData, coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
     amountOut = amountOut > coinBalance.toNumber() ? coinBalance.toNumber() : amountOut
     inDecimals = pc.decimals
     outDecimals = coin.decimals
@@ -251,11 +257,10 @@ export function getSwapOutAmountStable(
       getBigNumber(currentK)
     )
 
-    beforePrice = getStablePrice(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), false)
+    beforePrice = getStablePrice(poolInfo.modelData, coinBalance.toNumber(), pcBalance.toNumber(), false)
     const afterCoinBalance = coinBalance.plus(amountIn)
     const afterPcBalance = pcBalance.minus(amountOut)
-    const afterCurrentK = cK(afterCoinBalance, afterPcBalance)
-    afterPrice = getStablePrice(afterCurrentK.toNumber(), afterCoinBalance.toNumber(), afterPcBalance.toNumber(), false)
+    afterPrice = getStablePrice(poolInfo.modelData, afterCoinBalance.toNumber(), afterPcBalance.toNumber(), false)
   }
 
   const amountOutWithSlippage = getBigNumber(amountOut) / (1 + slippage / 100)
