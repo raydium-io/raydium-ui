@@ -100,7 +100,7 @@ function cD(k: number, dx: number, x: number, y: number, flag: boolean) {
   return mid
 }
 
-export function getDxByDy(k: number, x: number, y: number, dy: number): number {
+function getDxByDy(k: number, x: number, y: number, dy: number): number {
   if (x < y) {
     return getDyByDx(k, y, x, dy)
   }
@@ -123,7 +123,7 @@ export function getDxByDy(k: number, x: number, y: number, dy: number): number {
   }
 }
 
-export function getDyByDx(k: number, x: number, y: number, dx: number): number {
+function getDyByDx(k: number, x: number, y: number, dx: number): number {
   if (x < y) {
     return getDxByDy(k, y, x, dx)
   }
@@ -142,4 +142,34 @@ export function getDyByDx(k: number, x: number, y: number, dx: number): number {
     const dy2 = getDxByDy(k, y0, y0, dx2)
     return dy1 + dy2
   }
+}
+
+export function getDxByDyOut(k: number, x: number, y: number, dy: number): number {
+  const itemMax = y / 1000
+  let totalOut = 0
+  while (dy > 0) {
+    const itemDy = dy < itemMax ? dy : itemMax
+    const dx1 = getDxByDy(k, x, y, itemDy)
+
+    dy -= itemDy
+    x += dx1
+    y += itemDy
+    totalOut += dx1
+  }
+  return totalOut
+}
+
+export function getDyByDxOut(k: number, x: number, y: number, dx: number): number {
+  const itemMax = x / 1000
+  let totalOut = 0
+  while (dx > 0) {
+    const itemDx = dx < itemMax ? dx : itemMax
+    const dy1 = getDyByDx(k, x, y, itemDx)
+
+    dx -= itemDx
+    x += itemDx
+    y += dy1
+    totalOut += dy1
+  }
+  return totalOut
 }

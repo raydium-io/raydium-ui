@@ -29,7 +29,7 @@ import { getBigNumber } from './layouts'
 import { LiquidityPoolInfo } from './pools'
 // eslint-disable-next-line
 import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
-import { cK, getDxByDy, getDyByDx, getStablePrice } from './stable'
+import { cK, getDxByDyOut, getDyByDxOut, getStablePrice } from './stable'
 import BigNumber from 'bignumber.js'
 
 export function getOutAmount(
@@ -215,7 +215,7 @@ export function getSwapOutAmountStable(
   if (fromCoinMint === coin.mintAddress) {
     amountOut = amountIn.isNaN()
       ? 0
-      : Math.abs(getDyByDx(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+      : Math.abs(getDyByDxOut(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
     amountOut = amountOut > pcBalance.toNumber() ? pcBalance.toNumber() : amountOut
     inDecimals = coin.decimals
     outDecimals = pc.decimals
@@ -237,7 +237,7 @@ export function getSwapOutAmountStable(
   } else if (toCoinMint === coin.mintAddress) {
     amountOut = amountIn.isNaN()
       ? 0
-      : Math.abs(getDxByDy(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
+      : Math.abs(getDxByDyOut(currentK.toNumber(), coinBalance.toNumber(), pcBalance.toNumber(), amountIn.toNumber()))
     amountOut = amountOut > coinBalance.toNumber() ? coinBalance.toNumber() : amountOut
     inDecimals = pc.decimals
     outDecimals = coin.decimals
