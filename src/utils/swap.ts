@@ -28,6 +28,7 @@ import { getBigNumber } from './layouts'
 import { LiquidityPoolInfo } from './pools'
 // eslint-disable-next-line
 import { getTokenByMintAddress, NATIVE_SOL, TOKENS } from './tokens'
+import BigNumber from 'bignumber.js'
 
 export function getOutAmount(
   market: any,
@@ -82,22 +83,9 @@ export function getSwapOutAmount(
     const amountOut = pc.balance.wei.multipliedBy(fromAmountWithFee).dividedBy(denominator)
     const amountOutWithSlippage = amountOut.dividedBy(1 + slippage / 100)
 
-    const outBalance = pc.balance.wei.minus(amountOut)
-    const beforePrice = new TokenAmount(
-      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
-        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
-      pc.decimals,
-      false
-    )
-    const afterPrice = new TokenAmount(
-      parseFloat(new TokenAmount(outBalance, pc.decimals).fixed()) /
-        parseFloat(new TokenAmount(denominator, coin.decimals).fixed()),
-      pc.decimals,
-      false
-    )
-    const priceImpact =
-      Math.abs((parseFloat(beforePrice.fixed()) - parseFloat(afterPrice.fixed())) / parseFloat(beforePrice.fixed())) *
-      100
+    const marketAmountOut = fromAmountWithFee.multipliedBy(pc.balance.wei.dividedBy(coin.balance.wei))
+
+    const priceImpact = new BigNumber(1).minus(amountOut.dividedBy(marketAmountOut)).multipliedBy(100).toNumber()
 
     return {
       amountIn: fromAmount,
@@ -116,23 +104,9 @@ export function getSwapOutAmount(
     const amountOut = coin.balance.wei.multipliedBy(fromAmountWithFee).dividedBy(denominator)
     const amountOutWithSlippage = amountOut.dividedBy(1 + slippage / 100)
 
-    const outBalance = coin.balance.wei.minus(amountOut)
+    const marketAmountOut = fromAmountWithFee.multipliedBy(coin.balance.wei.dividedBy(pc.balance.wei))
 
-    const beforePrice = new TokenAmount(
-      parseFloat(new TokenAmount(pc.balance.wei, pc.decimals).fixed()) /
-        parseFloat(new TokenAmount(coin.balance.wei, coin.decimals).fixed()),
-      pc.decimals,
-      false
-    )
-    const afterPrice = new TokenAmount(
-      parseFloat(new TokenAmount(denominator, pc.decimals).fixed()) /
-        parseFloat(new TokenAmount(outBalance, coin.decimals).fixed()),
-      pc.decimals,
-      false
-    )
-    const priceImpact =
-      Math.abs((parseFloat(afterPrice.fixed()) - parseFloat(beforePrice.fixed())) / parseFloat(beforePrice.fixed())) *
-      100
+    const priceImpact = new BigNumber(1).minus(amountOut.dividedBy(marketAmountOut)).multipliedBy(100).toNumber()
 
     return {
       amountIn: fromAmount,
