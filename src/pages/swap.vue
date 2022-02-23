@@ -181,7 +181,10 @@
                 <template slot="title"> This venue gave the best price for your trade </template>
                 <Icon type="question-circle" /> </Tooltip
             ></span>
-            <span> {{ endpoint }} </span>
+            <span>
+              <b v-if="hasStable" style="color: #5ac4be; opacity: 1">Stable</b>
+              {{ endpoint }}
+            </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
             <span class="name">
@@ -771,7 +774,8 @@ export default Vue.extend({
 
       fromCoinAmountOld: undefined as string | undefined,
       toCoinAmountOld: undefined as string | undefined,
-      checkCoinAmountModelFlag: false
+      checkCoinAmountModelFlag: false,
+      hasStable: false
     }
   },
 
@@ -1416,6 +1420,7 @@ export default Vue.extend({
 
       let impact = 0
       let endpoint = ''
+      let hasStable = false
 
       let usedAmmId
       let usedRouteInfo
@@ -1447,6 +1452,7 @@ export default Vue.extend({
               // price = fAmountOut
               usedAmmId = poolInfo.ammId
               endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              hasStable = false
               showMarket = poolInfo.serumMarket
             }
             console.log(
@@ -1480,7 +1486,8 @@ export default Vue.extend({
               impact = priceImpact
               // price = fAmountOut
               usedAmmId = poolInfo.ammId
-              endpoint = `stable ${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              endpoint = ` ${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              hasStable = true
               showMarket = poolInfo.serumMarket
             }
             console.log(
@@ -1544,7 +1551,8 @@ export default Vue.extend({
               usedAmmId = undefined
               middleCoinAmount = amountOutWithSlippageA.fixed()
               endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
-              if (r[0].version === 5 || r[1].version === 5) endpoint = 'stable ' + endpoint
+              hasStable = false
+              if (r[0].version === 5 || r[1].version === 5) hasStable = true
               showMarket = undefined
             }
             console.log(
@@ -1586,6 +1594,7 @@ export default Vue.extend({
                 toCoinWithSlippage = outWithSlippage
                 impact = priceImpact
                 endpoint = 'Serum DEX'
+                hasStable = false
                 showMarket = marketAddress
               }
             }
@@ -1604,15 +1613,18 @@ export default Vue.extend({
 
           this.priceImpact = impact
           this.endpoint = endpoint
+          this.hasStable = hasStable
         } else {
           this.toCoinAmount = ''
           this.toCoinWithSlippage = ''
           this.outToPirceValue = 0
           this.priceImpact = 0
           this.endpoint = ''
+          this.hasStable = false
         }
         console.log(
           'end -> ',
+          this.hasStable,
           this.endpoint,
           this.usedAmmId,
           this.usedRouteInfo,
@@ -1669,7 +1681,7 @@ export default Vue.extend({
 
       if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
         const poolInfo: any = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
-        description = `Swap ${poolInfo.version === 5 ? 'Stable' : ''} ${this.fromCoinAmount} ${
+        description = `Swap ${poolInfo?.version === 5 ? 'Stable' : ''} ${this.fromCoinAmount} ${
           this.fromCoin?.symbol
         } to ${this.toCoinAmount} ${this.toCoin?.symbol}`
 

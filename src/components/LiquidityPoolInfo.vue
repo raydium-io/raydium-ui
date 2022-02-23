@@ -30,7 +30,9 @@
     </div>
 
     <div class="fs-container">
-      <span class="name">LP supply {{ poolInfo.version === 5 ? '(stable)' : '' }}</span>
+      <span class="name"
+        >LP supply <b style="color: #5ac4be; opacity: 1">{{ poolInfo.version === 5 ? '(Stable)' : '' }}</b></span
+      >
       <span>
         {{ lp.totalSupply.format() }}
       </span>
