@@ -287,6 +287,8 @@ export function formatLayout(buffer: Buffer): stableModelLayout {
 }
 
 export function getStablePrice(layoutData: stableModelLayout, coinReal: number, pcReal: number, baseCoin: boolean) {
-  const price = getMidPrice(layoutData, realToTable(layoutData, coinReal, getRatio(layoutData, coinReal, pcReal)))
+  const price =
+    getMidPrice(layoutData, realToTable(layoutData, coinReal, getRatio(layoutData, coinReal, pcReal))) /
+    layoutData.multiplier
   return baseCoin ? price : 1 / price
 }

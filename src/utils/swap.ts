@@ -258,8 +258,8 @@ export function getSwapOutAmountStable(
     )
 
     beforePrice = getStablePrice(poolInfo.modelData, coinBalance.toNumber(), pcBalance.toNumber(), false)
-    const afterCoinBalance = coinBalance.plus(amountIn)
-    const afterPcBalance = pcBalance.minus(amountOut)
+    const afterCoinBalance = coinBalance.minus(amountIn)
+    const afterPcBalance = pcBalance.plus(amountOut)
     afterPrice = getStablePrice(poolInfo.modelData, afterCoinBalance.toNumber(), afterPcBalance.toNumber(), false)
   }
 
