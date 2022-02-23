@@ -90,11 +90,11 @@ export function getOutAmountStable(
   toCoinMint: string,
   slippage: number
 ) {
-  const { coin, pc, currentK } = poolInfo
+  const { coin, pc } = poolInfo
 
   const x = poolInfo.coin.balance?.toEther()
   const y = poolInfo.pc.balance?.toEther()
-  if (!currentK || !x || !y) return new BigNumber(0)
+  if (!x || !y) return new BigNumber(0)
 
   const price = y.dividedBy(x).toNumber()
   //  getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
