@@ -728,7 +728,7 @@ export async function swapRoute(
         new PublicKey(poolInfoB.ammOpenOrders),
         new PublicKey(poolInfoB.poolCoinTokenAccount),
         new PublicKey(poolInfoB.poolPcTokenAccount),
-        new PublicKey(poolInfoA.modelDataAccount),
+        new PublicKey(poolInfoB.modelDataAccount),
         new PublicKey(poolInfoB.serumProgramId),
         new PublicKey(poolInfoB.serumMarket),
         new PublicKey(poolInfoB.serumBids),
