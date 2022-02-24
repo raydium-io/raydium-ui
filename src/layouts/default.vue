@@ -1,5 +1,6 @@
 <template>
   <Layout>
+    <RpcSpeed />
     <!-- <HeadChip /> -->
     <Head />
     <Setting />
