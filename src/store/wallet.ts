@@ -11,6 +11,20 @@ import { findAssociatedTokenAddress } from '@/utils/web3'
 
 const AUTO_REFRESH_TIME = 60
 
+const noATAMint = [
+  '98zVciBJZA6wvMM8b7RghZSSgDXGCkSXEPreTz3QxtAx',
+  'AyPMGuWw4nt2wJSUa6sFk3cvftbGVy6rFccHRgkttVtx',
+  'CZ6op9z4Xeid8TCbDQ5fmSyTj5M9HtPBJFjBugY8XsH1',
+  '3vdq6mKD9m8HW8aaUepxnqLvVRsh2QChHUuNY8AYA82g',
+  'FmKr3PRDcSH1tkbEoRWxGmqPjpnCF5M6t57AwiGXF7rS',
+  '9Ycm3goqLZbT1CnPszNtM9DdfnhT8JhqZokSfvghy68o',
+  '6xiJRaiYm8AFRg5bvoQy2AF4LM1X1jQtqxEDZAAYU4jB',
+  '5mLxak4bqu5NYheebvUgfNroSCRUjr6joe7yKx8WHTDt',
+  'AWbsDBHKGmjzJujwrmETG5tBjLf4jGjmopxjWTKc1252',
+  '2h8oKSoDXZpjLGWqMEX1uhFLWrCd4F79vRWDnnQkqPor',
+  '6MXp7K7LE83aqTfqfg1tRsX2PdksBQZx6THCXmimEuVY'
+]
+
 export const state = () => ({
   initialized: false,
   loading: false,
@@ -130,7 +144,9 @@ export const actions = actionTree(
                   balance
                 }
               } else if (parsedInfo.tokenAmount.uiAmount > 0) {
-                auxiliaryTokenAccounts.push(tokenAccountInfo)
+                if (!noATAMint.includes(mintAddress)) {
+                  auxiliaryTokenAccounts.push(tokenAccountInfo)
+                }
               }
             }
 

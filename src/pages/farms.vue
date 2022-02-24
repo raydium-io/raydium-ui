@@ -126,7 +126,12 @@
                 <Col class="state" :span="isMobile ? 6 : 5">
                   <div class="title">{{ isMobile ? 'Reward' : 'Pending Reward' }}</div>
                   <div v-if="farm.farmInfo.fusion" class="value">
-                    <div v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)">
+                    <div
+                      v-if="
+                        (!isNaN(farm.farmInfo.apr) && Number(farm.farmInfo.apr) > 0) ||
+                        farm.userInfo.pendingReward.toEther().gt(0)
+                      "
+                    >
                       {{
                         farm.userInfo.pendingReward.format().includes('-') ? 0 : farm.userInfo.pendingReward.format()
                       }}
@@ -158,10 +163,10 @@
                         <div v-if="farm.farmInfo.fusion" class="state" :span="isMobile ? 6 : 5">
                           <div v-if="farm.farmInfo.fees" class="value-s">FEES {{ farm.farmInfo.fees }}%</div>
                           <div class="value-s">
-                            <div v-if="farm.farmInfo.apr !== '0.00'">
+                            <div v-if="!isNaN(farm.farmInfo.apr) && Number(farm.farmInfo.apr) > 0">
                               {{ farm.farmInfo.reward.symbol }} {{ farm.farmInfo.apr }}%
                             </div>
-                            <div v-if="farm.farmInfo.aprB !== '0.00'">
+                            <div v-if="!isNaN(farm.farmInfo.aprB) && Number(farm.farmInfo.aprB) > 0">
                               {{ farm.farmInfo.rewardB.symbol }} {{ farm.farmInfo.aprB }}%
                             </div>
                           </div>
@@ -178,7 +183,7 @@
                     <div v-if="farm.farmInfo.fusion">
                       {{
                         (
-                          parseFloat(farm.farmInfo.aprTotal ? farm.farmInfo.aprTotal : 0) +
+                          parseFloat(!isNaN(farm.farmInfo.aprTotal) ? farm.farmInfo.aprTotal : 0) +
                           parseFloat(farm.farmInfo.fees ? farm.farmInfo.fees : 0)
                         ).toFixed(2)
                       }}%
@@ -257,7 +262,10 @@
                     <div class="pending fs-container">
                       <div v-if="farm.farmInfo.fusion" class="reward">
                         <div
-                          v-if="farm.farmInfo.apr !== '0.00' || farm.userInfo.pendingReward.toEther().gt(0)"
+                          v-if="
+                            (!isNaN(farm.farmInfo.apr) && Number(farm.farmInfo.apr) > 0) ||
+                            farm.userInfo.pendingReward.toEther().gt(0)
+                          "
                           class="token"
                         >
                           {{ farm.userInfo.pendingReward.format() }} {{ farm.farmInfo.reward.symbol }}
@@ -417,10 +425,7 @@ export default Vue.extend({
       unstaking: false,
       poolType: true,
       endedFarmsPoolId: [] as string[],
-      endedFarmsPoolIdWhiteList: [
-        'CmM9nTuYXkvMxAYptzfY8sdUSe9LUUoL2Pa6xaP4A6nG',
-        '7ubJHEDK5Uhqn9SgoauCTzMkGuA5kwvfuTpHNkAuF5y8'
-      ] as string[],
+      endedFarmsPoolIdWhiteList: ['5vkuK285fSgL3tjvNTYgiJnKA7MifVeQ5zSkUFEGXCJ3'] as string[],
       showCollapse: [] as any[]
     }
   },
