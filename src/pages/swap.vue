@@ -181,7 +181,10 @@
                 <template slot="title"> This venue gave the best price for your trade </template>
                 <Icon type="question-circle" /> </Tooltip
             ></span>
-            <span> {{ endpoint }} </span>
+            <span>
+              <b v-if="hasStable" style="color: #5ac4be; opacity: 1">Stable</b>
+              {{ endpoint }}
+            </span>
           </div>
           <div v-if="fromCoin && toCoin && fromCoinAmount && toCoinWithSlippage" class="fs-container">
             <span class="name">
@@ -397,7 +400,7 @@
             amms.length + routeInfos.length + Object.keys(market) === 0 ||
             (get(liquidity.infos, `${lpMintAddress}.status`) &&
               get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
-            (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
+            (amms.length + routeInfos.length + stableAmms.length === 0 && Object.keys(market).length !== 0)
           "
           :loading="swaping"
           style="width: 100%"
@@ -413,7 +416,7 @@
           "
         >
           <template v-if="!fromCoin || !toCoin"> Select a token </template>
-          <template v-else-if="amms.length + routeInfos.length + Object.keys(market).length === 0">
+          <template v-else-if="amms.length + routeInfos.length + stableAmms.length + Object.keys(market).length === 0">
             Pool Not Found
           </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
@@ -443,7 +446,7 @@
             v-else-if="
               (get(liquidity.infos, `${lpMintAddress}.status`) &&
                 get(liquidity.infos, `${lpMintAddress}.status`) !== 1) ||
-              (amms.length + routeInfos.length === 0 && Object.keys(market).length !== 0)
+              (amms.length + routeInfos.length + stableAmms.length === 0 && Object.keys(market).length !== 0)
             "
           >
             Pool coming soon
@@ -648,7 +651,8 @@ import {
   settleFund,
   swapRoute,
   getSwapRouter,
-  preSwapRoute
+  preSwapRoute,
+  getSwapOutAmountStable
 } from '@/utils/swap'
 import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
@@ -753,6 +757,7 @@ export default Vue.extend({
 
       amms: [] as LiquidityPoolInfo[],
       routeInfos: [] as [LiquidityPoolInfo, LiquidityPoolInfo][],
+      stableAmms: [] as LiquidityPoolInfo[],
 
       loadingArr: {
         setup: false,
@@ -769,7 +774,8 @@ export default Vue.extend({
 
       fromCoinAmountOld: undefined as string | undefined,
       toCoinAmountOld: undefined as string | undefined,
-      checkCoinAmountModelFlag: false
+      checkCoinAmountModelFlag: false,
+      hasStable: false
     }
   },
 
@@ -1265,6 +1271,14 @@ export default Vue.extend({
             ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
         )
 
+        this.stableAmms = (Object.values(this.$accessor.liquidity.infos) as LiquidityPoolInfo[]).filter(
+          (p: any) =>
+            p.version === 5 &&
+            ((p.coin.mintAddress === this.fromCoin?.mintAddress && p.pc.mintAddress === this.toCoin?.mintAddress) ||
+              (p.coin.mintAddress === this.toCoin?.mintAddress && p.pc.mintAddress === this.fromCoin?.mintAddress)) &&
+            ([1, 5].includes(p.status) || (p.status === 7 && p.poolOpenTime <= new Date().getTime() / 1000))
+        )
+
         this.routeInfos = getSwapRouter(
           Object.values(this.$accessor.liquidity.infos),
           this.fromCoin.mintAddress,
@@ -1361,22 +1375,24 @@ export default Vue.extend({
         )
           .then((infos) => {
             infos.forEach((info) => {
-              if (info === null) return
+              try {
+                if (info === null) return
 
-              const address = info.publicKey.toString()
+                const address = info.publicKey.toString()
 
-              if (!asksAndBidsAddressToMarket[address]) return
-              const market = asksAndBidsAddressToMarket[address]
+                if (!asksAndBidsAddressToMarket[address]) return
+                const market = asksAndBidsAddressToMarket[address]
 
-              const orderbook = Orderbook.decode(this.market[market].market, info.account.data)
+                const orderbook = Orderbook.decode(this.market[market].market, info.account.data)
 
-              const { isBids, slab } = orderbook
+                const { isBids, slab } = orderbook
 
-              if (isBids) {
-                this.market[market].bids = slab
-              } else {
-                this.market[market].asks = slab
-              }
+                if (isBids) {
+                  this.market[market].bids = slab
+                } else {
+                  this.market[market].asks = slab
+                }
+              } catch (e) {}
             })
           })
           .finally(() => {
@@ -1404,6 +1420,7 @@ export default Vue.extend({
 
       let impact = 0
       let endpoint = ''
+      let hasStable = false
 
       let usedAmmId
       let usedRouteInfo
@@ -1435,10 +1452,46 @@ export default Vue.extend({
               // price = fAmountOut
               usedAmmId = poolInfo.ammId
               endpoint = `${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              hasStable = false
               showMarket = poolInfo.serumMarket
             }
             console.log(
               'amm -> ',
+              this.fromCoin.symbol,
+              '>',
+              this.toCoin.symbol,
+              poolInfo.ammId,
+              amountOut.fixed(),
+              amountOutWithSlippage.fixed(),
+              priceImpact / 100
+            )
+          }
+        }
+
+        if (this.stableAmms) {
+          for (const poolInfo of this.stableAmms) {
+            if (poolInfo.status !== undefined && ![1, 7].includes(poolInfo.status)) continue
+            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmountStable(
+              poolInfo,
+              this.fromCoin.mintAddress,
+              this.toCoin.mintAddress,
+              this.fromCoinAmount,
+              this.setting.slippage
+            )
+            const fAmountOut = parseFloat(amountOut.fixed())
+            if (fAmountOut > maxAmountOut) {
+              maxAmountOut = fAmountOut
+              toCoinAmount = amountOut.fixed()
+              toCoinWithSlippage = amountOutWithSlippage
+              impact = priceImpact
+              // price = fAmountOut
+              usedAmmId = poolInfo.ammId
+              endpoint = ` ${this.fromCoin.symbol} > ${this.toCoin.symbol}`
+              hasStable = true
+              showMarket = poolInfo.serumMarket
+            }
+            console.log(
+              'amm stable -> ',
               this.fromCoin.symbol,
               '>',
               this.toCoin.symbol,
@@ -1461,21 +1514,13 @@ export default Vue.extend({
             } else {
               middleCoint = r[0].coin
             }
-            const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = getSwapOutAmount(
-              r[0],
-              this.fromCoin.mintAddress,
-              middleCoint.mintAddress,
-              this.fromCoinAmount,
-              slippage
-            )
+            const { amountOutWithSlippage: amountOutWithSlippageA, priceImpact: priceImpactA } = (
+              r[0].version === 4 ? getSwapOutAmount : getSwapOutAmountStable
+            )(r[0], this.fromCoin.mintAddress, middleCoint.mintAddress, this.fromCoinAmount, slippage)
 
-            const { amountOut, amountOutWithSlippage, priceImpact } = getSwapOutAmount(
-              r[1],
-              middleCoint.mintAddress,
-              this.toCoin.mintAddress,
-              amountOutWithSlippageA.fixed(),
-              slippage
-            )
+            const { amountOut, amountOutWithSlippage, priceImpact } = (
+              r[1].version === 4 ? getSwapOutAmount : getSwapOutAmountStable
+            )(r[1], middleCoint.mintAddress, this.toCoin.mintAddress, amountOutWithSlippageA.fixed(), slippage)
             const fAmountOut = parseFloat(amountOut.fixed())
             if (fAmountOut > maxAmountOut) {
               toCoinAmount = amountOut.fixed()
@@ -1506,11 +1551,15 @@ export default Vue.extend({
               usedAmmId = undefined
               middleCoinAmount = amountOutWithSlippageA.fixed()
               endpoint = `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`
+              hasStable = false
+              if (r[0].version === 5 || r[1].version === 5) hasStable = true
               showMarket = undefined
             }
             console.log(
               'route -> ',
-              `${this.fromCoin.symbol} > ${middleCoint.symbol} > ${this.toCoin.symbol}`,
+              `${r[0].version === 5 || r[1].version === 5 ? 'stable ' : ''}${this.fromCoin.symbol} > ${
+                middleCoint.symbol
+              } > ${this.toCoin.symbol}`,
               amountOut.fixed(),
               amountOutWithSlippage.fixed(),
               priceImpact / 100,
@@ -1545,6 +1594,7 @@ export default Vue.extend({
                 toCoinWithSlippage = outWithSlippage
                 impact = priceImpact
                 endpoint = 'Serum DEX'
+                hasStable = false
                 showMarket = marketAddress
               }
             }
@@ -1563,15 +1613,18 @@ export default Vue.extend({
 
           this.priceImpact = impact
           this.endpoint = endpoint
+          this.hasStable = hasStable
         } else {
           this.toCoinAmount = ''
           this.toCoinWithSlippage = ''
           this.outToPirceValue = 0
           this.priceImpact = 0
           this.endpoint = ''
+          this.hasStable = false
         }
         console.log(
           'end -> ',
+          this.hasStable,
           this.endpoint,
           this.usedAmmId,
           this.usedRouteInfo,
@@ -1627,8 +1680,10 @@ export default Vue.extend({
       let description = 'Swap'
 
       if (this.endpoint !== 'Serum DEX' && this.usedAmmId) {
-        const poolInfo = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
-        description = `Swap ${this.fromCoinAmount} ${this.fromCoin?.symbol} to ${this.toCoinAmount} ${this.toCoin?.symbol}`
+        const poolInfo: any = Object.values(this.$accessor.liquidity.infos).find((p: any) => p.ammId === this.usedAmmId)
+        description = `Swap ${poolInfo?.version === 5 ? 'Stable' : ''} ${this.fromCoinAmount} ${
+          this.fromCoin?.symbol
+        } to ${this.toCoinAmount} ${this.toCoin?.symbol}`
 
         swap(
           this.$web3,

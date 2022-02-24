@@ -27,6 +27,7 @@
                 <CoinIcon :mint-address="info.pc.mintAddress" />
               </div>
               {{ info.lp.symbol }}
+              <Tag v-if="[5].includes(info.poolInfo.version)" color="pink">Stable</Tag>
               <!-- {{ info.poolInfo.official ? '' : '(Permissionless)' }} -->
               <Tag v-if="![4, 5].includes(info.poolInfo.version)" color="pink">Legacy</Tag>
             </div>

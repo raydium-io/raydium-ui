@@ -1,40 +1,49 @@
-import { publicKey, u128, u64 } from '@project-serum/borsh';
-import { closeAccount } from '@project-serum/serum/lib/token-instructions';
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-import BigNumber from 'bignumber.js';
+import { publicKey, u128, u64 } from '@project-serum/borsh'
+import { closeAccount } from '@project-serum/serum/lib/token-instructions'
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
+import BigNumber from 'bignumber.js'
 // @ts-ignore
-import { nu64, struct, u8 } from 'buffer-layout';
+import { nu64, struct, u8, seq } from 'buffer-layout'
 
-import { TOKEN_PROGRAM_ID } from '@/utils/ids';
+import { TOKEN_PROGRAM_ID } from '@/utils/ids'
 import {
-  getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses,
-  LIQUIDITY_POOLS, LiquidityPoolInfo
-} from '@/utils/pools';
-import { TokenAmount } from '@/utils/safe-math';
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens';
+  getLpMintByTokenMintAddresses,
+  getPoolByLpMintAddress,
+  getPoolByTokenMintAddresses,
+  LIQUIDITY_POOLS,
+  LiquidityPoolInfo
+} from '@/utils/pools'
+import { TokenAmount } from '@/utils/safe-math'
+import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
 import {
-  commitment, createAssociatedTokenAccountIfNotExist, createTokenAccountIfNotExist,
-  getMultipleAccounts, sendTransaction
-} from '@/utils/web3';
-import { getBigNumber, MINT_LAYOUT } from './layouts';
+  commitment,
+  createAssociatedTokenAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
+import { getBigNumber, MINT_LAYOUT } from './layouts'
+import { getStablePrice } from './stable'
 
 export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMintAddresses }
 
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo
 
-  if (!coin.balance || !pc.balance) {
+  if (!coin.balance || !pc.balance || !poolInfo.modelData) {
     return new BigNumber(0)
   }
 
   if (poolInfo.version === 5) {
-    const { currentK = 1 } = poolInfo
-    const systemDecimal = Math.max(coin.decimals, pc.decimals)
-    const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
-    const y = parseFloat(coin.balance.fixed())
-    let price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
-    if (!coinBase) price = 1 / price
-    return new BigNumber(price)
+    const x = poolInfo.coin.balance?.toEther()
+    const y = poolInfo.pc.balance?.toEther()
+    if (!x || !y) return new BigNumber(0)
+
+    if (coinBase) {
+      return getStablePrice(poolInfo.modelData, x.toNumber(), y.toNumber(), true)
+    } else {
+      return getStablePrice(poolInfo.modelData, x.toNumber(), y.toNumber(), false)
+    }
   } else if (coinBase) {
     return pc.balance.toEther().dividedBy(coin.balance.toEther())
   } else {
@@ -81,30 +90,34 @@ export function getOutAmountStable(
   toCoinMint: string,
   slippage: number
 ) {
-  const { coin, pc, currentK } = poolInfo
-  const systemDecimal = Math.max(coin.decimals, pc.decimals)
-  const k = currentK / (10 ** systemDecimal * 10 ** systemDecimal)
-  const y = parseFloat(coin.balance.fixed())
-  const price = Math.sqrt(((10 - 1) * y * y) / (10 * y * y - k))
+  const { coin, pc } = poolInfo
 
-  const amountIn = parseFloat(amount)
-  let amountOut = 1
-  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
-    // outcoin is pc
-    amountOut = amountIn * price
-  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
-    // outcoin is coin
-    amountOut = amountIn / price
+  const x = poolInfo.coin.balance?.toEther()
+  const y = poolInfo.pc.balance?.toEther()
+  if (!x || !y) return new BigNumber(0)
+
+  const price = y.dividedBy(x).toNumber()
+  //  getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
+  const fromAmount = new BigNumber(amount)
+  let outAmount = new BigNumber(0)
+
+  const percent = new BigNumber(100).plus(slippage).dividedBy(100)
+
+  if (!coin.balance || !pc.balance) {
+    return outAmount
   }
 
-  const amountOutWithSlippage = amountOut / (1 - slippage / 100)
+  if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
+    // outcoin is pc
+    outAmount = fromAmount.multipliedBy(price)
+    outAmount = outAmount.multipliedBy(percent)
+  } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
+    // outcoin is coin
+    outAmount = fromAmount.dividedBy(price)
+    outAmount = outAmount.multipliedBy(percent)
+  }
 
-  // const price = Math.sqrt((10 - 1) * y * y /(10 * y * y - k))
-  // const afterY = y - amountOut
-  // const afterPrice = Math.sqrt((10 - 1) * afterY  * afterY /(10 * afterY * afterY - k))
-  // const priceImpact = (beforePrice - afterPrice) / beforePrice * 100
-
-  return new BigNumber(amountOutWithSlippage)
+  return outAmount
 }
 
 /* eslint-disable */
@@ -183,7 +196,28 @@ export async function addLiquidity(
   )
 
   transaction.add(
-    [4, 5].includes(poolInfo.version)
+    poolInfo.version === 5
+      ? addLiquidityInstructionStable(
+          new PublicKey(poolInfo.programId),
+          new PublicKey(poolInfo.ammId),
+          new PublicKey(poolInfo.ammAuthority),
+          new PublicKey(poolInfo.ammOpenOrders),
+          new PublicKey(poolInfo.ammTargetOrders),
+          new PublicKey(poolInfo.lp.mintAddress),
+          new PublicKey(poolInfo.poolCoinTokenAccount),
+          new PublicKey(poolInfo.poolPcTokenAccount),
+          new PublicKey(poolInfo.modelDataAccount ?? ''),
+          new PublicKey(poolInfo.serumMarket),
+          wrappedCoinSolAccount ? wrappedCoinSolAccount : userCoinTokenAccount,
+          wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
+          userLpTokenAccount,
+          owner,
+
+          coinAmount,
+          pcAmount,
+          fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
+        )
+      : poolInfo.version === 4
       ? addLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -320,7 +354,34 @@ export async function removeLiquidity(
   }
 
   transaction.add(
-    [4, 5].includes(poolInfo.version)
+    poolInfo.version === 5
+      ? removeLiquidityInstructionStable(
+          new PublicKey(poolInfo.programId),
+
+          new PublicKey(poolInfo.ammId),
+          new PublicKey(poolInfo.ammAuthority),
+          new PublicKey(poolInfo.ammOpenOrders),
+          new PublicKey(poolInfo.ammTargetOrders),
+          new PublicKey(poolInfo.lp.mintAddress),
+          new PublicKey(poolInfo.poolCoinTokenAccount),
+          new PublicKey(poolInfo.poolPcTokenAccount),
+          new PublicKey(poolInfo.modelDataAccount ?? ''),
+          new PublicKey(poolInfo.serumProgramId),
+          new PublicKey(poolInfo.serumMarket),
+          new PublicKey(poolInfo.serumCoinVaultAccount),
+          new PublicKey(poolInfo.serumPcVaultAccount),
+          new PublicKey(poolInfo.serumVaultSigner),
+
+          new PublicKey(lpAccount),
+          newFromTokenAccount,
+          newToTokenAccount,
+          owner,
+
+          poolInfo,
+
+          lpAmount
+        )
+      : poolInfo.version === 4
       ? removeLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
@@ -663,6 +724,140 @@ export function removeLiquidityInstructionV4(
   })
 }
 
+export function addLiquidityInstructionStable(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammTargetOrders: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumMarket: PublicKey,
+  // user
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userLpTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  maxCoinAmount: number,
+  maxPcAmount: number,
+  fixedFromCoin: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('maxCoinAmount'), nu64('maxPcAmount'), nu64('fixedFromCoin')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: false },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 3,
+      maxCoinAmount,
+      maxPcAmount,
+      fixedFromCoin
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
+export function removeLiquidityInstructionStable(
+  programId: PublicKey,
+  // tokenProgramId: PublicKey,
+  // amm
+  ammId: PublicKey,
+  ammAuthority: PublicKey,
+  ammOpenOrders: PublicKey,
+  ammTargetOrders: PublicKey,
+  lpMintAddress: PublicKey,
+  poolCoinTokenAccount: PublicKey,
+  poolPcTokenAccount: PublicKey,
+  modelDataAccount: PublicKey,
+  // serum
+  serumProgramId: PublicKey,
+  serumMarket: PublicKey,
+  serumCoinVaultAccount: PublicKey,
+  serumPcVaultAccount: PublicKey,
+  serumVaultSigner: PublicKey,
+  // user
+  userLpTokenAccount: PublicKey,
+  userCoinTokenAccount: PublicKey,
+  userPcTokenAccount: PublicKey,
+  userOwner: PublicKey,
+
+  poolInfo: LiquidityPoolInfo,
+
+  amount: number
+): TransactionInstruction {
+  const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+  const keys = [
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+    { pubkey: ammId, isSigner: false, isWritable: true },
+    { pubkey: ammAuthority, isSigner: false, isWritable: false },
+    { pubkey: ammOpenOrders, isSigner: false, isWritable: true },
+    { pubkey: ammTargetOrders, isSigner: false, isWritable: true },
+    { pubkey: lpMintAddress, isSigner: false, isWritable: true },
+    { pubkey: poolCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: poolPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: modelDataAccount, isSigner: false, isWritable: false },
+    { pubkey: serumProgramId, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: true },
+    { pubkey: serumCoinVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumPcVaultAccount, isSigner: false, isWritable: true },
+    { pubkey: serumVaultSigner, isSigner: false, isWritable: false },
+    { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
+    { pubkey: userOwner, isSigner: true, isWritable: false }
+  ]
+
+  if (poolInfo.serumEventQueue && poolInfo.serumBids && poolInfo.serumAsks) {
+    keys.push({ pubkey: new PublicKey(poolInfo.serumEventQueue), isSigner: false, isWritable: true })
+    keys.push({ pubkey: new PublicKey(poolInfo.serumBids), isSigner: false, isWritable: true })
+    keys.push({ pubkey: new PublicKey(poolInfo.serumAsks), isSigner: false, isWritable: true })
+  }
+
+  const data = Buffer.alloc(dataLayout.span)
+  dataLayout.encode(
+    {
+      instruction: 4,
+      amount: amount
+    },
+    data
+  )
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data
+  })
+}
+
 export const AMM_INFO_LAYOUT = struct([
   u64('status'),
   u64('nonce'),
@@ -805,8 +1000,8 @@ export const AMM_INFO_LAYOUT_V4 = struct([
 ])
 
 export const AMM_INFO_LAYOUT_STABLE = struct([
+  u64('accountType'),
   u64('status'),
-  publicKey('own_address'),
   u64('nonce'),
   u64('orderNum'),
   u64('depth'),
@@ -822,11 +1017,9 @@ export const AMM_INFO_LAYOUT_STABLE = struct([
   u64('minPriceMultiplier'),
   u64('maxPriceMultiplier'),
   u64('systemDecimalsValue'),
-
-  u64('ammMaxPrice'),
-  u64('ammMiddlePrice'),
-  u64('ammPriceMultiplier'),
-
+  u64('abortTradeFactor'),
+  u64('priceTickMultiplier'),
+  u64('priceTick'),
   // Fees
   u64('minSeparateNumerator'),
   u64('minSeparateDenominator'),
@@ -841,32 +1034,29 @@ export const AMM_INFO_LAYOUT_STABLE = struct([
   u64('needTakePnlPc'),
   u64('totalPnlPc'),
   u64('totalPnlCoin'),
-  u128('poolTotalDepositPc'),
-  u128('poolTotalDepositCoin'),
+  u64('poolOpenTime'),
+  u64('punishPcAmount'),
+  u64('punishCoinAmount'),
+  u64('orderbookToInitTime'),
   u128('swapCoinInAmount'),
   u128('swapPcOutAmount'),
   u128('swapPcInAmount'),
   u128('swapCoinOutAmount'),
-  u64('swapPcFee'),
-  u64('swapCoinFee'),
+  u64('swapCoin2PcFee'),
+  u64('swapPc2CoinFee'),
 
   publicKey('poolCoinTokenAccount'),
   publicKey('poolPcTokenAccount'),
   publicKey('coinMintAddress'),
   publicKey('pcMintAddress'),
   publicKey('lpMintAddress'),
+  publicKey('modelDataAccount'),
   publicKey('ammOpenOrders'),
   publicKey('serumMarket'),
   publicKey('serumProgramId'),
   publicKey('ammTargetOrders'),
-  publicKey('poolWithdrawQueue'),
-  publicKey('poolTempLpTokenAccount'),
   publicKey('ammOwner'),
-  publicKey('pnlOwner'),
-
-  u128('currentK'),
-  u128('padding1'),
-  publicKey('padding2')
+  seq(u64('padding'), 64, 'padding')
 ])
 
 export async function getLpMintInfo(conn: any, mintAddress: string, coin: any, pc: any): Promise<TokenInfo> {

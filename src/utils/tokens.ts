@@ -2969,6 +2969,15 @@ export const LP_TOKENS: Tokens = {
     mintAddress: '8uDVKmVwNmbXHDB7rNKqtpcT9VAsFHTJ5pPYxjyoBbNg',
     decimals: TOKENS.STR.decimals
   },
+  'USDT-USDC-V4': {
+    symbol: 'USDT-USDC',
+    name: 'USDT-USDC LP',
+    coin: { ...TOKENS.USDT },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'As3EGgLtUVpdNpE6WCKauyNRrCCwcQ57trWQ3wyRXDa6',
+    decimals: TOKENS.USDT.decimals
+  },
   'SEEDED-USDC-V4': {
     symbol: 'SEEDED-USDC',
     name: 'SEEDED-USDC LP',

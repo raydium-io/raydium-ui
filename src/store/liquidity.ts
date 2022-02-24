@@ -24,6 +24,7 @@ import {
   getFilteredProgramAccountsAmmOrMarketCache,
   getMultipleAccounts
 } from '@/utils/web3'
+import { formatLayout } from '@/utils/stable'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -268,8 +269,8 @@ export const actions = actionTree(
         }
       }
 
-      const liquidityPools = {} as any
-      const publicKeys = [] as any
+      const liquidityPools: { [lp: string]: LiquidityPoolInfo } = {}
+      const publicKeys: PublicKey[] = []
 
       LIQUIDITY_POOLS.forEach((pool) => {
         const { poolCoinTokenAccount, poolPcTokenAccount, ammOpenOrders, ammId, coin, pc, lp } = pool
@@ -292,6 +293,7 @@ export const actions = actionTree(
 
       const multipleInfo = await getMultipleAccounts(conn, publicKeys, commitment)
 
+      const modelAccount: { [account: string]: string[] } = {}
       multipleInfo.forEach((info) => {
         if (info) {
           const address = info.publicKey.toBase58()
@@ -300,7 +302,7 @@ export const actions = actionTree(
           const { key, lpMintAddress, version } = getAddressForWhat(address)
 
           if (key && lpMintAddress) {
-            const poolInfo = liquidityPools[lpMintAddress]
+            const poolInfo: any = liquidityPools[lpMintAddress]
 
             switch (key) {
               case 'poolCoinTokenAccount': {
@@ -336,7 +338,10 @@ export const actions = actionTree(
                 } else {
                   if (version === 5) {
                     parsed = AMM_INFO_LAYOUT_STABLE.decode(data)
-                    poolInfo.currentK = getBigNumber(parsed.currentK)
+
+                    if (modelAccount[parsed.modelDataAccount.toString()] === undefined)
+                      modelAccount[parsed.modelDataAccount.toString()] = []
+                    modelAccount[parsed.modelDataAccount.toString()].push(lpMintAddress)
                   } else {
                     parsed = AMM_INFO_LAYOUT_V4.decode(data)
                     if (getBigNumber(parsed.status) === 7) {
@@ -370,6 +375,42 @@ export const actions = actionTree(
           }
         }
       })
+
+      for (const [item, lpMintList] of Object.entries(modelAccount)) {
+        const localData = window.localStorage.getItem('cache:' + item)
+        if (localData === null) continue
+        try {
+          const localD = JSON.parse(localData)
+          if (localD.flushTime < new Date().getTime() - 3600 * 24 * 1000) continue
+
+          for (const itemLp of lpMintList) {
+            console.log('local model data', itemLp)
+            liquidityPools[itemLp].modelData = localD.result
+          }
+          delete modelAccount[item]
+        } catch (e) {
+          console.log('local model data error', item)
+        }
+      }
+      if (Object.keys(modelAccount).length > 0) {
+        const modelAccountData = await getMultipleAccounts(
+          conn,
+          Object.keys(modelAccount).map((item) => new PublicKey(item))
+        )
+        for (const item of modelAccountData) {
+          if (item === null) continue
+          const lpMintList = modelAccount[item.publicKey.toString()]
+          const data = formatLayout(item.account.data)
+          window.localStorage.setItem(
+            'cache:' + item.publicKey.toString(),
+            JSON.stringify({ flushTime: new Date().getTime(), result: data })
+          )
+          for (const itemLp of lpMintList) {
+            console.log('update model data', itemLp)
+            liquidityPools[itemLp].modelData = data
+          }
+        }
+      }
 
       commit('setInfos', liquidityPools)
       logger('Liquidity pool infomations updated')
