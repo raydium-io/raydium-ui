@@ -55,6 +55,7 @@
             </div>
             <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
               {{ row.name }}
+              {{ row.amm_id === '2EXiumdi14E9b8Fy62QcA5Uh6WdHS2b38wtSxp72Mibj' ? '(Stable)' : '' }}
               <Tooltip v-if="row.liquidity < 100000" placement="right">
                 <template slot="title"
                   >This pool has relatively low liquidity. Always check the quoted price and that the pool has
