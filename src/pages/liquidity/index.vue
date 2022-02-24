@@ -777,7 +777,7 @@ export default Vue.extend({
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
         if (this.fixedCoin === this.fromCoin.mintAddress) {
-          const amount = (poolInfo.version === 4 ? getOutAmount : getOutAmountStable)(
+          const amount = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
             poolInfo,
             this.fromCoinAmount,
             this.fromCoin.mintAddress,
@@ -793,7 +793,7 @@ export default Vue.extend({
         } else {
           const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-          const amount = (poolInfo.version === 4 ? getOutAmount : getOutAmountStable)(
+          const amount = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
             poolInfo,
             this.toCoinAmount,
             this.toCoin.mintAddress,

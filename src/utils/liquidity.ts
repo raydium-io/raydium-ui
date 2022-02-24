@@ -30,11 +30,12 @@ export { getLpMintByTokenMintAddresses, getPoolByLpMintAddress, getPoolByTokenMi
 export function getPrice(poolInfo: LiquidityPoolInfo, coinBase = true) {
   const { coin, pc } = poolInfo
 
-  if (!coin.balance || !pc.balance || !poolInfo.modelData) {
+  if (!coin.balance || !pc.balance) {
     return new BigNumber(0)
   }
 
   if (poolInfo.version === 5) {
+    if (!poolInfo.modelData) return new BigNumber(0)
     const x = poolInfo.coin.balance?.toEther()
     const y = poolInfo.pc.balance?.toEther()
     if (!x || !y) return new BigNumber(0)
