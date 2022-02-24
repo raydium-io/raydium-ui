@@ -1,6 +1,6 @@
 <template>
   <div v-if="showTime" class="head-chip">
-    Solana network is experiencing degraded performance. Transactions man fail to send or confirm.
+    The Solana network is experiencing congestion or reduced performance. Transactions may fail to send or confirm.
   </div>
 </template>
 
