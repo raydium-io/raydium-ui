@@ -56,8 +56,9 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
         AMM_ASSOCIATED_SEED
       )
     ).toString()
-    if (LIQUIDITY_POOLS.find((item) => item.ammId === expectAmmId)) {
-      throw new Error('There is already a pool for this Serum Market')
+    const knownAmm = LIQUIDITY_POOLS.find((item) => item.ammId === expectAmmId)
+    if (knownAmm) {
+      throw new Error(`There is already a pool for this Serum Market, ammid -> ${knownAmm.ammId}`)
     }
     const marketAddressPubKey = new PublicKey(marketAddress)
     const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey(SERUM_PROGRAM_ID_V3))
