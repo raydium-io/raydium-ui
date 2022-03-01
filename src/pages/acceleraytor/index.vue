@@ -13,9 +13,9 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Pools open Jan 24, 12:00 UTC - Full details
+              Pools open March 9, 14:00 UTC - Full details
               <a
-                href="https://raydium.medium.com/space-falcon-is-launching-on-acceleraytor-e32dedd8378b"
+                href="https://raydium.medium.com/yawww-is-launching-on-acceleraytor-553327fe2b81"
                 rel="nofollow noopener noreferrer"
                 target="_blank"
               >
@@ -23,11 +23,17 @@
               >
             </div>
             <a
-              href="https://raydium.medium.com/space-falcon-is-launching-on-acceleraytor-e32dedd8378b"
+              href="https://raydium.medium.com/yawww-is-launching-on-acceleraytor-553327fe2b81"
               rel="nofollow noopener noreferrer"
               target="_blank"
             >
-              <img class="carousel-image" src="../../assets/background/acceleraytor-SPACE-FALCON.jpg" />
+              <img class="carousel-image" src="../../assets/background/acceleraytor-yawww.jpg" />
+            </a>
+          </div>
+          <div>
+            <div class="inner-decorator-words">Launching March 15, full details soon!</div>
+            <a href="#" rel="nofollow noopener noreferrer">
+              <img class="carousel-image" src="../../assets/background/acceleraytor-zebec.jpg" />
             </a>
           </div>
         </Carousel>
