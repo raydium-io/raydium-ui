@@ -113,11 +113,11 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
-    base: { ...TOKENS.YAWWW },
+    base: { ...TOKENS.YAW },
     quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(0.2, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(7500000, TOKENS.FCON.decimals, false),
+    raise: new TokenAmount(7500000, TOKENS.YAW.decimals, false),
 
     version: 3, // just an identify for Lottery activity
     programId: IDO_PROGRAM_ID_V3,
