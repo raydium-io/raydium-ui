@@ -137,7 +137,7 @@ export const actions = actionTree(
         }
         lpMintAddressList.push(ammLayout.lpMintAddress.toString())
       })
-      const lpMintListDecimls = await getLpMintListDecimals(conn, lpMintAddressList)
+      const lpMintListDecimals = await getLpMintListDecimals(conn, lpMintAddressList)
 
       const tokenMintData: { [mintAddress: string]: TokenInfo } = {}
       for (const itemToken of Object.values(TOKENS)) {
@@ -147,7 +147,7 @@ export const actions = actionTree(
         if (BLACK_LIST.includes(ammAll[indexAmmInfo].publicKey.toString())) continue
         const ammInfo = AMM_INFO_LAYOUT_V4.decode(Buffer.from(ammAll[indexAmmInfo].accountInfo.data))
         if (
-          !Object.keys(lpMintListDecimls).includes(ammInfo.lpMintAddress.toString()) ||
+          !Object.keys(lpMintListDecimals).includes(ammInfo.lpMintAddress.toString()) ||
           ammInfo.pcMintAddress.toString() === ammInfo.serumMarket.toString() ||
           ammInfo.lpMintAddress.toString() === '11111111111111111111111111111111' ||
           !Object.keys(marketToLayout).includes(ammInfo.serumMarket.toString())
@@ -216,7 +216,7 @@ export const actions = actionTree(
           coin,
           pc,
           mintAddress: ammInfo.lpMintAddress.toString(),
-          decimals: lpMintListDecimls[ammInfo.lpMintAddress]
+          decimals: lpMintListDecimals[ammInfo.lpMintAddress]
         }
 
         const { publicKey } = await createAmmAuthority(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4))
