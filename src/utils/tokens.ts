@@ -1370,7 +1370,7 @@ export const TOKENS: Tokens = {
 
     detailLink: 'https://raydium.medium.com/yawww-is-launching-on-acceleraytor-553327fe2b81',
     details:
-      'Yawww allows NFT aficionados to negotiate, create deals, and trade with peers through Solana’s first fully automated on-chain escrow service. Yawww combines a P2P trading service with P2P collateralized lending, a negotiable listings marketplace, NFT staking, and a platform rewards system. The native token, YAW, will be used to cover transaction fees, unlock premium features, and facilitate the platform economy. The token is backed by platform revenue and secured by the Yawww Treasury and Reserve.',
+      'Yawww allows NFT aficionados to negotiate, create deals, and trade with peers through Solana’s first fully automated on-chain escrow service. Yawww combines a P2P trading service with P2P collateralized lending, a negotiable listings marketplace, NFT staking, and a platform rewards system. The native token, YAW, will be used to cover transaction fees, unlock premium features, and facilitate the platform economy. The token is backed by 50% of all platform revenue and secured by the Yawww Treasury.',
     docs: {
       website: 'https://www.yawww.io/',
       whitepaper: 'https://yawww.gitbook.io/whitepaper/yawww-nft-whitepaper/introduction'
