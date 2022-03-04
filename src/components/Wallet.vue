@@ -77,6 +77,7 @@ import { SafePalWalletAdapter } from '@solana/wallet-adapter-safepal'
 import { BloctoWalletAdapter } from '@solana/wallet-adapter-blocto'
 import { BitpieWalletAdapter } from '@solana/wallet-adapter-bitpie'
 // import { TorusWalletAdapter } from '@solana/wallet-adapter-torus'
+import { GlowWalletAdapter } from '@/libs/wallet-adapter-glow'
 
 import importIcon from '@/utils/import-icon'
 import logger from '@/utils/logger'
@@ -206,6 +207,12 @@ export default class Wallet extends Vue {
       providerUrl: 'https://solflare.com/access-wallet',
       getAdapter(providerUrl) {
         return new SolletWalletAdapter({ provider: providerUrl })
+      }
+    },
+    Glow: {
+      website: 'https://glow.app',
+      getAdapter() {
+        return new GlowWalletAdapter()
       }
     }
   }
