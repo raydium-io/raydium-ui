@@ -9,7 +9,7 @@
     @cancel="$emit('onClose')"
   >
     <div class="select-token">
-      This token does not appear on the detault token list. Anyone can create an SPL token on Solana, which may include
+      This token does not appear on the default token list. Anyone can create an SPL token on Solana, which may include
       fake versions of existing tokens or tokens that claim to represent projects that do not have a token. Take extra
       caution to confirm token addresses.
       <br />
