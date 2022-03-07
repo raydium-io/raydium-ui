@@ -31,8 +31,21 @@
             </a>
           </div>
           <div>
-            <div class="inner-decorator-words">Launching March 15, full details soon!</div>
-            <a href="#" rel="nofollow noopener noreferrer">
+            <div class="inner-decorator-words">
+              Pools open March 15, 04:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/zebec-is-launching-on-acceleraytor-410d87988f37"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
+            </div>
+            <a
+              href="https://raydium.medium.com/zebec-is-launching-on-acceleraytor-410d87988f37"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
               <img class="carousel-image" src="../../assets/background/acceleraytor-zebec.jpg" />
             </a>
           </div>
