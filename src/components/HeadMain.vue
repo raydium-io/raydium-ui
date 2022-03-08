@@ -1,6 +1,9 @@
 <template>
   <Header class="header fs-container" :class="isMobile ? 'mobile' : ''">
-    <NuxtLink to="/"><img class="logo" src="@/assets/icons/logo-text.svg" /></NuxtLink>
+    <NuxtLink to="/">
+      <img v-if="isMobile" class="logo" src="@/assets/icons/logo.svg" />
+      <img v-else class="logo" src="@/assets/icons/logo-text.svg"
+    /></NuxtLink>
 
     <div v-if="isMobile ? (navOpened ? true : false) : true" :class="isMobile ? 'mobile-nav' : ''">
       <Nav @onSelect="() => (navOpened = false)" />
@@ -9,7 +12,7 @@
     <div class="fs-container">
       <a target="_blank" rel="nofollow noopener noreferrer" href="https://beta.raydium.io/swap">
         <div class="v2-button card">
-          <div class="card-body">Try Raydium V2</div>
+          <div class="card-body">Try {{ isMobile ? '' : 'Raydium ' }}V2</div>
         </div>
       </a>
       <Wallet />
