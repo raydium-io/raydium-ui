@@ -726,7 +726,10 @@ export default Vue.extend({
           )
 
           const firstPool = poolListTemp.sort((a, b) =>
-            (a.coin.balance ? a.coin.balance.toEther() : 0) < (b.coin.balance ? b.coin.balance.toEther() : 0) ? 1 : -1
+            (a.coin.balance ? a.coin.balance.toEther().toNumber() : 0) <
+            (b.coin.balance ? b.coin.balance.toEther().toNumber() : 0)
+              ? 1
+              : -1
           )[0]
 
           ammId = firstPool.ammId
