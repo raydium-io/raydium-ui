@@ -7,6 +7,11 @@
     </div>
 
     <div class="fs-container">
+      <a target="_blank" rel="nofollow noopener noreferrer" href="https://beta.raydium.io/swap">
+        <div class="v2-button card">
+          <div class="card-body">Try Raydium V2</div>
+        </div>
+      </a>
       <Wallet />
       <div
         v-if="isMobile"
@@ -140,5 +145,18 @@ export default Vue.extend({
 
 .header.mobile {
   padding: 0 20px;
+}
+
+.v2-button.card {
+  align-self: center;
+  line-height: initial;
+  padding: 0.5px;
+  margin: 16px;
+  .card-body {
+    padding: 7px;
+    height: 100%;
+    font-weight: bold;
+    color: white;
+  }
 }
 </style>

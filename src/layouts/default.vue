@@ -2,7 +2,7 @@
   <Layout>
     <RpcSpeed />
     <!-- <HeadChip /> -->
-    <Head />
+    <HeadMain />
     <Setting />
 
     <Content>
