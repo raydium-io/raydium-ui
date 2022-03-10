@@ -3033,6 +3033,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '4UTG7MGS7AgeRpGGZg9RmrPzByhQTnzZty9oVRt1SbdH',
     decimals: TOKENS.NINJA.decimals
+  },
+  'YAW-USDC-V4': {
+    symbol: 'YAW-USDC',
+    name: 'YAW-USDC LP',
+    coin: { ...TOKENS.YAW },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'BREhg1HCGk34wuUbh8CNzvE7Sj8FpiwdAVypKWHhZyYx',
+    decimals: TOKENS.YAW.decimals
   }
 }
 
