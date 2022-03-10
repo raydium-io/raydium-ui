@@ -10,7 +10,7 @@
     </div>
 
     <div class="fs-container">
-      <a target="_blank" rel="nofollow noopener noreferrer" href="https://beta.raydium.io/swap">
+      <a target="_blank" rel="nofollow noopener noreferrer" href="https://raydium.io">
         <div class="v2-button card">
           <div class="card-body">Try {{ isMobile ? '' : 'Raydium ' }}V2</div>
         </div>
