@@ -13,25 +13,6 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Pools open March 9, 14:00 UTC - Full details
-              <a
-                href="https://raydium.medium.com/yawww-is-launching-on-acceleraytor-553327fe2b81"
-                rel="nofollow noopener noreferrer"
-                target="_blank"
-              >
-                here</a
-              >
-            </div>
-            <a
-              href="https://raydium.medium.com/yawww-is-launching-on-acceleraytor-553327fe2b81"
-              rel="nofollow noopener noreferrer"
-              target="_blank"
-            >
-              <img class="carousel-image" src="../../assets/background/acceleraytor-yawww.jpg" />
-            </a>
-          </div>
-          <div>
-            <div class="inner-decorator-words">
               Pools open March 15, 04:00 UTC - Full details
               <a
                 href="https://raydium.medium.com/zebec-is-launching-on-acceleraytor-410d87988f37"
