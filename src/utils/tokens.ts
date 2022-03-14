@@ -1381,6 +1381,26 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
+  },
+  ZBC: {
+    symbol: 'ZBC',
+    name: 'ZBC',
+    mintAddress: 'zebeczgi5fSEtbpfQKVZKCJ3WgYXxjkMUkNNx7fLKAF',
+    decimals: 9,
+
+    detailLink: 'https://raydium.medium.com/zebec-is-launching-on-acceleraytor-410d87988f37',
+    details:
+      'Zebec Protocol stands as modular money, layer, upgradeable and extensible through governance. Our aim is to strive for a DeFi revolution. Bring change in the Web3 digital economy. Establish Programmable Money Streaming as a foundation for greater, better, and more legendary financial innovations. The Protocol remains programmable, open to apps wanting to establish ongoing connections with user balances, automating payments, investments and trading.',
+    docs: {
+      website: 'https://zebec.io/'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/Zebec_HQ',
+      Telegram: 'https://t.me/zebececosystem',
+      Discord: 'https://discord.gg/fJM9cHuvvB'
+    },
+
+    tags: ['raydium']
   }
 }
 
