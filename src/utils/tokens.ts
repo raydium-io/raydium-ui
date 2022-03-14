@@ -1392,7 +1392,9 @@ export const TOKENS: Tokens = {
     details:
       'Zebec Protocol stands as modular money, layer, upgradeable and extensible through governance. Our aim is to strive for a DeFi revolution. Bring change in the Web3 digital economy. Establish Programmable Money Streaming as a foundation for greater, better, and more legendary financial innovations. The Protocol remains programmable, open to apps wanting to establish ongoing connections with user balances, automating payments, investments and trading.',
     docs: {
-      website: 'https://zebec.io/'
+      website: 'https://zebec.io/',
+      tokenomics:
+        'https://medium.com/zebec-protocol/the-launch-of-zbc-utility-and-governance-token-of-zebec-protocol-4342f5094327'
     },
     socials: {
       Twitter: 'https://twitter.com/Zebec_HQ',
