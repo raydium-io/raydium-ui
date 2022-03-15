@@ -545,6 +545,10 @@
             <img :src="importIcon(`/icons/${key.toLowerCase()}.svg`)" />
           </a>
         </div>
+
+        <p class="details">
+          {{ msg }}
+        </p>
       </Col>
       <Col :span="isMobile ? 24 : 12">
         <Tabs :class="pool.version === 3 ? 'tab-count-3' : 'tab-count-2'">
@@ -728,6 +732,9 @@ export default class AcceleRaytor extends Vue {
   pool = {} as IdoPool
   purchasing = false
   currentTime = getUnixTs()
+
+  msg =
+    'Persons located in or residents of the United States, North Korea, Iran, Venezuela, any sanctioned countries as provided by OFAC, or any other jurisdiction in which it is prohibited from using any of the services offered on the Raydium website, including AcceleRaytor, (the “Prohibited Jurisdictions”) are not permitted to make use of these services or participate in this token sale. For the avoidance of doubt, the foregoing restrictions on any of the services offered on the Raydium website from Prohibited Jurisdictions apply equally to residents and citizens of other nations while located in a Prohibited Jurisdiction.'
 
   mounted() {
     setInterval(() => {
