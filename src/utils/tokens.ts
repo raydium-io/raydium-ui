@@ -1417,6 +1417,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'bonegFPgrpZ4bfVn3kQK1aMbGYddWtfMAywNt5LsuVE',
     decimals: 2,
     tags: ['raydium']
+  },
+  DGE: {
+    symbol: 'DGE',
+    name: 'DGE',
+    mintAddress: 'AAXng5czWLNtTXHdWEn9Ef7kXMXEaraHj2JQKo7ZoLux',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
