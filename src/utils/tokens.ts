@@ -1403,6 +1403,13 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
+  },
+  UM: {
+    symbol: 'UM',
+    name: 'UM',
+    mintAddress: 'DMCUFm2ZAnSU7UgsdVq23gRogMU3MEBjPgQF1gK53rEn',
+    decimals: 6,
+    tags: ['raydium']
   }
 }
 
@@ -3064,6 +3071,24 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'BREhg1HCGk34wuUbh8CNzvE7Sj8FpiwdAVypKWHhZyYx',
     decimals: TOKENS.YAW.decimals
+  },
+  'ZBC-USDC-V4': {
+    symbol: 'ZBC-USDC',
+    name: 'ZBC-USDC LP',
+    coin: { ...TOKENS.ZBC },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: 'AJ236J6tLen18QW8t7XLAaELyUjg57HcQgSq33aH8Qkq',
+    decimals: TOKENS.ZBC.decimals
+  },
+  'UM-USDC-V4': {
+    symbol: 'UM-USDC',
+    name: 'UM-USDC LP',
+    coin: { ...TOKENS.UM },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '6UjtYnDGbQ2Y2e4M8VJUeC6kXy6hdGRecMzAbjVJDAiZ',
+    decimals: TOKENS.UM.decimals
   }
 }
 
