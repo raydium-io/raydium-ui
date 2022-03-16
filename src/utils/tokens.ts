@@ -1410,6 +1410,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'DMCUFm2ZAnSU7UgsdVq23gRogMU3MEBjPgQF1gK53rEn',
     decimals: 6,
     tags: ['raydium']
+  },
+  BONES: {
+    symbol: 'BONES',
+    name: 'BONES',
+    mintAddress: 'bonegFPgrpZ4bfVn3kQK1aMbGYddWtfMAywNt5LsuVE',
+    decimals: 2,
+    tags: ['raydium']
   }
 }
 
@@ -3089,6 +3096,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '6UjtYnDGbQ2Y2e4M8VJUeC6kXy6hdGRecMzAbjVJDAiZ',
     decimals: TOKENS.UM.decimals
+  },
+  'BONES-SOL-V4': {
+    symbol: 'BONES-SOL',
+    name: 'BONES-SOL LP',
+    coin: { ...TOKENS.BONES },
+    pc: { ...NATIVE_SOL },
+
+    mintAddress: 'YxFUkd8xiLTNRcMspfMTiWsY4hfajir9vNexqntUje2',
+    decimals: TOKENS.BONES.decimals
   }
 }
 

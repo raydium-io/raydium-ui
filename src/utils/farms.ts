@@ -2488,6 +2488,25 @@ export const FARMS: FarmInfo[] = [
     poolLpTokenAccount: '2WzeohvEA5vBLUWuvtPR1phKF3AenPLMKfrjm9Vr1tv8',
     poolRewardTokenAccount: 'EzjyTWqQ6Q6K2vUfMUHNco1SReqtpvQ1BiNaHFWn9TCY',
     poolRewardTokenAccountB: '8TmLnq9Qh3qvVnyBFRghFyeudVVhU7DbpSuJKWpwH5si'
+  },
+  {
+    name: 'BONES-SOL',
+    lp: { ...LP_TOKENS['BONES-SOL-V4'] },
+    reward: { ...TOKENS.RAY },
+    rewardB: { ...TOKENS.BONES },
+    isStake: false,
+
+    fusion: true,
+    legacy: false,
+    dual: false,
+    version: 5,
+    programId: STAKE_PROGRAM_ID_V5,
+
+    poolId: '94u5pHLkEhkxiFqRTcRgKEnEn79Csf6iaXCxNFPmqoSt',
+    poolAuthority: 'Dzbwfuif9XBFYNqHonbjnqGGF65wgi7N8tkp9kciPT4c',
+    poolLpTokenAccount: 'DWgLDJ695vcdBPGFS7qiCVw8mPpXSNuE76sXXpVMcrr',
+    poolRewardTokenAccount: '8WpWE9pVeqkkvRGNKGWt4GBBe8r6bvieYXrNiD3GcXBa',
+    poolRewardTokenAccountB: 'E4aMXrpnNqEkDEAmZ4nquzJSiWsTwdgwjxYNf4yr78WK'
   }
 ].sort((a, b) => (a.fusion === true && b.fusion === false ? 1 : -1))
 
