@@ -234,9 +234,15 @@ export default Vue.extend({
 
           const rewardPerBlockAmount = new TokenAmount(getBigNumber(rewardPerBlock), reward.decimals)
           const rewardPerBlockAmountTotalValue =
-            getBigNumber(rewardPerBlockAmount.toEther()) * 2 * 60 * 60 * 24 * 365 * get(this.price.prices, lp.symbol)
+            getBigNumber(rewardPerBlockAmount.toEther()) *
+            2 *
+            60 *
+            60 *
+            24 *
+            365 *
+            get(this.price.prices, lp.mintAddress)
 
-          const liquidityItemValue = get(this.price.prices, lp.symbol)
+          const liquidityItemValue = get(this.price.prices, lp.mintAddress)
 
           const apr = (
             (rewardPerBlockAmountTotalValue / (getBigNumber(lp.balance.toEther()) * liquidityItemValue)) *

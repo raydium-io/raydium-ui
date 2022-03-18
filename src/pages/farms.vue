@@ -514,7 +514,7 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[reward.symbol as string]
+              this.price.prices[reward.mintAddress as string]
             const rewardBPerBlockAmountTotalValue =
               getBigNumber(rewardBPerBlockAmount.toEther()) *
               2 *
@@ -522,14 +522,14 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[rewardB.symbol as string]
+              this.price.prices[rewardB.mintAddress as string]
 
             const liquidityCoinValue =
               getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              this.price.prices[liquidityItem?.coin.mintAddress as string]
             const liquidityPcValue =
               getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
-              this.price.prices[liquidityItem?.pc.symbol as string]
+              this.price.prices[liquidityItem?.pc.mintAddress as string]
 
             const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
             const liquidityTotalSupply = getBigNumber((liquidityItem?.lp.totalSupply as TokenAmount).toEther())
@@ -570,14 +570,14 @@ export default Vue.extend({
               60 *
               24 *
               365 *
-              this.price.prices[reward.symbol as string]
+              this.price.prices[reward.mintAddress as string]
 
             const liquidityCoinValue =
               getBigNumber((liquidityItem?.coin.balance as TokenAmount).toEther()) *
-              this.price.prices[liquidityItem?.coin.symbol as string]
+              this.price.prices[liquidityItem?.coin.mintAddress as string]
             const liquidityPcValue =
               getBigNumber((liquidityItem?.pc.balance as TokenAmount).toEther()) *
-              this.price.prices[liquidityItem?.pc.symbol as string]
+              this.price.prices[liquidityItem?.pc.mintAddress as string]
 
             const liquidityTotalValue = liquidityPcValue + liquidityCoinValue
             const liquidityTotalSupply = getBigNumber((liquidityItem?.lp.totalSupply as TokenAmount).toEther())

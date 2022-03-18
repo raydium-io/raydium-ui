@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash-es'
 import { PricesData } from '@/types/api'
 
 import logger from '@/utils/logger'
+import { NATIVE_SOL, WSOL_MINT } from '@/utils/tokens'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -52,6 +53,7 @@ export const actions = actionTree(
       commit('setLoading', true)
 
       const prices: PricesData = await this.$api.getPrices()
+      prices[NATIVE_SOL.mintAddress] = prices[WSOL_MINT]
 
       commit('setPrices', prices)
       logger('Price updated')

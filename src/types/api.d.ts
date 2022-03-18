@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 export interface PricesData {
-  [key: string]: number
+  [mint: string]: number
 }
 
 export interface InfoData {

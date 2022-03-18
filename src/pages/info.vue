@@ -34,7 +34,7 @@
           <div class="data_div">
             <div class="data_div_title font_color_3">RAY Price</div>
             <div class="data_div_num">
-              ${{ (Math.round(prices.RAY * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }}
+              ${{ (Math.round(prices[RAY_MINT] * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') }}
             </div>
           </div>
           <div style="clear: both"></div>
@@ -229,6 +229,7 @@
 </template>
 
 <script lang="ts">
+import { RAY_MINT } from '@/utils/tokens'
 import { Vue, Component } from 'nuxt-property-decorator'
 
 @Component({
@@ -251,6 +252,7 @@ export default class Info extends Vue {
   tvl = 0
   volume24h = 0
   timer: number | undefined = undefined
+  RAY_MINT = RAY_MINT
 
   get isMobile() {
     return this.$accessor.isMobile

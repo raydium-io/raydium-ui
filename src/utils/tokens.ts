@@ -90,6 +90,9 @@ export const NATIVE_SOL: TokenInfo = {
   tags: ['raydium']
 }
 
+export const RAY_MINT: string = '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'
+export const WSOL_MINT: string = 'So11111111111111111111111111111111111111112'
+
 export const TOKENS: Tokens = {
   WSOL: {
     symbol: 'WSOL',

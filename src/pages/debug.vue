@@ -47,7 +47,8 @@
               (rewardB = pool.rewardB || {}),
               (userInfo = farm.stakeAccounts[poolId] || {}),
               (userLpAccount = wallet.tokenAccounts[lp.mintAddress] || {}),
-              (lpPrice = lp.coin && lp.pc ? prices[lp.coin.symbol] + prices[lp.pc.symbol] : prices[lp.symbol]))
+              (lpPrice =
+                lp.coin && lp.pc ? prices[lp.coin.mintAddress] + prices[lp.pc.mintAddress] : prices[lp.mintAddress]))
             }}
             <table>
               <tbody>
