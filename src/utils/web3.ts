@@ -310,35 +310,35 @@ export async function getFilteredProgramAccounts(
   }))
 }
 
-export async function getFilteredProgramAccountsAmmOrMarketCache(
-  cacheName: String,
-  connection: Connection,
-  programId: PublicKey,
-  filters: any
-): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
-  try {
-    if (!cacheName) {
-      throw new Error('cacheName error')
-    }
+// export async function getFilteredProgramAccountsAmmOrMarketCache(
+//   cacheName: String,
+//   connection: Connection,
+//   programId: PublicKey,
+//   filters: any
+// ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
+//   try {
+//     if (!cacheName) {
+//       throw new Error('cacheName error')
+//     }
 
-    const resp = await (await fetch('https://api.raydium.io/cache/rpc/' + cacheName)).json()
-    if (resp.error) {
-      throw new Error(resp.error.message)
-    }
-    // @ts-ignore
-    return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
-      publicKey: new PublicKey(pubkey),
-      accountInfo: {
-        data: Buffer.from(data[0], 'base64'),
-        executable,
-        owner: new PublicKey(owner),
-        lamports
-      }
-    }))
-  } catch (e) {
-    return getFilteredProgramAccounts(connection, programId, filters)
-  }
-}
+//     const resp = await (await fetch('https://api.raydium.io/cache/rpc/' + cacheName)).json()
+//     if (resp.error) {
+//       throw new Error(resp.error.message)
+//     }
+//     // @ts-ignore
+//     return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
+//       publicKey: new PublicKey(pubkey),
+//       accountInfo: {
+//         data: Buffer.from(data[0], 'base64'),
+//         executable,
+//         owner: new PublicKey(owner),
+//         lamports
+//       }
+//     }))
+//   } catch (e) {
+//     return getFilteredProgramAccounts(connection, programId, filters)
+//   }
+// }
 
 // getMultipleAccounts
 export async function getMultipleAccounts(

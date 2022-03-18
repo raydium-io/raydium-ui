@@ -3170,23 +3170,26 @@ function blockBlackList(tokens: { address: string }[]) {
 }
 
 function addTokensSolana() {
-  fetch('https://api.raydium.io/cache/solana-token-list')
-    .then(async (response) => {
-      addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
-    })
-    .catch(() => {
-      fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
-        .then(function (response) {
-          return response.json()
-        })
-        .then(function (myJson) {
-          addTokensSolanaFunc(blockBlackList(myJson.tokens))
-        })
-    })
+  blockBlackList([])
+  addTokensSolanaFunc([])
+  flushTokenIcon([])
+  // fetch('https://api.raydium.io/cache/solana-token-list')
+  //   .then(async (response) => {
+  //     addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
+  //   })
+  //   .catch(() => {
+  //     fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
+  //       .then(function (response) {
+  //         return response.json()
+  //       })
+  //       .then(function (myJson) {
+  //         addTokensSolanaFunc(blockBlackList(myJson.tokens))
+  //       })
+  //   })
 
-  fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
-    flushTokenIcon(Object.values((await response.json()).spl))
-  })
+  // fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
+  //   flushTokenIcon(Object.values((await response.json()).spl))
+  // })
 }
 
 const notUseSolanaPicMint: string[] = [TOKENS.TTT.mintAddress]

@@ -2,26 +2,26 @@ import { cloneDeep } from 'lodash-es'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
 import { OpenOrders } from '@project-serum/serum'
-import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
+// import { _MARKET_STATE_LAYOUT_V2 } from '@project-serum/serum/lib/market'
 // eslint-disable-next-line import/named
-import { AccountInfo, PublicKey } from '@solana/web3.js'
-import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
+import { PublicKey } from '@solana/web3.js'
+// import { LIQUIDITY_POOL_PROGRAM_ID_V4, SERUM_PROGRAM_ID_V3 } from '@/utils/ids'
 import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from '@/utils/layouts'
 import {
   AMM_INFO_LAYOUT,
   AMM_INFO_LAYOUT_STABLE,
   AMM_INFO_LAYOUT_V3,
-  AMM_INFO_LAYOUT_V4,
-  getLpMintListDecimals
+  AMM_INFO_LAYOUT_V4
+  // getLpMintListDecimals
 } from '@/utils/liquidity'
 import logger from '@/utils/logger'
 import { getAddressForWhat, LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
-import { LP_TOKENS, NATIVE_SOL, TokenInfo, TOKENS } from '@/utils/tokens'
+import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import {
   commitment,
-  createAmmAuthority,
-  getFilteredProgramAccountsAmmOrMarketCache,
+  // createAmmAuthority,
+  // getFilteredProgramAccountsAmmOrMarketCache,
   getMultipleAccounts
 } from '@/utils/web3'
 import { formatLayout } from '@/utils/stable'
@@ -29,10 +29,10 @@ import { formatLayout } from '@/utils/stable'
 const AUTO_REFRESH_TIME = 60
 
 // fake
-const BLACK_LIST: string[] = [
-  'DHgHX6eqZQTcRY5xixV5sM68NZBpJLLvnM9riG7i5FHz',
-  '5uN8CdpKxKFTkobBnqdv8bx6c7coGNSJgWX6AJLnyKxW'
-]
+// const BLACK_LIST: string[] = [
+//   'DHgHX6eqZQTcRY5xixV5sM68NZBpJLLvnM9riG7i5FHz',
+//   '5uN8CdpKxKFTkobBnqdv8bx6c7coGNSJgWX6AJLnyKxW'
+// ]
 
 export const state = () => ({
   initialized: false,
@@ -77,6 +77,180 @@ export const mutations = mutationTree(state, {
   }
 })
 
+interface tokenItemApi {
+  [mint: string]: {
+    symbol: string
+    decimals: number
+    icon: string
+  }
+}
+interface tokenApi {
+  official: tokenItemApi
+  unOfficial: tokenItemApi
+  blacklist: string[]
+}
+
+async function updateToken(axios: any) {
+  const tokens: tokenApi = await axios.get('https://api.raydium.io/v1/main/token')
+  for (const itemTokenMint of Object.keys(tokens.official)) {
+    const itemToken = tokens.official[itemTokenMint]
+    const knownTokenInfo = Object.entries(TOKENS).find((item) => item[1].mintAddress === itemTokenMint)
+    if (knownTokenInfo) {
+      if (!knownTokenInfo[1].tags.includes('raydium')) {
+        TOKENS[knownTokenInfo[0]].tags.push('raydium')
+      }
+      TOKENS[knownTokenInfo[0]].picUrl = tokens.official[itemTokenMint].icon
+    } else {
+      TOKENS[itemTokenMint] = {
+        symbol: itemToken.symbol,
+        name: itemToken.symbol,
+        mintAddress: itemTokenMint,
+        decimals: itemToken.decimals,
+        tags: ['raydium'],
+        picUrl: itemToken.icon
+      }
+    }
+  }
+  for (const itemTokenMint of Object.keys(tokens.unOfficial)) {
+    const itemToken = tokens.unOfficial[itemTokenMint]
+    const knownTokenInfo = Object.entries(TOKENS).find((item) => item[1].mintAddress === itemTokenMint)
+    if (knownTokenInfo) {
+      if (!knownTokenInfo[1].tags.includes('solana')) {
+        TOKENS[knownTokenInfo[0]].tags.push('solana')
+      }
+      TOKENS[knownTokenInfo[0]].picUrl = tokens.unOfficial[itemTokenMint].icon
+    } else {
+      TOKENS[itemTokenMint] = {
+        symbol: itemToken.symbol,
+        name: itemToken.symbol,
+        mintAddress: itemTokenMint,
+        decimals: itemToken.decimals,
+        tags: ['solana'],
+        picUrl: itemToken.icon
+      }
+    }
+  }
+}
+
+interface liquidityItemApi {
+  coin: string
+  pc: string
+  lp: string
+  coinDecimals: number
+  pcDecimals: number
+  version: number
+  programId: string
+  ammAuthority: string
+  ammOpenOrders: string
+  ammTargetOrders: string
+  modelDataAccount: string
+  poolCoinTokenAccount: string
+  poolPcTokenAccount: string
+  poolWithdrawQueue: string
+  poolTempLpTokenAccount: string
+  serumProgramId: string
+  serumMarket: string
+  serumBids: string
+  serumAsks: string
+  serumEventQueue: string
+  serumCoinVaultAccount: string
+  serumPcVaultAccount: string
+  serumVaultSigner: string
+}
+interface liquidityApi {
+  official: { [poolId: string]: liquidityItemApi }
+  unOfficial: { [poolId: string]: liquidityItemApi }
+}
+
+function checkLiquidity(poolInfos: { [poolId: string]: liquidityItemApi }, official: boolean) {
+  for (const [poolId, poolInfo] of Object.entries(poolInfos)) {
+    let coinTokenInfo =
+      TOKENS[poolInfo.coin] ?? Object.values(TOKENS).find((item) => item.mintAddress === poolInfo.coin)
+    let pcTokenInfo = TOKENS[poolInfo.pc] ?? Object.values(TOKENS).find((item) => item.mintAddress === poolInfo.pc)
+    if (poolInfo.coin === TOKENS.WSOL.mintAddress) {
+      coinTokenInfo = { ...NATIVE_SOL }
+    } else if (coinTokenInfo === undefined) {
+      coinTokenInfo = {
+        symbol: 'unknown',
+        name: 'unknown',
+        mintAddress: poolInfo.coin,
+        decimals: poolInfo.coinDecimals,
+        cache: true,
+        tags: []
+      }
+      TOKENS[poolInfo.coin] = { ...coinTokenInfo }
+    }
+    if (poolInfo.pc === TOKENS.WSOL.mintAddress) {
+      pcTokenInfo = { ...NATIVE_SOL }
+    } else if (pcTokenInfo === undefined) {
+      pcTokenInfo = {
+        symbol: 'unknown',
+        name: 'unknown',
+        mintAddress: poolInfo.pc,
+        decimals: poolInfo.pcDecimals,
+        cache: true,
+        tags: []
+      }
+      TOKENS[poolInfo.pc] = { ...pcTokenInfo }
+    }
+
+    let lp = LP_TOKENS[poolInfo.lp] ?? Object.values(LP_TOKENS).find((item) => item.mintAddress === poolInfo.lp)
+    if (lp === undefined) {
+      lp = {
+        symbol: `${coinTokenInfo.symbol}-${pcTokenInfo.symbol}`,
+        name: `${coinTokenInfo.symbol}-${pcTokenInfo.symbol} LP`,
+        coin: { ...coinTokenInfo },
+        pc: { ...pcTokenInfo },
+
+        mintAddress: poolInfo.lp,
+        decimals: coinTokenInfo.decimals
+      }
+      LP_TOKENS[poolInfo.lp] = lp
+    }
+
+    const itemLiquidity = {
+      name: `${coinTokenInfo.symbol}-${pcTokenInfo.symbol}`,
+      coin: coinTokenInfo,
+      pc: pcTokenInfo,
+      lp,
+      version: poolInfo.version,
+      programId: poolInfo.programId,
+      ammId: poolId,
+      ammAuthority: poolInfo.ammAuthority,
+      ammOpenOrders: poolInfo.ammOpenOrders,
+      ammTargetOrders: poolInfo.ammTargetOrders,
+      ammQuantities: NATIVE_SOL.mintAddress,
+      poolCoinTokenAccount: poolInfo.poolCoinTokenAccount,
+      poolPcTokenAccount: poolInfo.poolPcTokenAccount,
+      poolWithdrawQueue: poolInfo.poolWithdrawQueue,
+      poolTempLpTokenAccount: poolInfo.poolTempLpTokenAccount,
+      serumProgramId: poolInfo.serumProgramId,
+      serumMarket: poolInfo.serumMarket,
+      serumBids: poolInfo.serumBids,
+      serumAsks: poolInfo.serumAsks,
+      serumEventQueue: poolInfo.serumEventQueue,
+      serumCoinVaultAccount: poolInfo.serumCoinVaultAccount,
+      serumPcVaultAccount: poolInfo.serumPcVaultAccount,
+      serumVaultSigner: poolInfo.serumVaultSigner,
+      official
+    }
+
+    if (!LIQUIDITY_POOLS.find((item) => item.ammId === poolId)) {
+      LIQUIDITY_POOLS.push(itemLiquidity)
+    } else {
+      for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {
+        if (
+          LIQUIDITY_POOLS[itemIndex].ammId === itemLiquidity.ammId &&
+          LIQUIDITY_POOLS[itemIndex].name !== itemLiquidity.name &&
+          LIQUIDITY_POOLS[itemIndex].official !== itemLiquidity.official
+        ) {
+          LIQUIDITY_POOLS[itemIndex] = itemLiquidity
+        }
+      }
+    }
+  }
+}
+
 export const actions = actionTree(
   { state, getters, mutations },
   {
@@ -85,189 +259,11 @@ export const actions = actionTree(
 
       const conn = this.$web3
 
-      let ammAll: {
-        publicKey: PublicKey
-        accountInfo: AccountInfo<Buffer>
-      }[] = []
-      let marketAll: {
-        publicKey: PublicKey
-        accountInfo: AccountInfo<Buffer>
-      }[] = []
+      await updateToken(this.$axios)
 
-      await Promise.all([
-        await (async () => {
-          ammAll = await getFilteredProgramAccountsAmmOrMarketCache(
-            'amm',
-            conn,
-            new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4),
-            [
-              {
-                dataSize: AMM_INFO_LAYOUT_V4.span
-              }
-            ]
-          )
-        })(),
-        await (async () => {
-          marketAll = await getFilteredProgramAccountsAmmOrMarketCache(
-            'market',
-            conn,
-            new PublicKey(SERUM_PROGRAM_ID_V3),
-            [
-              {
-                dataSize: _MARKET_STATE_LAYOUT_V2.span
-              }
-            ]
-          )
-        })()
-      ])
-
-      const marketToLayout: { [name: string]: any } = {}
-      marketAll.forEach((item) => {
-        marketToLayout[item.publicKey.toString()] = _MARKET_STATE_LAYOUT_V2.decode(item.accountInfo.data)
-      })
-
-      const lpMintAddressList: string[] = []
-      ammAll.forEach((item) => {
-        const ammLayout = AMM_INFO_LAYOUT_V4.decode(Buffer.from(item.accountInfo.data))
-        if (
-          ammLayout.pcMintAddress.toString() === ammLayout.serumMarket.toString() ||
-          ammLayout.lpMintAddress.toString() === '11111111111111111111111111111111'
-        ) {
-          return
-        }
-        lpMintAddressList.push(ammLayout.lpMintAddress.toString())
-      })
-      const lpMintListDecimls = await getLpMintListDecimals(conn, lpMintAddressList)
-
-      const tokenMintData: { [mintAddress: string]: TokenInfo } = {}
-      for (const itemToken of Object.values(TOKENS)) {
-        tokenMintData[itemToken.mintAddress] = itemToken
-      }
-      for (let indexAmmInfo = 0; indexAmmInfo < ammAll.length; indexAmmInfo += 1) {
-        if (BLACK_LIST.includes(ammAll[indexAmmInfo].publicKey.toString())) continue
-        const ammInfo = AMM_INFO_LAYOUT_V4.decode(Buffer.from(ammAll[indexAmmInfo].accountInfo.data))
-        if (
-          !Object.keys(lpMintListDecimls).includes(ammInfo.lpMintAddress.toString()) ||
-          ammInfo.pcMintAddress.toString() === ammInfo.serumMarket.toString() ||
-          ammInfo.lpMintAddress.toString() === '11111111111111111111111111111111' ||
-          !Object.keys(marketToLayout).includes(ammInfo.serumMarket.toString())
-        ) {
-          continue
-        }
-        const fromCoin =
-          ammInfo.coinMintAddress.toString() === TOKENS.WSOL.mintAddress
-            ? NATIVE_SOL.mintAddress
-            : ammInfo.coinMintAddress.toString()
-        const toCoin =
-          ammInfo.pcMintAddress.toString() === TOKENS.WSOL.mintAddress
-            ? NATIVE_SOL.mintAddress
-            : ammInfo.pcMintAddress.toString()
-        let coin = tokenMintData[fromCoin]
-        if (!coin && fromCoin !== NATIVE_SOL.mintAddress) {
-          TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`] = {
-            symbol: 'unknown',
-            name: 'unknown',
-            mintAddress: ammInfo.coinMintAddress.toString(),
-            decimals: getBigNumber(ammInfo.coinDecimals),
-            cache: true,
-            tags: []
-          }
-          coin = TOKENS[`unknow-${ammInfo.coinMintAddress.toString()}`]
-          tokenMintData[ammInfo.coinMintAddress.toString()] = coin
-        } else if (fromCoin === NATIVE_SOL.mintAddress) {
-          coin = NATIVE_SOL
-        }
-        if (!coin.tags.includes('unofficial')) {
-          coin.tags.push('unofficial')
-        }
-
-        let pc = tokenMintData[toCoin]
-        if (!pc && toCoin !== NATIVE_SOL.mintAddress) {
-          TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`] = {
-            symbol: 'unknown',
-            name: 'unknown',
-            mintAddress: ammInfo.pcMintAddress.toString(),
-            decimals: getBigNumber(ammInfo.pcDecimals),
-            cache: true,
-            tags: []
-          }
-          pc = TOKENS[`unknow-${ammInfo.pcMintAddress.toString()}`]
-          tokenMintData[ammInfo.pcMintAddress.toString()] = pc
-        } else if (toCoin === NATIVE_SOL.mintAddress) {
-          pc = NATIVE_SOL
-        }
-        if (!pc.tags.includes('unofficial')) {
-          pc.tags.push('unofficial')
-        }
-
-        if (coin.mintAddress === TOKENS.WSOL.mintAddress) {
-          coin.symbol = 'SOL'
-          coin.name = 'SOL'
-          coin.mintAddress = '11111111111111111111111111111111'
-        }
-        if (pc.mintAddress === TOKENS.WSOL.mintAddress) {
-          pc.symbol = 'SOL'
-          pc.name = 'SOL'
-          pc.mintAddress = '11111111111111111111111111111111'
-        }
-        const lp = Object.values(LP_TOKENS).find((item) => item.mintAddress === ammInfo.lpMintAddress) ?? {
-          symbol: `${coin.symbol}-${pc.symbol}`,
-          name: `${coin.symbol}-${pc.symbol}`,
-          coin,
-          pc,
-          mintAddress: ammInfo.lpMintAddress.toString(),
-          decimals: lpMintListDecimls[ammInfo.lpMintAddress]
-        }
-
-        const { publicKey } = await createAmmAuthority(new PublicKey(LIQUIDITY_POOL_PROGRAM_ID_V4))
-
-        const market = marketToLayout[ammInfo.serumMarket]
-
-        const serumVaultSigner = await PublicKey.createProgramAddress(
-          [ammInfo.serumMarket.toBuffer(), market.vaultSignerNonce.toArrayLike(Buffer, 'le', 8)],
-          new PublicKey(SERUM_PROGRAM_ID_V3)
-        )
-
-        const itemLiquidity: LiquidityPoolInfo = {
-          name: `${coin.symbol}-${pc.symbol}`,
-          coin,
-          pc,
-          lp,
-          version: 4,
-          programId: LIQUIDITY_POOL_PROGRAM_ID_V4,
-          ammId: ammAll[indexAmmInfo].publicKey.toString(),
-          ammAuthority: publicKey.toString(),
-          ammOpenOrders: ammInfo.ammOpenOrders.toString(),
-          ammTargetOrders: ammInfo.ammTargetOrders.toString(),
-          ammQuantities: NATIVE_SOL.mintAddress,
-          poolCoinTokenAccount: ammInfo.poolCoinTokenAccount.toString(),
-          poolPcTokenAccount: ammInfo.poolPcTokenAccount.toString(),
-          poolWithdrawQueue: ammInfo.poolWithdrawQueue.toString(),
-          poolTempLpTokenAccount: ammInfo.poolTempLpTokenAccount.toString(),
-          serumProgramId: SERUM_PROGRAM_ID_V3,
-          serumMarket: ammInfo.serumMarket.toString(),
-          serumBids: market.bids.toString(),
-          serumAsks: market.asks.toString(),
-          serumEventQueue: market.eventQueue.toString(),
-          serumCoinVaultAccount: market.baseVault.toString(),
-          serumPcVaultAccount: market.quoteVault.toString(),
-          serumVaultSigner: serumVaultSigner.toString(),
-          official: false
-        }
-        if (!LIQUIDITY_POOLS.find((item) => item.ammId === itemLiquidity.ammId)) {
-          LIQUIDITY_POOLS.push(itemLiquidity)
-        } else {
-          for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {
-            if (
-              LIQUIDITY_POOLS[itemIndex].ammId === itemLiquidity.ammId &&
-              LIQUIDITY_POOLS[itemIndex].name !== itemLiquidity.name &&
-              !LIQUIDITY_POOLS[itemIndex].official
-            ) {
-              LIQUIDITY_POOLS[itemIndex] = itemLiquidity
-            }
-          }
-        }
-      }
+      const liquidityApiInfo: liquidityApi = await this.$axios.get('https://api.raydium.io/v1/main/liquidity')
+      checkLiquidity(liquidityApiInfo.official, true)
+      checkLiquidity(liquidityApiInfo.unOfficial, false)
 
       const liquidityPools: { [lp: string]: LiquidityPoolInfo } = {}
       const publicKeys: PublicKey[] = []

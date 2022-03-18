@@ -50,12 +50,12 @@
         >
           <span slot="name" slot-scope="text, row" class="lp-icons">
             <div class="icons">
-              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[0] : ''" />
-              <CoinIcon :mint-address="row.pair_id ? row.pair_id.split('-')[1] : ''" />
+              <CoinIcon :mint-address="row.pairId ? row.pairId.split('-')[0] : ''" />
+              <CoinIcon :mint-address="row.pairId ? row.pairId.split('-')[1] : ''" />
             </div>
-            <NuxtLink :to="`/liquidity/?ammId=${row.amm_id}`">
+            <NuxtLink :to="`/liquidity/?ammId=${row.ammId}`">
               {{ row.name }}
-              {{ row.amm_id === '2EXiumdi14E9b8Fy62QcA5Uh6WdHS2b38wtSxp72Mibj' ? '(Stable)' : '' }}
+              {{ row.ammId === '2EXiumdi14E9b8Fy62QcA5Uh6WdHS2b38wtSxp72Mibj' ? '(Stable)' : '' }}
               <Tooltip v-if="row.liquidity < 100000" placement="right">
                 <template slot="title"
                   >This pool has relatively low liquidity. Always check the quoted price and that the pool has
@@ -66,9 +66,9 @@
             </NuxtLink>
           </span>
           <span slot="liquidity" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="volume_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="volume_7d" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="fee_24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="volume24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="volume7d" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
+          <span slot="fee24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="apy" slot-scope="text"> {{ new TokenAmount(text, 2, false).format() }}% </span>
         </Table>
       </div>
@@ -119,31 +119,31 @@ export default class Pools extends Vue {
     },
     {
       title: 'Volume (24hrs)',
-      dataIndex: 'volume_24h',
-      key: 'volume_24h',
-      scopedSlots: { customRender: 'volume_24h' },
-      sorter: (a: any, b: any) => a.volume_24h - b.volume_24h
+      dataIndex: 'volume24h',
+      key: 'volume24h',
+      scopedSlots: { customRender: 'volume24h' },
+      sorter: (a: any, b: any) => a.volume24h - b.volume24h
     },
     {
       title: 'Volume (7d)',
-      dataIndex: 'volume_7d',
-      key: 'volume_7d',
-      scopedSlots: { customRender: 'volume_7d' },
-      sorter: (a: any, b: any) => a.volume_7d - b.volume_7d
+      dataIndex: 'volume7d',
+      key: 'volume7d',
+      scopedSlots: { customRender: 'volume7d' },
+      sorter: (a: any, b: any) => a.volume7d - b.volume7d
     },
     {
       title: 'Fees (24hr)',
-      dataIndex: 'fee_24h',
-      key: 'fee_24h',
-      scopedSlots: { customRender: 'fee_24h' },
-      sorter: (a: any, b: any) => a.fee_24h - b.fee_24h
+      dataIndex: 'fee24h',
+      key: 'fee24h',
+      scopedSlots: { customRender: 'fee24h' },
+      sorter: (a: any, b: any) => a.fee24h - b.fee24h
     },
     {
       title: '1y Fees / Liquidity',
-      dataIndex: 'apy',
-      key: 'apy',
-      scopedSlots: { customRender: 'apy' },
-      sorter: (a: any, b: any) => a.apy - b.apy
+      dataIndex: 'apr',
+      key: 'apr',
+      scopedSlots: { customRender: 'apr' },
+      sorter: (a: any, b: any) => a.apr - b.apr
     }
   ]
 
@@ -174,7 +174,7 @@ export default class Pools extends Vue {
     let pools: PairData[]
     try {
       if (firstLoading) this.loading = true
-      pools = await this.$api.getPairs()
+      pools = (await this.$api.getPairs()).data
       this.pools = pools
     } catch (e) {
       pools = this.pools

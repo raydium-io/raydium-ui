@@ -82,7 +82,7 @@ type CampaignWinnerList = string[]
 export interface NuxtApiInstance {
   getPrices: () => Promise<PricesData>
   getInfo: () => Promise<InfoData>
-  getPairs: () => Promise<PairData[]>
+  getPairs: () => Promise<{ data: PairData[] }>
   getConfig: () => Promise<ConfigData>
   getEpochInfo: (rpc: string) => Promise<EpochInfo>
   getCompaign: (param: {
