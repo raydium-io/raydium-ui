@@ -1157,13 +1157,17 @@ export default Vue.extend({
       } else {
         // check coin
         if (this.fromCoin !== null) {
-          const newFromCoin = Object.values(TOKENS).find((item) => item.mintAddress === this.fromCoin?.mintAddress)
+          const newFromCoin =
+            TOKENS[this.fromCoin?.mintAddress] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === this.fromCoin?.mintAddress)
           if (newFromCoin === null || newFromCoin === undefined) {
             this.fromCoin = null
           }
         }
         if (this.toCoin !== null) {
-          const newToCoin = Object.values(TOKENS).find((item) => item.mintAddress === this.toCoin?.mintAddress)
+          const newToCoin =
+            TOKENS[this.toCoin?.mintAddress] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === this.toCoin?.mintAddress)
           if (newToCoin === null || newToCoin === undefined) {
             this.toCoin = null
           }

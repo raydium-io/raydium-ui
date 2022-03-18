@@ -15,7 +15,7 @@ import {
   // getLpMintListDecimals
 } from '@/utils/liquidity'
 import logger from '@/utils/logger'
-import { getAddressForWhat, LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools'
+import { LIQUIDITY_POOLS, LiquidityPoolInfo } from '@/utils/pools'
 import { TokenAmount } from '@/utils/safe-math'
 import { LP_TOKENS, NATIVE_SOL, TOKENS } from '@/utils/tokens'
 import {
@@ -268,6 +268,8 @@ export const actions = actionTree(
       const liquidityPools: { [lp: string]: LiquidityPoolInfo } = {}
       const publicKeys: PublicKey[] = []
 
+      const tempKey: { [key: string]: { key: string; lpMintAddress: string; version: number } } = {}
+
       LIQUIDITY_POOLS.forEach((pool) => {
         const { poolCoinTokenAccount, poolPcTokenAccount, ammOpenOrders, ammId, coin, pc, lp } = pool
 
@@ -278,6 +280,19 @@ export const actions = actionTree(
           new PublicKey(ammId),
           new PublicKey(lp.mintAddress)
         )
+        tempKey[poolCoinTokenAccount] = {
+          key: 'poolCoinTokenAccount',
+          lpMintAddress: lp.mintAddress,
+          version: pool.version
+        }
+        tempKey[poolPcTokenAccount] = {
+          key: 'poolPcTokenAccount',
+          lpMintAddress: lp.mintAddress,
+          version: pool.version
+        }
+        tempKey[ammOpenOrders] = { key: 'ammOpenOrders', lpMintAddress: lp.mintAddress, version: pool.version }
+        tempKey[ammId] = { key: 'ammId', lpMintAddress: lp.mintAddress, version: pool.version }
+        tempKey[lp.mintAddress] = { key: 'lpMintAddress', lpMintAddress: lp.mintAddress, version: pool.version }
 
         const poolInfo = cloneDeep(pool)
 
@@ -295,7 +310,7 @@ export const actions = actionTree(
           const address = info.publicKey.toBase58()
           const data = Buffer.from(info.account.data)
 
-          const { key, lpMintAddress, version } = getAddressForWhat(address)
+          const { key, lpMintAddress, version } = tempKey[address]
 
           if (key && lpMintAddress) {
             const poolInfo: any = liquidityPools[lpMintAddress]

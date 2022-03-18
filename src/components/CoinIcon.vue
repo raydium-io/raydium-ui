@@ -50,7 +50,7 @@ export default Vue.extend({
       if (this.mintAddress === NATIVE_SOL.mintAddress) {
         token = NATIVE_SOL
       } else {
-        token = Object.values(TOKENS).find((item) => item.mintAddress === this.mintAddress)
+        token = TOKENS[this.mintAddress] ?? Object.values(TOKENS).find((item) => item.mintAddress === this.mintAddress)
       }
       if (token) {
         this.coinName = token.symbol.toLowerCase()
