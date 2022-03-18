@@ -3112,6 +3112,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: 'YxFUkd8xiLTNRcMspfMTiWsY4hfajir9vNexqntUje2',
     decimals: TOKENS.BONES.decimals
+  },
+  'DGE-USDC-V4': {
+    symbol: 'DGE-USDC',
+    name: 'DGE-USDC LP',
+    coin: { ...TOKENS.DGE },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '5HRjr4s8e6QF8LGv1sqvedJk9sNxenSgfEuU7SNamAJJ',
+    decimals: TOKENS.DGE.decimals
   }
 }
 
