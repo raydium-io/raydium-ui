@@ -45,7 +45,7 @@ export default Vue.extend({
         return
       }
       this.verifyValue = 'loading'
-      this.$axios.get('https://api.raydium.io/verifytg', { params: { s: this.userInputName } }).then((data) => {
+      this.$axios.get('https://api.raydium.io/v1/main/verifytg', { params: { s: this.userInputName } }).then((data) => {
         // @ts-ignore
         this.verifyValue = data.msg
       })
