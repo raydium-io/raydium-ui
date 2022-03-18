@@ -326,7 +326,8 @@ export const TOKENS: Tokens = {
     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
     decimals: 6,
     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy',
-    tags: ['raydium']
+    tags: ['raydium'],
+    picUrl: 'https://sdk.raydium.io/icons/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R.png'
   },
   xCOPE: {
     symbol: 'xCOPE',
