@@ -313,7 +313,8 @@ export default Vue.extend({
           description: ''
         })
       } else if (this.addUserCoinToken !== null) {
-        const key = Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === this.keyword)
+        const key =
+          TOKENS[this.keyword] ?? Object.keys(TOKENS).find((item) => TOKENS[item].mintAddress === this.keyword)
         if (key === undefined) {
           return
         }

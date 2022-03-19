@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { cloneDeep } from 'lodash-es'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
-import { FARMS, getAddressForWhat, getFarmByPoolId } from '@/utils/farms'
+import { FARMS, getFarmByPoolId } from '@/utils/farms'
 import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
 import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
 import logger from '@/utils/logger'
@@ -91,10 +91,15 @@ export const actions = actionTree(
       const farms = {} as any
       const publicKeys = [] as any
 
+      const tempKey: { [key: string]: { key: string; poolId: string } } = {}
+
       FARMS.forEach((farm) => {
         const { lp, poolId, poolLpTokenAccount } = farm
 
         publicKeys.push(new PublicKey(poolId), new PublicKey(poolLpTokenAccount))
+
+        tempKey[poolId] = { key: 'poolId', poolId }
+        tempKey[poolLpTokenAccount] = { key: 'poolLpTokenAccount', poolId }
 
         const farmInfo = cloneDeep(farm)
 
@@ -109,7 +114,7 @@ export const actions = actionTree(
           const address = info.publicKey.toBase58()
           const data = Buffer.from(info.account.data)
 
-          const { key, poolId } = getAddressForWhat(address)
+          const { key, poolId } = tempKey[address]
 
           if (key && poolId) {
             const farmInfo = farms[poolId]

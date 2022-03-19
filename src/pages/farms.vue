@@ -479,7 +479,7 @@ export default Vue.extend({
     async updateFarms() {
       const farms: any[] = []
       const endedFarmsPoolId: string[] = []
-      const pools = await this.$api.getPairs()
+      const pools = (await this.$api.getPairs()).data
 
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         const isFusion = Boolean((farmInfo as any).fusion)
@@ -492,13 +492,13 @@ export default Vue.extend({
           const { reward, rewardB, lp } = farmInfo
 
           // @ts-ignore
-          const poolsLp = pools.find((item) => item.lp_mint === lp.mintAddress)
+          const poolsLp = pools.find((item) => item.lpMint === lp.mintAddress)
 
           const newFarmInfo = cloneDeep(farmInfo)
 
           if (poolsLp) {
             // @ts-ignore
-            newFarmInfo.fees = poolsLp.apy
+            newFarmInfo.fees = poolsLp.apr
           }
 
           // for fusion

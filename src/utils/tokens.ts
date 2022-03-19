@@ -326,7 +326,8 @@ export const TOKENS: Tokens = {
     mintAddress: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
     decimals: 6,
     referrer: '33XpMmMQRf6tSPpmYyzpwU4uXpZHkFwCZsusD9dMYkjy',
-    tags: ['raydium']
+    tags: ['raydium'],
+    picUrl: 'https://sdk.raydium.io/icons/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R.png'
   },
   xCOPE: {
     symbol: 'xCOPE',
@@ -3170,23 +3171,26 @@ function blockBlackList(tokens: { address: string }[]) {
 }
 
 function addTokensSolana() {
-  fetch('https://api.raydium.io/cache/solana-token-list')
-    .then(async (response) => {
-      addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
-    })
-    .catch(() => {
-      fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
-        .then(function (response) {
-          return response.json()
-        })
-        .then(function (myJson) {
-          addTokensSolanaFunc(blockBlackList(myJson.tokens))
-        })
-    })
+  blockBlackList([])
+  addTokensSolanaFunc([])
+  flushTokenIcon([])
+  // fetch('https://api.raydium.io/cache/solana-token-list')
+  //   .then(async (response) => {
+  //     addTokensSolanaFunc(blockBlackList((await response.json()).tokens))
+  //   })
+  //   .catch(() => {
+  //     fetch('https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json')
+  //       .then(function (response) {
+  //         return response.json()
+  //       })
+  //       .then(function (myJson) {
+  //         addTokensSolanaFunc(blockBlackList(myJson.tokens))
+  //       })
+  //   })
 
-  fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
-    flushTokenIcon(Object.values((await response.json()).spl))
-  })
+  // fetch('https://sdk.raydium.io/token/raydium.mainnet.json').then(async (response) => {
+  //   flushTokenIcon(Object.values((await response.json()).spl))
+  // })
 }
 
 const notUseSolanaPicMint: string[] = [TOKENS.TTT.mintAddress]

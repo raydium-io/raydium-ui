@@ -657,7 +657,7 @@ import {
 import { TokenAmount, gt, lt } from '@/utils/safe-math'
 import { getUnixTs } from '@/utils'
 import { getLiquidityInfoSimilar } from '@/utils/liquidity'
-import { isOfficalMarket, LiquidityPoolInfo, LIQUIDITY_POOLS } from '@/utils/pools'
+import { LiquidityPoolInfo, LIQUIDITY_POOLS } from '@/utils/pools'
 import { RouterInfo, RouterInfoItem } from '@/types/api'
 import { getBigNumber } from '@/utils/layouts'
 
@@ -1157,13 +1157,17 @@ export default Vue.extend({
       } else {
         // check coin
         if (this.fromCoin !== null) {
-          const newFromCoin = Object.values(TOKENS).find((item) => item.mintAddress === this.fromCoin?.mintAddress)
+          const newFromCoin =
+            TOKENS[this.fromCoin?.mintAddress] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === this.fromCoin?.mintAddress)
           if (newFromCoin === null || newFromCoin === undefined) {
             this.fromCoin = null
           }
         }
         if (this.toCoin !== null) {
-          const newToCoin = Object.values(TOKENS).find((item) => item.mintAddress === this.toCoin?.mintAddress)
+          const newToCoin =
+            TOKENS[this.toCoin?.mintAddress] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === this.toCoin?.mintAddress)
           if (newToCoin === null || newToCoin === undefined) {
             this.toCoin = null
           }
@@ -1288,23 +1292,31 @@ export default Vue.extend({
         const marketAddress: string[] = []
 
         // serum
-        for (const address of Object.keys(this.swap.markets)) {
-          if (isOfficalMarket(address)) {
-            const info = cloneDeep(this.swap.markets[address])
-            let fromMint = this.fromCoin.mintAddress
-            let toMint = this.toCoin.mintAddress
-            if (fromMint === NATIVE_SOL.mintAddress) {
-              fromMint = TOKENS.WSOL.mintAddress
-            }
-            if (toMint === NATIVE_SOL.mintAddress) {
-              toMint = TOKENS.WSOL.mintAddress
-            }
-            if (
-              (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
-              (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
-            ) {
-              marketAddress.push(address)
-            }
+        // for (const address of Object.keys(this.swap.markets)) {
+        //   if (isOfficalMarket(address)) {
+        //     const info = cloneDeep(this.swap.markets[address])
+        //     let fromMint = this.fromCoin.mintAddress
+        //     let toMint = this.toCoin.mintAddress
+        //     if (fromMint === NATIVE_SOL.mintAddress) {
+        //       fromMint = TOKENS.WSOL.mintAddress
+        //     }
+        //     if (toMint === NATIVE_SOL.mintAddress) {
+        //       toMint = TOKENS.WSOL.mintAddress
+        //     }
+        //     if (
+        //       (info.baseMint.toBase58() === fromMint && info.quoteMint.toBase58() === toMint) ||
+        //       (info.baseMint.toBase58() === toMint && info.quoteMint.toBase58() === fromMint)
+        //     ) {
+        //       marketAddress.push(address)
+        //     }
+        //   }
+        // }
+        for (const item of LIQUIDITY_POOLS) {
+          if (
+            (item.coin.mintAddress === this.fromCoin.mintAddress && item.pc.mintAddress === this.toCoin.mintAddress) ||
+            (item.coin.mintAddress === this.toCoin.mintAddress && item.pc.mintAddress === this.fromCoin.mintAddress)
+          ) {
+            marketAddress.push(item.serumMarket)
           }
         }
 
