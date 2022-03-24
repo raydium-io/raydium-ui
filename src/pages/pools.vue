@@ -69,7 +69,7 @@
           <span slot="volume24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="volume7d" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
           <span slot="fee24h" slot-scope="text"> ${{ new TokenAmount(text, 2, false).format() }} </span>
-          <span slot="apy" slot-scope="text"> {{ new TokenAmount(text, 2, false).format() }}% </span>
+          <span slot="apr" slot-scope="text"> {{ new TokenAmount(text, 2, false).format() }}% </span>
         </Table>
       </div>
     </div>
