@@ -248,8 +248,8 @@
             !lpMintAddress ||
             !liquidity.initialized ||
             liquidity.loading ||
-            gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
-            gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '0') ||
+            gt(fromCoinAmountMin, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(toCoinAmountMin, toCoin.balance ? toCoin.balance.fixed() : '0') ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -261,10 +261,10 @@
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
+          <template v-else-if="gt(fromCoinAmountMin, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '')">
+          <template v-else-if="gt(toCoinAmountMin, toCoin.balance ? toCoin.balance.fixed() : '0')">
             Insufficient {{ toCoin.symbol }} balance
           </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, fromCoinAmount)">
