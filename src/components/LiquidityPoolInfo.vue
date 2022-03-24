@@ -16,6 +16,20 @@
     </div>
 
     <div class="fs-container">
+      <span class="name">Base</span>
+      <span>
+        {{ fixedCoinSymbol }}
+      </span>
+    </div>
+
+    <div class="fs-container">
+      <span class="name">Max Amount</span>
+      <span>
+        {{ maxAmount }}
+      </span>
+    </div>
+
+    <div class="fs-container">
       <span class="name">Pool liquidity</span>
       <div class="info">
         <span>
@@ -58,6 +72,14 @@ export default Vue.extend({
     poolInfo: {
       type: [Object || null],
       default: null
+    },
+    fixedCoinSymbol: {
+      type: String,
+      default: 'false'
+    },
+    maxAmount: {
+      type: Number,
+      default: 0
     }
   },
 

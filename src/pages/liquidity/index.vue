@@ -129,7 +129,7 @@
     <div class="card">
       <div class="card-body">
         <CoinInput
-          v-model="fromCoinAmount"
+          v-model="fromCoinAmountMin"
           label="Input"
           :mint-address="fromCoin ? fromCoin.mintAddress : ''"
           :coin-name="fromCoin ? fromCoin.symbol : ''"
@@ -156,7 +156,7 @@
         </div>
 
         <CoinInput
-          v-model="toCoinAmount"
+          v-model="toCoinAmountMin"
           label="Input"
           :mint-address="toCoin ? toCoin.mintAddress : ''"
           :coin-name="toCoin ? toCoin.symbol : ''"
@@ -176,7 +176,30 @@
           @onSelect="openToCoinSelect"
         />
 
-        <LiquidityPoolInfo :initialized="liquidity.initialized" :pool-info="liquidity.infos[lpMintAddress]" />
+        <LiquidityPoolInfo
+          :fixed-coin-symbol="
+            toCoin !== null && fixedCoin === toCoin.mintAddress
+              ? toCoin.symbol
+              : fromCoin !== null && fixedCoin === fromCoin.mintAddress
+              ? fromCoin.symbol
+              : ''
+          "
+          :max-amount="`${
+            toCoin !== null && fixedCoin === toCoin.mintAddress
+              ? fromCoinAmount
+              : fromCoin !== null && fixedCoin === fromCoin.mintAddress
+              ? toCoinAmount
+              : 0
+          } ${
+            toCoin !== null && fromCoin !== null && fixedCoin === toCoin.mintAddress
+              ? fromCoin.symbol
+              : toCoin !== null && fromCoin !== null && fixedCoin === fromCoin.mintAddress
+              ? toCoin.symbol
+              : ''
+          }`"
+          :initialized="liquidity.initialized"
+          :pool-info="liquidity.infos[lpMintAddress]"
+        />
         <!-- <div v-if="officialPool === false">
           <div style="margin: 10px">
             <div>AMM ID:</div>
@@ -225,8 +248,8 @@
             !lpMintAddress ||
             !liquidity.initialized ||
             liquidity.loading ||
-            gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
-            gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '0') ||
+            gt(fromCoinAmountMin, fromCoin.balance ? fromCoin.balance.fixed() : '0') ||
+            gt(toCoinAmountMin, toCoin.balance ? toCoin.balance.fixed() : '0') ||
             suppling ||
             (fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, fromCoinAmount)) ||
             (toCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(5, toCoinAmount))
@@ -238,10 +261,10 @@
           <template v-else-if="!lpMintAddress || !liquidity.initialized"> Invalid pair </template>
           <template v-else-if="!fromCoinAmount"> Enter an amount </template>
           <template v-else-if="liquidity.loading"> Updating pool information </template>
-          <template v-else-if="gt(fromCoinAmount, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
+          <template v-else-if="gt(fromCoinAmountMin, fromCoin.balance ? fromCoin.balance.fixed() : '0')">
             Insufficient {{ fromCoin.symbol }} balance
           </template>
-          <template v-else-if="gt(toCoinAmount, toCoin.balance ? toCoin.balance.fixed() : '')">
+          <template v-else-if="gt(toCoinAmountMin, toCoin.balance ? toCoin.balance.fixed() : '0')">
             Insufficient {{ toCoin.symbol }} balance
           </template>
           <template v-else-if="fromCoin.mintAddress === TOKENS.xCOPE.mintAddress && gt(50, fromCoinAmount)">
@@ -321,6 +344,8 @@ export default Vue.extend({
 
       fromCoin: RAY as TokenInfo | null,
       toCoin: null as TokenInfo | null,
+      fromCoinAmountMin: '',
+      toCoinAmountMin: '',
       fromCoinAmount: '',
       toCoinAmount: '',
 
@@ -456,6 +481,8 @@ export default Vue.extend({
         this.findLiquidityPool()
         this.fromCoinAmount = ''
         this.toCoinAmount = ''
+        this.fromCoinAmountMin = ''
+        this.toCoinAmountMin = ''
       }
     },
 
@@ -468,6 +495,8 @@ export default Vue.extend({
         this.findLiquidityPool()
         this.fromCoinAmount = ''
         this.toCoinAmount = ''
+        this.fromCoinAmountMin = ''
+        this.toCoinAmountMin = ''
       }
     },
 
@@ -675,9 +704,14 @@ export default Vue.extend({
     changeCoinAmountPosition() {
       const tempFromCoinAmount = this.fromCoinAmount
       const tempToCoinAmount = this.toCoinAmount
+      const tempFromCoinAmountMin = this.fromCoinAmountMin
+      const tempToCoinAmountMin = this.toCoinAmountMin
 
       this.fromCoinAmount = tempToCoinAmount
       this.toCoinAmount = tempFromCoinAmount
+
+      this.fromCoinAmountMin = tempToCoinAmountMin
+      this.toCoinAmountMin = tempFromCoinAmountMin
     },
 
     updateCoinInfo(tokenAccounts: any) {
@@ -780,7 +814,7 @@ export default Vue.extend({
         const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
         if (this.fixedCoin === this.fromCoin.mintAddress) {
-          const amount = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
+          const { outAmount, outMinAmount } = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
             poolInfo,
             this.fromCoinAmount,
             this.fromCoin.mintAddress,
@@ -788,15 +822,17 @@ export default Vue.extend({
             this.setting.slippage
           )
 
-          if (amount.isNaN() || !amount.isFinite()) {
+          if (outAmount.isNaN() || !outAmount.isFinite()) {
             this.toCoinAmount = ''
+            this.toCoinAmountMin = ''
           } else {
-            this.toCoinAmount = amount.toFixed(this.toCoin.decimals)
+            this.toCoinAmountMin = outMinAmount.toFixed(this.toCoin.decimals)
+            this.toCoinAmount = outAmount.toFixed(this.toCoin.decimals)
           }
         } else {
           const poolInfo = this.liquidity.infos[this.lpMintAddress]
 
-          const amount = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
+          const { outAmount, outMinAmount } = (poolInfo.version === 5 ? getOutAmountStable : getOutAmount)(
             poolInfo,
             this.toCoinAmount,
             this.toCoin.mintAddress,
@@ -804,10 +840,12 @@ export default Vue.extend({
             this.setting.slippage
           )
 
-          if (amount.isNaN() || !amount.isFinite()) {
+          if (outAmount.isNaN() || !outAmount.isFinite()) {
             this.fromCoinAmount = ''
+            this.fromCoinAmountMin = ''
           } else {
-            this.fromCoinAmount = amount.toFixed(this.toCoin.decimals)
+            this.fromCoinAmountMin = outMinAmount.toFixed(this.toCoin.decimals)
+            this.fromCoinAmount = outAmount.toFixed(this.toCoin.decimals)
           }
         }
       }

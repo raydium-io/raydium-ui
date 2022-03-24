@@ -68,20 +68,21 @@ export function getOutAmount(
   const percent = new BigNumber(100).plus(slippage).dividedBy(100)
 
   if (!coin.balance || !pc.balance) {
-    return outAmount
+    return { outAmount, outMinAmount: outAmount }
   }
 
   if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // outcoin is pc
     outAmount = fromAmount.multipliedBy(price)
-    outAmount = outAmount.multipliedBy(percent)
   } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
     // outcoin is coin
     outAmount = fromAmount.dividedBy(price)
-    outAmount = outAmount.multipliedBy(percent)
   }
 
-  return outAmount
+  return {
+    outAmount: outAmount.multipliedBy(percent),
+    outMinAmount: outAmount
+  }
 }
 
 export function getOutAmountStable(
@@ -95,7 +96,7 @@ export function getOutAmountStable(
 
   const x = poolInfo.coin.balance?.toEther()
   const y = poolInfo.pc.balance?.toEther()
-  if (!x || !y) return new BigNumber(0)
+  if (!x || !y) return { outAmount: new BigNumber(0), outMinAmount: new BigNumber(0) }
 
   const price = y.dividedBy(x).toNumber()
   //  getStablePrice(currentK.toNumber(), x.toNumber(), y.toNumber(), true)
@@ -105,20 +106,21 @@ export function getOutAmountStable(
   const percent = new BigNumber(100).plus(slippage).dividedBy(100)
 
   if (!coin.balance || !pc.balance) {
-    return outAmount
+    return { outAmount, outMinAmount: outAmount }
   }
 
   if (fromCoinMint === coin.mintAddress && toCoinMint === pc.mintAddress) {
     // outcoin is pc
     outAmount = fromAmount.multipliedBy(price)
-    outAmount = outAmount.multipliedBy(percent)
   } else if (fromCoinMint === pc.mintAddress && toCoinMint === coin.mintAddress) {
     // outcoin is coin
     outAmount = fromAmount.dividedBy(price)
-    outAmount = outAmount.multipliedBy(percent)
   }
 
-  return outAmount
+  return {
+    outAmount: outAmount.multipliedBy(percent),
+    outMinAmount: outAmount
+  }
 }
 
 /* eslint-disable */
