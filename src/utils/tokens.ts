@@ -1428,6 +1428,13 @@ export const TOKENS: Tokens = {
     mintAddress: 'AAXng5czWLNtTXHdWEn9Ef7kXMXEaraHj2JQKo7ZoLux',
     decimals: 9,
     tags: ['raydium']
+  },
+  PRGC: {
+    symbol: 'PRGC',
+    name: 'PRGC',
+    mintAddress: '66edZnAPEJSxnAK4SckuupssXpbu5doV57FUcghaqPsY',
+    decimals: 9,
+    tags: ['raydium']
   }
 }
 
@@ -3125,6 +3132,15 @@ export const LP_TOKENS: Tokens = {
 
     mintAddress: '5HRjr4s8e6QF8LGv1sqvedJk9sNxenSgfEuU7SNamAJJ',
     decimals: TOKENS.DGE.decimals
+  },
+  'PRGC-USDC-V4': {
+    symbol: 'PRGC-USDC',
+    name: 'PRGC-USDC LP',
+    coin: { ...TOKENS.PRGC },
+    pc: { ...TOKENS.USDC },
+
+    mintAddress: '2HEdj3PkxeMhkf19TW2pZbV4bEFJ5fyZHHrswzUZg5VL',
+    decimals: TOKENS.PRGC.decimals
   }
 }
 
