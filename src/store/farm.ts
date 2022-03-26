@@ -121,7 +121,7 @@ export const actions = actionTree(
           const lp =
             LP_TOKENS[farmItem.lpMint] ?? Object.values(LP_TOKENS).find((item) => item.mintAddress === farmItem.lpMint)
 
-          if (!(rewardA && rewardB && lp)) continue
+          if (!(rewardA && (farmItem.rewardMintB === null || rewardB) && lp)) continue
 
           farmsNew.push({
             name: 'PRGC-USDC',
