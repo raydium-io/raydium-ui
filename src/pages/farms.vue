@@ -98,12 +98,10 @@
             <CollapsePanel
               v-for="farm in farms.filter(isInSearch).filter(isInTab).filter(canShowByStaked)"
               v-show="
-                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) ||
-                  endedFarmsPoolIdWhiteList.includes(farm.farmInfo.poolId)) &&
+                ((!endedFarmsPoolId.includes(farm.farmInfo.poolId) || UPCOMING.includes(farm.farmInfo.poolId)) &&
                   !farm.farmInfo.legacy &&
                   poolType) ||
-                (((endedFarmsPoolId.includes(farm.farmInfo.poolId) &&
-                  !endedFarmsPoolIdWhiteList.includes(farm.farmInfo.poolId)) ||
+                (((endedFarmsPoolId.includes(farm.farmInfo.poolId) && !UPCOMING.includes(farm.farmInfo.poolId)) ||
                   farm.farmInfo.legacy) &&
                   !poolType)
               "
@@ -121,6 +119,23 @@
                     v-if="farm.farmInfo.fusion && Number(farm.farmInfo.apr) > 0 && Number(farm.farmInfo.aprB) > 0"
                     class="dual-tag"
                     >DUAL YIELD</span
+                  >
+                  <span
+                    v-if="
+                      UPCOMING.includes(farm.farmInfo.poolId) &&
+                      Number(farm.farmInfo.apr) === 0 &&
+                      Number(farm.farmInfo.aprB) === 0
+                    "
+                    class="new-tag"
+                    >UPCOMING POOL</span
+                  >
+                  <span
+                    v-if="
+                      UPCOMING.includes(farm.farmInfo.poolId) &&
+                      (Number(farm.farmInfo.apr) > 0 || Number(farm.farmInfo.aprB) > 0)
+                    "
+                    class="new-tag"
+                    >NEW POOL</span
                   >
                 </Col>
                 <Col class="state" :span="isMobile ? 6 : 5">
@@ -381,7 +396,7 @@ import {
 
 import { get, cloneDeep } from 'lodash-es'
 import { TokenAmount } from '@/utils/safe-math'
-import { FarmInfo } from '@/utils/farms'
+import { FarmInfo, UPCOMING } from '@/utils/farms'
 import { deposit, depositV5, withdraw, withdrawV4, withdrawV5 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
@@ -425,8 +440,8 @@ export default Vue.extend({
       unstaking: false,
       poolType: true,
       endedFarmsPoolId: [] as string[],
-      endedFarmsPoolIdWhiteList: ['GBjTMHf9TsRdMnP6S3ewAgpSoCacpZqQF1tXmnchborv'] as string[],
-      showCollapse: [] as any[]
+      showCollapse: [] as any[],
+      UPCOMING
     }
   },
 
@@ -1064,6 +1079,14 @@ export default Vue.extend({
         font-size: 10px;
         color: #c200fb;
         border: 1px solid #c200fb;
+        border-radius: 4px;
+      }
+      .new-tag {
+        margin-left: 8px;
+        padding: 0 7px;
+        font-size: 10px;
+        color: rgb(0, 209, 255);
+        border: 1px solid rgb(0, 209, 255);
         border-radius: 4px;
       }
     }

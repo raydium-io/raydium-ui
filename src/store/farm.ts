@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { cloneDeep } from 'lodash-es'
 import { actionTree, getterTree, mutationTree } from 'typed-vuex'
 
-import { FARMS, getFarmByPoolId } from '@/utils/farms'
+import { FARMS, FARMS_OLD, getFarmByPoolId, UPCOMING } from '@/utils/farms'
 import { STAKE_PROGRAM_ID, STAKE_PROGRAM_ID_V4, STAKE_PROGRAM_ID_V5 } from '@/utils/ids'
 import { ACCOUNT_LAYOUT, getBigNumber } from '@/utils/layouts'
 import logger from '@/utils/logger'
@@ -23,6 +23,7 @@ import {
   getMultipleAccounts
 } from '@/utils/web3'
 import BigNumber from 'bignumber.js'
+import { LP_TOKENS, TOKENS } from '@/utils/tokens'
 
 const AUTO_REFRESH_TIME = 60
 
@@ -79,12 +80,80 @@ export const mutations = mutationTree(state, {
   }
 })
 
+interface farmApiInfo {
+  id: string
+  lpMint: string
+  rewardMintA: string
+  rewardMintB: string
+  version: number
+  programId: string
+  authority: string
+  lpVault: string
+  rewardVaultA: string
+  rewardVaultB: string
+  upcoming: boolean
+}
+
 export const actions = actionTree(
   { state, getters, mutations },
   {
     async requestInfos({ commit, dispatch }) {
       commit('setLoading', true)
       dispatch('getStakeAccounts')
+
+      const farmsNew = []
+      const upcomings = []
+
+      const farmApiInfosData: { official: farmApiInfo[] } = await this.$axios.get('https://api.raydium.io/v1/main/farm')
+      const farmApiInfos = farmApiInfosData.official
+      for (const farmItem of farmApiInfos) {
+        if (farmItem.upcoming) upcomings.push(farmItem.id)
+
+        const known = FARMS_OLD.find((item) => item.poolId === farmItem.id)
+
+        if (known === undefined) {
+          const rewardA =
+            TOKENS[farmItem.rewardMintA] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === farmItem.rewardMintA)
+          const rewardB =
+            TOKENS[farmItem.rewardMintB] ??
+            Object.values(TOKENS).find((item) => item.mintAddress === farmItem.rewardMintB)
+          const lp =
+            LP_TOKENS[farmItem.lpMint] ?? Object.values(LP_TOKENS).find((item) => item.mintAddress === farmItem.lpMint)
+
+          if (!(rewardA && rewardB && lp)) continue
+
+          farmsNew.push({
+            name: 'PRGC-USDC',
+            lp: { ...lp },
+            reward: { ...rewardA },
+            rewardB: { ...rewardB },
+            isStake: false,
+
+            fusion: true,
+            legacy: false,
+            dual: false,
+            version: farmItem.version,
+            programId: farmItem.programId,
+
+            poolId: farmItem.id,
+            poolAuthority: farmItem.authority,
+            poolLpTokenAccount: farmItem.lpVault,
+            poolRewardTokenAccount: farmItem.rewardVaultA,
+            poolRewardTokenAccountB: farmItem.rewardVaultB
+          })
+        }
+      }
+
+      const tempFarms = [...FARMS_OLD, ...farmsNew]
+
+      FARMS.splice(0, FARMS.length)
+      FARMS.push(...tempFarms)
+
+      UPCOMING.splice(0, upcomings.length)
+      UPCOMING.push(...upcomings)
+
+      console.log(farmsNew.length, tempFarms.length)
 
       const conn = this.$web3
 
