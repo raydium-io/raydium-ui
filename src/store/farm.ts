@@ -124,13 +124,13 @@ export const actions = actionTree(
           if (!(rewardA && (farmItem.rewardMintB === null || rewardB) && lp)) continue
 
           farmsNew.push({
-            name: 'PRGC-USDC',
+            name: lp.symbol,
             lp: { ...lp },
             reward: { ...rewardA },
             rewardB: { ...rewardB },
             isStake: false,
 
-            fusion: true,
+            fusion: farmItem.version !== 3,
             legacy: false,
             dual: false,
             version: farmItem.version,
