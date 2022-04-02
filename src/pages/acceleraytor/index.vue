@@ -13,10 +13,20 @@
         <Carousel autoplay dots-class="carousel-dots">
           <div>
             <div class="inner-decorator-words">
-              Launching on April 5, full details coming soon!
-              <a href="https://nirvana.finance" rel="nofollow noopener noreferrer" target="_blank"> here</a>
+              Pools open April 5, 02:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/nirvana-is-launching-on-acceleraytor-6661c7b71e99"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
             </div>
-            <a href="https://nirvana.finance" rel="nofollow noopener noreferrer" target="_blank">
+            <a
+              href="https://raydium.medium.com/nirvana-is-launching-on-acceleraytor-6661c7b71e99"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
               <img class="carousel-image" src="../../assets/background/acceleraytor-nirvana.jpg" />
             </a>
           </div>

@@ -1435,6 +1435,25 @@ export const TOKENS: Tokens = {
     mintAddress: '66edZnAPEJSxnAK4SckuupssXpbu5doV57FUcghaqPsY',
     decimals: 9,
     tags: ['raydium']
+  },
+  prANA: {
+    symbol: 'prANA',
+    name: 'prANA',
+    mintAddress: 'PRAxfbouRoJ9yZqhyejEAH6RvjJ86Y82vfiZTBSM3xG',
+    decimals: 6,
+    tags: ['raydium'],
+
+    detailLink: 'https://raydium.medium.com/nirvana-is-launching-on-acceleraytor-6661c7b71e99',
+    details:
+      'The Nirvana protocol is a twin system that produces $ANA, a volatile token with an algorithmically rising floor price, as well as $NIRV, a decentralized superstable coin with a delegated peg.\n  Nirvana’s virtual AMM enables the minting of ANA from a diverse set of trusted stablecoin options. ANA’s price is free to appreciate, but the minimum floor price rises algorithmically as stablecoin reserves increase.\n  Zero liquidation-risk loans of the superstable NIRV token can be taken by staking ANA. Loans have a negative interest rate by virtue of prANA reward emissions, meaning users earn yield on debt.\n  Yield for staking ANA and taking NIRV loans is distributed in prANA (pre-ANA), which are tokens that act as non-expiring options to mint ANA at its floor price. Any funds used to exercise prANA return to the stablecoin reserve, adding value to the protocol and stabilizing floor price.',
+    docs: {
+      website: 'https://nirvana.finance/'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/nirvana_fi',
+      Telegram: 'https://t.me/nirvanadao',
+      Discord: 'https://discord.gg/Nirvanafi'
+    }
   }
 }
 
