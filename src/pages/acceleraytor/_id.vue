@@ -614,7 +614,10 @@
               <span class="text">
                 {{
                   $dayjs
-                    .unix(pool.info.startTime - 3600 * 24 * 7)
+                    .unix(
+                      pool.info.startTime -
+                        3600 * 24 * (pool.idoId === '3XJpeTMso92CxkNEKp9n6cBtRu89FsC3cUerkGUGtsSp' ? 5 : 7)
+                    )
                     .utc()
                     .format('YYYY-MM-DD HH:mm UTC')
                 }}
