@@ -100,6 +100,7 @@ async function updateToken(axios: any) {
         TOKENS[knownTokenInfo[0]].tags.push('raydium')
       }
       TOKENS[knownTokenInfo[0]].picUrl = tokens.official[itemTokenMint].icon
+      TOKENS[knownTokenInfo[0]].symbol = tokens.official[itemTokenMint].symbol
     } else {
       TOKENS[itemTokenMint] = {
         symbol: itemToken.symbol,
@@ -111,6 +112,7 @@ async function updateToken(axios: any) {
       }
     }
   }
+
   for (const itemTokenMint of Object.keys(tokens.unOfficial)) {
     const itemToken = tokens.unOfficial[itemTokenMint]
     const knownTokenInfo = Object.entries(TOKENS).find((item) => item[1].mintAddress === itemTokenMint)
@@ -119,6 +121,7 @@ async function updateToken(axios: any) {
         TOKENS[knownTokenInfo[0]].tags.push('solana')
       }
       TOKENS[knownTokenInfo[0]].picUrl = tokens.unOfficial[itemTokenMint].icon
+      TOKENS[knownTokenInfo[0]].symbol = tokens.unOfficial[itemTokenMint].symbol
     } else {
       TOKENS[itemTokenMint] = {
         symbol: itemToken.symbol,
