@@ -11,7 +11,7 @@
       </div>
       <div class="image-part">
         <Carousel autoplay dots-class="carousel-dots">
-          <div>
+          <!-- <div>
             <div class="inner-decorator-words">
               Pools open April 5, 02:00 UTC - Full details
               <a
@@ -28,6 +28,12 @@
               target="_blank"
             >
               <img class="carousel-image" src="../../assets/background/acceleraytor-nirvana.jpg" />
+            </a>
+          </div> -->
+          <div>
+            <div class="inner-decorator-words">Launching on April 20, full details coming soon!</div>
+            <a href="#" rel="nofollow noopener noreferrer">
+              <img class="carousel-image" src="../../assets/background/acceleraytor-hawksight.jpg" />
             </a>
           </div>
         </Carousel>
