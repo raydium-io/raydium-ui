@@ -31,8 +31,21 @@
             </a>
           </div> -->
           <div>
-            <div class="inner-decorator-words">Launching on April 20, full details coming soon!</div>
-            <a href="#" rel="nofollow noopener noreferrer">
+            <div class="inner-decorator-words">
+              Pools open April 20, 10:00 UTC - Full details
+              <a
+                href="https://raydium.medium.com/hawksight-is-launching-on-acceleraytor-88b5e8f9f2a8"
+                rel="nofollow noopener noreferrer"
+                target="_blank"
+              >
+                here</a
+              >
+            </div>
+            <a
+              href="https://raydium.medium.com/hawksight-is-launching-on-acceleraytor-88b5e8f9f2a8"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+            >
               <img class="carousel-image" src="../../assets/background/acceleraytor-hawksight.jpg" />
             </a>
           </div>

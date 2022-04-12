@@ -113,6 +113,24 @@ export interface IdoPool {
 
 export const IDO_POOLS: IdoPool[] = [
   {
+    base: { ...TOKENS.HAWK },
+    quote: { ...TOKENS.USDC },
+
+    price: new TokenAmount(0.012, TOKENS.USDC.decimals, false),
+    raise: new TokenAmount(20000000, TOKENS.HAWK.decimals, false),
+
+    version: 3, // just an identify for Lottery activity
+    programId: IDO_PROGRAM_ID_V3,
+    snapshotProgramId: '4kCccBVdQpsonm2jL2TRV1noMdarsWR2mhwwkxUTqW3W',
+
+    isRayPool: true,
+    isPrivate: false,
+    idoId: 'J8SYuY4PHJ8Z5FGDUvmzREKqXRSMY9zr88D6szpbMKNg',
+    baseVault: 'FdvbwAgaUaaEfx3fvscVoHZ6tULLs6xdhyMZukJaoZEe',
+    quoteVault: 'B5KFqoJ7w7tJ7LTXTEZZSWuHF192HmRUeAxJyXkBkw79',
+    seedId: 'FCFfK84Lwn9BPGwfJZvVgazjiNaWUVhBTB4Wxx4Aq4sz'
+  },
+  {
     base: { ...TOKENS.prANA },
     quote: { ...TOKENS.USDC },
 

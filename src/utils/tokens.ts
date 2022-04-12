@@ -1455,6 +1455,28 @@ export const TOKENS: Tokens = {
       Telegram: 'https://t.me/nirvanadao',
       Discord: 'https://discord.gg/Nirvanafi'
     }
+  },
+  HAWK: {
+    symbol: 'HAWK',
+    name: 'HAWK',
+    mintAddress: 'BKipkearSqAUdNKa1WDstvcMjoPsSKBuNyvKDQDDu9WE',
+    decimals: 6,
+
+    detailLink: 'https://raydium.medium.com/hawksight-is-launching-on-acceleraytor-88b5e8f9f2a8',
+    details:
+      'Hawksight is a DeFi super-app for everyone. Simply deposit USDC to automate DeFi strategies and earn profit-optimized yield on Solana & Terra. Make smarter investment decisions using our superapp’s AI-driven trading signals, social signals, DeFi-NFTs, and GameFi utilities.\n Hawksight has built and launched an AI engine that pushes profit-optimized trading signals to reach 1,284,429+ Individuals & Institutions globally via web platform, email, Telegram chatbot, Discord chatbot, and API, which is key to expanding the addressable market and driving mainstream adoption of DeFi — by pulling everyday Individuals & Institutions into the Solana DeFi ecosystem with actionable AI signals that can be instantly executed with a non-custodial DApp',
+    docs: {
+      website: 'https://hawksight.co/',
+      tokenomics: 'https://hawksight.gitbook.io/whitepaper/'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/HawksightCo',
+      Telegram: 'https://t.me/hawksight',
+      Discord: 'https://discord.gg/hawksight',
+      Medium: 'https://hawksight.medium.com/'
+    },
+
+    tags: ['raydium']
   }
 }
 
