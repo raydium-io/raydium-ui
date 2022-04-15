@@ -70,24 +70,29 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
     } = market
     let coinOrPcInTokenFlag = false
 
-    for (const item of [
-      TOKENS.USDT,
-      TOKENS.USDC,
-      TOKENS.RAY,
-      TOKENS.WSOL,
-      TOKENS.SRM,
-      TOKENS.PAI,
-      TOKENS.mSOL,
-      TOKENS.stSOL
-    ]) {
-      if (quoteMint?.toBase58() === item.mintAddress) {
+    const tMint = [
+      TOKENS.USDT.mintAddress,
+      TOKENS.USDC.mintAddress,
+      TOKENS.RAY.mintAddress,
+      TOKENS.WSOL.mintAddress,
+      TOKENS.SRM.mintAddress,
+      TOKENS.PAI.mintAddress,
+      TOKENS.mSOL.mintAddress,
+      TOKENS.stSOL.mintAddress,
+      'ANAxByE6G2WjFp7A4NqtWYXb3mgruyzZYg3spfxe6Lbo', //	ANA	ANA
+      'NRVwhjBQiUPYtfDT5zRBVJajzFQHaBUNtC7SNVvqRFa', //	NIRV	NIRV
+      'USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX' //	USDH Hubble Stablecoin	USDH
+    ]
+
+    for (const item of tMint) {
+      if (quoteMint?.toBase58() === item) {
         coinOrPcInTokenFlag = true
         break
       }
     }
     if (!coinOrPcInTokenFlag) {
       throw new Error(
-        'Only markets that contain USDC, USDT, SOL, RAY, SRM, PAI, mSOL or stSOL as the Quote Token are currently supported.'
+        'Only markets that contain USDC, USDT, SOL, RAY, SRM, PAI, mSOL, stSOL, ANA, NIRV or USDH as the Quote Token are currently supported.'
       )
     }
     const asks: number[] = []
