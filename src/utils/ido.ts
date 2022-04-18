@@ -117,7 +117,7 @@ export const IDO_POOLS: IdoPool[] = [
     quote: { ...TOKENS.USDC },
 
     price: new TokenAmount(0.012, TOKENS.USDC.decimals, false),
-    raise: new TokenAmount(20000000, TOKENS.HAWK.decimals, false),
+    raise: new TokenAmount(30000000, TOKENS.HAWK.decimals, false),
 
     version: 3, // just an identify for Lottery activity
     programId: IDO_PROGRAM_ID_V3,
