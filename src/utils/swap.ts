@@ -279,14 +279,27 @@ export function getSwapOutAmountStable(
 }
 
 export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: string, toCoinMint: string) {
-  const routerCoinDefault = ['USDC', 'RAY', 'SOL', 'WSOL', 'mSOL', 'PAI', 'stSOL']
+  const routerCoinDefault = [
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+    '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R', // RAY
+    '11111111111111111111111111111111', // SOL
+    'So11111111111111111111111111111111111111112', // WSOL
+    'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So', // mSOL
+    'Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS', // PAI
+    '7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj', // stSOL
+    'USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX', // USDH
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' // USDT
+  ]
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
   for (const p of poolInfos) {
     if (!([4, 5].includes(p.version) && p.status === 1)) continue
-    if ([fromCoinMint, toCoinMint].includes(p.coin.mintAddress) && routerCoinDefault.includes(p.pc.symbol)) {
+    if ([fromCoinMint, toCoinMint].includes(p.coin.mintAddress) && routerCoinDefault.includes(p.pc.mintAddress)) {
       avaPools.push(p)
-    } else if ([fromCoinMint, toCoinMint].includes(p.pc.mintAddress) && routerCoinDefault.includes(p.coin.symbol)) {
+    } else if (
+      [fromCoinMint, toCoinMint].includes(p.pc.mintAddress) &&
+      routerCoinDefault.includes(p.coin.mintAddress)
+    ) {
       avaPools.push(p)
     }
   }
