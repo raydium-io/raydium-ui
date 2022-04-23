@@ -52,7 +52,7 @@ export default class Foot extends Vue {
     info: '/info/',
     listing: 'https://forms.gle/Ct7ySJkxQyUvrHR99',
     twitter: 'https://twitter.com/RaydiumProtocol',
-    discord: 'https://discord.gg/mEPnd8chex',
+    discord: 'https://discord.com/invite/raydiumprotocol',
     telegram: 'https://t.me/raydiumprotocol',
     medium: 'https://raydium.medium.com/'
   }
