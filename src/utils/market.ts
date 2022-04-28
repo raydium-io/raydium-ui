@@ -81,7 +81,8 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
       TOKENS.stSOL.mintAddress,
       'ANAxByE6G2WjFp7A4NqtWYXb3mgruyzZYg3spfxe6Lbo', //	ANA	ANA
       'NRVwhjBQiUPYtfDT5zRBVJajzFQHaBUNtC7SNVvqRFa', //	NIRV	NIRV
-      'USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX' //	USDH Hubble Stablecoin	USDH
+      'USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX', //	USDH Hubble Stablecoin	USDH
+      '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs' // ETH
     ]
 
     for (const item of tMint) {

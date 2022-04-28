@@ -288,7 +288,8 @@ export function getSwapRouter(poolInfos: LiquidityPoolInfo[], fromCoinMint: stri
     'Ea5SjE2Y6yvCeW5dYTn7PYMuW5ikXkvbGdcmSnXeaLjS', // PAI
     '7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj', // stSOL
     'USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX', // USDH
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' // USDT
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB', // USDT
+    '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs' // ETH
   ]
   const ret: [LiquidityPoolInfo, LiquidityPoolInfo][] = []
   const avaPools: LiquidityPoolInfo[] = []
