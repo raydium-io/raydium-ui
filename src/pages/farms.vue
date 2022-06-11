@@ -400,6 +400,7 @@ import { FarmInfo, UPCOMING } from '@/utils/farms'
 import { deposit, depositV5, withdraw, withdrawV4, withdrawV5 } from '@/utils/stake'
 import { getUnixTs } from '@/utils'
 import { getBigNumber } from '@/utils/layouts'
+import { web3Config } from '@/utils/web3'
 
 const CollapsePanel = Collapse.Panel
 
@@ -496,6 +497,28 @@ export default Vue.extend({
       const endedFarmsPoolId: string[] = []
       const pools = (await this.$api.getPairs()).data
 
+      let itemSecondSlotSpread = 2
+
+      for (const rpcUrl of web3Config.rpcs) {
+        try {
+          const dataReq = await this.$axios.post(
+            rpcUrl.url,
+            {
+              id: 'getRecentPerformanceSamples',
+              jsonrpc: '2.0',
+              method: 'getRecentPerformanceSamples',
+              params: [100]
+            },
+            { timeout: 60000 }
+          )
+          // @ts-ignore
+          const data: any = dataReq.result
+          const slotList: number[] = data.map((item: any) => item.numSlots)
+          itemSecondSlotSpread = slotList.reduce((a, b) => a + b) / slotList.length / 60
+          break
+        } catch (e) {}
+      }
+
       for (const [poolId, farmInfo] of Object.entries(this.farm.infos)) {
         const isFusion = Boolean((farmInfo as any).fusion)
         // @ts-ignore
@@ -524,7 +547,7 @@ export default Vue.extend({
 
             const rewardPerBlockAmountTotalValue =
               getBigNumber(rewardPerBlockAmount.toEther()) *
-              2 *
+              itemSecondSlotSpread *
               60 *
               60 *
               24 *
@@ -532,7 +555,7 @@ export default Vue.extend({
               this.price.prices[reward.mintAddress as string]
             const rewardBPerBlockAmountTotalValue =
               getBigNumber(rewardBPerBlockAmount.toEther()) *
-              2 *
+              itemSecondSlotSpread *
               60 *
               60 *
               24 *
@@ -580,7 +603,7 @@ export default Vue.extend({
 
             const rewardPerBlockAmountTotalValue =
               getBigNumber(rewardPerBlockAmount.toEther()) *
-              2 *
+              itemSecondSlotSpread *
               60 *
               60 *
               24 *
