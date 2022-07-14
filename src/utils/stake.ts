@@ -1,19 +1,26 @@
-import { publicKey, u128, u64 } from '@project-serum/borsh';
+import { publicKey, u128, u64 } from '@project-serum/borsh'
 import {
-  Connection, PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction,
+  Connection,
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  SYSVAR_RENT_PUBKEY,
+  Transaction,
   TransactionInstruction
-} from '@solana/web3.js';
+} from '@solana/web3.js'
 // @ts-ignore
-import { blob, nu64, seq, struct, u8 } from 'buffer-layout';
+import { blob, nu64, seq, struct, u8 } from 'buffer-layout'
 
-import { FarmInfo } from '@/utils/farms';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids';
-import { TokenAmount } from '@/utils/safe-math';
+import { FarmInfo } from '@/utils/farms'
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@/utils/ids'
+import { TokenAmount } from '@/utils/safe-math'
 import {
-  createAssociatedTokenAccountIfNotExist, createProgramAccountIfNotExist,
-  findAssociatedStakeInfoAddress, sendTransaction
-} from '@/utils/web3';
-import { getBigNumber } from './layouts';
+  createAssociatedTokenAccountIfNotExist,
+  createProgramAccountIfNotExist,
+  createTokenAccountIfNotExist,
+  findAssociatedStakeInfoAddress,
+  sendTransaction
+} from '@/utils/web3'
+import { getBigNumber } from './layouts'
 
 // deposit
 export async function deposit(
@@ -472,6 +479,136 @@ export async function withdrawV5(
       value
     )
   )
+
+  return await sendTransaction(connection, wallet, transaction, signers)
+}
+
+export async function notATAWithdraw(
+  connection: Connection | undefined | null,
+  wallet: any | undefined | null,
+  farmInfo: FarmInfo | undefined | null,
+  walletAccount: { [mint: string]: { tokenAccountAddress: string; balance: TokenAmount } },
+  depositInfo: any
+) {
+  if (!connection || !wallet) throw new Error('Miss connection')
+  if (!farmInfo) throw new Error('Miss pool infomations')
+
+  const transaction = new Transaction()
+  const signers: any = []
+
+  const owner = wallet.publicKey
+
+  const infoAccount = depositInfo.stakeAccountAddress
+  const pda = await findAssociatedStakeInfoAddress(
+    new PublicKey(farmInfo.poolId),
+    wallet.publicKey,
+    new PublicKey(farmInfo.programId)
+  )
+  // if no associated userinfo account, create new one
+  if (pda.toBase58() !== infoAccount) {
+    transaction.add(
+      createAssociatedLedgerAccountInstructionV5(
+        new PublicKey(farmInfo.programId),
+        new PublicKey(farmInfo.poolId),
+        pda,
+        wallet.publicKey
+      )
+    )
+  }
+
+  const userLpAccount = await createTokenAccountIfNotExist(
+    connection,
+    walletAccount[farmInfo.lp.mintAddress]?.tokenAccountAddress,
+    owner,
+    farmInfo.lp.mintAddress,
+    null,
+    transaction,
+    signers
+  )
+  const userRewardTokenAccount = await createTokenAccountIfNotExist(
+    connection,
+    walletAccount[farmInfo.reward.mintAddress]?.tokenAccountAddress,
+    owner,
+    farmInfo.reward.mintAddress,
+    null,
+    transaction,
+    signers
+  )
+
+  if (farmInfo.version === 5 || farmInfo.version === 4) {
+    const userRewardTokenAccountB = await createTokenAccountIfNotExist(
+      connection,
+      walletAccount[farmInfo.rewardB?.mintAddress ?? '']?.tokenAccountAddress,
+      owner,
+      farmInfo.rewardB?.mintAddress ?? '',
+      null,
+      transaction,
+      signers
+    )
+
+    transaction.add(
+      withdrawInstructionV5(
+        new PublicKey(farmInfo.programId),
+        new PublicKey(farmInfo.poolId),
+        new PublicKey(farmInfo.poolAuthority),
+        pda,
+        [],
+        wallet.publicKey,
+        userLpAccount,
+        new PublicKey(farmInfo.poolLpTokenAccount),
+        userRewardTokenAccount,
+        new PublicKey(farmInfo.poolRewardTokenAccount),
+        userRewardTokenAccountB,
+        // @ts-ignore
+        new PublicKey(farmInfo.poolRewardTokenAccountB),
+        getBigNumber(depositInfo.depositBalance.wei)
+      )
+    )
+  } else if (farmInfo.version === 4) {
+    const userRewardTokenAccountB = await createTokenAccountIfNotExist(
+      connection,
+      walletAccount[farmInfo.rewardB?.mintAddress ?? '']?.tokenAccountAddress,
+      owner,
+      farmInfo.rewardB?.mintAddress ?? '',
+      null,
+      transaction,
+      signers
+    )
+
+    transaction.add(
+      withdrawInstructionV4(
+        new PublicKey(farmInfo.programId),
+        new PublicKey(farmInfo.poolId),
+        new PublicKey(farmInfo.poolAuthority),
+        pda,
+        wallet.publicKey,
+        userLpAccount,
+        new PublicKey(farmInfo.poolLpTokenAccount),
+        userRewardTokenAccount,
+        new PublicKey(farmInfo.poolRewardTokenAccount),
+        userRewardTokenAccountB,
+        // @ts-ignore
+        new PublicKey(farmInfo.poolRewardTokenAccountB),
+        getBigNumber(depositInfo.depositBalance.wei)
+      )
+    )
+  } else if (farmInfo.version === 3) {
+    transaction.add(
+      withdrawInstruction(
+        new PublicKey(farmInfo.programId),
+        new PublicKey(farmInfo.poolId),
+        new PublicKey(farmInfo.poolAuthority),
+        pda,
+        [],
+        wallet.publicKey,
+        userLpAccount,
+        new PublicKey(farmInfo.poolLpTokenAccount),
+        userRewardTokenAccount,
+        new PublicKey(farmInfo.poolRewardTokenAccount),
+        getBigNumber(depositInfo.depositBalance.wei)
+      )
+    )
+  }
 
   return await sendTransaction(connection, wallet, transaction, signers)
 }

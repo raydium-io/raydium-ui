@@ -1,17 +1,22 @@
 <template>
   <div class="debug container">
-    <Button v-if="!wallet.connected" ghost @click="$accessor.wallet.openModal"> Connect wallet </Button>
-    <div v-else class="debug-section">
+    <Button v-if="!wallet.connected"
+            ghost
+            @click="$accessor.wallet.openModal"> Connect wallet </Button>
+    <div v-else
+         class="debug-section">
       <div class="debug-header">
         Unwrap WSOL
         <div class="debug-card">
-          <Button ghost @click="unwrap">Unwrap WSOL</Button>
+          <Button ghost
+                  @click="unwrap">Unwrap WSOL</Button>
         </div>
       </div>
       <div class="debug-header">
         Token Accounts
         <div class="debug-card">
-          <Button ghost @click="getTokenAccounts">Fetch token accounts</Button>
+          <Button ghost
+                  @click="getTokenAccounts">Fetch token accounts</Button>
           <table>
             <thead>
               <tr>
@@ -21,7 +26,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="tokenAccount in tokenAccounts" :key="tokenAccount.pubkey.toBase58()">
+              <tr v-for="tokenAccount in tokenAccounts"
+                  :key="tokenAccount.pubkey.toBase58()">
                 {{
                   void ((address = tokenAccount.pubkey.toBase58()), (info = tokenAccount.account.data.parsed.info))
                 }}
@@ -40,7 +46,9 @@
       <div class="debug-header">
         All Farms
         <div class="debug-card">
-          <div v-for="(pool, poolId) in farm.infos" :key="poolId" class="debug-card">
+          <div v-for="(pool, poolId) in farm.infos"
+               :key="poolId"
+               class="debug-card">
             {{
               void ((lp = pool.lp),
               (reward = pool.reward),
@@ -74,10 +82,22 @@
                     <div>Reward B: {{ rewardB.symbol }}</div>
                     <div>Your deposited: {{ userInfo.depositBalance ? userInfo.depositBalance.format() : 0 }}</div>
                     <div>Your LP balance: {{ userLpAccount.balance ? userLpAccount.balance.format() : 0 }}</div>
-                    <Input :ref="`input-${poolId}`" size="small" />
+                    <Input :ref="`input-${poolId}`"
+                           size="small" />
                     <div>
-                      <Button size="small" type="danger" ghost @click="emergencyWithdraw(pool)">
+                      <Button size="small"
+                              type="danger"
+                              ghost
+                              @click="emergencyWithdraw(pool)">
                         Emergency withdraw all LP and wipe all rewards
+                      </Button>
+                    </div>
+                    <div>
+                      <Button size="small"
+                              type="danger"
+                              ghost
+                              @click="notATAWithdrawBtn(pool)">
+                        Not ATA withdraw all LP and rewards
                       </Button>
                     </div>
                   </td>
@@ -104,7 +124,8 @@ import { TOKENS } from '@/utils/tokens'
 import { sendTransaction } from '@/utils/web3'
 import { getUnixTs } from '@/utils'
 import { TOKEN_PROGRAM_ID } from '@/utils/ids'
-import { emergencyWithdrawV4 } from '@/utils/stake'
+import { emergencyWithdrawV4, notATAWithdraw } from '@/utils/stake'
+import { FarmInfo } from '@/utils/farms'
 
 @Component({
   head: {
@@ -240,6 +261,53 @@ export default class Debug extends Vue {
         this.$notify.error({
           key,
           message: 'Stake failed',
+          description: error.message
+        })
+      })
+  }
+
+  notATAWithdrawBtn(poolInfo: FarmInfo) {
+    const conn = this.$web3
+    const wallet = (this as any).$wallet
+
+    const key = getUnixTs().toString()
+    this.$notify.info({
+      key,
+      message: 'Making transaction...',
+      description: '',
+      duration: 0
+    })
+
+    // @ts-ignore
+    const depositInfo = this.farm.stakeAccounts[poolInfo.poolId]
+    if (!depositInfo) {
+      this.$notify.info({
+        key,
+        message: 'Deposit info not found',
+        description: (h: any) => h('div', [''])
+      })
+      return
+    }
+
+    notATAWithdraw(conn, wallet, poolInfo, this.wallet.tokenAccounts, depositInfo)
+      .then((txid) => {
+        this.$notify.info({
+          key,
+          message: 'Transaction has been sent',
+          description: (h: any) =>
+            h('div', [
+              'Confirmation is in progress.  Check your transaction on ',
+              h('a', { attrs: { href: `${this.url.explorer}/tx/${txid}`, target: '_blank' } }, 'here')
+            ])
+        })
+
+        const description = `Unstake all LP and rewards`
+        this.$accessor.transaction.sub({ txid, description })
+      })
+      .catch((error) => {
+        this.$notify.error({
+          key,
+          message: 'Unstake failed',
           description: error.message
         })
       })
