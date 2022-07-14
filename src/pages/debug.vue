@@ -92,9 +92,9 @@
                         Emergency withdraw all LP and wipe all rewards
                       </Button>
                     </div>
+                    <br />
                     <div>
                       <Button size="small"
-                              type="danger"
                               ghost
                               @click="notATAWithdrawBtn(pool)">
                         Not ATA withdraw all LP and rewards
