@@ -535,7 +535,7 @@ export async function notATAWithdraw(
     signers
   )
 
-  if (farmInfo.version === 5 || farmInfo.version === 4) {
+  if (farmInfo.version === 5) {
     const userRewardTokenAccountB = await createTokenAccountIfNotExist(
       connection,
       walletAccount[farmInfo.rewardB?.mintAddress ?? '']?.tokenAccountAddress,
@@ -592,7 +592,7 @@ export async function notATAWithdraw(
         getBigNumber(depositInfo.depositBalance.wei)
       )
     )
-  } else if (farmInfo.version === 3) {
+  } else if (farmInfo.version === 3 || farmInfo.version === 2) {
     transaction.add(
       withdrawInstruction(
         new PublicKey(farmInfo.programId),
