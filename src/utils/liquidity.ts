@@ -563,7 +563,7 @@ export function addLiquidityInstructionV4(
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userOwner, isSigner: true, isWritable: false },
-    { pubkey: marketEventQueue, isSigner: true, isWritable: false }
+    { pubkey: marketEventQueue, isSigner: false, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
