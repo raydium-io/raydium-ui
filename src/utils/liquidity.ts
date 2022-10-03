@@ -201,27 +201,27 @@ export async function addLiquidity(
   transaction.add(
     poolInfo.version === 5
       ? addLiquidityInstructionStable(
-          new PublicKey(poolInfo.programId),
-          new PublicKey(poolInfo.ammId),
-          new PublicKey(poolInfo.ammAuthority),
-          new PublicKey(poolInfo.ammOpenOrders),
-          new PublicKey(poolInfo.ammTargetOrders),
-          new PublicKey(poolInfo.lp.mintAddress),
-          new PublicKey(poolInfo.poolCoinTokenAccount),
-          new PublicKey(poolInfo.poolPcTokenAccount),
-          new PublicKey(poolInfo.modelDataAccount ?? ''),
-          new PublicKey(poolInfo.serumMarket),
-          wrappedCoinSolAccount ? wrappedCoinSolAccount : userCoinTokenAccount,
-          wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
-          userLpTokenAccount,
-          owner,
+        new PublicKey(poolInfo.programId),
+        new PublicKey(poolInfo.ammId),
+        new PublicKey(poolInfo.ammAuthority),
+        new PublicKey(poolInfo.ammOpenOrders),
+        new PublicKey(poolInfo.ammTargetOrders),
+        new PublicKey(poolInfo.lp.mintAddress),
+        new PublicKey(poolInfo.poolCoinTokenAccount),
+        new PublicKey(poolInfo.poolPcTokenAccount),
+        new PublicKey(poolInfo.modelDataAccount ?? ''),
+        new PublicKey(poolInfo.serumMarket),
+        wrappedCoinSolAccount ? wrappedCoinSolAccount : userCoinTokenAccount,
+        wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
+        userLpTokenAccount,
+        owner,
 
-          coinAmount,
-          pcAmount,
-          fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
-        )
+        coinAmount,
+        pcAmount,
+        fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
+      )
       : poolInfo.version === 4
-      ? addLiquidityInstructionV4(
+        ? addLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
           new PublicKey(poolInfo.ammId),
@@ -233,6 +233,7 @@ export async function addLiquidity(
           new PublicKey(poolInfo.poolPcTokenAccount),
 
           new PublicKey(poolInfo.serumMarket),
+          new PublicKey(poolInfo.serumEventQueue!),
 
           wrappedCoinSolAccount ? wrappedCoinSolAccount : userCoinTokenAccount,
           wrappedSolAccount ? wrappedSolAccount : userPcTokenAccount,
@@ -243,7 +244,7 @@ export async function addLiquidity(
           pcAmount,
           fixedCoin === poolInfo.coin.mintAddress ? 0 : 1
         )
-      : addLiquidityInstruction(
+        : addLiquidityInstruction(
           new PublicKey(poolInfo.programId),
 
           new PublicKey(poolInfo.ammId),
@@ -359,33 +360,33 @@ export async function removeLiquidity(
   transaction.add(
     poolInfo.version === 5
       ? removeLiquidityInstructionStable(
-          new PublicKey(poolInfo.programId),
+        new PublicKey(poolInfo.programId),
 
-          new PublicKey(poolInfo.ammId),
-          new PublicKey(poolInfo.ammAuthority),
-          new PublicKey(poolInfo.ammOpenOrders),
-          new PublicKey(poolInfo.ammTargetOrders),
-          new PublicKey(poolInfo.lp.mintAddress),
-          new PublicKey(poolInfo.poolCoinTokenAccount),
-          new PublicKey(poolInfo.poolPcTokenAccount),
-          new PublicKey(poolInfo.modelDataAccount ?? ''),
-          new PublicKey(poolInfo.serumProgramId),
-          new PublicKey(poolInfo.serumMarket),
-          new PublicKey(poolInfo.serumCoinVaultAccount),
-          new PublicKey(poolInfo.serumPcVaultAccount),
-          new PublicKey(poolInfo.serumVaultSigner),
+        new PublicKey(poolInfo.ammId),
+        new PublicKey(poolInfo.ammAuthority),
+        new PublicKey(poolInfo.ammOpenOrders),
+        new PublicKey(poolInfo.ammTargetOrders),
+        new PublicKey(poolInfo.lp.mintAddress),
+        new PublicKey(poolInfo.poolCoinTokenAccount),
+        new PublicKey(poolInfo.poolPcTokenAccount),
+        new PublicKey(poolInfo.modelDataAccount ?? ''),
+        new PublicKey(poolInfo.serumProgramId),
+        new PublicKey(poolInfo.serumMarket),
+        new PublicKey(poolInfo.serumCoinVaultAccount),
+        new PublicKey(poolInfo.serumPcVaultAccount),
+        new PublicKey(poolInfo.serumVaultSigner),
 
-          new PublicKey(lpAccount),
-          newFromTokenAccount,
-          newToTokenAccount,
-          owner,
+        new PublicKey(lpAccount),
+        newFromTokenAccount,
+        newToTokenAccount,
+        owner,
 
-          poolInfo,
+        poolInfo,
 
-          lpAmount
-        )
+        lpAmount
+      )
       : poolInfo.version === 4
-      ? removeLiquidityInstructionV4(
+        ? removeLiquidityInstructionV4(
           new PublicKey(poolInfo.programId),
 
           new PublicKey(poolInfo.ammId),
@@ -413,7 +414,7 @@ export async function removeLiquidity(
 
           lpAmount
         )
-      : removeLiquidityInstruction(
+        : removeLiquidityInstruction(
           new PublicKey(poolInfo.programId),
 
           new PublicKey(poolInfo.ammId),
@@ -535,6 +536,7 @@ export function addLiquidityInstructionV4(
   poolPcTokenAccount: PublicKey,
   // serum
   serumMarket: PublicKey,
+  marketEventQueue: PublicKey,
   // user
   userCoinTokenAccount: PublicKey,
   userPcTokenAccount: PublicKey,
@@ -560,7 +562,8 @@ export function addLiquidityInstructionV4(
     { pubkey: userCoinTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userPcTokenAccount, isSigner: false, isWritable: true },
     { pubkey: userLpTokenAccount, isSigner: false, isWritable: true },
-    { pubkey: userOwner, isSigner: true, isWritable: false }
+    { pubkey: userOwner, isSigner: true, isWritable: false },
+    { pubkey: marketEventQueue, isSigner: true, isWritable: false }
   ]
 
   const data = Buffer.alloc(dataLayout.span)
