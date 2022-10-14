@@ -864,6 +864,23 @@ export const TOKENS: Tokens = {
     decimals: 9,
     tags: ['raydium']
   },
+  ISKT: {
+    symbol: 'ISKT',
+    name: 'Rafkróna',
+    mintAddress: 'isktkk27QaTpoRUhwwS5n9YUoYf8ydCuoTz5R2tFEKu',
+    referrer: 'FJHQizEzPA81wb6DVnh13iVTR9DpvCgyCv4NHsLAb88E',
+    details: 'Fiat-backed stablecoin for ISK',
+    decimals: 2,
+    docs: {
+      website: 'https://mintum.is',
+      whitepaper: 'https://github.com/rafmyntasjodur/whitepaper'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/mintum_is',
+      Youtube: 'https://www.youtube.com/channel/UCiW4iTiEleP6ZsYXBIP8Bbw'
+    },
+    tags: ['raydium']
+  },
   weDYDX: {
     symbol: 'weDYDX',
     name: 'weDYDX',
