@@ -1,33 +1,5 @@
 import BigNumber from 'bignumber.js'
-// @ts-ignore
-import { struct, u8, nu64 } from 'buffer-layout'
 
-// import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
-import { Market as MarketSerum } from '@project-serum/serum'
-import { Orderbook } from '@project-serum/serum/lib/market.js'
-import { closeAccount, initializeAccount } from '@project-serum/serum/lib/token-instructions'
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token } from '@solana/spl-token'
-import {
-  Account,
-  Connection,
-  PublicKey,
-  SystemProgram,
-  SYSVAR_RENT_PUBKEY,
-  Transaction,
-  TransactionInstruction
-} from '@solana/web3.js'
-
-import {
-  commitment,
-  createAmmAuthority,
-  createAssociatedId,
-  findAssociatedTokenAddress,
-  getFilteredTokenAccountsByOwner,
-  getMintDecimals,
-  getMultipleAccounts,
-  sendTransaction
-} from '@/utils/web3'
-import { TOKENS } from '@/utils/tokens'
 import {
   AMM_ASSOCIATED_SEED,
   COIN_VAULT_ASSOCIATED_SEED,
@@ -42,10 +14,48 @@ import {
   TOKEN_PROGRAM_ID,
   WITHDRAW_ASSOCIATED_SEED
 } from '@/utils/ids'
+import { TOKENS } from '@/utils/tokens'
+import {
+  commitment,
+  createAmmAuthority,
+  createAssociatedId,
+  findAssociatedTokenAddress,
+  getFilteredTokenAccountsByOwner,
+  getMintDecimals,
+  getMultipleAccounts,
+  sendTransaction
+} from '@/utils/web3'
+// import { AMM_INFO_LAYOUT_V4 } from '@/utils/liquidity'
+import { Market as MarketSerum } from '@project-serum/serum'
+import { Orderbook } from '@project-serum/serum/lib/market.js'
+import {
+  closeAccount,
+  initializeAccount
+} from '@project-serum/serum/lib/token-instructions'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token
+} from '@solana/spl-token'
+import {
+  Account,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
+  Transaction,
+  TransactionInstruction
+} from '@solana/web3.js'
+
 import { throwIfNull } from './errors'
-import { ACCOUNT_LAYOUT, getBigNumber, MINT_LAYOUT } from './layouts'
+import {
+  ACCOUNT_LAYOUT,
+  getBigNumber,
+  MINT_LAYOUT
+} from './layouts'
 import { LIQUIDITY_POOLS } from './pools'
 import { transfer } from './swap'
+
+const { nu64, struct, u8 } = require('buffer-layout')
 
 export async function getMarket(conn: any, marketAddress: string): Promise<any | any> {
   try {
@@ -61,7 +71,7 @@ export async function getMarket(conn: any, marketAddress: string): Promise<any |
       throw new Error(`There is already a pool for this Serum Market, ammid -> ${knownAmm.ammId}`)
     }
     const marketAddressPubKey = new PublicKey(marketAddress)
-    const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey(SERUM_PROGRAM_ID_V3))
+    const market = await Market.load(conn, marketAddressPubKey, undefined, new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX'))
     const {
       asksAddress,
       bidsAddress,
@@ -548,7 +558,7 @@ export function preInitialize(
   poolTempLpTokenAccount: PublicKey,
   market: PublicKey,
   owner: PublicKey,
-  nonce: u8
+  nonce: number
 ): TransactionInstruction {
   const dataLayout = struct([u8('instruction'), u8('nonce')])
 
