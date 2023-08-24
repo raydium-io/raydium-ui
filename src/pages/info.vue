@@ -168,63 +168,6 @@
         </div>
       </div>
     </div>
-    <div class="big_div div7">
-      <div class="node_div">
-        <div class="font_color_1 team_title">Team</div>
-        <div style="font-weight: 100">
-          <div class="team_table_line">
-            <div class="font_color_3 name">AlphaRay</div>
-            <div class="font_color_2 value">
-              AlphaRay leads overall strategy, operations, product direction and business development for Raydium. With
-              a background in algorithmic trading in commodities, Alpha transitioned to market making and liquidity
-              providing for cryptocurrency in 2017 and hasn't looked back. After diving into DeFi in the summer of 2020,
-              Alpha saw a market need for an order book AMM to aggregate liquidity, and with the release of Serum,
-              pulled together a team of experienced trading developers to tackle the problem head on.
-            </div>
-            <div style="clear: both"></div>
-          </div>
-          <div class="team_table_line">
-            <div class="font_color_3 name">XRay</div>
-            <div class="font_color_2 value">
-              XRay is Raydium's Chief of Technology and Dev Team leader. X has 8 years of experience as a trading and
-              low latency systems architect for both traditional and crypto markets. X designs all of Raydium’s systems
-              and infrastructure as needed.
-            </div>
-            <div style="clear: both"></div>
-          </div>
-          <div class="team_table_line">
-            <div class="font_color_3 name">GammaRay</div>
-            <div class="font_color_2 value">
-              GammaRay heads up marketing and communications while also playing a key role in strategy and product
-              direction. Gamma spent a large part of his career at a leading data analytics and market research firm,
-              working on both client engagements and corporate marketing. Prior to Raydium, Gamma's focus within
-              cryptocurrency has been technical analysis and discretionary trading.
-            </div>
-            <div style="clear: both"></div>
-          </div>
-          <div class="team_table_line">
-            <div class="font_color_3 name">StingRay</div>
-            <div class="font_color_2 value">
-              A developer with an eye for detail and innovative solutions, StingRay is an experienced operating system
-              and trading developer. With a range of talents garnered through working on the systems kernel for an
-              autonomous car driving company, StingRay shifted focus to trading and is the senior developer for
-              Raydium's on-chain order book AMM.
-            </div>
-            <div style="clear: both"></div>
-          </div>
-          <div class="team_table_line" style="border: none">
-            <div class="font_color_3 name">RayZor</div>
-            <div class="font_color_2 value">
-              RayZor mined his first BTC in 2012, his first ETH in 2015 and his first SUSHI since day one. He’s written
-              many smart contracts on Ethereum as well as toying around with the BSC. With a degree in systems security
-              engineering and significant experience working as a white hat hacker, RayZor ensures all the capital in
-              Raydium is secure.
-            </div>
-            <div style="clear: both"></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
