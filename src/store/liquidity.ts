@@ -243,9 +243,11 @@ function checkLiquidity(poolInfos: { [poolId: string]: liquidityItemApi }, offic
     } else {
       for (let itemIndex = 0; itemIndex < LIQUIDITY_POOLS.length; itemIndex += 1) {
         if (
-          LIQUIDITY_POOLS[itemIndex].ammId === itemLiquidity.ammId &&
-          LIQUIDITY_POOLS[itemIndex].name !== itemLiquidity.name &&
-          LIQUIDITY_POOLS[itemIndex].official !== itemLiquidity.official
+          LIQUIDITY_POOLS[itemIndex].ammId === itemLiquidity.ammId && (
+            LIQUIDITY_POOLS[itemIndex].name !== itemLiquidity.name ||
+            LIQUIDITY_POOLS[itemIndex].official !== itemLiquidity.official ||
+            LIQUIDITY_POOLS[itemIndex].serumMarket !== itemLiquidity.serumMarket
+          )
         ) {
           LIQUIDITY_POOLS[itemIndex] = itemLiquidity
         }
