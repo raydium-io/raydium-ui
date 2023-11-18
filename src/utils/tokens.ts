@@ -585,6 +585,28 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  DRAW: {
+    symbol: 'DRAW',
+    name: 'Dragon War',
+    mintAddress: '48AEwauAHsJibyt3WqjQ6EoHnFBcnyHASfo7vB2eCXPS',
+    decimals: 0,
+    referrer: 'DctT7Zo7Cn3aaJciD3K3L4CxQHK65rEuhtmzpCDckNNG',
+ 
+    details:
+      'DRAW is the primary governance token of Dragon War.\n\nIn the turn-based Gaming category, there are so many NFT games out there being created almost every day, but most of them lack quality in terms of gaming experience.\n\nWith Dragon War we are trying to create the best combination of: - Engaging & exciting gameplay - Gorgeous 2D Graphics and animations - Balance in earning mechanisms - Inspiring stories. To make sure people playing the game can earn value while enjoying and having a great gaming experience with it.',
+    docs: {
+      website: 'https://dragonwar.io',
+      whitepaper: 'https://doc.dragonwar.io/whitepaper'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/io_dragonwar',
+      Telegram: 'https://t.me/dragonwarglobal',
+      Medium: 'https://medium.com/@dragonwar',
+      Discord: 'https://discord.gg/kFUmzU6nCH',
+      Youtube: 'https://youtube.com/channel/UCzl9Gsl58YR9MyL2650tg8w'
+    },
+    tags: ['raydium']
+  },
   POLIS: {
     symbol: 'POLIS',
     name: 'POLIS',
