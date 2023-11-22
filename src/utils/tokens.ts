@@ -451,6 +451,23 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  MOF: {
+    symbol: 'MOF',
+    name: 'Molar Finance',
+    mintAddress: '6QxNGjZsLaKa35pKnxY2sa7GcUCnWSni9LPfw7KDLqYr',
+    decimals: 9,
+    referrer: 'CQzK6MWycRhYjrgdTjwzLRoQM3wWrHXzqY6D8JBrhrUu',
+    details:
+      'Molar Finance \n We are chemist on the solana ecosystem \n Dev ops at its peek.\n All your favorite tools in one place',
+    docs: {
+      website: 'https://www.molar.finance/'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/MolarFinance',
+      Discord: 'https://discord.gg/5euk87sWhH'
+    },
+    tags: ['raydium']
+  },
   WOO: {
     symbol: 'WOO',
     name: 'Wootrade Network',
