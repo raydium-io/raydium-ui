@@ -353,6 +353,14 @@ export const TOKENS: Tokens = {
     referrer: 'EFQVX1S6dFroDDhJDAnMTX4fCfjt4fJXHdk1eEtJ2uRY',
     tags: ['raydium']
   },
+  KEKW: {
+    symbol: 'KEKW',
+    name: 'Kekwcoin',
+    mintAddress: '2QK9vxydd7WoDwvVFT5JSU8cwE9xmbJSzeqbRESiPGMG',
+    decimals: 9,
+    official: true,
+    showDefault: true
+  },
   MEDIA: {
     symbol: 'MEDIA',
     name: 'MEDIA',
