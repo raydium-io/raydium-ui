@@ -161,6 +161,7 @@
           :mint-address="toCoin ? toCoin.mintAddress : ''"
           :coin-name="toCoin ? toCoin.symbol : ''"
           :balance="toCoin ? toCoin.balance : null"
+          :disabled="!toCoin"
           @onInput="(amount) => (toCoinAmount = amount)"
           @onFocus="
             () => {
