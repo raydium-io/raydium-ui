@@ -1477,7 +1477,14 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
-  }
+  },
+  FRANK: {
+    symbol: '$FRNK',
+    name: 'FRANK',
+    mintAddress: '9wDektDWyP8NGChruNrHpPvX6Jev7439mtg8pc79BGfa',
+    decimals: 9,
+    tags: ['raydium']
+  },
 }
 
 export const LP_TOKENS: Tokens = {
