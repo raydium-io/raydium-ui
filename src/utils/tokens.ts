@@ -624,7 +624,7 @@ export const TOKENS: Tokens = {
       // whitepaper: '' // TODO
     },
     socials: {
-      Discord: 'https://discord.com/invite/greatape',
+      Discord: 'https://discord.gg/grapedao',
       Medium: 'https://medium.com/great-ape',
       Twitter: 'https://twitter.com/grapeprotocol',
       Twitch: 'https://www.twitch.tv/whalesfriend'
