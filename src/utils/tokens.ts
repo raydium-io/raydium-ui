@@ -1477,7 +1477,23 @@ export const TOKENS: Tokens = {
     },
 
     tags: ['raydium']
-  }
+  },
+  PIF: {
+    symbol: 'PIF',
+    name: 'pepewifhat',
+    mintAddress: '8vRnnknwERunJEEDtEFoxzaxbxGnEY61FPbx8uTVKsUD',
+    decimals: 6,
+
+    docs: {
+      website: 'https://pepewif.io'
+    },
+    socials: {
+      Twitter: 'https://twitter.com/pepewifcoinsol',
+      Telegram: 'https://t.me/pepewifportal'
+    },
+
+    tags: ['raydium']
+  },
 }
 
 export const LP_TOKENS: Tokens = {
