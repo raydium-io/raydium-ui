@@ -680,6 +680,24 @@ export const TOKENS: Tokens = {
     referrer: '',
     tags: ['raydium']
   },
+  DRO: {
+    symbol: 'DRO',
+    name: 'lanidro',
+    mintAddress: 'BxZSzWskQ1JXUkmZKuZVMjx7y7H5GgxKUnpQKKHtdkAz',
+    decimals: 6,
+
+    detailLink: 'https://medium.com/@lanidro.number1/2024-most-valuable-cryptocurrency-landiro-dro-b64ad670e354',
+    details:
+      'The most valuable memecoin that keeps reminding you: Do Research, OK ?',
+    docs: {
+      website: 'https://www.lanidro.meme/'
+    },
+    socials: {
+      Medium: 'https://medium.com/@lanidro.number1',
+      Twitter: 'https://twitter.com/lanidro_meme',
+    },
+    tags: ['raydium']
+  },
   stSOL: {
     symbol: 'stSOL',
     name: 'stSOL',
