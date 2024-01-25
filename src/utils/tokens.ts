@@ -1456,6 +1456,23 @@ export const TOKENS: Tokens = {
       Discord: 'https://discord.gg/Nirvanafi'
     }
   },
+    CCAR: {
+    symbol: 'CCAR',
+    name: 'CatinCar',
+    mintAddress: 'Cri4RaHNEmvRJy8GkN66aXsL41qsVtQxV9safL9dTdNY',
+    decimals: 9,
+
+    details:
+      'Cat still driving , community owned token',
+    docs: {
+      website: 'https://www.catincar.lol/'
+    },
+    socials: {
+      TikTok: 'https://www.tiktok.com/@catincarsolana?_t=8jKO1GhJeXH&_r=1',
+      Twitter: 'https://twitter.com/CatinCarSolana',
+    },
+    tags: ['raydium']
+  },
   HAWK: {
     symbol: 'HAWK',
     name: 'HAWK',
