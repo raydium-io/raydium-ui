@@ -513,6 +513,21 @@ export const TOKENS: Tokens = {
     },
     tags: ['raydium']
   },
+  LUCK: {
+    symbol: 'LUCK',
+    name: 'LUCK',
+    mintAddress: 'HgDQRcG8NRbjU4Lnm9KvLZxxUzhCTdroyEQQou2mzXas',
+    decimals: 6,
+    details: 'Pope-pepe blessings to you all. The only token approved by Pope-pepe.',
+    docs: {
+      website: 'https://luck-landing.vercel.app/',
+    },
+    socials: {
+      Twitter: 'https://twitter.com/luck_token_',
+      Telegram: 'https://t.me/LUCKTOKENP',
+    },
+    tags: ['raydium']
+  },
   DXL: {
     symbol: 'DXL',
     name: 'DXL',
